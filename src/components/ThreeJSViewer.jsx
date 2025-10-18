@@ -39,7 +39,7 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
       containerRef.current.clientWidth,
       containerRef.current.clientHeight
     );
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
     rendererRef.current = renderer;
     containerRef.current.appendChild(renderer.domElement);
@@ -69,9 +69,9 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
 
     // Load model
     const loader = new GLTFLoader();
-    if (modelInfo && modelInfo.modelPath) {
+    if (modelInfo && modelInfo.path) {
       loader.load(
-        modelInfo.modelPath,
+        modelInfo.path,
         (gltf) => {
           // Clear previous model
           if (modelRef.current) {

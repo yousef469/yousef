@@ -25,7 +25,7 @@ export const carModels = [
     name: 'BMW M4 F82',
     description: 'High-performance sports coupe with aggressive styling',
     type: 'glb',
-    path: '/bmw.glb',
+    path: '/bmw-m4.glb',
     scale: 2.5,
     position: [0, 0, 0],
     specs: [
@@ -46,7 +46,7 @@ export const carModels = [
     name: 'Ford F-150 Raptor',
     description: 'High-performance off-road pickup truck',
     type: 'glb',
-    path: '/ford.glb',
+    path: '/ford-f150.glb',
     scale: 2.5,
     position: [0, 0, 0],
     specs: [
