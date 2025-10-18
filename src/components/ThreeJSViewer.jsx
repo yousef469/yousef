@@ -54,14 +54,27 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
     controls.maxPolarAngle = Math.PI / 2;
     controlsRef.current = controls;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    // Lighting - Enhanced for better visibility
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(1, 1, 1);
+    // Main directional light (key light)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight.position.set(5, 10, 7);
     directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
     scene.add(directionalLight);
+
+    // Fill light (from opposite side)
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    fillLight.position.set(-5, 5, -5);
+    scene.add(fillLight);
+
+    // Rim light (from behind)
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    rimLight.position.set(0, 5, -10);
+    scene.add(rimLight);
 
     // Grid helper
     const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
@@ -83,6 +96,16 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
+              
+              // Enhance material brightness
+              if (child.material) {
+                child.material.needsUpdate = true;
+                // Ensure materials aren't too dark
+                if (child.material.color) {
+                  child.material.emissive = child.material.color.clone().multiplyScalar(0.1);
+                  child.material.emissiveIntensity = 0.2;
+                }
+              }
             }
           });
           
