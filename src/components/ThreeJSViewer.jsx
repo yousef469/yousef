@@ -106,11 +106,23 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
               // Enhance material brightness
               if (child.material) {
                 child.material.needsUpdate = true;
-                // Ensure materials aren't too dark
+                
+                // Check if material is too dark and brighten it
                 if (child.material.color) {
-                  child.material.emissive = child.material.color.clone().multiplyScalar(0.15);
-                  child.material.emissiveIntensity = 0.3;
+                  const brightness = (child.material.color.r + child.material.color.g + child.material.color.b) / 3;
+                  
+                  // If material is very dark (black or near-black), brighten it significantly
+                  if (brightness < 0.2) {
+                    child.material.color.multiplyScalar(2.5);
+                    child.material.emissive = child.material.color.clone().multiplyScalar(0.3);
+                    child.material.emissiveIntensity = 0.5;
+                  } else {
+                    // For normal colors, add subtle emissive glow
+                    child.material.emissive = child.material.color.clone().multiplyScalar(0.15);
+                    child.material.emissiveIntensity = 0.3;
+                  }
                 }
+                
                 // Reduce metalness and roughness for brighter appearance
                 if (child.material.metalness !== undefined) {
                   child.material.metalness = Math.min(child.material.metalness, 0.5);
