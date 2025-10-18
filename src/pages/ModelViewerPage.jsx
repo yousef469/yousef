@@ -2,16 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ModelList from '../components/ModelList';
 import ThreeJSViewer from '../components/ThreeJSViewer';
-// Combine all models from different categories
-const combineModels = (categories) => {
-  return Object.values(categories).flatMap(category => 
-    category.map(item => ({
-      ...item,
-      type: category.title
-    }))
-  );
-};
-
 const ModelViewerPage = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -28,12 +18,13 @@ const ModelViewerPage = () => {
         const rocketsModule = await import('../data/rocketsData');
         const enginesModule = await import('../data/enginesData');
 
-        const allModels = combineModels({
-          cars: { title: 'Cars', ...carsModule },
-          planes: { title: 'Planes', ...planesModule },
-          rockets: { title: 'Rockets', ...rocketsModule },
-          engines: { title: 'Engines', ...enginesModule }
-        });
+        // Combine all models with their type
+        const allModels = [
+          ...carsModule.carModels.map(m => ({ ...m, type: 'Cars' })),
+          ...planesModule.planeModels.map(m => ({ ...m, type: 'Planes' })),
+          ...rocketsModule.rocketModels.map(m => ({ ...m, type: 'Rockets' })),
+          ...enginesModule.engineModels.map(m => ({ ...m, type: 'Engines' }))
+        ];
 
         setModels(allModels);
         

@@ -21,11 +21,15 @@ const ModelList = ({ models, onModelSelect, selectedModelId }) => {
   };
 
   return (
-    <div className="w-80 h-full bg-gradient-to-b from-gray-900 to-gray-950 border-r border-gray-800 overflow-y-auto">
-      <div className="p-4">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white mb-1">Model Library</h2>
-          <p className="text-sm text-gray-400">{models.length} models available</p>
+    <div className="w-96 h-full bg-gradient-to-b from-gray-900 to-gray-950 border-r border-gray-800 overflow-y-auto shadow-2xl">
+      <div className="p-6">
+        <div className="mb-8 pb-4 border-b border-gray-700">
+          <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            Model Garage
+          </h2>
+          <p className="text-sm text-gray-400">
+            <span className="text-cyan-400 font-semibold">{models.length}</span> models available
+          </p>
         </div>
         
         <div className="space-y-3">
