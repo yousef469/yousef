@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ModelList from '../components/ModelList';
-import { ThreeJSViewer } from '../App';
-
+import ThreeJSViewer from '../components/ThreeJSViewer';
 // Combine all models from different categories
 const combineModels = (categories) => {
   return Object.values(categories).flatMap(category => 
