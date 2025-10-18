@@ -1065,9 +1065,9 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/rockets" element={<RocketsPage />} />
-        <Route path="/planes" element={<PlanesPage />} />
-        <Route path="/cars" element={<CarsPage />} />
+        <Route path="/rockets" element={<ModelViewerPage />} />
+        <Route path="/planes" element={<ModelViewerPage />} />
+        <Route path="/cars" element={<ModelViewerPage />} />
         <Route path="/models/:id?" element={<ModelViewerPage />} />
       </Routes>
     </Router>
