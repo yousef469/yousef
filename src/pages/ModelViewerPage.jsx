@@ -74,7 +74,7 @@ const ModelViewerPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
       {/* Sidebar with model list */}
       <ModelList 
         models={models} 
@@ -82,20 +82,32 @@ const ModelViewerPage = () => {
         selectedModelId={selectedModel?.id} 
       />
       
-      {/* Main content area */}
+      {/* Main content area - 3D Viewer */}
       <div className="flex-1 flex flex-col">
-        <header className="bg-gray-800/50 border-b border-gray-700 p-4">
-          <h1 className="text-2xl font-bold">
-            {selectedModel?.name || '3D Model Viewer'}
-          </h1>
-          {selectedModel && (
-            <p className="text-sm text-gray-400">
-              {selectedModel.type} • {selectedModel.description}
-            </p>
-          )}
+        {/* Compact header */}
+        <header className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700/50 px-6 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-white">
+                {selectedModel?.name || '3D Model Viewer'}
+              </h1>
+              {selectedModel && (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {selectedModel.description}
+                </p>
+              )}
+            </div>
+            
+            {/* Controls hint */}
+            <div className="text-xs text-gray-400 flex items-center gap-4">
+              <span>🖱️ Drag to rotate</span>
+              <span>🔍 Scroll to zoom</span>
+            </div>
+          </div>
         </header>
         
-        <main className="flex-1 relative">
+        {/* 3D Viewer - Full screen */}
+        <main className="flex-1 relative bg-gradient-to-br from-gray-900 to-black">
           {selectedModel ? (
             <div className="absolute inset-0">
               <ThreeJSViewer 
@@ -104,8 +116,9 @@ const ModelViewerPage = () => {
               />
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              <p>No model selected</p>
+            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+              <p className="text-lg">No model selected</p>
+              <p className="text-sm mt-2">Choose a model from the left sidebar</p>
             </div>
           )}
         </main>

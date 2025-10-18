@@ -1,55 +1,117 @@
 import React from 'react';
+import { Rocket, Plane, Car, Cog } from 'lucide-react';
 
 const ModelList = ({ models, onModelSelect, selectedModelId }) => {
+  const getIcon = (type) => {
+    const iconType = type?.toLowerCase();
+    if (iconType?.includes('rocket')) return Rocket;
+    if (iconType?.includes('plane')) return Plane;
+    if (iconType?.includes('car')) return Car;
+    if (iconType?.includes('engine')) return Cog;
+    return Car;
+  };
+
+  const getGradient = (type) => {
+    const iconType = type?.toLowerCase();
+    if (iconType?.includes('rocket')) return 'from-cyan-500 to-blue-600';
+    if (iconType?.includes('plane')) return 'from-blue-500 to-indigo-600';
+    if (iconType?.includes('car')) return 'from-orange-500 to-red-600';
+    if (iconType?.includes('engine')) return 'from-purple-500 to-pink-600';
+    return 'from-gray-500 to-gray-700';
+  };
+
   return (
-    <div className="w-64 h-full bg-gray-900 border-r border-gray-800 overflow-y-auto">
+    <div className="w-80 h-full bg-gradient-to-b from-gray-900 to-gray-950 border-r border-gray-800 overflow-y-auto">
       <div className="p-4">
-        <h2 className="text-xl font-bold text-white mb-4">Model Library</h2>
-        <div className="space-y-2">
-          {models.map((model) => (
-            <div
-              key={model.id}
-              onClick={() => onModelSelect(model)}
-              className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                selectedModelId === model.id
-                  ? 'bg-blue-600/20 border border-blue-500/50'
-                  : 'hover:bg-gray-800/50'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gray-800 rounded-md overflow-hidden">
-                  {model.thumbnail ? (
-                    <img
-                      src={model.thumbnail}
-                      alt={model.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-700 text-gray-400">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-1">Model Library</h2>
+          <p className="text-sm text-gray-400">{models.length} models available</p>
+        </div>
+        
+        <div className="space-y-3">
+          {models.map((model) => {
+            const Icon = getIcon(model.type);
+            const gradient = getGradient(model.type);
+            const isSelected = selectedModelId === model.id;
+            
+            return (
+              <div
+                key={model.id}
+                onClick={() => onModelSelect(model)}
+                className={`group relative rounded-xl cursor-pointer transition-all duration-300 ${
+                  isSelected
+                    ? 'bg-gradient-to-r ' + gradient + ' shadow-lg scale-105'
+                    : 'bg-gray-800/50 hover:bg-gray-800 hover:scale-102'
+                }`}
+              >
+                {isSelected && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur-xl" />
+                )}
+                
+                <div className="relative p-4">
+                  <div className="flex items-center space-x-4">
+                    {/* Thumbnail/Icon */}
+                    <div className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 ${
+                      isSelected 
+                        ? 'bg-white/20 backdrop-blur-sm' 
+                        : 'bg-gradient-to-br ' + gradient
+                    }`}>
+                      {model.thumbnail ? (
+                        <img
+                          src={model.thumbnail}
+                          alt={model.name}
+                          className="w-full h-full object-cover"
                         />
-                      </svg>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Icon className={`w-10 h-10 ${isSelected ? 'text-white' : 'text-white/90'}`} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-medium text-white">{model.name}</h3>
-                  <p className="text-xs text-gray-400">{model.type}</p>
+                    
+                    {/* Model Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-bold text-sm mb-1 truncate ${
+                        isSelected ? 'text-white' : 'text-gray-100 group-hover:text-white'
+                      }`}>
+                        {model.name}
+                      </h3>
+                      <p className={`text-xs mb-2 ${
+                        isSelected ? 'text-white/80' : 'text-gray-400'
+                      }`}>
+                        {model.type}
+                      </p>
+                      
+                      {/* Specs preview */}
+                      {model.specs && model.specs.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {model.specs.slice(0, 2).map((spec, idx) => (
+                            <span
+                              key={idx}
+                              className={`text-xs px-2 py-0.5 rounded ${
+                                isSelected
+                                  ? 'bg-white/20 text-white'
+                                  : 'bg-gray-700/50 text-gray-300'
+                              }`}
+                            >
+                              {spec.value}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Selection indicator */}
+                    {isSelected && (
+                      <div className="flex-shrink-0">
+                        <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
