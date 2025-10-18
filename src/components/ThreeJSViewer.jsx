@@ -17,8 +17,8 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a0f);
-    scene.fog = new THREE.Fog(0x0a0a0f, 20, 50);
+    scene.background = new THREE.Color(0x1a1a1f);
+    scene.fog = new THREE.Fog(0x1a1a1f, 20, 50);
     sceneRef.current = scene;
 
     // Camera setup
@@ -41,6 +41,8 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
     );
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 2.0;
     rendererRef.current = renderer;
     containerRef.current.appendChild(renderer.domElement);
 
@@ -55,11 +57,11 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
     controlsRef.current = controls;
 
     // Lighting - Enhanced for better visibility
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.5);
     scene.add(ambientLight);
 
     // Main directional light (key light)
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5);
     directionalLight.position.set(5, 10, 7);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 2048;
@@ -67,14 +69,18 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
     scene.add(directionalLight);
 
     // Fill light (from opposite side)
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
     fillLight.position.set(-5, 5, -5);
     scene.add(fillLight);
 
     // Rim light (from behind)
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.2);
     rimLight.position.set(0, 5, -10);
     scene.add(rimLight);
+
+    // Additional hemisphere light for natural lighting
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
+    scene.add(hemiLight);
 
     // Grid helper
     const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
@@ -90,38 +96,45 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
           if (modelRef.current) {
             scene.remove(modelRef.current);
           }
-          
+
           const model = gltf.scene;
           model.traverse((child) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
-              
+
               // Enhance material brightness
               if (child.material) {
                 child.material.needsUpdate = true;
                 // Ensure materials aren't too dark
                 if (child.material.color) {
-                  child.material.emissive = child.material.color.clone().multiplyScalar(0.1);
-                  child.material.emissiveIntensity = 0.2;
+                  child.material.emissive = child.material.color.clone().multiplyScalar(0.15);
+                  child.material.emissiveIntensity = 0.3;
+                }
+                // Reduce metalness and roughness for brighter appearance
+                if (child.material.metalness !== undefined) {
+                  child.material.metalness = Math.min(child.material.metalness, 0.5);
+                }
+                if (child.material.roughness !== undefined) {
+                  child.material.roughness = Math.max(child.material.roughness, 0.3);
                 }
               }
             }
           });
-          
+
           // Center and scale model
           const box = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
-          
+
           model.position.x = -center.x;
           model.position.y = -center.y;
           model.position.z = -center.z;
-          
+
           const maxDim = Math.max(size.x, size.y, size.z);
           const scale = 5 / maxDim;
           model.scale.set(scale, scale, scale);
-          
+
           scene.add(model);
           modelRef.current = model;
         },
@@ -143,7 +156,7 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
     // Handle window resize
     const handleResize = () => {
       if (!containerRef.current || !camera || !renderer) return;
-      
+
       camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(
@@ -151,7 +164,7 @@ const ThreeJSViewer = ({ modelType, modelInfo }) => {
         containerRef.current.clientHeight
       );
     };
-    
+
     window.addEventListener('resize', handleResize);
 
     // Cleanup
