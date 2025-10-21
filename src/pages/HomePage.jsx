@@ -39,6 +39,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      {/* AeroAI 3D - Interactive Engineering Platform */}
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 py-6">
