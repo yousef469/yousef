@@ -1,7 +1,7 @@
 import React from 'react';
 import { Rocket, Plane, Car, Cog } from 'lucide-react';
 
-const ModelList = ({ models, onModelSelect, selectedModelId }) => {
+const ModelList = ({ models, onModelSelect, selectedModelId, categoryName }) => {
   const getIcon = (type) => {
     const iconType = type?.toLowerCase();
     if (iconType?.includes('rocket')) return Rocket;
@@ -20,20 +20,44 @@ const ModelList = ({ models, onModelSelect, selectedModelId }) => {
     return 'from-gray-500 to-gray-700';
   };
 
+  const [searchQuery, setSearchQuery] = React.useState('');
+  
+  const filteredModels = models.filter(model =>
+    model.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="w-96 h-full bg-gradient-to-b from-gray-900 to-gray-950 border-r border-gray-800 overflow-y-auto shadow-2xl">
       <div className="p-6">
-        <div className="mb-8 pb-4 border-b border-gray-700">
+        <div className="mb-6 pb-4 border-b border-gray-700">
           <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Model Garage
+            {categoryName || 'Model Garage'}
           </h2>
-          <p className="text-sm text-gray-400">
-            <span className="text-cyan-400 font-semibold">{models.length}</span> models available
+          <p className="text-sm text-gray-400 mb-4">
+            <span className="text-cyan-400 font-semibold">{models.length}</span> {models.length === 1 ? 'model' : 'models'} available
           </p>
+          
+          {/* Search Bar */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search models..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+            <span className="absolute left-3 top-2.5 text-gray-500">🔍</span>
+          </div>
         </div>
         
         <div className="space-y-3">
-          {models.map((model) => {
+          {filteredModels.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No models found</p>
+              <p className="text-sm mt-2">Try a different search term</p>
+            </div>
+          ) : (
+            filteredModels.map((model) => {
             const Icon = getIcon(model.type);
             const gradient = getGradient(model.type);
             const isSelected = selectedModelId === model.id;
@@ -115,7 +139,7 @@ const ModelList = ({ models, onModelSelect, selectedModelId }) => {
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
     </div>

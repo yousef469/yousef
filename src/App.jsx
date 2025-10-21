@@ -1060,16 +1060,29 @@ const VehicleCard = ({ icon: Icon, title, description, gradient, onClick, delay 
 };
 
 // ==================== MAIN APP COMPONENT ====================
+import IntroAnimation from './components/IntroAnimation';
+import AllInOnePage from './pages/AllInOnePage';
+import AuthPage from './pages/AuthPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useState as useAppState } from 'react';
+
 export default function App() {
+  const [showIntro, setShowIntro] = useAppState(true);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/rockets" element={<ModelViewerPage />} />
-        <Route path="/planes" element={<ModelViewerPage />} />
-        <Route path="/cars" element={<ModelViewerPage />} />
-        <Route path="/models/:id?" element={<ModelViewerPage />} />
-      </Routes>
-    </Router>
+    <>
+      {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+          <Route path="/rockets" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+          <Route path="/planes" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+          <Route path="/cars" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+          <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+        </Routes>
+      </Router>
+    </>
   );
 }

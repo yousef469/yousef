@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const categories = [
     {
@@ -40,11 +42,49 @@ const HomePage = () => {
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-8 h-8 text-cyan-400" />
-            <h1 className="text-3xl font-bold">AeroAI 3D</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-8 h-8 text-cyan-400" />
+              <div>
+                <h1 className="text-3xl font-bold">AeroAI 3D</h1>
+                <p className="text-gray-400 text-sm mt-1">Interactive 3D Engineering Models</p>
+              </div>
+            </div>
+            
+            {/* Auth Buttons */}
+            <div className="flex items-center gap-3">
+              {user ? (
+                <>
+                  <div className="text-sm text-gray-400">
+                    Welcome, <span className="text-cyan-400 font-semibold">{user.email}</span>
+                  </div>
+                  <button
+                    onClick={() => signOut()}
+                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate('/auth')}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Login</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/auth')}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>Sign Up</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-          <p className="text-gray-400 mt-2">Interactive 3D Engineering Models</p>
         </div>
       </header>
 
@@ -59,6 +99,21 @@ const HomePage = () => {
           </p>
         </div>
 
+        {/* CTA for non-authenticated users */}
+        {!user && (
+          <div className="mb-12 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-8 text-center">
+            <h3 className="text-2xl font-bold mb-3">Ready to explore?</h3>
+            <p className="text-gray-300 mb-6">Sign up now to access all 3D models and AI-powered learning</p>
+            <button
+              onClick={() => navigate('/auth')}
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-all font-semibold text-lg"
+            >
+              <UserPlus className="w-5 h-5" />
+              <span>Get Started Free</span>
+            </button>
+          </div>
+        )}
+
         {/* Category Cards */}
         <div className="grid md:grid-cols-3 gap-8">
           {categories.map((category) => {
@@ -66,7 +121,7 @@ const HomePage = () => {
             return (
               <div
                 key={category.id}
-                onClick={() => navigate(category.path)}
+                onClick={() => user ? navigate(category.path) : navigate('/auth')}
                 className="group relative bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-gray-700 hover:border-gray-600 transition-all cursor-pointer hover:scale-105 hover:shadow-2xl"
               >
                 {/* Gradient Background */}
