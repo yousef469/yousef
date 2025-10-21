@@ -1,104 +1,124 @@
 # AeroAI 3D - Interactive Engineering Models
 
-A modern web application featuring interactive 3D models of rockets, planes, and cars with an AI-powered learning assistant.
+🚀 An immersive 3D engineering education platform featuring realistic rocket fire effects, AI-powered tutoring, and interactive model exploration.
 
-## Features
+## ✨ Features
 
-- **Interactive 3D Models**: Explore engineering marvels in real-time 3D
-  - Rockets: Space launch vehicles with detailed specifications
-  - Aircraft: Commercial planes with aerodynamic components
-  - Sports Cars: High-performance automotive engineering
+- **3D Model Viewer** - Explore rockets, planes, and cars with realistic physics
+- **Realistic Fire Effects** - Multi-layer particle systems with shock diamonds
+- **AI Tutor** - Powered by Google Gemini for engineering questions
+- **Authentication** - Secure user accounts with Supabase
+- **Interactive Controls** - Nozzle playground with real-time physics
+- **Engineering Lessons** - Comprehensive tutorials and exercises
 
-- **AI Engineering Tutor**: Ask questions and learn about engineering concepts
+## 🛠️ Tech Stack
 
-- **Modern UI**: Beautiful, responsive design with smooth animations
+- **Frontend**: React + Vite
+- **3D Graphics**: Three.js
+- **Authentication**: Supabase
+- **AI**: Google Gemini API
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
 
-- **Interactive Controls**:
-  - Drag to rotate 3D models
-  - Scroll to zoom in/out
-  - Detailed component information
-
-## Tech Stack
-
-- **React 18** - Modern UI framework
-- **Three.js** - 3D graphics and rendering
-- **Vite** - Fast build tool and dev server
-- **Tailwind CSS** - Utility-first styling
-- **Lucide React** - Beautiful icon library
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
+- Node.js 18+ installed
+- Supabase account
+- Google Gemini API key
 
 ### Installation
 
-1. Install dependencies:
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd best-engineering-website
+```
+
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Start the development server:
+3. Create `.env` file:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_GEMINI_API_KEY=your_gemini_api_key
+```
+
+4. Run development server:
 ```bash
 npm run dev
 ```
 
-3. Open your browser and navigate to `http://localhost:3000`
+5. Open http://localhost:3000
 
-## Available Scripts
+## 🔑 Getting API Keys
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+### Supabase Setup
+1. Go to [supabase.com](https://supabase.com)
+2. Create a new project
+3. Copy your project URL and anon key from Settings > API
 
-## Project Structure
+### Gemini API Key
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Click "Get API Key"
+3. Create API key in new project
+4. Copy your key (starts with `AIza...`)
 
+## 📦 Deployment
+
+### Deploy to Vercel
+
+1. Push to GitHub:
+```bash
+git remote add origin <your-github-repo-url>
+git push -u origin main
 ```
-best-engineering-website/
-├── src/
-│   ├── App.jsx          # Main application component
-│   ├── main.jsx         # Application entry point
-│   └── index.css        # Global styles
-├── public/              # Static assets
-├── index.html           # HTML template
-├── package.json         # Dependencies and scripts
-├── vite.config.js       # Vite configuration
-└── tailwind.config.js   # Tailwind CSS configuration
-```
 
-## Features in Detail
+2. Go to [vercel.com](https://vercel.com)
+3. Click "New Project"
+4. Import your GitHub repository
+5. Add environment variables:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_GEMINI_API_KEY`
+6. Click "Deploy"
 
-### 3D Model Viewer
-- Real-time rendering with Three.js
-- Interactive mouse controls
-- Smooth animations
-- Responsive design
+## 🎯 Features Breakdown
 
-### AI Tutor Panel
-- Conversational interface
-- Engineering knowledge base
-- Real-time responses
-- Mobile-friendly design
+### Fire Effects
+- 4 particle layers (core, outer, smoke, sparks)
+- Shock diamond visualization
+- Real-time parameter control
+- Multi-engine support (Falcon 9, Saturn V, etc.)
 
-### Responsive Design
-- Works on desktop, tablet, and mobile
-- Adaptive layouts
-- Touch-friendly controls
+### Authentication
+- Email/password signup and login
+- Protected routes
+- User session management
+- Profile data storage
 
-## Browser Support
+### AI Tutor
+- Context-aware responses
+- Engineering-focused explanations
+- Model-specific information
+- Lesson generation
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+## 📝 License
 
-## License
+MIT License - feel free to use for educational purposes
 
-MIT License - feel free to use this project for learning and development.
+## 🤝 Contributing
 
-## Contributing
+Contributions welcome! Please open an issue or submit a PR.
 
-Contributions are welcome! Feel free to submit issues and pull requests.
+## 📧 Contact
+
+For questions or feedback, please open an issue on GitHub.
+
+---
+
+Built with ❤️ for engineering education
