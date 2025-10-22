@@ -13,9 +13,22 @@ console.log('🔑 Gemini API Key Check:', {
 
 let model = null;
 let genAI = null;
+let workingModel = null;
+
+// List of models to try (in order of preference)
+const MODELS_TO_TRY = [
+  'gemini-1.5-flash-latest',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro-latest', 
+  'gemini-1.5-pro',
+  'gemini-pro',
+  'models/gemini-pro',
+  'models/gemini-1.5-flash',
+  'models/gemini-1.5-pro'
+];
 
 // Try to initialize the model
-const initializeModel = () => {
+const initializeModel = async () => {
   if (!apiKey || apiKey === 'YOUR_KEY_HERE' || apiKey === 'YOUR_GEMINI_API_KEY' || apiKey === 'YOUR_NEW_KEY_HERE') {
     console.error('❌ Invalid or missing API key');
     return false;
@@ -24,37 +37,39 @@ const initializeModel = () => {
   try {
     genAI = new GoogleGenerativeAI(apiKey);
     
-    // Try gemini-pro first (most stable)
-    model = genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
-      generationConfig: {
-        temperature: 0.9,
-        topK: 1,
-        topP: 1,
-        maxOutputTokens: 2048,
-      },
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_NONE",
-        },
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_NONE",
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_NONE",
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_NONE",
-        },
-      ],
-    });
+    // Try each model until one works
+    for (const modelName of MODELS_TO_TRY) {
+      try {
+        console.log(`🔄 Trying model: ${modelName}...`);
+        const testModel = genAI.getGenerativeModel({ 
+          model: modelName,
+          generationConfig: {
+            temperature: 0.9,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+          },
+        });
+        
+        // Test the model with a simple request
+        const testResult = await testModel.generateContent('Hi');
+        const testResponse = await testResult.response;
+        const testText = testResponse.text();
+        
+        if (testText) {
+          model = testModel;
+          workingModel = modelName;
+          console.log(`✅ Successfully connected using model: ${modelName}`);
+          return true;
+        }
+      } catch (error) {
+        console.log(`❌ Model ${modelName} failed:`, error.message);
+        continue;
+      }
+    }
     
-    console.log('✅ Gemini model initialized successfully');
-    return true;
+    console.error('❌ None of the models worked');
+    return false;
   } catch (error) {
     console.error('❌ Failed to initialize Gemini:', error);
     return false;
@@ -62,30 +77,63 @@ const initializeModel = () => {
 };
 
 // Initialize on load
-const isInitialized = initializeModel();
+let isInitialized = false;
+let initPromise = null;
+
+// Lazy initialization
+const ensureInitialized = async () => {
+  if (isInitialized) return true;
+  
+  if (!initPromise) {
+    initPromise = initializeModel();
+  }
+  
+  isInitialized = await initPromise;
+  return isInitialized;
+};
 
 export const generateResponse = async (prompt, context = '') => {
-  // Check initialization
-  if (!isInitialized || !model) {
+  // Try to initialize if not already done
+  const initialized = await ensureInitialized();
+  
+  if (!initialized || !model) {
     console.error('❌ Gemini not initialized');
-    return `**AI Tutor Unavailable**
+    return `**AI Tutor Configuration Needed**
 
-The AI assistant is currently not configured. To enable it:
-1. Get a free API key from: https://aistudio.google.com/app/apikey
-2. Add it to your .env file as: VITE_GEMINI_API_KEY=your_key_here
-3. Restart your development server
+The AI assistant requires setup. Please follow these steps:
 
-For now, here's some general guidance about ${prompt}:
-This is a placeholder response. The AI tutor will provide detailed, personalized explanations once configured.`;
+**Step 1: Get API Key**
+Visit: https://aistudio.google.com/app/apikey
+- Click "Create API Key"
+- Choose "Create API key in new project"
+- Copy the key (starts with AIza...)
+
+**Step 2: Add to Environment**
+Create/update your .env file in the project root:
+\`\`\`
+VITE_GEMINI_API_KEY=your_api_key_here
+\`\`\`
+
+**Step 3: Restart Server**
+\`\`\`bash
+npm run dev
+\`\`\`
+
+**For Vercel:**
+1. Dashboard → Your Project → Settings
+2. Environment Variables
+3. Add VITE_GEMINI_API_KEY
+4. Redeploy
+
+Meanwhile, explore the 3D models and interactive features!`;
   }
 
   try {
     const fullPrompt = context 
-      ? `Context: ${context}\n\nQuestion: ${prompt}\n\nProvide a detailed engineering explanation with practical examples.`
-      : `${prompt}\n\nProvide a detailed engineering explanation with practical examples.`;
+      ? `Context: ${context}\n\nQuestion: ${prompt}\n\nProvide a detailed, practical engineering explanation with examples.`
+      : `${prompt}\n\nProvide a detailed, practical engineering explanation with examples.`;
 
-    console.log('🚀 Sending request to Gemini API...');
-    console.log('📝 Prompt length:', fullPrompt.length);
+    console.log(`🚀 Sending request using ${workingModel}...`);
 
     const result = await model.generateContent(fullPrompt);
     
@@ -100,108 +148,130 @@ This is a placeholder response. The AI tutor will provide detailed, personalized
       throw new Error('Empty text in response');
     }
 
-    console.log('✅ Gemini API response received:', text.substring(0, 100) + '...');
+    console.log('✅ Response received');
     return text;
   } catch (error) {
-    console.error('❌ Gemini API Error Details:', {
-      message: error.message,
-      status: error.status,
-      statusText: error.statusText,
-      error: error
-    });
+    console.error('❌ Gemini API Error:', error);
 
-    // Return helpful error messages
+    // If we get a 404, try reinitializing with different model
+    if (error.status === 404) {
+      console.log('🔄 Got 404, trying to reinitialize...');
+      isInitialized = false;
+      initPromise = null;
+      model = null;
+      
+      const reinitialized = await ensureInitialized();
+      if (reinitialized) {
+        console.log('✅ Reinitialized, retrying request...');
+        return generateResponse(prompt, context);
+      }
+    }
+
+    // Error handling
     if (error.message?.includes('API_KEY_INVALID') || error.status === 400) {
-      return `**API Key Error**
+      return `**Invalid API Key**
 
-Your Gemini API key appears to be invalid. Please:
+Your API key is not valid. Please:
 1. Go to https://aistudio.google.com/app/apikey
-2. Create a new API key
-3. Update your .env file with the new key
-4. Restart your server
+2. Create a NEW API key (don't reuse old ones)
+3. Copy the ENTIRE key (usually 39 characters starting with "AIza")
+4. Update your .env file
+5. Restart the server
 
-Current issue: Invalid API key format or permissions`;
+Make sure there are no spaces or quotes around the key.`;
     }
 
-    if (error.message?.includes('404') || error.status === 404) {
-      return `**Model Not Found**
+    if (error.status === 429) {
+      return `**Rate Limit Exceeded**
 
-The AI model is not available. This could mean:
-1. Your API key doesn't have access to this model
-2. The model name is incorrect
-3. Your API key needs to be regenerated
+You've made too many requests. Please:
+1. Wait 1-2 minutes
+2. Try again
+3. Free tier limit: 60 requests/minute
 
-Try creating a new API key at: https://aistudio.google.com/app/apikey`;
+If you need more, visit: https://aistudio.google.com/`;
     }
 
-    if (error.message?.includes('quota') || error.status === 429) {
-      return `**Rate Limit Reached**
+    if (error.status === 404) {
+      return `**API Access Issue**
 
-You've reached the API rate limit. Please:
-1. Wait a few minutes and try again
-2. Check your usage at: https://aistudio.google.com/
-3. Consider upgrading your plan if you need more requests
+Cannot access the AI model. This means:
+1. Your API key might be for an older API version
+2. The Gemini API might have changed
 
-The free tier allows 60 requests per minute.`;
+**Solution:**
+1. Go to https://aistudio.google.com/app/apikey
+2. Delete your old API key
+3. Create a BRAND NEW API key
+4. Update your .env file with the new key
+5. Restart your server
+
+Make sure you're using Google AI Studio (not Google Cloud Console).`;
     }
 
-    if (error.message?.includes('CORS') || error.message?.includes('fetch')) {
+    if (error.message?.includes('fetch') || error.message?.includes('network')) {
       return `**Connection Error**
 
-Having trouble connecting to the AI service. This could be:
-1. Network issue - check your internet connection
-2. CORS issue - this usually only happens in development
-3. Firewall blocking the API
+Cannot reach the AI service. Check:
+1. Internet connection
+2. Firewall settings
+3. VPN (try disabling)
+4. Try again in a few seconds
 
-Try refreshing the page or checking your network settings.`;
+Error: ${error.message}`;
     }
 
     // Generic fallback
-    return `**AI Tutor Temporarily Unavailable**
+    return `**Temporary Issue**
 
-I'm having trouble connecting right now. Error: ${error.message || 'Unknown error'}
+${error.message || 'Unknown error occurred'}
 
-Please try again in a moment. If the issue persists:
-1. Check your internet connection
-2. Verify your API key is correct
-3. Try refreshing the page
+**Quick Fixes:**
+1. Refresh the page
+2. Clear browser cache
+3. Check console logs (F12)
+4. Verify API key at: https://aistudio.google.com/
 
-You can still explore the 3D models and interactive features while I'm offline!`;
+The 3D models and other features still work!`;
   }
 };
 
 export const generateLesson = async (topic, difficulty = 'beginner') => {
-  const prompt = `Create a comprehensive ${difficulty} level engineering lesson about ${topic}. Structure:
+  const prompt = `Create a ${difficulty} level engineering lesson about ${topic}. Include:
 
-1. **Introduction** - Brief overview
-2. **Key Concepts** - Main engineering principles
-3. **Real-World Applications** - Practical examples
-4. **Engineering Analysis** - Technical details
-5. **Practice Exercises** - 3 problems to solve
+1. **Introduction** - Overview and importance
+2. **Core Concepts** - Key engineering principles  
+3. **How It Works** - Step-by-step explanation
+4. **Real Examples** - Practical applications
+5. **Key Numbers** - Important specifications
+6. **Try This** - 2-3 practice problems
 
-Make it engaging and include specific numbers and examples.`;
+Make it engaging with specific examples and numbers.`;
   
   return await generateResponse(prompt);
 };
 
 export const explainModel = async (modelName, specificQuestion = '') => {
   const prompt = specificQuestion
-    ? `Explain the ${modelName} with focus on: ${specificQuestion}
+    ? `Explain ${modelName} focusing on: ${specificQuestion}
 
-Include:
-- Engineering specifications
-- Design principles
+Provide:
+- Technical details
+- Engineering principles
 - How it works
-- Real-world applications`
-    : `Provide a detailed engineering explanation of the ${modelName}.
+- Practical applications`
+    : `Give a detailed engineering explanation of ${modelName}.
 
-Include:
-- Technical specifications
-- Design and engineering principles
+Cover:
+- What it is and its purpose
+- Key specifications and numbers
+- Design and engineering
 - How it functions
-- Materials and construction
+- Materials used
 - Performance characteristics
-- Real-world applications and impact`;
+- Real-world impact
+
+Use specific examples and data.`;
   
   return await generateResponse(prompt);
 };
@@ -285,15 +355,41 @@ Keep it concise (2-3 paragraphs).`;
   }
 };
 
-// Test function to verify API is working
+// Test API connectivity
 export const testAPI = async () => {
-  console.log('🧪 Testing Gemini API...');
+  console.log('🧪 Testing Gemini API connection...');
   try {
-    const response = await generateResponse('Say "Hello! API is working!" and nothing else.');
-    console.log('✅ API Test Result:', response);
-    return { success: true, message: response };
+    const initialized = await ensureInitialized();
+    
+    if (!initialized) {
+      return { 
+        success: false, 
+        error: 'Could not initialize any model',
+        model: null
+      };
+    }
+    
+    const response = await generateResponse('Say "Hello! API test successful!"');
+    
+    return { 
+      success: true, 
+      message: response,
+      model: workingModel
+    };
   } catch (error) {
     console.error('❌ API Test Failed:', error);
-    return { success: false, error: error.message };
+    return { 
+      success: false, 
+      error: error.message,
+      model: workingModel
+    };
   }
 };
+
+// Export for debugging
+export const getModelInfo = () => ({
+  initialized: isInitialized,
+  workingModel: workingModel,
+  apiKeyExists: !!apiKey,
+  apiKeyValid: apiKey?.startsWith('AIza')
+});
