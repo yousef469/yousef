@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyCCmAlkc0jYTBJGjhOV7T1fjNleYhitq4g';
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // System prompt for engineering tutor
 const SYSTEM_PROMPT = `You are an expert aerospace and automotive engineering tutor. You help students understand:
