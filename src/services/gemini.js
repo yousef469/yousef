@@ -1,67 +1,209 @@
 // src/services/geminiService.js
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyB3MgLeBT9CxTQCdyKyKEiCiM3ZFutYTwo';
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+// Check if API key exists
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyB3MgLeBT9CxTQCdyKyKEiCiM3ZFutYTwo';
 
-// Use gemini-pro - the most stable and widely available model
-const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+console.log('🔑 Gemini API Key Check:', {
+  exists: !!apiKey,
+  length: apiKey?.length,
+  startsWithAIza: apiKey?.startsWith('AIza'),
+  firstChars: apiKey?.substring(0, 10) + '...'
+});
+
+let model = null;
+let genAI = null;
+
+// Try to initialize the model
+const initializeModel = () => {
+  if (!apiKey || apiKey === 'YOUR_KEY_HERE' || apiKey === 'YOUR_GEMINI_API_KEY' || apiKey === 'YOUR_NEW_KEY_HERE') {
+    console.error('❌ Invalid or missing API key');
+    return false;
+  }
+
+  try {
+    genAI = new GoogleGenerativeAI(apiKey);
+    
+    // Try gemini-pro first (most stable)
+    model = genAI.getGenerativeModel({ 
+      model: 'gemini-pro',
+      generationConfig: {
+        temperature: 0.9,
+        topK: 1,
+        topP: 1,
+        maxOutputTokens: 2048,
+      },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_NONE",
+        },
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_NONE",
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_NONE",
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_NONE",
+        },
+      ],
+    });
+    
+    console.log('✅ Gemini model initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to initialize Gemini:', error);
+    return false;
+  }
+};
+
+// Initialize on load
+const isInitialized = initializeModel();
 
 export const generateResponse = async (prompt, context = '') => {
+  // Check initialization
+  if (!isInitialized || !model) {
+    console.error('❌ Gemini not initialized');
+    return `**AI Tutor Unavailable**
+
+The AI assistant is currently not configured. To enable it:
+1. Get a free API key from: https://aistudio.google.com/app/apikey
+2. Add it to your .env file as: VITE_GEMINI_API_KEY=your_key_here
+3. Restart your development server
+
+For now, here's some general guidance about ${prompt}:
+This is a placeholder response. The AI tutor will provide detailed, personalized explanations once configured.`;
+  }
+
   try {
     const fullPrompt = context 
-      ? `Context: ${context}\n\nQuestion: ${prompt}\n\nPlease provide a detailed engineering explanation.`
-      : prompt;
+      ? `Context: ${context}\n\nQuestion: ${prompt}\n\nProvide a detailed engineering explanation with practical examples.`
+      : `${prompt}\n\nProvide a detailed engineering explanation with practical examples.`;
+
+    console.log('🚀 Sending request to Gemini API...');
+    console.log('📝 Prompt length:', fullPrompt.length);
 
     const result = await model.generateContent(fullPrompt);
+    
+    if (!result || !result.response) {
+      throw new Error('Empty response from API');
+    }
+
     const response = await result.response;
     const text = response.text();
     
+    if (!text || text.trim().length === 0) {
+      throw new Error('Empty text in response');
+    }
+
+    console.log('✅ Gemini API response received:', text.substring(0, 100) + '...');
     return text;
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    
-    // Better error handling
-    if (error.message?.includes('404')) {
-      throw new Error('Model not found. Please check your API key or try a different model.');
-    } else if (error.message?.includes('API key')) {
-      throw new Error('Invalid API key. Please check your Gemini API key in the .env file.');
-    } else if (error.message?.includes('quota')) {
-      throw new Error('API quota exceeded. Please try again later or upgrade your plan.');
+    console.error('❌ Gemini API Error Details:', {
+      message: error.message,
+      status: error.status,
+      statusText: error.statusText,
+      error: error
+    });
+
+    // Return helpful error messages
+    if (error.message?.includes('API_KEY_INVALID') || error.status === 400) {
+      return `**API Key Error**
+
+Your Gemini API key appears to be invalid. Please:
+1. Go to https://aistudio.google.com/app/apikey
+2. Create a new API key
+3. Update your .env file with the new key
+4. Restart your server
+
+Current issue: Invalid API key format or permissions`;
     }
-    
-    throw new Error(`Failed to generate response: ${error.message}`);
+
+    if (error.message?.includes('404') || error.status === 404) {
+      return `**Model Not Found**
+
+The AI model is not available. This could mean:
+1. Your API key doesn't have access to this model
+2. The model name is incorrect
+3. Your API key needs to be regenerated
+
+Try creating a new API key at: https://aistudio.google.com/app/apikey`;
+    }
+
+    if (error.message?.includes('quota') || error.status === 429) {
+      return `**Rate Limit Reached**
+
+You've reached the API rate limit. Please:
+1. Wait a few minutes and try again
+2. Check your usage at: https://aistudio.google.com/
+3. Consider upgrading your plan if you need more requests
+
+The free tier allows 60 requests per minute.`;
+    }
+
+    if (error.message?.includes('CORS') || error.message?.includes('fetch')) {
+      return `**Connection Error**
+
+Having trouble connecting to the AI service. This could be:
+1. Network issue - check your internet connection
+2. CORS issue - this usually only happens in development
+3. Firewall blocking the API
+
+Try refreshing the page or checking your network settings.`;
+    }
+
+    // Generic fallback
+    return `**AI Tutor Temporarily Unavailable**
+
+I'm having trouble connecting right now. Error: ${error.message || 'Unknown error'}
+
+Please try again in a moment. If the issue persists:
+1. Check your internet connection
+2. Verify your API key is correct
+3. Try refreshing the page
+
+You can still explore the 3D models and interactive features while I'm offline!`;
   }
 };
 
 export const generateLesson = async (topic, difficulty = 'beginner') => {
-  try {
-    const prompt = `Create a ${difficulty} level engineering lesson about ${topic}. Include:
-1. Introduction
-2. Key concepts
-3. Real-world applications
-4. Practice exercises
+  const prompt = `Create a comprehensive ${difficulty} level engineering lesson about ${topic}. Structure:
 
-Format the response in a clear, structured way.`;
-    
-    return await generateResponse(prompt);
-  } catch (error) {
-    console.error('Error generating lesson:', error);
-    throw error;
-  }
+1. **Introduction** - Brief overview
+2. **Key Concepts** - Main engineering principles
+3. **Real-World Applications** - Practical examples
+4. **Engineering Analysis** - Technical details
+5. **Practice Exercises** - 3 problems to solve
+
+Make it engaging and include specific numbers and examples.`;
+  
+  return await generateResponse(prompt);
 };
 
 export const explainModel = async (modelName, specificQuestion = '') => {
-  try {
-    const prompt = specificQuestion
-      ? `Explain ${modelName} focusing on: ${specificQuestion}`
-      : `Provide a detailed engineering explanation of ${modelName}, including its design, functionality, and engineering principles.`;
-    
-    return await generateResponse(prompt);
-  } catch (error) {
-    console.error('Error explaining model:', error);
-    throw error;
-  }
+  const prompt = specificQuestion
+    ? `Explain the ${modelName} with focus on: ${specificQuestion}
+
+Include:
+- Engineering specifications
+- Design principles
+- How it works
+- Real-world applications`
+    : `Provide a detailed engineering explanation of the ${modelName}.
+
+Include:
+- Technical specifications
+- Design and engineering principles
+- How it functions
+- Materials and construction
+- Performance characteristics
+- Real-world applications and impact`;
+  
+  return await generateResponse(prompt);
 };
 
 // System prompt for engineering tutor
@@ -85,9 +227,7 @@ export const askGemini = async (userMessage, conversationHistory = []) => {
 
     const fullPrompt = `${SYSTEM_PROMPT}\n\n${context ? context + '\n\n' : ''}Student: ${userMessage}\n\nTutor:`;
 
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = await generateResponse(fullPrompt);
 
     return { success: true, response: text };
   } catch (error) {
@@ -109,9 +249,7 @@ Question: ${question}
 
 Provide a detailed but concise technical explanation focusing on engineering principles and real specifications.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = await generateResponse(prompt);
 
     return { success: true, response: text };
   } catch (error) {
@@ -135,9 +273,7 @@ export const explainComponent = async (componentName, modelType) => {
 
 Keep it concise (2-3 paragraphs).`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = await generateResponse(prompt);
 
     return { success: true, explanation: text };
   } catch (error) {
@@ -146,5 +282,18 @@ Keep it concise (2-3 paragraphs).`;
       success: false,
       error: error.message
     };
+  }
+};
+
+// Test function to verify API is working
+export const testAPI = async () => {
+  console.log('🧪 Testing Gemini API...');
+  try {
+    const response = await generateResponse('Say "Hello! API is working!" and nothing else.');
+    console.log('✅ API Test Result:', response);
+    return { success: true, message: response };
+  } catch (error) {
+    console.error('❌ API Test Failed:', error);
+    return { success: false, error: error.message };
   }
 };
