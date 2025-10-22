@@ -4,8 +4,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyB3MgLeBT9CxTQCdyKyKEiCiM3ZFutYTwo';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-// Use the correct model name - gemini-pro or gemini-1.5-flash
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+// Use gemini-pro - the most stable and widely available model
+const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
 export const generateResponse = async (prompt, context = '') => {
   try {
