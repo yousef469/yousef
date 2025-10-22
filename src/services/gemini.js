@@ -17,7 +17,7 @@ If asked about specific models (Falcon 9, F-22, etc.), provide accurate technica
 
 export const askGemini = async (userMessage, conversationHistory = []) => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // Build conversation context
     const context = conversationHistory
@@ -44,7 +44,7 @@ export const askGemini = async (userMessage, conversationHistory = []) => {
 // Specialized function for model-specific questions
 export const askAboutModel = async (modelName, modelType, question) => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `As an engineering tutor, answer this question about the ${modelName} (a ${modelType}):
 
@@ -70,7 +70,7 @@ Provide a detailed but concise technical explanation focusing on engineering pri
 // Generate lesson content
 export const generateLesson = async (topic) => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `Create a concise engineering lesson about: ${topic}
 
@@ -99,7 +99,7 @@ Keep it educational and engaging for engineering students.`;
 // Explain a component
 export const explainComponent = async (componentName, modelType) => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `Explain the ${componentName} component of a ${modelType} in simple terms:
 - What it does
