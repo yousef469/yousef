@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Rocket, Plane, Car, Zap, Settings, Info, RotateCw, Menu, X, BookOpen, Play, Maximize2, LogOut, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import ThreeJSViewer from '../components/ThreeJSViewer';
+import AITutor from '../components/AITutor';
 
 // ============================================================================
 // DATA - Models and Lessons
@@ -565,6 +566,9 @@ export default function AllInOnePage() {
           </div>
         </div>
       )}
+
+      {/* AI Tutor Chat */}
+      <AITutor />
     </div>
   );
 }
