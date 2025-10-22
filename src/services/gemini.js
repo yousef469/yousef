@@ -1,5 +1,5 @@
 // Direct API implementation to bypass v1beta issues
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyB3MgLeBT9CxTQCdyKyKEiCiM3ZFutYTwo';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAyc8h7rPTKJ9UM5GF4div6iLgZ_dQ5CNw';
 
 console.log('🔑 Gemini API Key Check:', {
   exists: !!API_KEY,
