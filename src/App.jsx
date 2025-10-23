@@ -14,6 +14,8 @@ import PlaneMechanicsPage from './pages/PlaneMechanicsPage';
 import GamesPage from './pages/GamesPage';
 import QuizGame from './pages/QuizGame';
 import SimulationGame from './pages/SimulationGame';
+import MatchingGame from './pages/MatchingGame';
+import EngineBuilderGame from './pages/EngineBuilderGame';
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1089,6 +1091,8 @@ export default function App() {
           <Route path="/games" element={<ProtectedRoute><GamesPage /></ProtectedRoute>} />
           <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
           <Route path="/games/simulation" element={<ProtectedRoute><SimulationGame /></ProtectedRoute>} />
+          <Route path="/games/matching" element={<ProtectedRoute><MatchingGame /></ProtectedRoute>} />
+          <Route path="/games/engine-builder" element={<ProtectedRoute><EngineBuilderGame /></ProtectedRoute>} />
           <Route path="/rockets" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/planes" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/cars" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />

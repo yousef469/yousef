@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Gamepad2, Brain, Wrench, Beaker, Trophy, Target } from 'lucide-react';
+import { ArrowLeft, Gamepad2, Brain, Wrench, Beaker, Trophy, Target, Puzzle } from 'lucide-react';
 
 export default function GamesPage() {
   const navigate = useNavigate();
@@ -27,14 +26,24 @@ export default function GamesPage() {
       route: '/games/quiz'
     },
     {
-      id: 'build',
-      title: 'Fix & Build Game',
-      description: 'Drag parts to correct positions',
+      id: 'engine-builder',
+      title: 'Engine Builder',
+      description: 'Drag and drop parts to assemble engines',
       icon: Target,
       difficulty: 'Medium',
       color: 'from-orange-500 to-red-600',
-      examples: 'Assemble a gearbox or aircraft wing',
-      route: '/games/build'
+      examples: 'Build engine, turbo system, fuel injection',
+      route: '/games/engine-builder'
+    },
+    {
+      id: 'matching',
+      title: 'Part Matching',
+      description: 'Match parts with their functions',
+      icon: Puzzle,
+      difficulty: 'Easy',
+      color: 'from-pink-500 to-purple-600',
+      examples: 'Engine components, aircraft controls, rocket systems',
+      route: '/games/matching'
     },
     {
       id: 'sandbox',
