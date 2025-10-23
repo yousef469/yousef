@@ -49,7 +49,13 @@ export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/viewer`
+      redirectTo: window.location.origin.includes('localhost') 
+        ? 'http://localhost:5173/viewer'
+        : 'https://yousef.vercel.app/viewer',
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      }
     }
   });
   return { data, error };
