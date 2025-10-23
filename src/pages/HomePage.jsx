@@ -147,7 +147,7 @@ const HomePage = () => {
 
           {/* Learn Plane Mechanics */}
           <button
-            onClick={() => user ? navigate('/planes') : navigate('/auth')}
+            onClick={() => user ? navigate('/learn/planes') : navigate('/auth')}
             className="group relative bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-2xl p-8 border-2 border-blue-400/50 hover:border-blue-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-blue-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
@@ -171,7 +171,7 @@ const HomePage = () => {
 
           {/* Learn Car Mechanics */}
           <button
-            onClick={() => user ? navigate('/cars') : navigate('/auth')}
+            onClick={() => user ? navigate('/learn/cars') : navigate('/auth')}
             className="group relative bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />

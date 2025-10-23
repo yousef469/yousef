@@ -9,6 +9,8 @@ import PlanesPage from './pages/PlanesPage';
 import CarsPage from './pages/CarsPage';
 import ModelViewerPage from './pages/ModelViewerPage';
 import RocketMechanicsPage from './pages/RocketMechanicsPage';
+import CarMechanicsPage from './pages/CarMechanicsPage';
+import PlaneMechanicsPage from './pages/PlaneMechanicsPage';
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1079,6 +1081,8 @@ export default function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
+          <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
+          <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
           <Route path="/rockets" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/planes" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/cars" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
