@@ -87,38 +87,108 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* 3D Models Viewer Button */}
-        <div className="flex justify-center">
+        {/* Main Sections Grid */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          {/* 3D Models Viewer */}
           <button
             onClick={() => user ? navigate('/rockets') : navigate('/auth')}
-            className="group relative bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-3xl p-12 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-2xl shadow-cyan-500/50 max-w-2xl w-full"
+            className="group relative bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30"
           >
-            {/* Animated Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
             
-            {/* Content */}
-            <div className="relative z-10 text-center">
-              {/* Icons */}
-              <div className="flex justify-center gap-6 mb-8">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Rocket className="w-10 h-10 text-white" />
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Rocket className="w-7 h-7 text-white" />
                 </div>
-                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform delay-75">
-                  <Plane className="w-10 h-10 text-white" />
+                <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform delay-75">
+                  <Plane className="w-7 h-7 text-white" />
                 </div>
-                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform delay-150">
-                  <Car className="w-10 h-10 text-white" />
+                <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform delay-150">
+                  <Car className="w-7 h-7 text-white" />
                 </div>
               </div>
               
-              <h3 className="text-4xl font-bold mb-4 text-white">3D Models Viewer</h3>
-              <p className="text-xl text-white/90 mb-8">
-                Explore rockets, aircraft, and vehicles in stunning 3D with AI-powered learning
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">3D Models Viewer</h3>
+              <p className="text-white/90 text-center mb-4">
+                Explore all models in interactive 3D
               </p>
               
-              <div className="flex items-center justify-center text-white font-bold text-lg group-hover:gap-4 gap-3 transition-all">
+              <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
                 <span>Launch Viewer</span>
-                <span className="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* Learn Rocket Mechanics */}
+          <button
+            onClick={() => user ? navigate('/rockets') : navigate('/auth')}
+            className="group relative bg-gradient-to-br from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
+                <Rocket className="w-8 h-8 text-white" />
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Rocket Mechanics</h3>
+              <p className="text-white/90 text-center text-sm mb-4">
+                Master propulsion, orbital mechanics, staging, and launch systems
+              </p>
+              
+              <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
+                <span>Start Learning</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* Learn Plane Mechanics */}
+          <button
+            onClick={() => user ? navigate('/planes') : navigate('/auth')}
+            className="group relative bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-2xl p-8 border-2 border-blue-400/50 hover:border-blue-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-blue-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
+                <Plane className="w-8 h-8 text-white" />
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Plane Mechanics</h3>
+              <p className="text-white/90 text-center text-sm mb-4">
+                Understand aerodynamics, flight controls, engines, and aviation systems
+              </p>
+              
+              <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
+                <span>Start Learning</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* Learn Car Mechanics */}
+          <button
+            onClick={() => user ? navigate('/cars') : navigate('/auth')}
+            className="group relative bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
+                <Car className="w-8 h-8 text-white" />
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Car Mechanics</h3>
+              <p className="text-white/90 text-center text-sm mb-4">
+                Explore engines, transmissions, suspension, and automotive engineering
+              </p>
+              
+              <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
+                <span>Start Learning</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
           </button>
