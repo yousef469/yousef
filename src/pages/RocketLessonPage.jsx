@@ -197,8 +197,13 @@ export default function RocketLessonPage() {
     }
   };
 
-  // Default lesson for IDs not specifically defined
-  const lesson = lessons[id] || {
+  // Get lesson from data or use default
+  const lesson = lessons[id] || (lessonData ? {
+    unit: `Module ${lessonData.module}`,
+    title: lessonData.title,
+    description: lessonData.concept,
+    content: <QuizSection questions={lessonData.questions} />
+  } : {
     unit: 'Rocket Engineering',
     title: `Lesson ${id}`,
     description: 'Interactive rocket engineering lesson',
@@ -211,7 +216,7 @@ export default function RocketLessonPage() {
         </p>
       </div>
     )
-  };
+  });
 
   const completeLesson = () => {
     // TODO: Save progress to Supabase
