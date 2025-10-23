@@ -309,6 +309,7 @@ export default function AllInOnePage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [autoRotate, setAutoRotate] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [nozzleParams, setNozzleParams] = useState({
     expansionRatio: 10,
     ambientPressure: 101325,
@@ -320,9 +321,20 @@ export default function AllInOnePage() {
     navigate('/');
   };
 
-  const filteredModels = selectedCategory === 'all'
-    ? MODELS
-    : MODELS.filter(m => m.category === selectedCategory);
+  const filteredModels = useMemo(() => {
+    let models = selectedCategory === 'all'
+      ? MODELS
+      : MODELS.filter(m => m.category === selectedCategory);
+    
+    if (searchQuery.trim()) {
+      models = models.filter(m => 
+        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return models;
+  }, [selectedCategory, searchQuery]);
 
   useEffect(() => {
     if (!filteredModels.find(m => m.id === selectedModel.id)) {
@@ -402,11 +414,36 @@ export default function AllInOnePage() {
           </div>
         </div>
 
-        <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
-          <CategoryButton category="all" icon={Settings} label="All Models" />
-          <CategoryButton category="rockets" icon={Rocket} label="Rockets" />
-          <CategoryButton category="planes" icon={Plane} label="Aircraft" />
-          <CategoryButton category="cars" icon={Car} label="Cars" />
+        {/* Search Bar */}
+        <div className="mt-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search models... (e.g., Falcon 9, F-22, Porsche)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-5 py-3 pl-12 bg-gray-700 text-white rounded-xl border border-gray-600 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all text-lg"
+            />
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-600 rounded-full transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-400" />
+              </button>
+            )}
+          </div>
+          
+          {/* Filter Chips */}
+          <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+            <CategoryButton category="all" icon={Settings} label="All" />
+            <CategoryButton category="rockets" icon={Rocket} label="Rockets" />
+            <CategoryButton category="planes" icon={Plane} label="Planes" />
+            <CategoryButton category="cars" icon={Car} label="Cars" />
+          </div>
         </div>
       </header>
 
