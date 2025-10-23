@@ -7,35 +7,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
-  const categories = [
-    {
-      id: 'rockets',
-      title: 'Rockets',
-      icon: Rocket,
-      color: 'cyan',
-      gradient: 'from-cyan-500 to-blue-600',
-      description: 'Explore space vehicles and launch systems',
-      path: '/rockets'
-    },
-    {
-      id: 'planes',
-      title: 'Aircraft',
-      icon: Plane,
-      color: 'blue',
-      gradient: 'from-blue-500 to-indigo-600',
-      description: 'Discover aviation and flight technology',
-      path: '/planes'
-    },
-    {
-      id: 'cars',
-      title: 'Vehicles',
-      icon: Car,
-      color: 'orange',
-      gradient: 'from-orange-500 to-red-600',
-      description: 'Experience automotive engineering',
-      path: '/cars'
-    }
-  ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -115,36 +87,41 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* Category Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <div
-                key={category.id}
-                onClick={() => user ? navigate(category.path) : navigate('/auth')}
-                className="group relative bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-gray-700 hover:border-gray-600 transition-all cursor-pointer hover:scale-105 hover:shadow-2xl"
-              >
-                {/* Gradient Background */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity`} />
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  <div className={`w-16 h-16 bg-gradient-to-br ${category.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold mb-3">{category.title}</h3>
-                  <p className="text-gray-400 mb-6">{category.description}</p>
-                  
-                  <div className="flex items-center text-cyan-400 font-semibold group-hover:gap-3 gap-2 transition-all">
-                    <span>Explore Models</span>
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
+        {/* 3D Models Viewer Button */}
+        <div className="flex justify-center">
+          <button
+            onClick={() => user ? navigate('/rockets') : navigate('/auth')}
+            className="group relative bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-3xl p-12 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-2xl shadow-cyan-500/50 max-w-2xl w-full"
+          >
+            {/* Animated Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity" />
+            
+            {/* Content */}
+            <div className="relative z-10 text-center">
+              {/* Icons */}
+              <div className="flex justify-center gap-6 mb-8">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Rocket className="w-10 h-10 text-white" />
+                </div>
+                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform delay-75">
+                  <Plane className="w-10 h-10 text-white" />
+                </div>
+                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform delay-150">
+                  <Car className="w-10 h-10 text-white" />
                 </div>
               </div>
-            );
-          })}
+              
+              <h3 className="text-4xl font-bold mb-4 text-white">3D Models Viewer</h3>
+              <p className="text-xl text-white/90 mb-8">
+                Explore rockets, aircraft, and vehicles in stunning 3D with AI-powered learning
+              </p>
+              
+              <div className="flex items-center justify-center text-white font-bold text-lg group-hover:gap-4 gap-3 transition-all">
+                <span>Launch Viewer</span>
+                <span className="text-2xl group-hover:translate-x-2 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
         </div>
       </div>
 
