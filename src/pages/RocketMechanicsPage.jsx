@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Rocket, Zap, Gauge, Flame } from 'lucide-react';
+import ThrustCalculator from '../components/ThrustCalculator';
 
 const RocketMechanicsPage = () => {
   const [activeTab, setActiveTab] = useState('spacex');
@@ -372,6 +373,15 @@ const RocketMechanicsPage = () => {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Interactive Calculator */}
+        <section>
+          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+            <Gauge className="w-8 h-8 text-cyan-400" />
+            Interactive Tools
+          </h2>
+          <ThrustCalculator />
         </section>
       </div>
     </div>

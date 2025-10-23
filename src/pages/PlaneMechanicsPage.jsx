@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plane, Wind, Gauge, Zap, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import DragCalculator from '../components/DragCalculator';
 
 export default function PlaneMechanicsPage() {
   const [activeTab, setActiveTab] = useState('aerodynamics');
@@ -417,6 +418,15 @@ Autopilot:
               <li>• Airbus A380 can carry up to 853 passengers</li>
               <li>• Fighter jets can pull 9+ Gs in maneuvers</li>
             </ul>
+          </div>
+
+          {/* Interactive Calculator */}
+          <div>
+            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+              <Gauge className="w-8 h-8 text-cyan-400" />
+              Interactive Tools
+            </h2>
+            <DragCalculator />
           </div>
         </div>
       </div>

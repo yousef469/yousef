@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Car, Zap, Gauge, Cog, Fuel, Wind, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import DragCalculator from '../components/DragCalculator';
+import GearRatioCalculator from '../components/GearRatioCalculator';
 
 export default function CarMechanicsPage() {
   const [activeTab, setActiveTab] = useState('engine');
@@ -323,6 +325,18 @@ Adjustments:
               <li>• The Bugatti Chiron has 1,500 horsepower from a W16 engine</li>
               <li>• Modern cars have more computing power than the Apollo 11 spacecraft</li>
             </ul>
+          </div>
+
+          {/* Interactive Calculators */}
+          <div>
+            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+              <Gauge className="w-8 h-8 text-blue-400" />
+              Interactive Tools
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <DragCalculator />
+              <GearRatioCalculator />
+            </div>
           </div>
         </div>
       </div>
