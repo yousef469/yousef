@@ -6,6 +6,17 @@ export default function GamesPage() {
 
   const games = [
     {
+      id: 'journey',
+      title: '🚀 Engineering Journey',
+      description: 'Complete mixed challenges and watch your rocket fly!',
+      icon: Gamepad2,
+      difficulty: 'All Levels',
+      color: 'from-cyan-500 via-blue-600 to-purple-600',
+      examples: 'Quiz, Matching, Simulation, Building - All in one!',
+      route: '/games/journey',
+      featured: true
+    },
+    {
       id: 'simulation',
       title: 'Simulation Challenge',
       description: 'Adjust sliders until the system works perfectly',
@@ -118,9 +129,53 @@ export default function GamesPage() {
           </p>
         </div>
 
-        {/* Games Grid */}
+        {/* Featured Game */}
+        {games.filter(g => g.featured).map((game) => {
+          const Icon = game.icon;
+          return (
+            <button
+              key={game.id}
+              onClick={() => navigate(game.route)}
+              className="group relative bg-gray-800/50 backdrop-blur border-2 border-cyan-500 rounded-2xl p-8 hover:border-cyan-400 transition-all hover:scale-105 mb-8 w-full"
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-10 group-hover:opacity-20 rounded-2xl transition-opacity`} />
+              
+              <div className="relative flex items-center gap-6">
+                <div className={`w-20 h-20 bg-gradient-to-br ${game.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-10 h-10 text-white" />
+                </div>
+
+                <div className="flex-1 text-left">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-2xl font-bold text-white">{game.title}</h3>
+                    <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">
+                      FEATURED
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-300 mb-3">{game.description}</p>
+                  
+                  <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-700 mb-3">
+                    <div className="text-xs text-gray-500 mb-1">Includes:</div>
+                    <div className="text-sm text-gray-300">{game.examples}</div>
+                  </div>
+
+                  <div className="flex items-center text-cyan-400 group-hover:text-cyan-300 transition-colors">
+                    <span className="font-semibold">Start Journey</span>
+                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
+        {/* Other Games Grid */}
+        <h3 className="text-2xl font-bold mb-6">Individual Challenges</h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => {
+          {games.filter(g => !g.featured).map((game) => {
             const Icon = game.icon;
             return (
               <button
