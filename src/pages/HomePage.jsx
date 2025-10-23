@@ -204,7 +204,7 @@ const HomePage = () => {
           </div>
 
           <button
-            onClick={() => user ? navigate('/games/journey') : navigate('/auth')}
+            onClick={() => user ? navigate('/games') : navigate('/auth')}
             className="group relative bg-gradient-to-br from-purple-500 via-blue-600 to-cyan-500 hover:from-purple-600 hover:via-blue-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30 w-full max-w-4xl mx-auto block"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />

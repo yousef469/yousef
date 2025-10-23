@@ -17,6 +17,10 @@ import SimulationGame from './pages/SimulationGame';
 import MatchingGame from './pages/MatchingGame';
 import EngineBuilderGame from './pages/EngineBuilderGame';
 import UnifiedGame from './pages/UnifiedGame';
+import GameCategorySelect from './pages/GameCategorySelect';
+import GameMapRockets from './pages/GameMapRockets';
+import GameMapCars from './pages/GameMapCars';
+import GameMapPlanes from './pages/GameMapPlanes';
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1089,7 +1093,11 @@ export default function App() {
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
-          <Route path="/games" element={<ProtectedRoute><GamesPage /></ProtectedRoute>} />
+          <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
+          <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
+          <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
+          <Route path="/games/map/planes" element={<ProtectedRoute><GameMapPlanes /></ProtectedRoute>} />
+          <Route path="/games/play/:category/:level" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
           <Route path="/games/journey" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
           <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
           <Route path="/games/simulation" element={<ProtectedRoute><SimulationGame /></ProtectedRoute>} />
