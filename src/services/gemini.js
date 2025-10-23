@@ -1,5 +1,5 @@
-// Direct API implementation using v1 API - Fresh deployment
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAyc8h7rPTKJ9UM5GF4div6iLgZ_dQ5CNw';
+// Direct API implementation using v1 API - Hardcoded key to bypass Vercel env issues
+const API_KEY = 'AIzaSyAyc8h7rPTKJ9UM5GF4div6iLgZ_dQ5CNw';
 
 console.log('🔑 API Key Status [FRESH BUILD]:', {
   exists: !!API_KEY,
