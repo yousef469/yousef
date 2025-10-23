@@ -1,14 +1,114 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Rocket, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Rocket, CheckCircle, Brain } from 'lucide-react';
 import ThrustSliderDemo from '../components/lessons/ThrustSliderDemo';
 import DragVisualization from '../components/lessons/DragVisualization';
 import StabilityDemo from '../components/lessons/StabilityDemo';
 import OrbitalDemo from '../components/lessons/OrbitalDemo';
+import { rocketLessons } from '../data/rocketLessonsData';
 
 export default function RocketLessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
   const id = parseInt(lessonId);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+
+  // Get lesson data from curriculum
+  const lessonData = rocketLessons[id];
+
+  // Quiz Component
+  const QuizSection = ({ questions }) => {
+    if (!questions || questions.length === 0) return null;
+
+    const question = questions[currentQuestion];
+    const isLastQuestion = currentQuestion === questions.length - 1;
+
+    const handleAnswer = (answer) => {
+      setSelectedAnswer(answer);
+      setShowResult(true);
+      if (answer === question.a) {
+        setScore(score + 1);
+      }
+    };
+
+    const nextQuestion = () => {
+      if (!isLastQuestion) {
+        setCurrentQuestion(currentQuestion + 1);
+        setSelectedAnswer(null);
+        setShowResult(false);
+      }
+    };
+
+    return (
+      <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Brain className="w-6 h-6 text-purple-400" />
+            <h3 className="text-xl font-bold">Knowledge Check</h3>
+          </div>
+          <div className="text-sm text-gray-400">
+            Question {currentQuestion + 1}/{questions.length} • Score: {score}/{questions.length}
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <h4 className="text-lg font-semibold mb-4">{question.q}</h4>
+          <div className="space-y-3">
+            {question.options.map((option, idx) => {
+              const isSelected = selectedAnswer === option;
+              const isCorrect = option === question.a;
+              const showCorrect = showResult && isCorrect;
+              const showWrong = showResult && isSelected && !isCorrect;
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => !showResult && handleAnswer(option)}
+                  disabled={showResult}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                    showCorrect
+                      ? 'border-green-500 bg-green-500/20'
+                      : showWrong
+                      ? 'border-red-500 bg-red-500/20'
+                      : isSelected
+                      ? 'border-purple-500 bg-purple-500/20'
+                      : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {showResult && (
+          <div className="flex justify-end">
+            {isLastQuestion ? (
+              <div className="text-center w-full">
+                <div className="text-2xl font-bold mb-2">
+                  Quiz Complete! Score: {score}/{questions.length}
+                </div>
+                <div className="text-gray-400">
+                  {score === questions.length ? '🎉 Perfect!' : score >= questions.length * 0.7 ? '👍 Good job!' : '💪 Keep learning!'}
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={nextQuestion}
+                className="px-6 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold transition-colors"
+              >
+                Next Question →
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Lesson content mapping
   const lessons = {
@@ -44,9 +144,14 @@ export default function RocketLessonPage() {
     },
     1: {
       unit: 'Flight Dynamics',
-      title: 'Newton\'s Laws of Motion',
-      description: 'Understanding the fundamental forces that make rockets fly',
-      content: <ThrustSliderDemo />
+      title: lessonData?.title || 'Newton\'s Laws of Motion',
+      description: lessonData?.concept || 'Understanding the fundamental forces that make rockets fly',
+      content: (
+        <div className="space-y-8">
+          <ThrustSliderDemo />
+          {lessonData && <QuizSection questions={lessonData.questions} />}
+        </div>
+      )
     },
     2: {
       unit: 'Flight Dynamics',
