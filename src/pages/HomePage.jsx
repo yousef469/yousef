@@ -123,7 +123,7 @@ const HomePage = () => {
 
           {/* Learn Rocket Mechanics */}
           <button
-            onClick={() => user ? navigate('/rockets') : navigate('/auth')}
+            onClick={() => user ? navigate('/learn/rockets') : navigate('/auth')}
             className="group relative bg-gradient-to-br from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
