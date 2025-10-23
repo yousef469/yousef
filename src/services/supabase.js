@@ -44,6 +44,27 @@ export const onAuthStateChange = (callback) => {
   return supabase.auth.onAuthStateChange(callback);
 };
 
+// Social Authentication
+export const signInWithGoogle = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/viewer`
+    }
+  });
+  return { data, error };
+};
+
+export const signInWithApple = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'apple',
+    options: {
+      redirectTo: `${window.location.origin}/viewer`
+    }
+  });
+  return { data, error };
+};
+
 // ============================================
 // PROFILE
 // ============================================

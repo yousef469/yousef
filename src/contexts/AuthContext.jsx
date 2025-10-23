@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser, onAuthStateChange, signIn, signUp, signOut } from '../services/supabase';
+import { getCurrentUser, onAuthStateChange, signIn, signUp, signOut, signInWithGoogle, signInWithApple } from '../services/supabase';
 
 const AuthContext = createContext({});
 
@@ -49,9 +49,17 @@ export const AuthProvider = ({ children }) => {
       return data;
     },
     signOut: async () => {
-      const { error } = await signOut();
+      const { error} = await signOut();
       if (error) throw error;
       setUser(null);
+    },
+    signInWithGoogle: async () => {
+      const { error } = await signInWithGoogle();
+      if (error) throw error;
+    },
+    signInWithApple: async () => {
+      const { error } = await signInWithApple();
+      if (error) throw error;
     },
   };
 
