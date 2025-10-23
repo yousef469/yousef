@@ -8,9 +8,9 @@ console.log('🔑 API Key Status [FRESH BUILD]:', {
   firstChars: API_KEY?.substring(0, 10) + '...'
 });
 
-// Direct API call using v1 endpoint (not v1beta)
+// Direct API call using v1 endpoint with Gemini 2.5 Flash
 const callGeminiAPI = async (prompt) => {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
   
   try {
     console.log('🚀 Calling Gemini API directly...');
