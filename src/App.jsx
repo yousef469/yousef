@@ -22,6 +22,7 @@ import GameMapRockets from './pages/GameMapRockets';
 import GameMapCars from './pages/GameMapCars';
 import GameMapPlanes from './pages/GameMapPlanes';
 import LessonsDemoPage from './pages/LessonsDemoPage';
+import RocketLessonPage from './pages/RocketLessonPage';
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1099,6 +1100,7 @@ export default function App() {
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
           <Route path="/games/map/planes" element={<ProtectedRoute><GameMapPlanes /></ProtectedRoute>} />
           <Route path="/lessons/demo" element={<ProtectedRoute><LessonsDemoPage /></ProtectedRoute>} />
+          <Route path="/lessons/rockets/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/:category/:level" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
           <Route path="/games/journey" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
           <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />

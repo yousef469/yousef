@@ -56,8 +56,8 @@ export default function GameMapRockets() {
 
   const handleLevelClick = (level) => {
     if (isLevelUnlocked(level.id)) {
-      // Navigate to the actual game with this level
-      navigate(`/games/play/rockets/${level.id}`);
+      // Navigate to the specific lesson
+      navigate(`/lessons/rockets/${level.id}`);
     }
   };
 
