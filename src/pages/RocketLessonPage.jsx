@@ -110,113 +110,63 @@ export default function RocketLessonPage() {
     );
   };
 
-  // Lesson content mapping
-  const lessons = {
-    0: {
-      unit: 'Introduction',
-      title: 'Welcome to Rocket Engineering',
-      description: 'Learn the basics of how rockets work and what makes them fly',
-      content: (
-        <div className="space-y-6">
-          <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-8">
-            <h3 className="text-2xl font-bold mb-4">🚀 What You'll Learn</h3>
-            <div className="grid md:grid-cols-2 gap-6 text-gray-300">
-              <div>
-                <h4 className="font-semibold text-cyan-400 mb-2">Unit 1: Flight Dynamics</h4>
-                <p className="text-sm">Forces, thrust, mass, and the rocket equation</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-blue-400 mb-2">Unit 2: Aerodynamics</h4>
-                <p className="text-sm">Drag, streamlines, and nose cone design</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-purple-400 mb-2">Unit 3: Stability</h4>
-                <p className="text-sm">Balance, control, and keeping rockets straight</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-green-400 mb-2">Unit 4: Orbital Mechanics</h4>
-                <p className="text-sm">Getting to space and staying there</p>
-              </div>
+  // Lesson content mapping with interactive demos
+  const interactiveDemos = {
+    0: (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-8">
+          <h3 className="text-2xl font-bold mb-4">🚀 What You'll Learn</h3>
+          <div className="grid md:grid-cols-2 gap-6 text-gray-300">
+            <div>
+              <h4 className="font-semibold text-cyan-400 mb-2">Unit 1: Flight Dynamics</h4>
+              <p className="text-sm">Forces, thrust, mass, and the rocket equation</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-blue-400 mb-2">Unit 2: Aerodynamics</h4>
+              <p className="text-sm">Drag, streamlines, and nose cone design</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-purple-400 mb-2">Unit 3: Stability</h4>
+              <p className="text-sm">Balance, control, and keeping rockets straight</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-green-400 mb-2">Unit 4: Orbital Mechanics</h4>
+              <p className="text-sm">Getting to space and staying there</p>
             </div>
           </div>
         </div>
-      )
-    },
-    1: {
-      unit: 'Flight Dynamics',
-      title: lessonData?.title || 'Newton\'s Laws of Motion',
-      description: lessonData?.concept || 'Understanding the fundamental forces that make rockets fly',
-      content: (
-        <div className="space-y-8">
-          <ThrustSliderDemo />
-          {lessonData && <QuizSection questions={lessonData.questions} />}
-        </div>
-      )
-    },
-    2: {
-      unit: 'Flight Dynamics',
-      title: 'Thrust & Propulsion',
-      description: 'How rocket engines generate thrust',
-      content: <ThrustSliderDemo />
-    },
-    7: {
-      unit: 'Aerodynamics',
-      title: 'Drag Forces',
-      description: 'Understanding air resistance and how to minimize it',
-      content: <DragVisualization />
-    },
-    8: {
-      unit: 'Aerodynamics',
-      title: 'Nose Cone Design',
-      description: 'Why shape matters for high-speed flight',
-      content: <DragVisualization />
-    },
-    13: {
-      unit: 'Stability & Control',
-      title: 'Center of Gravity',
-      description: 'Understanding balance in rocket design',
-      content: <StabilityDemo />
-    },
-    14: {
-      unit: 'Stability & Control',
-      title: 'Center of Pressure',
-      description: 'Where aerodynamic forces act on the rocket',
-      content: <StabilityDemo />
-    },
-    19: {
-      unit: 'Orbital Mechanics',
-      title: 'Kepler\'s Laws',
-      description: 'The mathematics of orbital motion',
-      content: <OrbitalDemo />
-    },
-    20: {
-      unit: 'Orbital Mechanics',
-      title: 'Orbital Elements',
-      description: 'Describing orbits with precision',
-      content: <OrbitalDemo />
-    }
+      </div>
+    ),
+    1: <ThrustSliderDemo />,
+    2: <ThrustSliderDemo />,
+    7: <DragVisualization />,
+    8: <DragVisualization />,
+    13: <StabilityDemo />,
+    14: <StabilityDemo />,
+    19: <OrbitalDemo />,
+    20: <OrbitalDemo />
   };
 
-  // Get lesson from data or use default
-  const lesson = lessons[id] || (lessonData ? {
+  // Build lesson object from data
+  const lessons = {};
+
+  // Build lesson from data
+  const lesson = lessonData ? {
     unit: `Module ${lessonData.module}`,
     title: lessonData.title,
     description: lessonData.concept,
-    content: <QuizSection questions={lessonData.questions} />
-  } : {
-    unit: 'Rocket Engineering',
-    title: `Lesson ${id}`,
-    description: 'Interactive rocket engineering lesson',
     content: (
-      <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-8 text-center">
-        <Rocket className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold mb-4">Lesson Content Coming Soon</h3>
-        <p className="text-gray-400 mb-6">
-          This lesson is being developed. Check back soon for interactive demos and challenges!
-        </p>
+      <div className="space-y-8">
+        {interactiveDemos[id]}
+        <QuizSection questions={lessonData.questions} />
       </div>
     )
-  });
+  } : {
+    unit: 'Introduction',
+    title: 'Welcome to Rocket Engineering',
+    description: 'Start your journey into rocket science',
+    content: interactiveDemos[0]
+  };
 
   const completeLesson = () => {
     // TODO: Save progress to Supabase
