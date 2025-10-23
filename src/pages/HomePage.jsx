@@ -193,6 +193,48 @@ const HomePage = () => {
             </div>
           </button>
         </div>
+
+        {/* Learn by Games Section */}
+        <div className="mt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              Learn Mechanics by Games
+            </h2>
+            <p className="text-gray-300">Master engineering through interactive challenges and simulations</p>
+          </div>
+
+          <button
+            onClick={() => user ? navigate('/games') : navigate('/auth')}
+            className="group relative bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30 w-full max-w-4xl mx-auto block"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">Interactive Engineering Games</h3>
+              <p className="text-white/90 text-center text-sm mb-4">
+                Quiz battles, simulation challenges, build games, and mission scenarios
+              </p>
+              
+              <div className="flex justify-center gap-6 text-sm text-white/80 mb-4">
+                <span>🧠 Quiz Battle</span>
+                <span>⚙️ Simulations</span>
+                <span>🎮 Build Games</span>
+                <span>🚀 Missions</span>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Play Now</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Footer */}

@@ -11,6 +11,9 @@ import ModelViewerPage from './pages/ModelViewerPage';
 import RocketMechanicsPage from './pages/RocketMechanicsPage';
 import CarMechanicsPage from './pages/CarMechanicsPage';
 import PlaneMechanicsPage from './pages/PlaneMechanicsPage';
+import GamesPage from './pages/GamesPage';
+import QuizGame from './pages/QuizGame';
+import SimulationGame from './pages/SimulationGame';
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1083,6 +1086,9 @@ export default function App() {
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
+          <Route path="/games" element={<ProtectedRoute><GamesPage /></ProtectedRoute>} />
+          <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
+          <Route path="/games/simulation" element={<ProtectedRoute><SimulationGame /></ProtectedRoute>} />
           <Route path="/rockets" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/planes" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/cars" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
