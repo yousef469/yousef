@@ -34,12 +34,17 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
     { code: 'it', name: 'Italian', flag: '🇮🇹', nativeName: 'Italiano' }
   ];
 
-  const handleConfirm = () => {
-    i18n.changeLanguage(selectedLang);
-    localStorage.setItem('preferredLanguage', selectedLang);
+  const handleLanguageSelect = (langCode) => {
+    setSelectedLang(langCode);
+    // Change language immediately
+    i18n.changeLanguage(langCode);
+    localStorage.setItem('preferredLanguage', langCode);
     if (onSelect) {
-      onSelect(selectedLang);
+      onSelect(langCode);
     }
+  };
+
+  const handleConfirm = () => {
     onClose();
   };
 
@@ -79,7 +84,7 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
             {languages.map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => setSelectedLang(lang.code)}
+                onClick={() => handleLanguageSelect(lang.code)}
                 className={`relative p-4 rounded-xl border-2 transition-all ${
                   selectedLang === lang.code
                     ? 'border-cyan-400 bg-cyan-500/20'
@@ -115,13 +120,13 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
             </p>
           </div>
 
-          {/* Confirm Button */}
+          {/* Close Button */}
           <button
             onClick={handleConfirm}
             className="w-full mt-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2"
           >
             <Check className="w-5 h-5" />
-            Confirm Language
+            Done
           </button>
         </div>
       </div>
