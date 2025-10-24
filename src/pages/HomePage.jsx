@@ -107,9 +107,41 @@ const HomePage = () => {
           <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             Explore Engineering in 3D
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
             Choose a category to view detailed 3D models with interactive controls
           </p>
+          
+          {/* New Features Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full animate-pulse">
+            <Sparkles className="w-4 h-4 text-green-400" />
+            <span className="text-sm font-semibold text-green-400">
+              NEW: Voice AI • Model Comparison • Leaderboards • PWA Support
+            </span>
+          </div>
+        </div>
+
+        {/* Quick Features Showcase */}
+        <div className="mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-gray-800/50 border border-cyan-500/30 rounded-xl p-4 text-center">
+            <div className="text-3xl mb-2">🎤</div>
+            <div className="text-sm font-semibold text-cyan-400">Voice AI</div>
+            <div className="text-xs text-gray-400">Speak to learn</div>
+          </div>
+          <div className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-4 text-center">
+            <div className="text-3xl mb-2">⚖️</div>
+            <div className="text-sm font-semibold text-purple-400">Compare</div>
+            <div className="text-xs text-gray-400">Side-by-side</div>
+          </div>
+          <div className="bg-gray-800/50 border border-yellow-500/30 rounded-xl p-4 text-center">
+            <div className="text-3xl mb-2">🏆</div>
+            <div className="text-sm font-semibold text-yellow-400">Leaderboard</div>
+            <div className="text-xs text-gray-400">Compete & earn</div>
+          </div>
+          <div className="bg-gray-800/50 border border-green-500/30 rounded-xl p-4 text-center">
+            <div className="text-3xl mb-2">📱</div>
+            <div className="text-sm font-semibold text-green-400">PWA</div>
+            <div className="text-xs text-gray-400">Install as app</div>
+          </div>
         </div>
 
         {/* CTA for non-authenticated users */}
