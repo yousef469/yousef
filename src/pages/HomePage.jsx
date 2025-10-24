@@ -431,6 +431,7 @@ const HomePage = () => {
       <footer className="border-t border-gray-700 mt-20 py-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-500">
           <p>© 2025 AeroAI 3D - Interactive Engineering Education</p>
+          <p className="text-xs mt-2 text-gray-600">v2.0 - Voice AI • Model Comparison • Leaderboards • PWA</p>
         </div>
       </footer>
 
