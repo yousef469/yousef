@@ -9,9 +9,42 @@ export default function ComparePage() {
   const [rightModel, setRightModel] = useState('plane');
 
   const models = [
-    { id: 'rocket', name: 'Falcon 9 Rocket', icon: '🚀', type: 'rocket' },
-    { id: 'plane', name: 'Fighter Jet', icon: '✈️', type: 'plane' },
-    { id: 'car', name: 'Sports Car', icon: '🚗', type: 'car' }
+    { 
+      id: 'rocket', 
+      name: 'Falcon 9 Rocket', 
+      icon: '🚀', 
+      type: 'rocket',
+      path: '/falcon9.glb',
+      modelInfo: {
+        name: 'Falcon 9',
+        type: 'rocket',
+        path: '/falcon9.glb'
+      }
+    },
+    { 
+      id: 'plane', 
+      name: 'Fighter Jet', 
+      icon: '✈️', 
+      type: 'plane',
+      path: '/plane.glb',
+      modelInfo: {
+        name: 'Fighter Jet',
+        type: 'plane',
+        path: '/plane.glb'
+      }
+    },
+    { 
+      id: 'car', 
+      name: 'Sports Car', 
+      icon: '🚗', 
+      type: 'car',
+      path: '/porsche.glb',
+      modelInfo: {
+        name: 'Porsche',
+        type: 'car',
+        path: '/porsche.glb'
+      }
+    }
   ];
 
   const comparisonData = {
@@ -154,7 +187,7 @@ export default function ComparePage() {
               </select>
             </div>
             <div className="h-96 bg-gradient-to-br from-gray-900 to-black rounded-xl border border-gray-700 overflow-hidden">
-              <ThreeJSViewer modelType={leftModel} />
+              <ThreeJSViewer modelInfo={models.find(m => m.id === leftModel)?.modelInfo} />
             </div>
           </div>
 
@@ -175,7 +208,7 @@ export default function ComparePage() {
               </select>
             </div>
             <div className="h-96 bg-gradient-to-br from-gray-900 to-black rounded-xl border border-gray-700 overflow-hidden">
-              <ThreeJSViewer modelType={rightModel} />
+              <ThreeJSViewer modelInfo={models.find(m => m.id === rightModel)?.modelInfo} />
             </div>
           </div>
         </div>
