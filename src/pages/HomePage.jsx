@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import CommunityQA from '../components/CommunityQA';
 import Leaderboard from '../components/Leaderboard';
+import VoiceInput, { speakText } from '../components/VoiceInput';
+import ModelComparison from '../components/ModelComparison';
 import { askGemini } from '../services/gemini';
 
 const HomePage = () => {
@@ -12,22 +14,36 @@ const HomePage = () => {
   const [aiInput, setAiInput] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
-  const handleAskAI = async () => {
-    if (!aiInput.trim() || aiLoading) return;
+  const handleAskAI = async (question = aiInput) => {
+    if (!question.trim() || aiLoading) return;
 
-    const question = aiInput.trim();
+    const q = question.trim();
     setAiInput('');
     setAiLoading(true);
     setAiResponse('');
 
     try {
-      const result = await askGemini(question, []);
+      const result = await askGemini(q, []);
       setAiResponse(result.response);
+      
+      // Speak the response
+      speakText(result.response);
     } catch (error) {
       setAiResponse('Sorry, I had trouble processing that. Please try again.');
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  const handleVoiceTranscript = (transcript) => {
+    setAiInput(transcript);
+  };
+
+  const handleVoiceSpeechEnd = (transcript) => {
+    if (transcript.trim()) {
+      handleAskAI(transcript);
     }
   };
 
@@ -218,52 +234,81 @@ const HomePage = () => {
           </button>
         </div>
 
-        {/* Learn by Games Section */}
+        {/* Learn by Games & Compare Models Section */}
         <div className="mt-16">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              Learn Mechanics by Games
+              Interactive Learning
             </h2>
-            <p className="text-gray-300">Master engineering through interactive challenges and simulations</p>
+            <p className="text-gray-300">Master engineering through games and comparisons</p>
           </div>
 
-          <button
-            onClick={() => user ? navigate('/games') : navigate('/auth')}
-            className="group relative bg-gradient-to-br from-purple-500 via-blue-600 to-cyan-500 hover:from-purple-600 hover:via-blue-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30 w-full max-w-4xl mx-auto block"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-            
-            <div className="relative z-10">
-              <div className="flex justify-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur animate-bounce">
-                  <Rocket className="w-8 h-8 text-white" />
+          <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            {/* Games Button */}
+            <button
+              onClick={() => user ? navigate('/games') : navigate('/auth')}
+              className="group relative bg-gradient-to-br from-purple-500 via-blue-600 to-cyan-500 hover:from-purple-600 hover:via-blue-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur animate-bounce">
+                    <Rocket className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 Engineering Journey</h3>
+                <p className="text-white/90 text-center mb-4">
+                  Complete challenges and watch your rocket fly to space!
+                </p>
+                
+                <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
+                  <span>🧠 Quiz</span>
+                  <span>🧩 Matching</span>
+                  <span>⚙️ Simulation</span>
+                  <span>🔧 Building</span>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                  <span>Start Journey</span>
+                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
-              
-              <h3 className="text-3xl font-bold mb-3 text-white text-center">🚀 Engineering Journey</h3>
-              <p className="text-white/90 text-center text-lg mb-4">
-                Complete challenges and watch your rocket fly to space!
-              </p>
-              
-              <div className="flex justify-center gap-6 text-sm text-white/80 mb-4">
-                <span>🧠 Quiz</span>
-                <span>🧩 Matching</span>
-                <span>⚙️ Simulation</span>
-                <span>🔧 Building</span>
-              </div>
+            </button>
 
-              <div className="bg-white/10 backdrop-blur rounded-lg p-3 mb-4 max-w-md mx-auto">
-                <p className="text-white/80 text-sm text-center">
-                  Mixed challenges • Progressive difficulty • Track your rocket's altitude
+            {/* Compare Models Button */}
+            <button
+              onClick={() => setShowComparison(true)}
+              className="group relative bg-gradient-to-br from-orange-500 via-pink-600 to-purple-500 hover:from-orange-600 hover:via-pink-700 hover:to-purple-600 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                    <ArrowLeftRight className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ Compare Models</h3>
+                <p className="text-white/90 text-center mb-4">
+                  View models side-by-side and learn the differences!
                 </p>
-              </div>
+                
+                <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
+                  <span>🚀 Rocket</span>
+                  <span>✈️ Plane</span>
+                  <span>🚗 Car</span>
+                </div>
 
-              <div className="flex items-center justify-center gap-2 text-white font-semibold text-lg">
-                <span>Start Journey</span>
-                <span className="text-2xl group-hover:translate-x-1 transition-transform">🚀</span>
+                <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                  <span>Start Comparing</span>
+                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Quick AI Assistant */}
@@ -286,8 +331,15 @@ const HomePage = () => {
                 className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
                 disabled={aiLoading}
               />
+              
+              {/* Voice Input */}
+              <VoiceInput 
+                onTranscript={handleVoiceTranscript}
+                onSpeechEnd={handleVoiceSpeechEnd}
+              />
+              
               <button
-                onClick={handleAskAI}
+                onClick={() => handleAskAI()}
                 disabled={!aiInput.trim() || aiLoading}
                 className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-700 disabled:to-gray-700 rounded-lg font-semibold transition-all flex items-center gap-2"
               >
@@ -349,6 +401,9 @@ const HomePage = () => {
           <p>© 2025 AeroAI 3D - Interactive Engineering Education</p>
         </div>
       </footer>
+
+      {/* Model Comparison Modal */}
+      <ModelComparison isOpen={showComparison} onClose={() => setShowComparison(false)} />
     </div>
   );
 };
