@@ -1,10 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Globe, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function LanguageSelector({ isOpen, onClose, onSelect }) {
   const { i18n } = useTranslation();
   const [selectedLang, setSelectedLang] = useState(i18n.language || 'en');
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
@@ -33,8 +46,14 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 border border-cyan-400 rounded-2xl max-w-2xl w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+    <div 
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-gray-900 border border-cyan-400 rounded-2xl max-w-2xl w-full shadow-2xl animate-in fade-in zoom-in duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
