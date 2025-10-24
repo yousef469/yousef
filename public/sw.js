@@ -1,6 +1,7 @@
 // Service Worker for AeroAI 3D
-const CACHE_NAME = 'aeroai-3d-v1';
-const RUNTIME_CACHE = 'aeroai-runtime-v1';
+const CACHE_VERSION = '2.0.1'; // Increment this to force cache refresh
+const CACHE_NAME = `aeroai-3d-v${CACHE_VERSION}`;
+const RUNTIME_CACHE = `aeroai-runtime-v${CACHE_VERSION}`;
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
@@ -88,18 +89,39 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache first strategy for everything else
+  // Network first strategy for HTML/JS/CSS (always get fresh content)
+  if (request.destination === 'document' || 
+      request.destination === 'script' || 
+      request.destination === 'style' ||
+      request.url.includes('.js') ||
+      request.url.includes('.css') ||
+      request.url.includes('.html')) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          // Cache the fresh response
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Fallback to cache if offline
+          return caches.match(request).then((cachedResponse) => {
+            return cachedResponse || caches.match('/index.html');
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache first strategy for images and other assets
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cached version and update cache in background
-        fetch(request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(RUNTIME_CACHE).then((cache) => {
-              cache.put(request, networkResponse);
-            });
-          }
-        });
         return cachedResponse;
       }
 
