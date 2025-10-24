@@ -77,6 +77,16 @@ const HomePage = () => {
             
             {/* Auth Buttons */}
             <div className="flex items-center gap-3">
+              {/* Language Selector Button */}
+              <button
+                onClick={() => setShowLangModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
+                title="Change Language"
+              >
+                <Globe className="w-4 h-4" />
+                <span className="hidden sm:inline">Language</span>
+              </button>
+
               {user ? (
                 <>
                   <div className="text-sm text-gray-400">
