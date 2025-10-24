@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import CommunityQA from '../components/CommunityQA';
+import { askGemini } from '../services/gemini';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [aiInput, setAiInput] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const handleAskAI = async () => {
+    if (!aiInput.trim() || aiLoading) return;
+
+    const question = aiInput.trim();
+    setAiInput('');
+    setAiLoading(true);
+    setAiResponse('');
+
+    try {
+      const result = await askGemini(question, []);
+      setAiResponse(result.response);
+    } catch (error) {
+      setAiResponse('Sorry, I had trouble processing that. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
 
 
@@ -241,6 +263,63 @@ const HomePage = () => {
               </div>
             </div>
           </button>
+        </div>
+
+        {/* Quick AI Assistant */}
+        <div className="mt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Quick AI Assistant
+            </h2>
+            <p className="text-gray-300">Get instant answers to your engineering questions</p>
+          </div>
+
+          <div className="max-w-3xl mx-auto bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
+            <div className="flex gap-3 mb-4">
+              <input
+                type="text"
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAskAI()}
+                placeholder="Ask anything about rockets, planes, or cars..."
+                className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
+                disabled={aiLoading}
+              />
+              <button
+                onClick={handleAskAI}
+                disabled={!aiInput.trim() || aiLoading}
+                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-700 disabled:to-gray-700 rounded-lg font-semibold transition-all flex items-center gap-2"
+              >
+                {aiLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Thinking...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Ask</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {aiResponse && (
+              <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-cyan-400 font-semibold mb-2">
+                  <Bot className="w-5 h-5" />
+                  <span>AI Response</span>
+                </div>
+                <p className="text-gray-300 whitespace-pre-wrap">{aiResponse}</p>
+              </div>
+            )}
+
+            {!aiResponse && !aiLoading && (
+              <div className="text-center text-gray-500 text-sm">
+                <p>Try asking: "How does a rocket engine work?" or "Explain lift force on airplane wings"</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Community Q&A Section */}

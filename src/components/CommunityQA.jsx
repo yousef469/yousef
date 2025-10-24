@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, ThumbsUp, ThumbsDown, Send, User, Clock } from 'lucide-react';
+import { MessageCircle, ThumbsUp, ThumbsDown, Send, User, Clock, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { askGemini } from '../services/gemini';
 
 export default function CommunityQA({ modelId, lessonId }) {
   const { user } = useAuth();
@@ -67,12 +68,16 @@ export default function CommunityQA({ modelId, lessonId }) {
   const handleAskQuestion = async () => {
     if (!newQuestion.trim() || !user) return;
 
-    // TODO: Save to Supabase
+    const questionText = newQuestion.trim();
+    setNewQuestion('');
+
+    // Create question with loading state for AI answer
     const question = {
       id: Date.now(),
       user: { name: user.email.split('@')[0], avatar: '👤' },
-      question: newQuestion,
+      question: questionText,
       answer: null,
+      aiAnswer: { loading: true, content: null },
       upvotes: 0,
       downvotes: 0,
       replies: 0,
@@ -82,7 +87,34 @@ export default function CommunityQA({ modelId, lessonId }) {
     };
 
     setQuestions([question, ...questions]);
-    setNewQuestion('');
+
+    // Get AI response automatically
+    try {
+      const result = await askGemini(questionText, []);
+      
+      // Update question with AI answer
+      setQuestions(prev => prev.map(q => 
+        q.id === question.id 
+          ? { 
+              ...q, 
+              aiAnswer: { loading: false, content: result.response },
+              answer: result.response // Set as the answer
+            }
+          : q
+      ));
+    } catch (error) {
+      console.error('AI response error:', error);
+      setQuestions(prev => prev.map(q => 
+        q.id === question.id 
+          ? { 
+              ...q, 
+              aiAnswer: { loading: false, content: null }
+            }
+          : q
+      ));
+    }
+
+    // TODO: Save to Supabase
   };
 
   const handleVote = (questionId, voteType) => {
@@ -202,11 +234,29 @@ export default function CommunityQA({ modelId, lessonId }) {
               </div>
             </div>
 
+            {/* AI Answer */}
+            {q.aiAnswer?.loading && (
+              <div className="ml-11 mb-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <div className="flex items-center gap-2 text-xs text-blue-400 font-semibold mb-2">
+                  <Sparkles className="w-3 h-3 animate-pulse" />
+                  AI is thinking...
+                </div>
+                <div className="flex space-x-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+              </div>
+            )}
+
             {/* Answer */}
-            {q.answer && (
-              <div className="ml-11 mb-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <div className="text-xs text-green-400 font-semibold mb-1">✓ Answer</div>
-                <p className="text-sm text-gray-300">{q.answer}</p>
+            {q.answer && !q.aiAnswer?.loading && (
+              <div className="ml-11 mb-3 p-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg">
+                <div className="flex items-center gap-2 text-xs text-blue-400 font-semibold mb-1">
+                  <Sparkles className="w-3 h-3" />
+                  AI Answer
+                </div>
+                <p className="text-sm text-gray-300 whitespace-pre-wrap">{q.answer}</p>
               </div>
             )}
 
