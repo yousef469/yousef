@@ -8,20 +8,7 @@
   "background_color": "#0a0a0f",
   "theme_color": "#22d3ee",
   "orientation": "any",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
+  "icons": [],
   "categories": ["education", "engineering", "3d"],
   "screenshots": [
     {
@@ -35,22 +22,19 @@
       "name": "3D Models",
       "short_name": "Models",
       "description": "View interactive 3D models",
-      "url": "/rockets",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "url": "/rockets"
     },
     {
       "name": "Learn",
       "short_name": "Learn",
       "description": "Start learning",
-      "url": "/learn/rockets",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "url": "/learn/rockets"
     },
     {
       "name": "Games",
       "short_name": "Games",
       "description": "Play engineering games",
-      "url": "/games",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "url": "/games"
     }
   ]
 }

@@ -51,6 +51,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip POST requests (can't be cached)
+  if (request.method !== 'GET') {
+    return;
+  }
+
   // Handle GLB files specially - cache them for offline use
   if (request.url.endsWith('.glb')) {
     event.respondWith(
