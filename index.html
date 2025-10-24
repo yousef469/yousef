@@ -5,6 +5,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Prevent aggressive caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#22d3ee" />
@@ -54,16 +59,40 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     
-    <!-- Service Worker Unregistration (disabled for now) -->
+    <!-- Service Worker Cleanup & Cache Clear -->
     <script>
-      // Unregister any existing service workers to prevent caching issues
+      // Aggressively unregister service workers and clear caches
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
           for(let registration of registrations) {
-            registration.unregister();
-            console.log('🗑️ Service Worker unregistered');
+            registration.unregister().then(function() {
+              console.log('🗑️ Service Worker unregistered');
+            });
           }
         });
+      }
+      
+      // Clear all caches
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) {
+            caches.delete(name);
+            console.log('🗑️ Cache deleted:', name);
+          }
+        });
+      }
+      
+      // Force reload from server (bypass cache)
+      if (performance.navigation.type !== 1) {
+        // Not a refresh, check if we need to force reload
+        const lastVersion = localStorage.getItem('app-version');
+        const currentVersion = '2.0.2';
+        
+        if (lastVersion !== currentVersion) {
+          localStorage.setItem('app-version', currentVersion);
+          console.log('🔄 New version detected, reloading...');
+          window.location.reload(true);
+        }
       }
     </script>
   </body>
