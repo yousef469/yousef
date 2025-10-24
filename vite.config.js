@@ -9,10 +9,15 @@ export default defineConfig({
     open: true
   },
   build: {
-    chunkSizeWarningLimit: 1000, // Increase from default 500kb to 1000kb
+    chunkSizeWarningLimit: 1600, // Increase to handle large bundle
     rollupOptions: {
       output: {
-        manualChunks: undefined
+        manualChunks: {
+          'three': ['three'],
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['lucide-react'],
+          'services': ['@supabase/supabase-js', '@google/generative-ai']
+        }
       }
     }
   }
