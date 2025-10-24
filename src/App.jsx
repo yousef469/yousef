@@ -1078,6 +1078,7 @@ const VehicleCard = ({ icon: Icon, title, description, gradient, onClick, delay 
 import IntroAnimation from './components/IntroAnimation';
 import AllInOnePage from './pages/AllInOnePage';
 import AuthPage from './pages/AuthPage';
+import ComparePage from './pages/ComparePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useState as useAppState } from 'react';
 
@@ -1095,6 +1096,7 @@ export default function App() {
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
+          <Route path="/compare" element={<ComparePage />} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />

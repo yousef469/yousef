@@ -322,7 +322,7 @@ const HomePage = () => {
 
             {/* Compare Models Button */}
             <button
-              onClick={() => setShowComparison(true)}
+              onClick={() => navigate('/compare')}
               className="group relative bg-gradient-to-br from-orange-500 via-pink-600 to-purple-500 hover:from-orange-600 hover:via-pink-700 hover:to-purple-600 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
