@@ -167,4 +167,22 @@ i18n
     }
   });
 
+// RTL languages list
+const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
+
+// Set document direction based on language
+const setDocumentDirection = (language) => {
+  const isRTL = rtlLanguages.includes(language);
+  document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  document.documentElement.lang = language;
+};
+
+// Set initial direction
+setDocumentDirection(i18n.language);
+
+// Update direction when language changes
+i18n.on('languageChanged', (lng) => {
+  setDocumentDirection(lng);
+});
+
 export default i18n;

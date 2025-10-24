@@ -43,3 +43,39 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* RTL Support for Arabic and other RTL languages */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .flex {
+  flex-direction: row-reverse;
+}
+
+/* Preserve specific flex directions in RTL */
+[dir="rtl"] .flex-col {
+  flex-direction: column;
+}
+
+[dir="rtl"] .flex-col-reverse {
+  flex-direction: column-reverse;
+}
+
+/* Adjust spacing for RTL */
+[dir="rtl"] .gap-2,
+[dir="rtl"] .gap-3,
+[dir="rtl"] .gap-4 {
+  gap: inherit;
+}
+
+/* Icons and buttons should maintain LTR in RTL context */
+[dir="rtl"] svg {
+  transform: scaleX(-1);
+}
+
+/* Don't flip certain icons */
+[dir="rtl"] .no-flip {
+  transform: none;
+}
