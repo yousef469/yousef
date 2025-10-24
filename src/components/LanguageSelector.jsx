@@ -19,19 +19,16 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
     };
   }, [isOpen]);
 
+  // Core 8 languages for global reach
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
+    { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' },
     { code: 'es', name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' },
     { code: 'fr', name: 'French', flag: '🇫🇷', nativeName: 'Français' },
-    { code: 'de', name: 'German', flag: '🇩🇪', nativeName: 'Deutsch' },
     { code: 'zh', name: 'Chinese', flag: '🇨🇳', nativeName: '中文' },
-    { code: 'ja', name: 'Japanese', flag: '🇯🇵', nativeName: '日本語' },
-    { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' },
-    { code: 'pt', name: 'Portuguese', flag: '🇧🇷', nativeName: 'Português' },
-    { code: 'ru', name: 'Russian', flag: '🇷🇺', nativeName: 'Русский' },
     { code: 'hi', name: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी' },
-    { code: 'ko', name: 'Korean', flag: '🇰🇷', nativeName: '한국어' },
-    { code: 'it', name: 'Italian', flag: '🇮🇹', nativeName: 'Italiano' }
+    { code: 'pt', name: 'Portuguese', flag: '🇧🇷', nativeName: 'Português' },
+    { code: 'ru', name: 'Russian', flag: '🇷🇺', nativeName: 'Русский' }
   ];
 
   const handleLanguageSelect = (langCode) => {
