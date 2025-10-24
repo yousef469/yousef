@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import CommunityQA from '../components/CommunityQA';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -240,6 +241,20 @@ const HomePage = () => {
               </div>
             </div>
           </button>
+        </div>
+
+        {/* Community Q&A Section */}
+        <div className="mt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+              Community Q&A
+            </h2>
+            <p className="text-gray-300">Ask questions, share knowledge, and learn from the engineering community</p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            <CommunityQA />
+          </div>
         </div>
       </div>
 
