@@ -1,0 +1,55 @@
+{
+  "name": "AeroAI 3D - Interactive Engineering Education",
+  "short_name": "AeroAI 3D",
+  "description": "Learn aerospace and automotive engineering through interactive 3D models, AI tutoring, and gamified lessons",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#22d3ee",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "engineering", "3d"],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "3D Models",
+      "short_name": "Models",
+      "description": "View interactive 3D models",
+      "url": "/rockets",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Learn",
+      "short_name": "Learn",
+      "description": "Start learning",
+      "url": "/learn/rockets",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Games",
+      "short_name": "Games",
+      "description": "Play engineering games",
+      "url": "/games",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
