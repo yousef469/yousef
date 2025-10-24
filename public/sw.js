@@ -51,9 +51,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip POST requests (can't be cached)
+  // Skip non-GET requests (can't be cached)
   if (request.method !== 'GET') {
-    return;
+    return fetch(request);
   }
 
   // Handle GLB files specially - cache them for offline use
@@ -171,8 +171,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'AeroAI 3D';
   const options = {
     body: data.body || 'New content available!',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/icon.svg',
+    badge: '/icon.svg',
     data: data.url || '/'
   };
 
