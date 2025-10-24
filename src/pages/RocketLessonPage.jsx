@@ -5,6 +5,7 @@ import ThrustSliderDemo from '../components/lessons/ThrustSliderDemo';
 import DragVisualization from '../components/lessons/DragVisualization';
 import StabilityDemo from '../components/lessons/StabilityDemo';
 import OrbitalDemo from '../components/lessons/OrbitalDemo';
+import CommunityQA from '../components/CommunityQA';
 import { rocketLessons } from '../data/rocketLessonsData';
 
 export default function RocketLessonPage() {
@@ -210,6 +211,11 @@ export default function RocketLessonPage() {
         </div>
 
         {lesson.content}
+
+        {/* Community Q&A */}
+        <div className="mt-12">
+          <CommunityQA lessonId={id} />
+        </div>
 
         {/* Navigation */}
         <div className="mt-8 flex justify-between items-center">
