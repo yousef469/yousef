@@ -70,8 +70,8 @@ const HomePage = () => {
             <div className="flex items-center gap-3">
               <Sparkles className="w-8 h-8 text-cyan-400" />
               <div>
-                <h1 className="text-3xl font-bold">AeroAI 3D</h1>
-                <p className="text-gray-400 text-sm mt-1">Interactive 3D Engineering Models</p>
+                <h1 className="text-3xl font-bold">{t('app.title')}</h1>
+                <p className="text-gray-400 text-sm mt-1">{t('app.subtitle')}</p>
               </div>
             </div>
             
@@ -81,22 +81,22 @@ const HomePage = () => {
               <button
                 onClick={() => setShowLangModal(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
-                title="Change Language"
+                title={t('nav.language')}
               >
                 <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">Language</span>
+                <span className="hidden sm:inline">{t('nav.language')}</span>
               </button>
 
               {user ? (
                 <>
                   <div className="text-sm text-gray-400">
-                    Welcome, <span className="text-cyan-400 font-semibold">{user.email}</span>
+                    {t('nav.welcome')}, <span className="text-cyan-400 font-semibold">{user.email}</span>
                   </div>
                   <button
                     onClick={() => signOut()}
                     className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
                   >
-                    Sign Out
+                    {t('nav.signOut')}
                   </button>
                 </>
               ) : (
@@ -106,14 +106,14 @@ const HomePage = () => {
                     className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
                   >
                     <LogIn className="w-4 h-4" />
-                    <span>Login</span>
+                    <span>{t('nav.login')}</span>
                   </button>
                   <button
                     onClick={() => navigate('/auth')}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-colors text-sm font-medium"
                   >
                     <UserPlus className="w-4 h-4" />
-                    <span>Sign Up</span>
+                    <span>{t('nav.signUp')}</span>
                   </button>
                 </>
               )}
