@@ -4,6 +4,7 @@
   "description": "Learn aerospace and automotive engineering through interactive 3D models, AI tutoring, and gamified lessons",
   "start_url": "/",
   "display": "standalone",
+  "prefer_related_applications": false,
   "background_color": "#0a0a0f",
   "theme_color": "#22d3ee",
   "orientation": "any",
