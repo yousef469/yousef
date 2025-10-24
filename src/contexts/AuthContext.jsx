@@ -14,6 +14,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
   useEffect(() => {
     // Check active session
@@ -46,8 +47,14 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await signUp(email, password, fullName);
       if (error) throw error;
       setUser(data.user);
+      // Show language selector for new users
+      if (!localStorage.getItem('preferredLanguage')) {
+        setShowLanguageSelector(true);
+      }
       return data;
     },
+    showLanguageSelector,
+    setShowLanguageSelector,
     signOut: async () => {
       const { error} = await signOut();
       if (error) throw error;

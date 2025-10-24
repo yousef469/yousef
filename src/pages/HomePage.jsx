@@ -1,20 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import CommunityQA from '../components/CommunityQA';
 import Leaderboard from '../components/Leaderboard';
 import VoiceInput, { speakText } from '../components/VoiceInput';
 import ModelComparison from '../components/ModelComparison';
+import LanguageSelector from '../components/LanguageSelector';
 import { askGemini } from '../services/gemini';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut, showLanguageSelector, setShowLanguageSelector } = useAuth();
+  const { t } = useTranslation();
   const [aiInput, setAiInput] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
+  const [showLangModal, setShowLangModal] = useState(false);
+
+  // Show language selector for new users
+  useEffect(() => {
+    if (showLanguageSelector) {
+      setShowLangModal(true);
+    }
+  }, [showLanguageSelector]);
 
   const handleAskAI = async (question = aiInput) => {
     if (!question.trim() || aiLoading) return;
@@ -437,6 +448,20 @@ const HomePage = () => {
 
       {/* Model Comparison Modal */}
       <ModelComparison isOpen={showComparison} onClose={() => setShowComparison(false)} />
+
+      {/* Language Selector Modal */}
+      <LanguageSelector 
+        isOpen={showLangModal} 
+        onClose={() => {
+          setShowLangModal(false);
+          if (setShowLanguageSelector) {
+            setShowLanguageSelector(false);
+          }
+        }}
+        onSelect={(lang) => {
+          console.log('Language selected:', lang);
+        }}
+      />
     </div>
   );
 };
