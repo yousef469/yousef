@@ -126,17 +126,17 @@ const HomePage = () => {
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Explore Engineering in 3D
+            {t('home.hero.title')}
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
-            Choose a category to view detailed 3D models with interactive controls
+            {t('home.hero.subtitle')}
           </p>
           
           {/* New Features Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full animate-pulse">
             <Sparkles className="w-4 h-4 text-green-400" />
             <span className="text-sm font-semibold text-green-400">
-              NEW: Voice AI • Model Comparison • Leaderboards • PWA Support
+              {t('home.hero.new')}
             </span>
           </div>
         </div>
@@ -145,23 +145,23 @@ const HomePage = () => {
         <div className="mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-gray-800/50 border border-cyan-500/30 rounded-xl p-4 text-center">
             <div className="text-3xl mb-2">🎤</div>
-            <div className="text-sm font-semibold text-cyan-400">Voice AI</div>
-            <div className="text-xs text-gray-400">Speak to learn</div>
+            <div className="text-sm font-semibold text-cyan-400">{t('home.features.voiceAI')}</div>
+            <div className="text-xs text-gray-400">{t('home.features.voiceAI.desc')}</div>
           </div>
           <div className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-4 text-center">
             <div className="text-3xl mb-2">⚖️</div>
-            <div className="text-sm font-semibold text-purple-400">Compare</div>
-            <div className="text-xs text-gray-400">Side-by-side</div>
+            <div className="text-sm font-semibold text-purple-400">{t('home.features.compare')}</div>
+            <div className="text-xs text-gray-400">{t('home.features.compare.desc')}</div>
           </div>
           <div className="bg-gray-800/50 border border-yellow-500/30 rounded-xl p-4 text-center">
             <div className="text-3xl mb-2">🏆</div>
-            <div className="text-sm font-semibold text-yellow-400">Leaderboard</div>
-            <div className="text-xs text-gray-400">Compete & earn</div>
+            <div className="text-sm font-semibold text-yellow-400">{t('home.features.leaderboard')}</div>
+            <div className="text-xs text-gray-400">{t('home.features.leaderboard.desc')}</div>
           </div>
           <div className="bg-gray-800/50 border border-green-500/30 rounded-xl p-4 text-center">
             <div className="text-3xl mb-2">📱</div>
-            <div className="text-sm font-semibold text-green-400">PWA</div>
-            <div className="text-xs text-gray-400">Install as app</div>
+            <div className="text-sm font-semibold text-green-400">{t('home.features.pwa')}</div>
+            <div className="text-xs text-gray-400">{t('home.features.pwa.desc')}</div>
           </div>
         </div>
 
@@ -202,13 +202,13 @@ const HomePage = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">3D Models Viewer</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.viewer.title')}</h3>
               <p className="text-white/90 text-center mb-4">
-                Explore all models in interactive 3D
+                {t('home.viewer.desc')}
               </p>
               
               <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>Launch Viewer</span>
+                <span>{t('home.viewer.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
