@@ -168,14 +168,14 @@ const HomePage = () => {
         {/* CTA for non-authenticated users */}
         {!user && (
           <div className="mb-12 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-8 text-center">
-            <h3 className="text-2xl font-bold mb-3">Ready to explore?</h3>
-            <p className="text-gray-300 mb-6">Sign up now to access all 3D models and AI-powered learning</p>
+            <h3 className="text-2xl font-bold mb-3">{t('home.hero.readyToExplore')}</h3>
+            <p className="text-gray-300 mb-6">{t('home.hero.signUpNow')}</p>
             <button
               onClick={() => navigate('/auth')}
               className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-all font-semibold text-lg"
             >
               <UserPlus className="w-5 h-5" />
-              <span>Get Started Free</span>
+              <span>{t('home.hero.getStarted')}</span>
             </button>
           </div>
         )}
@@ -226,13 +226,13 @@ const HomePage = () => {
                 <Rocket className="w-8 h-8 text-white" />
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Rocket Mechanics</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.learn.rockets')}</h3>
               <p className="text-white/90 text-center text-sm mb-4">
-                Master propulsion, orbital mechanics, staging, and launch systems
+                {t('home.learn.rocketsDesc')}
               </p>
               
               <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>Start Learning</span>
+                <span>{t('home.learn.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -250,13 +250,13 @@ const HomePage = () => {
                 <Plane className="w-8 h-8 text-white" />
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Plane Mechanics</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.learn.planes')}</h3>
               <p className="text-white/90 text-center text-sm mb-4">
-                Understand aerodynamics, flight controls, engines, and aviation systems
+                {t('home.learn.planesDesc')}
               </p>
               
               <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>Start Learning</span>
+                <span>{t('home.learn.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -274,13 +274,13 @@ const HomePage = () => {
                 <Car className="w-8 h-8 text-white" />
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Car Mechanics</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.learn.cars')}</h3>
               <p className="text-white/90 text-center text-sm mb-4">
-                Explore engines, transmissions, suspension, and automotive engineering
+                {t('home.learn.carsDesc')}
               </p>
               
               <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>Start Learning</span>
+                <span>{t('home.learn.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -291,9 +291,9 @@ const HomePage = () => {
         <div className="mt-16">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              Interactive Learning
+              {t('home.interactive.title')}
             </h2>
-            <p className="text-gray-300">Master engineering through games and comparisons</p>
+            <p className="text-gray-300">{t('home.interactive.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
@@ -311,20 +311,20 @@ const HomePage = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 Engineering Journey</h3>
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 {t('home.journey.title')}</h3>
                 <p className="text-white/90 text-center mb-4">
-                  Complete challenges and watch your rocket fly to space!
+                  {t('home.journey.desc')}
                 </p>
                 
                 <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
-                  <span>🧠 Quiz</span>
-                  <span>🧩 Matching</span>
-                  <span>⚙️ Simulation</span>
-                  <span>🔧 Building</span>
+                  <span>🧠 {t('home.journey.quiz')}</span>
+                  <span>🧩 {t('home.journey.matching')}</span>
+                  <span>⚙️ {t('home.journey.simulation')}</span>
+                  <span>🔧 {t('home.journey.building')}</span>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <span>Start Journey</span>
+                  <span>{t('home.journey.button')}</span>
                   <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
@@ -344,19 +344,19 @@ const HomePage = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ Compare Models</h3>
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ {t('home.compare.title')}</h3>
                 <p className="text-white/90 text-center mb-4">
-                  View models side-by-side and learn the differences!
+                  {t('home.compare.desc')}
                 </p>
                 
                 <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
-                  <span>🚀 Rocket</span>
-                  <span>✈️ Plane</span>
-                  <span>🚗 Car</span>
+                  <span>🚀 {t('home.compare.rocket')}</span>
+                  <span>✈️ {t('home.compare.plane')}</span>
+                  <span>🚗 {t('home.compare.car')}</span>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <span>Start Comparing</span>
+                  <span>{t('home.compare.button')}</span>
                   <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
