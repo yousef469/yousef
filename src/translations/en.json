@@ -1,0 +1,183 @@
+{
+  "app": {
+    "title": "AeroAI 3D",
+    "subtitle": "Interactive 3D Engineering Models",
+    "footer": "Interactive Engineering Education"
+  },
+  "nav": {
+    "language": "Language",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "welcome": "Welcome"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back!",
+    "startJourney": "Start your engineering journey",
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "createAccount": "Create Account",
+    "continueWith": "Or continue with",
+    "continueGoogle": "Continue with Google",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "pleaseWait": "Please wait...",
+    "whySignUp": "Why create an account?",
+    "benefit1": "Access all 3D models with realistic fire effects",
+    "benefit2": "Interactive AI tutor powered by Gemini",
+    "benefit3": "Save your favorite models and progress",
+    "benefit4": "Engineering lessons and tutorials",
+    "features": {
+      "models": "100+",
+      "modelsLabel": "3D Models",
+      "ai": "AI",
+      "aiLabel": "Tutor",
+      "free": "Free",
+      "freeLabel": "Forever"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Explore Engineering in 3D",
+      "subtitle": "Choose a category to view detailed 3D models with interactive controls",
+      "new": "NEW: Voice AI • Model Comparison • Leaderboards • PWA Support",
+      "getStarted": "Get Started Free",
+      "readyToExplore": "Ready to explore?",
+      "signUpNow": "Sign up now to access all 3D models and AI-powered learning"
+    },
+    "features": {
+      "voiceAI": "Voice AI",
+      "voiceAIDesc": "Speak to learn",
+      "compare": "Compare",
+      "compareDesc": "Side-by-side",
+      "leaderboard": "Leaderboard",
+      "leaderboardDesc": "Compete & earn",
+      "pwa": "PWA",
+      "pwaDesc": "Install as app"
+    },
+    "viewer": {
+      "title": "3D Models Viewer",
+      "desc": "Explore all models in interactive 3D",
+      "button": "Launch Viewer"
+    },
+    "learn": {
+      "rockets": "Learn Rocket Mechanics",
+      "rocketsDesc": "Master propulsion, orbital mechanics, staging, and launch systems",
+      "planes": "Learn Plane Mechanics",
+      "planesDesc": "Understand aerodynamics, flight controls, engines, and aviation systems",
+      "cars": "Learn Car Mechanics",
+      "carsDesc": "Explore engines, transmissions, suspension, and automotive engineering",
+      "button": "Start Learning"
+    },
+    "interactive": {
+      "title": "Interactive Learning",
+      "subtitle": "Master engineering through games and comparisons"
+    },
+    "journey": {
+      "title": "Engineering Journey",
+      "desc": "Complete challenges and watch your rocket fly to space!",
+      "quiz": "Quiz",
+      "matching": "Matching",
+      "simulation": "Simulation",
+      "building": "Building",
+      "button": "Start Journey"
+    },
+    "compare": {
+      "title": "Compare Models",
+      "desc": "View models side-by-side and learn the differences!",
+      "rocket": "Rocket",
+      "plane": "Plane",
+      "car": "Car",
+      "button": "Start Comparing"
+    }
+  },
+  "ai": {
+    "title": "Quick AI Assistant",
+    "placeholder": "Ask anything about rockets, planes, or cars...",
+    "ask": "Ask",
+    "loading": "Thinking...",
+    "getAnswers": "Get instant answers to your engineering questions"
+  },
+  "community": {
+    "title": "Community Q&A",
+    "askQuestion": "Ask a Question",
+    "viewAll": "View All Questions"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "topLearners": "Top Learners",
+    "points": "points",
+    "rank": "Rank",
+    "user": "User",
+    "score": "Score"
+  },
+  "categories": {
+    "title": "Engineering Categories",
+    "rockets": "Rockets",
+    "rocketsDesc": "Space Launch Vehicles",
+    "planes": "Aircraft",
+    "planesDesc": "Aviation Engineering",
+    "cars": "Vehicles",
+    "carsDesc": "Automotive Engineering"
+  },
+  "games": {
+    "title": "Engineering Games",
+    "subtitle": "Learn through interactive challenges",
+    "quiz": {
+      "title": "Quiz Game",
+      "desc": "Test your knowledge"
+    },
+    "matching": {
+      "title": "Matching Game",
+      "desc": "Match parts and concepts"
+    },
+    "simulation": {
+      "title": "Simulation Game",
+      "desc": "Run realistic simulations"
+    },
+    "builder": {
+      "title": "Engine Builder",
+      "desc": "Build your own engine"
+    }
+  },
+  "mechanics": {
+    "rockets": {
+      "title": "Rocket Mechanics",
+      "propulsion": "Propulsion",
+      "orbital": "Orbital Mechanics",
+      "staging": "Staging",
+      "launch": "Launch Systems"
+    },
+    "planes": {
+      "title": "Plane Mechanics",
+      "aerodynamics": "Aerodynamics",
+      "controls": "Flight Controls",
+      "engines": "Engines",
+      "systems": "Aviation Systems"
+    },
+    "cars": {
+      "title": "Car Mechanics",
+      "engine": "Engine",
+      "transmission": "Transmission",
+      "suspension": "Suspension",
+      "systems": "Automotive Systems"
+    }
+  },
+  "common": {
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "tryAgain": "Try Again",
+    "learnMore": "Learn More"
+  }
+}
