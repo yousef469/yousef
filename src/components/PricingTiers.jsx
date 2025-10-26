@@ -1,59 +1,62 @@
 import React from 'react';
 import { Check, Sparkles, Crown, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PricingTiers = () => {
+  const { t } = useTranslation();
+  
   const tiers = [
     {
-      name: 'Free',
+      name: t('home.pricing.free.name'),
       price: '$0',
       period: '',
       icon: Zap,
       color: 'from-gray-500 to-gray-600',
       borderColor: 'border-gray-500/30',
       features: [
-        'Limited lessons',
-        'AI chat quota',
-        'No comparison tool',
-        'Basic 3D models'
+        t('home.pricing.free.features.0'),
+        t('home.pricing.free.features.1'),
+        t('home.pricing.free.features.2'),
+        t('home.pricing.free.features.3')
       ],
-      cta: 'Get Started',
+      cta: t('home.pricing.free.cta'),
       popular: false
     },
     {
-      name: 'Pro',
+      name: t('home.pricing.pro.name'),
       price: '$12',
-      period: '/month',
-      altPrice: '$99/year',
+      period: t('home.pricing.pro.period'),
+      altPrice: t('home.pricing.pro.altPrice'),
       icon: Sparkles,
       color: 'from-cyan-500 to-blue-600',
       borderColor: 'border-cyan-500/50',
       features: [
-        'Full lessons',
-        'Unlimited AI tutoring',
-        'Offline mode',
-        'All 3D models',
-        'Model comparison tool',
-        'Priority support'
+        t('home.pricing.pro.features.0'),
+        t('home.pricing.pro.features.1'),
+        t('home.pricing.pro.features.2'),
+        t('home.pricing.pro.features.3'),
+        t('home.pricing.pro.features.4'),
+        t('home.pricing.pro.features.5')
       ],
-      cta: 'Upgrade to Pro',
+      cta: t('home.pricing.pro.cta'),
       popular: true
     },
     {
-      name: 'Master',
+      name: t('home.pricing.master.name'),
       price: '$199',
-      period: '/year',
+      period: t('home.pricing.master.period'),
       icon: Crown,
       color: 'from-purple-500 to-pink-600',
       borderColor: 'border-purple-500/50',
       features: [
-        'Everything in Pro',
-        'VR/AR support (when ready)',
-        'Certificate of completion',
-        'Advanced simulations',
-        'Exclusive content',
-        'Direct mentor access'
+        t('home.pricing.master.features.0'),
+        t('home.pricing.master.features.1'),
+        t('home.pricing.master.features.2'),
+        t('home.pricing.master.features.3'),
+        t('home.pricing.master.features.4'),
+        t('home.pricing.master.features.5')
       ],
-      cta: 'Go Master',
+      cta: t('home.pricing.master.cta'),
       popular: false
     }
   ];
@@ -62,10 +65,10 @@ const PricingTiers = () => {
     <div className="mt-20">
       <div className="text-center mb-12">
         <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-          Choose Your Learning Path
+          {t('home.pricing.title')}
         </h2>
         <p className="text-gray-300 text-lg">
-          Start free, upgrade when you're ready to accelerate
+          {t('home.pricing.subtitle')}
         </p>
       </div>
 
@@ -81,7 +84,7 @@ const PricingTiers = () => {
             >
               {tier.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-sm font-bold text-white">
-                  Most Popular
+                  {t('home.pricing.popular')}
                 </div>
               )}
 
@@ -95,7 +98,7 @@ const PricingTiers = () => {
                   <span className="text-gray-400">{tier.period}</span>
                 </div>
                 {tier.altPrice && (
-                  <p className="text-sm text-gray-400 mt-1">or {tier.altPrice}</p>
+                  <p className="text-sm text-gray-400 mt-1">{t('home.pricing.or')} {tier.altPrice}</p>
                 )}
               </div>
 
@@ -123,7 +126,7 @@ const PricingTiers = () => {
       </div>
 
       <div className="text-center mt-12 text-gray-400 text-sm">
-        <p>All plans include access to our community and regular content updates</p>
+        <p>{t('home.pricing.note')}</p>
       </div>
     </div>
   );
