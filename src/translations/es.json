@@ -1,0 +1,141 @@
+{
+    "app": {
+        "title": "AeroAI 3D",
+        "subtitle": "Modelos de ingeniería 3D interactivos"
+    },
+    "nav": {
+        "language": "Idioma",
+        "login": "Iniciar sesión",
+        "signUp": "Registrarse",
+        "signOut": "Cerrar sesión",
+        "welcome": "Bienvenido"
+    },
+    "home": {
+        "hero": {
+            "title": "Explora la ingeniería en 3D",
+            "subtitle": "Elige una categoría para ver modelos 3D detallados con controles interactivos",
+            "new": "NUEVO: IA de voz • Comparación de modelos • Clasificaciones • Soporte PWA",
+            "getStarted": "Comenzar gratis",
+            "readyToExplore": "¿Listo para explorar?",
+            "signUpNow": "Regístrate ahora para acceder a todos los modelos 3D y aprendizaje con IA"
+        },
+        "features": {
+            "dashboard": {
+                "title": "Panel",
+                "desc": "Seguir progreso"
+            },
+            "bookmarks": {
+                "title": "Favoritos",
+                "desc": "Guardar lecciones"
+            },
+            "collaborate": {
+                "title": "Colaborar",
+                "desc": "Estudiar juntos"
+            },
+            "upload": {
+                "title": "Subir",
+                "desc": "Compartir modelos"
+            },
+            "progression": {
+                "title": "Progresión",
+                "desc": "Niveles y recompensas"
+            }
+        },
+        "viewer": {
+            "title": "Visor de modelos 3D",
+            "desc": "Explora todos los modelos en 3D interactivo",
+            "button": "Iniciar visor"
+        },
+        "learn": {
+            "rockets": "Aprender mecánica de cohetes",
+            "rocketsDesc": "Domina la propulsión, mecánica orbital, etapas y sistemas de lanzamiento",
+            "planes": "Aprender mecánica de aviones",
+            "planesDesc": "Comprende la aerodinámica, controles de vuelo, motores y sistemas de aviación",
+            "cars": "Aprender mecánica de automóviles",
+            "carsDesc": "Explora motores, transmisiones, suspensión e ingeniería automotriz",
+            "button": "Comenzar a aprender"
+        },
+        "interactive": {
+            "title": "Aprendizaje interactivo",
+            "subtitle": "Domina la ingeniería a través de juegos y comparaciones"
+        },
+        "journey": {
+            "title": "Viaje de ingeniería",
+            "desc": "¡Completa desafíos y observa tu cohete volar al espacio!",
+            "quiz": "Cuestionario",
+            "matching": "Emparejar",
+            "simulation": "Simulación",
+            "building": "Construcción",
+            "button": "Comenzar viaje"
+        },
+        "compare": {
+            "title": "Comparar modelos",
+            "desc": "¡Visualiza modelos lado a lado y aprende las diferencias!",
+            "rocket": "Cohete",
+            "plane": "Avión",
+            "car": "Automóvil",
+            "button": "Comenzar comparación"
+        },
+        "ai": {
+            "title": "Asistente IA rápido",
+            "subtitle": "Obtén respuestas instantáneas a tus preguntas de ingeniería",
+            "placeholder": "Pregunta cualquier cosa sobre cohetes, aviones o automóviles...",
+            "ask": "Preguntar",
+            "thinking": "Pensando...",
+            "response": "Respuesta IA",
+            "examples": "Intenta preguntar: \"¿Cómo funciona un motor de cohete?\" o \"Explica la fuerza de sustentación en las alas de avión\""
+        },
+        "community": {
+            "title": "Preguntas y Respuestas de la Comunidad",
+            "subtitle": "Haz preguntas y ayuda a otros a aprender"
+        },
+        "pricing": {
+            "title": "Elige tu camino de aprendizaje",
+            "subtitle": "Comienza gratis, actualiza cuando estés listo para acelerar",
+            "popular": "Más popular",
+            "or": "o",
+            "note": "Todos los planes incluyen acceso a nuestra comunidad y actualizaciones regulares de contenido",
+            "free": {
+                "name": "Gratis",
+                "cta": "Comenzar",
+                "features": [
+                    "Lecciones limitadas",
+                    "Cuota de chat IA",
+                    "Sin herramienta de comparación",
+                    "Modelos 3D básicos"
+                ]
+            },
+            "pro": {
+                "name": "Pro",
+                "period": "/mes",
+                "altPrice": "$99/año",
+                "cta": "Actualizar a Pro",
+                "features": [
+                    "Lecciones completas",
+                    "Tutoría IA ilimitada",
+                    "Modo sin conexión",
+                    "Todos los modelos 3D",
+                    "Herramienta de comparación de modelos",
+                    "Soporte prioritario"
+                ]
+            },
+            "master": {
+                "name": "Master",
+                "period": "/año",
+                "cta": "Ser Master",
+                "features": [
+                    "Todo en Pro",
+                    "Soporte VR/AR (cuando esté disponible)",
+                    "Certificado de finalización",
+                    "Simulaciones avanzadas",
+                    "Contenido exclusivo",
+                    "Acceso directo al mentor"
+                ]
+            }
+        },
+        "footer": {
+            "copyright": "© 2025 AeroAI 3D - Educación interactiva de ingeniería",
+            "version": "v2.0 - IA de voz • Comparación de modelos • Clasificaciones • PWA"
+        }
+    }
+}

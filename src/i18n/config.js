@@ -5,11 +5,13 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translation files
 import en from '../translations/en.json';
 import fr from '../translations/fr.json';
+import es from '../translations/es.json';
 
 // Translation resources
 const resources = {
   en: { translation: en },
-  fr: { translation: fr }
+  fr: { translation: fr },
+  es: { translation: es }
 };
 
 i18n
