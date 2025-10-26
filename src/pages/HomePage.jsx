@@ -9,6 +9,7 @@ import VoiceInput, { speakText } from '../components/VoiceInput';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
 import PricingTiers from '../components/PricingTiers';
+import MixpanelTest from '../components/MixpanelTest';
 import { askGemini } from '../services/gemini';
 
 const HomePage = () => {
@@ -481,6 +482,9 @@ const HomePage = () => {
           console.log('Language selected:', lang);
         }}
       />
+
+      {/* Mixpanel Test Component (only in development) */}
+      {import.meta.env.DEV && <MixpanelTest />}
     </div>
   );
 };
