@@ -25,7 +25,8 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
     { code: 'es', name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' },
     { code: 'zh', name: 'Chinese', flag: '🇨🇳', nativeName: '中文' },
     { code: 'ja', name: 'Japanese', flag: '🇯🇵', nativeName: '日本語' },
-    { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' }
+    { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' },
+    { code: 'hi', name: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी' }
   ];
 
   const handleLanguageSelect = (langCode) => {
