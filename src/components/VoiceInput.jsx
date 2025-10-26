@@ -6,6 +6,8 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
   const recognitionRef = useRef(null);
+  const shouldRestartRef = useRef(false);
+  const fullTranscriptRef = useRef('');
 
   useEffect(() => {
     // Check if browser supports speech recognition
@@ -37,14 +39,17 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
           }
         }
 
-        const fullTranscript = finalTranscript || interimTranscript;
-        setTranscript(fullTranscript);
-        
-        if (onTranscript) {
-          onTranscript(fullTranscript);
+        // Accumulate final transcripts
+        if (finalTranscript) {
+          fullTranscriptRef.current += finalTranscript;
         }
 
-        // Don't auto-stop - let user control when to stop speaking
+        const displayTranscript = fullTranscriptRef.current + interimTranscript;
+        setTranscript(displayTranscript);
+        
+        if (onTranscript) {
+          onTranscript(displayTranscript);
+        }
       };
 
       recognition.onerror = (event) => {
@@ -54,9 +59,22 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
 
       recognition.onend = () => {
         console.log('🎤 Voice recognition ended');
-        setIsListening(false);
-        if (transcript && onSpeechEnd) {
-          onSpeechEnd(transcript);
+        
+        // If we should keep listening (user didn't manually stop), restart
+        if (shouldRestartRef.current) {
+          console.log('🔄 Auto-restarting recognition...');
+          try {
+            recognition.start();
+          } catch (e) {
+            console.log('Could not restart:', e);
+            setIsListening(false);
+          }
+        } else {
+          setIsListening(false);
+          if (fullTranscriptRef.current && onSpeechEnd) {
+            onSpeechEnd(fullTranscriptRef.current);
+          }
+          fullTranscriptRef.current = '';
         }
       };
 
@@ -74,9 +92,14 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
     if (!recognitionRef.current) return;
 
     if (isListening) {
+      // User manually stopped - don't restart
+      shouldRestartRef.current = false;
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
+      // User started - enable auto-restart
+      shouldRestartRef.current = true;
+      fullTranscriptRef.current = '';
       setTranscript('');
       recognitionRef.current.start();
       setIsListening(true);
