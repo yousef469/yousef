@@ -1,16 +1,7 @@
 import mixpanel from 'mixpanel-browser';
 
-// Initialize Mixpanel
+// Mixpanel is initialized in main.jsx
 const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
-
-if (MIXPANEL_TOKEN) {
-  mixpanel.init(MIXPANEL_TOKEN, {
-    debug: import.meta.env.DEV,
-    track_pageview: true,
-    persistence: 'localStorage',
-    ignore_dnt: false,
-  });
-}
 
 // ============================================
 // USER IDENTIFICATION
