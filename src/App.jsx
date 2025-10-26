@@ -1114,9 +1114,6 @@ export default function App() {
           <Route path="/games/simulation" element={<ProtectedRoute><SimulationGame /></ProtectedRoute>} />
           <Route path="/games/matching" element={<ProtectedRoute><MatchingGame /></ProtectedRoute>} />
           <Route path="/games/engine-builder" element={<ProtectedRoute><EngineBuilderGame /></ProtectedRoute>} />
-          <Route path="/rockets" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
-          <Route path="/planes" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
-          <Route path="/cars" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           
           {/* New Features */}

@@ -191,7 +191,7 @@ const HomePage = () => {
         <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {/* 3D Models Viewer */}
           <button
-            onClick={() => user ? navigate('/rockets') : navigate('/auth')}
+            onClick={() => user ? navigate('/viewer') : navigate('/auth')}
             className="group relative bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
