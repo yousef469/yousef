@@ -11,7 +11,7 @@
     "welcome": "Welcome"
   },
   "viewer": {
-    "title": "AeroAI 3D",
+    "title": "3D Viewer",
     "subtitle": "Interactive Engineering Models",
     "models": "MODELS",
     "lessons": "Lessons",

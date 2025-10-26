@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Rocket, Plane, Car, Zap, Settings, Info, RotateCw, Menu, X, BookOpen, Play, Maximize2, LogOut, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import ThreeJSViewer from '../components/ThreeJSViewer';
 import AITutor from '../components/AITutor';
 
@@ -294,6 +295,7 @@ export default function AllInOnePage() {
   const location = window.location;
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
   
   // Determine initial category from URL
   const getInitialCategory = () => {
@@ -370,9 +372,9 @@ export default function AllInOnePage() {
             </button>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                AeroAI 3D
+                {t('viewer.title')}
               </h1>
-              <p className="text-sm text-gray-400">Interactive Engineering Models</p>
+              <p className="text-sm text-gray-400">{t('viewer.subtitle')}</p>
             </div>
           </div>
 
