@@ -19,9 +19,9 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
     };
   }, [isOpen]);
 
-  // English only for now - add more languages after Crowdin translation
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' }
+    { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
+    { code: 'fr', name: 'French', flag: '🇫🇷', nativeName: 'Français' }
   ];
 
   const handleLanguageSelect = (langCode) => {
