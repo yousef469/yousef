@@ -1,0 +1,141 @@
+{
+    "app": {
+        "title": "AeroAI 3D",
+        "subtitle": "交互式3D工程模型"
+    },
+    "nav": {
+        "language": "语言",
+        "login": "登录",
+        "signUp": "注册",
+        "signOut": "退出",
+        "welcome": "欢迎"
+    },
+    "home": {
+        "hero": {
+            "title": "探索3D工程",
+            "subtitle": "选择一个类别查看带有交互控制的详细3D模型",
+            "new": "新功能：语音AI • 模型比较 • 排行榜 • PWA支持",
+            "getStarted": "免费开始",
+            "readyToExplore": "准备好探索了吗？",
+            "signUpNow": "立即注册以访问所有3D模型和AI驱动的学习"
+        },
+        "features": {
+            "dashboard": {
+                "title": "仪表板",
+                "desc": "跟踪进度"
+            },
+            "bookmarks": {
+                "title": "书签",
+                "desc": "保存课程"
+            },
+            "collaborate": {
+                "title": "协作",
+                "desc": "一起学习"
+            },
+            "upload": {
+                "title": "上传",
+                "desc": "分享模型"
+            },
+            "progression": {
+                "title": "进度",
+                "desc": "等级和奖励"
+            }
+        },
+        "viewer": {
+            "title": "3D模型查看器",
+            "desc": "在交互式3D中探索所有模型",
+            "button": "启动查看器"
+        },
+        "learn": {
+            "rockets": "学习火箭力学",
+            "rocketsDesc": "掌握推进、轨道力学、分级和发射系统",
+            "planes": "学习飞机力学",
+            "planesDesc": "了解空气动力学、飞行控制、发动机和航空系统",
+            "cars": "学习汽车力学",
+            "carsDesc": "探索发动机、变速器、悬架和汽车工程",
+            "button": "开始学习"
+        },
+        "interactive": {
+            "title": "互动学习",
+            "subtitle": "通过游戏和比较掌握工程"
+        },
+        "journey": {
+            "title": "工程之旅",
+            "desc": "完成挑战，看着你的火箭飞向太空！",
+            "quiz": "测验",
+            "matching": "配对",
+            "simulation": "模拟",
+            "building": "建造",
+            "button": "开始旅程"
+        },
+        "compare": {
+            "title": "比较模型",
+            "desc": "并排查看模型并了解差异！",
+            "rocket": "火箭",
+            "plane": "飞机",
+            "car": "汽车",
+            "button": "开始比较"
+        },
+        "ai": {
+            "title": "快速AI助手",
+            "subtitle": "立即获得工程问题的答案",
+            "placeholder": "询问有关火箭、飞机或汽车的任何问题...",
+            "ask": "询问",
+            "thinking": "思考中...",
+            "response": "AI回复",
+            "examples": "尝试询问："火箭发动机如何工作？"或"解释飞机机翼上的升力""
+        },
+        "community": {
+            "title": "社区问答",
+            "subtitle": "提问并帮助他人学习"
+        },
+        "pricing": {
+            "title": "选择您的学习路径",
+            "subtitle": "免费开始，准备好加速时升级",
+            "popular": "最受欢迎",
+            "or": "或",
+            "note": "所有计划都包括访问我们的社区和定期内容更新",
+            "free": {
+                "name": "免费",
+                "cta": "开始",
+                "features": [
+                    "有限课程",
+                    "AI聊天配额",
+                    "无比较工具",
+                    "基础3D模型"
+                ]
+            },
+            "pro": {
+                "name": "专业版",
+                "period": "/月",
+                "altPrice": "$99/年",
+                "cta": "升级到专业版",
+                "features": [
+                    "完整课程",
+                    "无限AI辅导",
+                    "离线模式",
+                    "所有3D模型",
+                    "模型比较工具",
+                    "优先支持"
+                ]
+            },
+            "master": {
+                "name": "大师版",
+                "period": "/年",
+                "cta": "成为大师",
+                "features": [
+                    "专业版的所有功能",
+                    "VR/AR支持（准备就绪时）",
+                    "完成证书",
+                    "高级模拟",
+                    "独家内容",
+                    "直接导师访问"
+                ]
+            }
+        },
+        "footer": {
+            "copyright": "© 2025 AeroAI 3D - 互动工程教育",
+            "version": "v2.0 - 语音AI • 模型比较 • 排行榜 • PWA"
+        }
+    }
+}

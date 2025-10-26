@@ -22,7 +22,10 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
     { code: 'fr', name: 'French', flag: '🇫🇷', nativeName: 'Français' },
-    { code: 'es', name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' }
+    { code: 'es', name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' },
+    { code: 'zh', name: 'Chinese', flag: '🇨🇳', nativeName: '中文' },
+    { code: 'ja', name: 'Japanese', flag: '🇯🇵', nativeName: '日本語' },
+    { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' }
   ];
 
   const handleLanguageSelect = (langCode) => {
