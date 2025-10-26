@@ -10,6 +10,36 @@
     "signOut": "Sign Out",
     "welcome": "Welcome"
   },
+  "auth": {
+    "welcomeBack": "Welcome back!",
+    "startJourney": "Start your engineering journey",
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "createAccount": "Create Account",
+    "continueWith": "Or continue with",
+    "continueGoogle": "Continue with Google",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "pleaseWait": "Please wait...",
+    "whySignUp": "Why create an account?",
+    "benefit1": "Access all 3D models with realistic fire effects",
+    "benefit2": "Interactive AI tutor powered by Gemini",
+    "benefit3": "Save your favorite models and progress",
+    "benefit4": "Engineering lessons and tutorials",
+    "features": {
+      "models": "100+",
+      "modelsLabel": "3D Models",
+      "ai": "AI",
+      "aiLabel": "Tutor",
+      "free": "Free",
+      "freeLabel": "Forever"
+    },
+    "errors": {
+      "nameRequired": "Please enter your full name",
+      "general": "An error occurred"
+    }
+  },
   "home": {
     "hero": {
       "title": "Explore Engineering in 3D",

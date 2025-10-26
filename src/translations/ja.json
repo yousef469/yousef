@@ -10,6 +10,36 @@
         "signOut": "サインアウト",
         "welcome": "ようこそ"
     },
+    "auth": {
+        "welcomeBack": "おかえりなさい！",
+        "startJourney": "エンジニアリングの旅を始めましょう",
+        "fullName": "フルネーム",
+        "email": "メールアドレス",
+        "password": "パスワード",
+        "createAccount": "アカウントを作成",
+        "continueWith": "または続行",
+        "continueGoogle": "Googleで続行",
+        "dontHaveAccount": "アカウントをお持ちでないですか？",
+        "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+        "pleaseWait": "お待ちください...",
+        "whySignUp": "なぜアカウントを作成するのですか？",
+        "benefit1": "リアルな炎の効果を持つすべての3Dモデルにアクセス",
+        "benefit2": "Gemini搭載のインタラクティブAIチューター",
+        "benefit3": "お気に入りのモデルと進捗を保存",
+        "benefit4": "エンジニアリングのレッスンとチュートリアル",
+        "features": {
+            "models": "100+",
+            "modelsLabel": "3Dモデル",
+            "ai": "AI",
+            "aiLabel": "チューター",
+            "free": "無料",
+            "freeLabel": "永久"
+        },
+        "errors": {
+            "nameRequired": "フルネームを入力してください",
+            "general": "エラーが発生しました"
+        }
+    },
     "home": {
         "hero": {
             "title": "3Dでエンジニアリングを探索",

@@ -10,6 +10,36 @@
         "signOut": "退出",
         "welcome": "欢迎"
     },
+    "auth": {
+        "welcomeBack": "欢迎回来！",
+        "startJourney": "开始您的工程之旅",
+        "fullName": "全名",
+        "email": "电子邮件",
+        "password": "密码",
+        "createAccount": "创建账户",
+        "continueWith": "或继续使用",
+        "continueGoogle": "使用Google继续",
+        "dontHaveAccount": "还没有账户？",
+        "alreadyHaveAccount": "已有账户？",
+        "pleaseWait": "请稍候...",
+        "whySignUp": "为什么要创建账户？",
+        "benefit1": "访问所有带有逼真火焰效果的3D模型",
+        "benefit2": "由Gemini驱动的交互式AI导师",
+        "benefit3": "保存您喜欢的模型和进度",
+        "benefit4": "工程课程和教程",
+        "features": {
+            "models": "100+",
+            "modelsLabel": "3D模型",
+            "ai": "AI",
+            "aiLabel": "导师",
+            "free": "免费",
+            "freeLabel": "永久"
+        },
+        "errors": {
+            "nameRequired": "请输入您的全名",
+            "general": "发生错误"
+        }
+    },
     "home": {
         "hero": {
             "title": "探索3D工程",

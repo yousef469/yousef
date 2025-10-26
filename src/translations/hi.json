@@ -10,6 +10,36 @@
         "signOut": "साइन आउट करें",
         "welcome": "स्वागत है"
     },
+    "auth": {
+        "welcomeBack": "वापसी पर स्वागत है!",
+        "startJourney": "अपनी इंजीनियरिंग यात्रा शुरू करें",
+        "fullName": "पूरा नाम",
+        "email": "ईमेल",
+        "password": "पासवर्ड",
+        "createAccount": "खाता बनाएं",
+        "continueWith": "या जारी रखें",
+        "continueGoogle": "Google के साथ जारी रखें",
+        "dontHaveAccount": "खाता नहीं है?",
+        "alreadyHaveAccount": "पहले से खाता है?",
+        "pleaseWait": "कृपया प्रतीक्षा करें...",
+        "whySignUp": "खाता क्यों बनाएं?",
+        "benefit1": "यथार्थवादी आग प्रभावों के साथ सभी 3D मॉडल तक पहुंच",
+        "benefit2": "Gemini द्वारा संचालित इंटरैक्टिव AI ट्यूटर",
+        "benefit3": "अपने पसंदीदा मॉडल और प्रगति सहेजें",
+        "benefit4": "इंजीनियरिंग पाठ और ट्यूटोरियल",
+        "features": {
+            "models": "100+",
+            "modelsLabel": "3D मॉडल",
+            "ai": "AI",
+            "aiLabel": "ट्यूटर",
+            "free": "मुफ्त",
+            "freeLabel": "हमेशा के लिए"
+        },
+        "errors": {
+            "nameRequired": "कृपया अपना पूरा नाम दर्ज करें",
+            "general": "एक त्रुटि हुई"
+        }
+    },
     "home": {
         "hero": {
             "title": "3D में इंजीनियरिंग का अन्वेषण करें",

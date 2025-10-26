@@ -28,7 +28,7 @@ export default function AuthPage() {
         await signIn(email, password);
       } else {
         if (!fullName.trim()) {
-          setError('Please enter your full name');
+          setError(t('auth.errors.nameRequired'));
           setLoading(false);
           return;
         }
@@ -36,7 +36,7 @@ export default function AuthPage() {
       }
       navigate('/viewer');
     } catch (err) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || t('auth.errors.general'));
     } finally {
       setLoading(false);
     }
@@ -236,38 +236,38 @@ export default function AuthPage() {
         {/* Features */}
         <div className="mt-8 grid grid-cols-3 gap-4 text-center">
           <div className="text-gray-400">
-            <div className="text-2xl font-bold text-cyan-400">100+</div>
-            <div className="text-xs">3D Models</div>
+            <div className="text-2xl font-bold text-cyan-400">{t('auth.features.models')}</div>
+            <div className="text-xs">{t('auth.features.modelsLabel')}</div>
           </div>
           <div className="text-gray-400">
-            <div className="text-2xl font-bold text-blue-400">AI</div>
-            <div className="text-xs">Tutor</div>
+            <div className="text-2xl font-bold text-blue-400">{t('auth.features.ai')}</div>
+            <div className="text-xs">{t('auth.features.aiLabel')}</div>
           </div>
           <div className="text-gray-400">
-            <div className="text-2xl font-bold text-purple-400">Free</div>
-            <div className="text-xs">Forever</div>
+            <div className="text-2xl font-bold text-purple-400">{t('auth.features.free')}</div>
+            <div className="text-xs">{t('auth.features.freeLabel')}</div>
           </div>
         </div>
 
         {/* Why Sign Up */}
         <div className="mt-8 bg-gray-800/30 backdrop-blur border border-gray-700/50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Why create an account?</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">{t('auth.whySignUp')}</h3>
           <ul className="space-y-3 text-sm text-gray-300">
             <li className="flex items-start gap-2">
               <span className="text-cyan-400 mt-0.5">✓</span>
-              <span>Access all 3D models with realistic fire effects</span>
+              <span>{t('auth.benefit1')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-cyan-400 mt-0.5">✓</span>
-              <span>Interactive AI tutor powered by Gemini</span>
+              <span>{t('auth.benefit2')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-cyan-400 mt-0.5">✓</span>
-              <span>Save your favorite models and progress</span>
+              <span>{t('auth.benefit3')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-cyan-400 mt-0.5">✓</span>
-              <span>Engineering lessons and tutorials</span>
+              <span>{t('auth.benefit4')}</span>
             </li>
           </ul>
         </div>

@@ -10,6 +10,36 @@
         "signOut": "Déconnexion",
         "welcome": "Bienvenue"
     },
+    "auth": {
+        "welcomeBack": "Bon retour !",
+        "startJourney": "Commencez votre parcours en ingénierie",
+        "fullName": "Nom complet",
+        "email": "Email",
+        "password": "Mot de passe",
+        "createAccount": "Créer un compte",
+        "continueWith": "Ou continuer avec",
+        "continueGoogle": "Continuer avec Google",
+        "dontHaveAccount": "Vous n'avez pas de compte ?",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "pleaseWait": "Veuillez patienter...",
+        "whySignUp": "Pourquoi créer un compte ?",
+        "benefit1": "Accédez à tous les modèles 3D avec des effets de feu réalistes",
+        "benefit2": "Tuteur IA interactif propulsé par Gemini",
+        "benefit3": "Enregistrez vos modèles préférés et votre progression",
+        "benefit4": "Leçons et tutoriels d'ingénierie",
+        "features": {
+            "models": "100+",
+            "modelsLabel": "Modèles 3D",
+            "ai": "IA",
+            "aiLabel": "Tuteur",
+            "free": "Gratuit",
+            "freeLabel": "Pour toujours"
+        },
+        "errors": {
+            "nameRequired": "Veuillez entrer votre nom complet",
+            "general": "Une erreur s'est produite"
+        }
+    },
     "home": {
         "hero": {
             "title": "Explorez l'ingénierie en 3D",
