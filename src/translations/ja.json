@@ -10,6 +10,26 @@
         "signOut": "サインアウト",
         "welcome": "ようこそ"
     },
+    "viewer": {
+        "title": "3Dビューア",
+        "subtitle": "インタラクティブエンジニアリングモデル",
+        "models": "モデル",
+        "lessons": "レッスン",
+        "signOut": "サインアウト",
+        "signedInAs": "サインイン中",
+        "specifications": "仕様",
+        "engineeringLessons": "エンジニアリングレッスン",
+        "keyConcepts": "主要概念：",
+        "interactiveExercise": "インタラクティブ演習：",
+        "nozzlePlayground": "ノズルプレイグラウンド",
+        "expansionRatio": "膨張比",
+        "ambientPressure": "周囲圧力",
+        "throttle": "スロットル",
+        "specificImpulse": "比推力",
+        "thrust": "推力",
+        "keyInsights": "重要な洞察",
+        "searchPlaceholder": "モデルを検索..."
+    },
     "auth": {
         "welcomeBack": "おかえりなさい！",
         "startJourney": "エンジニアリングの旅を始めましょう",

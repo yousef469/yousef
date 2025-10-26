@@ -10,6 +10,26 @@
         "signOut": "Cerrar sesión",
         "welcome": "Bienvenido"
     },
+    "viewer": {
+        "title": "Visor 3D",
+        "subtitle": "Modelos de ingeniería interactivos",
+        "models": "MODELOS",
+        "lessons": "Lecciones",
+        "signOut": "Cerrar sesión",
+        "signedInAs": "Conectado como",
+        "specifications": "Especificaciones",
+        "engineeringLessons": "Lecciones de ingeniería",
+        "keyConcepts": "Conceptos clave:",
+        "interactiveExercise": "Ejercicio interactivo:",
+        "nozzlePlayground": "Área de juego de boquilla",
+        "expansionRatio": "Relación de expansión",
+        "ambientPressure": "Presión ambiente",
+        "throttle": "Acelerador",
+        "specificImpulse": "Impulso específico",
+        "thrust": "Empuje",
+        "keyInsights": "Información clave",
+        "searchPlaceholder": "Buscar modelos..."
+    },
     "auth": {
         "welcomeBack": "¡Bienvenido de nuevo!",
         "startJourney": "Comienza tu viaje de ingeniería",

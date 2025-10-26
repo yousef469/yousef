@@ -10,6 +10,26 @@
         "signOut": "Déconnexion",
         "welcome": "Bienvenue"
     },
+    "viewer": {
+        "title": "Visionneuse 3D",
+        "subtitle": "Modèles d'ingénierie interactifs",
+        "models": "MODÈLES",
+        "lessons": "Leçons",
+        "signOut": "Déconnexion",
+        "signedInAs": "Connecté en tant que",
+        "specifications": "Spécifications",
+        "engineeringLessons": "Leçons d'ingénierie",
+        "keyConcepts": "Concepts clés :",
+        "interactiveExercise": "Exercice interactif :",
+        "nozzlePlayground": "Terrain de jeu de buse",
+        "expansionRatio": "Rapport d'expansion",
+        "ambientPressure": "Pression ambiante",
+        "throttle": "Accélérateur",
+        "specificImpulse": "Impulsion spécifique",
+        "thrust": "Poussée",
+        "keyInsights": "Informations clés",
+        "searchPlaceholder": "Rechercher des modèles..."
+    },
     "auth": {
         "welcomeBack": "Bon retour !",
         "startJourney": "Commencez votre parcours en ingénierie",

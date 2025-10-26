@@ -10,6 +10,26 @@
         "signOut": "退出",
         "welcome": "欢迎"
     },
+    "viewer": {
+        "title": "3D查看器",
+        "subtitle": "交互式工程模型",
+        "models": "模型",
+        "lessons": "课程",
+        "signOut": "退出",
+        "signedInAs": "登录为",
+        "specifications": "规格",
+        "engineeringLessons": "工程课程",
+        "keyConcepts": "关键概念：",
+        "interactiveExercise": "互动练习：",
+        "nozzlePlayground": "喷嘴游乐场",
+        "expansionRatio": "膨胀比",
+        "ambientPressure": "环境压力",
+        "throttle": "节流阀",
+        "specificImpulse": "比冲",
+        "thrust": "推力",
+        "keyInsights": "关键见解",
+        "searchPlaceholder": "搜索模型..."
+    },
     "auth": {
         "welcomeBack": "欢迎回来！",
         "startJourney": "开始您的工程之旅",

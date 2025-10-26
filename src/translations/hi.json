@@ -10,6 +10,26 @@
         "signOut": "साइन आउट करें",
         "welcome": "स्वागत है"
     },
+    "viewer": {
+        "title": "3D व्यूअर",
+        "subtitle": "इंटरैक्टिव इंजीनियरिंग मॉडल",
+        "models": "मॉडल",
+        "lessons": "पाठ",
+        "signOut": "साइन आउट करें",
+        "signedInAs": "के रूप में साइन इन",
+        "specifications": "विशिष्टताएँ",
+        "engineeringLessons": "इंजीनियरिंग पाठ",
+        "keyConcepts": "मुख्य अवधारणाएं:",
+        "interactiveExercise": "इंटरैक्टिव अभ्यास:",
+        "nozzlePlayground": "नोजल प्लेग्राउंड",
+        "expansionRatio": "विस्तार अनुपात",
+        "ambientPressure": "परिवेश दबाव",
+        "throttle": "थ्रॉटल",
+        "specificImpulse": "विशिष्ट आवेग",
+        "thrust": "थ्रस्ट",
+        "keyInsights": "मुख्य अंतर्दृष्टि",
+        "searchPlaceholder": "मॉडल खोजें..."
+    },
     "auth": {
         "welcomeBack": "वापसी पर स्वागत है!",
         "startJourney": "अपनी इंजीनियरिंग यात्रा शुरू करें",

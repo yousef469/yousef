@@ -10,6 +10,26 @@
         "signOut": "تسجيل الخروج",
         "welcome": "مرحباً"
     },
+    "viewer": {
+        "title": "عارض ثلاثي الأبعاد",
+        "subtitle": "نماذج هندسية تفاعلية",
+        "models": "النماذج",
+        "lessons": "الدروس",
+        "signOut": "تسجيل الخروج",
+        "signedInAs": "مسجل الدخول كـ",
+        "specifications": "المواصفات",
+        "engineeringLessons": "دروس الهندسة",
+        "keyConcepts": "المفاهيم الأساسية:",
+        "interactiveExercise": "تمرين تفاعلي:",
+        "nozzlePlayground": "ملعب الفوهة",
+        "expansionRatio": "نسبة التوسع",
+        "ambientPressure": "الضغط المحيط",
+        "throttle": "دواسة الوقود",
+        "specificImpulse": "الدفع النوعي",
+        "thrust": "الدفع",
+        "keyInsights": "رؤى رئيسية",
+        "searchPlaceholder": "البحث عن النماذج..."
+    },
     "auth": {
         "welcomeBack": "مرحباً بعودتك!",
         "startJourney": "ابدأ رحلتك الهندسية",

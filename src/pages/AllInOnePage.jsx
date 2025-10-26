@@ -384,7 +384,7 @@ export default function AllInOnePage() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
               <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline text-sm">Lessons</span>
+              <span className="hidden sm:inline text-sm">{t('viewer.lessons')}</span>
             </button>
             
             {/* User Menu */}
@@ -400,7 +400,7 @@ export default function AllInOnePage() {
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
                   <div className="p-3 border-b border-gray-700">
-                    <p className="text-xs text-gray-400">Signed in as</p>
+                    <p className="text-xs text-gray-400">{t('viewer.signedInAs')}</p>
                     <p className="text-sm text-white truncate">{user?.email}</p>
                   </div>
                   <button
@@ -408,7 +408,7 @@ export default function AllInOnePage() {
                     className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-700 transition-colors text-red-400"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span className="text-sm">Sign Out</span>
+                    <span className="text-sm">{t('viewer.signOut')}</span>
                   </button>
                 </div>
               )}
@@ -421,10 +421,10 @@ export default function AllInOnePage() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search models... (e.g., Falcon 9, F-22, Porsche)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-5 py-3 pl-12 bg-gray-700 text-white rounded-xl border border-gray-600 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all text-lg"
+              placeholder={t('viewer.searchPlaceholder')}
             />
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -459,7 +459,7 @@ export default function AllInOnePage() {
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-gray-400">
-                MODELS ({filteredModels.length})
+                {t('viewer.models')} ({filteredModels.length})
               </h2>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -536,7 +536,7 @@ export default function AllInOnePage() {
           <div className="absolute bottom-4 left-4 z-20 bg-gray-800/95 backdrop-blur-sm p-4 rounded-xl border border-gray-700 max-w-sm">
             <div className="flex items-center gap-2 mb-3">
               <Info className="w-4 h-4 text-cyan-400" />
-              <h3 className="font-semibold">Specifications</h3>
+              <h3 className="font-semibold">{t('viewer.specifications')}</h3>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(selectedModel.specs).map(([key, value]) => (
@@ -562,7 +562,7 @@ export default function AllInOnePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-700">
             <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Engineering Lessons</h2>
+              <h2 className="text-2xl font-bold">{t('viewer.engineeringLessons')}</h2>
               <button
                 onClick={() => setShowLessons(false)}
                 className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
