@@ -44,12 +44,7 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
           onTranscript(fullTranscript);
         }
 
-        // If we have a final result, stop listening
-        if (finalTranscript) {
-          setTimeout(() => {
-            recognition.stop();
-          }, 500);
-        }
+        // Don't auto-stop - let user control when to stop speaking
       };
 
       recognition.onerror = (event) => {
@@ -146,13 +141,15 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
       </button>
 
       {/* Live Transcript */}
-      {isListening && transcript && (
+      {isListening && (
         <div className="bg-gray-800 border border-cyan-400 rounded-lg p-3 animate-in fade-in slide-in-from-bottom-2">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-xs text-gray-400 uppercase tracking-wide">Listening...</span>
+            <span className="text-xs text-gray-400 uppercase tracking-wide">
+              {transcript ? 'Listening... Click mic to stop' : 'Listening... Start speaking'}
+            </span>
           </div>
-          <p className="text-sm text-white">{transcript}</p>
+          {transcript && <p className="text-sm text-white">{transcript}</p>}
         </div>
       )}
     </div>
