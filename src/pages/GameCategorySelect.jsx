@@ -1,14 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Rocket, Plane, Car } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function GameCategorySelect() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const categories = [
     {
       id: 'rockets',
-      title: 'Rocket Mechanics',
-      description: 'Journey through space, planet by planet',
+      title: t('pages.gameCategorySelect.rockets.title'),
+      description: t('pages.gameCategorySelect.rockets.description'),
       icon: Rocket,
       color: 'from-cyan-500 to-blue-600',
       emoji: '🚀',
@@ -16,8 +18,8 @@ export default function GameCategorySelect() {
     },
     {
       id: 'planes',
-      title: 'Aircraft Mechanics',
-      description: 'Fly through the clouds, checkpoint by checkpoint',
+      title: t('pages.gameCategorySelect.planes.title'),
+      description: t('pages.gameCategorySelect.planes.description'),
       icon: Plane,
       color: 'from-blue-500 to-indigo-600',
       emoji: '✈️',
@@ -25,8 +27,8 @@ export default function GameCategorySelect() {
     },
     {
       id: 'cars',
-      title: 'Automotive Mechanics',
-      description: 'Drive down the road, station by station',
+      title: t('pages.gameCategorySelect.cars.title'),
+      description: t('pages.gameCategorySelect.cars.description'),
       icon: Car,
       color: 'from-orange-500 to-red-600',
       emoji: '🚗',
@@ -47,8 +49,8 @@ export default function GameCategorySelect() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold">Choose Your Path</h1>
-              <p className="text-sm text-gray-400">What do you want to learn about?</p>
+              <h1 className="text-2xl font-bold">{t('pages.gameCategorySelect.title')}</h1>
+              <p className="text-sm text-gray-400">{t('pages.gameCategorySelect.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -58,10 +60,10 @@ export default function GameCategorySelect() {
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-            Select Your Engineering Journey
+            {t('pages.gameCategorySelect.heading')}
           </h2>
           <p className="text-xl text-gray-300">
-            Each path has unique challenges and a visual journey to complete
+            {t('pages.gameCategorySelect.description')}
           </p>
         </div>
 
@@ -89,7 +91,7 @@ export default function GameCategorySelect() {
                   <p className="text-gray-400 mb-6">{category.description}</p>
                   
                   <div className="inline-flex items-center gap-2 text-cyan-400 group-hover:text-cyan-300 transition-colors font-semibold">
-                    <span>Start Journey</span>
+                    <span>{t('pages.gameCategorySelect.startJourney')}</span>
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

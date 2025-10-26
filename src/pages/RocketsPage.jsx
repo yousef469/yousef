@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Rocket } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ModelViewer from '../components/ModelViewer';
 import { rocketModels } from '../data/rocketsData';
 
 const RocketsPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedModel, setSelectedModel] = useState(null);
 
   return (
@@ -21,7 +23,7 @@ const RocketsPage = () => {
               <ArrowLeft className="w-6 h-6" />
             </button>
             <Rocket className="w-6 h-6 text-cyan-400" />
-            <h1 className="text-2xl font-bold">Rocket Models</h1>
+            <h1 className="text-2xl font-bold">{t('pages.rocketsPage.title')}</h1>
           </div>
         </div>
       </header>
@@ -34,8 +36,8 @@ const RocketsPage = () => {
       ) : (
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Select a Rocket Model</h2>
-            <p className="text-gray-400">Choose from our collection of detailed rocket models</p>
+            <h2 className="text-3xl font-bold mb-2">{t('pages.rocketsPage.subtitle')}</h2>
+            <p className="text-gray-400">{t('pages.rocketsPage.description')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -54,7 +56,7 @@ const RocketsPage = () => {
                       {model.name}
                     </h3>
                     <p className="text-gray-400 text-sm mb-4">{model.description}</p>
-                    
+
                     <div className="flex gap-2 flex-wrap">
                       {model.specs.slice(0, 3).map((spec, idx) => (
                         <span
@@ -67,9 +69,9 @@ const RocketsPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mt-4 flex items-center text-cyan-400 font-semibold group-hover:gap-3 gap-2 transition-all">
-                  <span>View in 3D</span>
+                  <span>{t('pages.rocketsPage.viewIn3D')}</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>

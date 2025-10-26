@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, LayoutDashboard, BookMarked, Users, Upload, Trophy } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import CommunityQA from '../components/CommunityQA';
@@ -8,6 +8,7 @@ import Leaderboard from '../components/Leaderboard';
 import VoiceInput, { speakText } from '../components/VoiceInput';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
+import PricingTiers from '../components/PricingTiers';
 import { askGemini } from '../services/gemini';
 
 const HomePage = () => {
@@ -142,27 +143,32 @@ const HomePage = () => {
         </div>
 
         {/* Quick Features Showcase */}
-        <div className="mb-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-800/50 border border-cyan-500/30 rounded-xl p-4 text-center">
-            <div className="text-3xl mb-2">🎤</div>
-            <div className="text-sm font-semibold text-cyan-400">{t('home.features.voiceAI')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.voiceAI.desc')}</div>
-          </div>
-          <div className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-4 text-center">
-            <div className="text-3xl mb-2">⚖️</div>
-            <div className="text-sm font-semibold text-purple-400">{t('home.features.compare')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.compare.desc')}</div>
-          </div>
-          <div className="bg-gray-800/50 border border-yellow-500/30 rounded-xl p-4 text-center">
-            <div className="text-3xl mb-2">🏆</div>
-            <div className="text-sm font-semibold text-yellow-400">{t('home.features.leaderboard')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.leaderboard.desc')}</div>
-          </div>
-          <div className="bg-gray-800/50 border border-green-500/30 rounded-xl p-4 text-center">
-            <div className="text-3xl mb-2">📱</div>
-            <div className="text-sm font-semibold text-green-400">{t('home.features.pwa')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.pwa.desc')}</div>
-          </div>
+        <div className="mb-12 grid grid-cols-2 md:grid-cols-5 gap-4">
+          <button onClick={() => navigate('/dashboard')} className="bg-gray-800/50 border border-cyan-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
+            <LayoutDashboard className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
+            <div className="text-sm font-semibold text-cyan-400">Dashboard</div>
+            <div className="text-xs text-gray-400">Track progress</div>
+          </button>
+          <button onClick={() => navigate('/bookmarks')} className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
+            <BookMarked className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+            <div className="text-sm font-semibold text-purple-400">Bookmarks</div>
+            <div className="text-xs text-gray-400">Save lessons</div>
+          </button>
+          <button onClick={() => navigate('/collaborate')} className="bg-gray-800/50 border border-yellow-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
+            <Users className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+            <div className="text-sm font-semibold text-yellow-400">Collaborate</div>
+            <div className="text-xs text-gray-400">Study together</div>
+          </button>
+          <button onClick={() => navigate('/upload')} className="bg-gray-800/50 border border-green-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
+            <Upload className="w-8 h-8 text-green-400 mx-auto mb-2" />
+            <div className="text-sm font-semibold text-green-400">Upload</div>
+            <div className="text-xs text-gray-400">Share models</div>
+          </button>
+          <button onClick={() => navigate('/progression')} className="bg-gray-800/50 border border-orange-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
+            <Trophy className="w-8 h-8 text-orange-400 mx-auto mb-2" />
+            <div className="text-sm font-semibold text-orange-400">Progression</div>
+            <div className="text-xs text-gray-400">Levels & rewards</div>
+          </button>
         </div>
 
         {/* CTA for non-authenticated users */}
@@ -427,6 +433,9 @@ const HomePage = () => {
             )}
           </div>
         </div>
+
+        {/* Pricing Tiers Section */}
+        <PricingTiers />
 
         {/* Leaderboard & Community Section */}
         <div className="mt-16 grid lg:grid-cols-2 gap-8">

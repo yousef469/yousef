@@ -4,24 +4,10 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Import translation files
 import en from '../translations/en.json';
-import es from '../translations/es.json';
-import ar from '../translations/ar.json';
-import fr from '../translations/fr.json';
-import zh from '../translations/zh.json';
-import hi from '../translations/hi.json';
-import pt from '../translations/pt.json';
-import ru from '../translations/ru.json';
 
 // Translation resources
 const resources = {
-  en: { translation: en },
-  es: { translation: es },
-  ar: { translation: ar },
-  fr: { translation: fr },
-  zh: { translation: zh },
-  hi: { translation: hi },
-  pt: { translation: pt },
-  ru: { translation: ru }
+  en: { translation: en }
 };
 
 i18n

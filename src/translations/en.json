@@ -47,14 +47,22 @@
       "signUpNow": "Sign up now to access all 3D models and AI-powered learning"
     },
     "features": {
-      "voiceAI": "Voice AI",
-      "voiceAIDesc": "Speak to learn",
-      "compare": "Compare",
-      "compareDesc": "Side-by-side",
-      "leaderboard": "Leaderboard",
-      "leaderboardDesc": "Compete & earn",
-      "pwa": "PWA",
-      "pwaDesc": "Install as app"
+      "voiceAI": {
+        "title": "Voice AI",
+        "desc": "Speak to learn"
+      },
+      "compare": {
+        "title": "Compare",
+        "desc": "Side-by-side"
+      },
+      "leaderboard": {
+        "title": "Leaderboard",
+        "desc": "Compete & earn"
+      },
+      "pwa": {
+        "title": "PWA",
+        "desc": "Install as app"
+      }
     },
     "viewer": {
       "title": "3D Models Viewer",

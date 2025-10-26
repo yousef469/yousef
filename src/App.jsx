@@ -1079,6 +1079,11 @@ import IntroAnimation from './components/IntroAnimation';
 import AllInOnePage from './pages/AllInOnePage';
 import AuthPage from './pages/AuthPage';
 import ComparePage from './pages/ComparePage';
+import DashboardPage from './pages/DashboardPage';
+import BookmarksNotes from './components/BookmarksNotes';
+import CollaborationMode from './components/CollaborationMode';
+import ModelUpload from './components/ModelUpload';
+import GamificationSystem from './components/GamificationSystem';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useState as useAppState } from 'react';
 
@@ -1113,6 +1118,14 @@ export default function App() {
           <Route path="/planes" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/cars" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+          
+          {/* New Features */}
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/bookmarks" element={<ProtectedRoute><BookmarksNotes /></ProtectedRoute>} />
+          <Route path="/collaborate" element={<ProtectedRoute><CollaborationMode /></ProtectedRoute>} />
+          <Route path="/collaborate/:sessionId" element={<ProtectedRoute><CollaborationMode /></ProtectedRoute>} />
+          <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
+          <Route path="/progression" element={<ProtectedRoute><GamificationSystem /></ProtectedRoute>} />
         </Routes>
       </Router>
     </>

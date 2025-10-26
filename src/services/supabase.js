@@ -46,12 +46,13 @@ export const onAuthStateChange = (callback) => {
 
 // Social Authentication
 export const signInWithGoogle = async () => {
+  // Get the current origin dynamically
+  const redirectUrl = `${window.location.origin}/`;
+  
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin.includes('localhost') 
-        ? 'http://localhost:5173/viewer'
-        : 'https://yousef.vercel.app/viewer',
+      redirectTo: redirectUrl,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
@@ -65,7 +66,7 @@ export const signInWithApple = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
     options: {
-      redirectTo: `${window.location.origin}/viewer`
+      redirectTo: `${window.location.origin}/`
     }
   });
   return { data, error };

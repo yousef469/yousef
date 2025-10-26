@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plane } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ModelViewer from '../components/ModelViewer';
 import { planeModels } from '../data/planesData';
 
 const PlanesPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedModel, setSelectedModel] = useState(null);
 
   return (
@@ -21,7 +23,7 @@ const PlanesPage = () => {
               <ArrowLeft className="w-6 h-6" />
             </button>
             <Plane className="w-6 h-6 text-blue-400" />
-            <h1 className="text-2xl font-bold">Aircraft Models</h1>
+            <h1 className="text-2xl font-bold">{t('pages.planesPage.title')}</h1>
           </div>
         </div>
       </header>
@@ -34,8 +36,8 @@ const PlanesPage = () => {
       ) : (
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Select an Aircraft Model</h2>
-            <p className="text-gray-400">Explore our collection of aviation models</p>
+            <h2 className="text-3xl font-bold mb-2">{t('pages.planesPage.subtitle')}</h2>
+            <p className="text-gray-400">{t('pages.planesPage.description')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -69,7 +71,7 @@ const PlanesPage = () => {
                 </div>
                 
                 <div className="mt-4 flex items-center text-blue-400 font-semibold group-hover:gap-3 gap-2 transition-all">
-                  <span>View in 3D</span>
+                  <span>{t('pages.planesPage.viewIn3D')}</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>

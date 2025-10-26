@@ -19,16 +19,9 @@ export default function LanguageSelector({ isOpen, onClose, onSelect }) {
     };
   }, [isOpen]);
 
-  // Core 8 languages for global reach
+  // English only for now - add more languages after Crowdin translation
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
-    { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' },
-    { code: 'es', name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' },
-    { code: 'fr', name: 'French', flag: '🇫🇷', nativeName: 'Français' },
-    { code: 'zh', name: 'Chinese', flag: '🇨🇳', nativeName: '中文' },
-    { code: 'hi', name: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी' },
-    { code: 'pt', name: 'Portuguese', flag: '🇧🇷', nativeName: 'Português' },
-    { code: 'ru', name: 'Russian', flag: '🇷🇺', nativeName: 'Русский' }
+    { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' }
   ];
 
   const handleLanguageSelect = (langCode) => {
