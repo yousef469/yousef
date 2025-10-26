@@ -10,6 +10,26 @@
     "signOut": "Sign Out",
     "welcome": "Welcome"
   },
+  "viewer": {
+    "title": "AeroAI 3D",
+    "subtitle": "Interactive Engineering Models",
+    "models": "MODELS",
+    "lessons": "Lessons",
+    "signOut": "Sign Out",
+    "signedInAs": "Signed in as",
+    "specifications": "Specifications",
+    "engineeringLessons": "Engineering Lessons",
+    "keyConcepts": "Key Concepts:",
+    "interactiveExercise": "Interactive Exercise:",
+    "nozzlePlayground": "Nozzle Playground",
+    "expansionRatio": "Expansion Ratio",
+    "ambientPressure": "Ambient Pressure",
+    "throttle": "Throttle",
+    "specificImpulse": "Specific Impulse",
+    "thrust": "Thrust",
+    "keyInsights": "Key Insights",
+    "searchPlaceholder": "Search models..."
+  },
   "auth": {
     "welcomeBack": "Welcome back!",
     "startJourney": "Start your engineering journey",
