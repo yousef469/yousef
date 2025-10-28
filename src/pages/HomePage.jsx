@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import CommunityQA from '../components/CommunityQA';
 import Leaderboard from '../components/Leaderboard';
 import VoiceInput, { speakText } from '../components/VoiceInput';
+import GeminiLiveChat from '../components/GeminiLiveChat';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
 import PricingTiers from '../components/PricingTiers';
@@ -21,6 +22,7 @@ const HomePage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
+  const [useLiveChat, setUseLiveChat] = useState(true); // Toggle for Gemini Live
 
   // Show language selector for new users
   useEffect(() => {
@@ -378,6 +380,30 @@ const HomePage = () => {
               {t('home.ai.title')}
             </h2>
             <p className="text-gray-300">{t('home.ai.subtitle')}</p>
+            
+            {/* Toggle between Live Chat and Classic */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setUseLiveChat(false)}
+                className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                  !useLiveChat 
+                    ? 'bg-cyan-500 text-white' 
+                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                }`}
+              >
+                Classic Mode
+              </button>
+              <button
+                onClick={() => setUseLiveChat(true)}
+                className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                  useLiveChat 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                }`}
+              >
+                🎙️ Live Chat (NEW)
+              </button>
+            </div>
           </div>
 
           <div className="max-w-3xl mx-auto bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
@@ -392,11 +418,15 @@ const HomePage = () => {
                 disabled={aiLoading}
               />
               
-              {/* Voice Input */}
-              <VoiceInput 
-                onTranscript={handleVoiceTranscript}
-                onSpeechEnd={handleVoiceSpeechEnd}
-              />
+              {/* Voice Input - Toggle between Live Chat and Classic */}
+              {useLiveChat ? (
+                <GeminiLiveChat />
+              ) : (
+                <VoiceInput 
+                  onTranscript={handleVoiceTranscript}
+                  onSpeechEnd={handleVoiceSpeechEnd}
+                />
+              )}
               
               <button
                 onClick={() => handleAskAI()}
