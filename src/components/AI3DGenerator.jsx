@@ -25,7 +25,7 @@ export default function AI3DGenerator() {
     }
   };
 
-  // Generate 3D model using Hugging Face API
+  // Generate 3D model using local Python backend
   const generateModel = async () => {
     if (mode === 'text' && !textPrompt.trim()) {
       setError('Please enter a text prompt');
@@ -41,59 +41,66 @@ export default function AI3DGenerator() {
     setProgress(0);
 
     try {
+      // Check if backend is running
+      const BACKEND_URL = 'http://localhost:5000';
+      
+      try {
+        const healthCheck = await fetch(`${BACKEND_URL}/health`);
+        if (!healthCheck.ok) {
+          throw new Error('Backend not responding');
+        }
+      } catch (e) {
+        setError('Backend not running. Please start the Python backend first. See AI_BACKEND_SETUP.md for instructions.');
+        setIsGenerating(false);
+        return;
+      }
+
       // Simulate progress
       const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 10, 90));
-      }, 500);
+        setProgress(prev => Math.min(prev + 5, 90));
+      }, 1000);
 
-      // For now, we'll use a demo/placeholder approach
-      // In production, you'd call Hugging Face API or your Python backend
+      // Prepare form data
+      const formData = new FormData();
+      formData.append('mode', mode);
       
-      // Option 1: Hugging Face Inference API (requires API key)
-      // const HF_API_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY;
-      // const response = await fetch(
-      //   'https://api-inference.huggingface.co/models/stabilityai/TripoSR',
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       'Authorization': `Bearer ${HF_API_KEY}`,
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       inputs: mode === 'text' ? textPrompt : imageFile,
-      //     }),
-      //   }
-      // );
+      if (mode === 'text') {
+        formData.append('prompt', textPrompt);
+        formData.append('model', 'triposr');
+      } else {
+        formData.append('image', imageFile);
+        formData.append('model', 'triposr'); // or 'trellis' for higher quality
+      }
 
-      // Option 2: Local Python backend
-      // const formData = new FormData();
-      // if (mode === 'text') {
-      //   formData.append('prompt', textPrompt);
-      //   formData.append('model', 'triposr');
-      // } else {
-      //   formData.append('image', imageFile);
-      //   formData.append('model', 'trellis');
-      // }
-      // const response = await fetch('http://localhost:5000/generate-3d', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
+      // Call backend API
+      const response = await fetch(`${BACKEND_URL}/generate-3d`, {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Demo: Show a sample model after delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
       clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate model');
+      }
+
+      // Get the generated GLB file
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
       setProgress(100);
 
-      // For demo purposes, use an existing model
+      // Set generated model
       setGeneratedModel({
         name: mode === 'text' ? textPrompt : 'Generated from image',
         type: 'generated',
-        path: '/rocket.glb', // Replace with actual generated model
+        path: url,
         timestamp: new Date().toISOString(),
+        blob: blob, // Store blob for download
       });
 
-      setError('Demo mode: Using sample model. Connect to Hugging Face API or local backend for real generation.');
+      setError(null);
     } catch (err) {
       setError(err.message || 'Failed to generate 3D model');
       console.error('Generation error:', err);
@@ -110,7 +117,9 @@ export default function AI3DGenerator() {
     const link = document.createElement('a');
     link.href = generatedModel.path;
     link.download = `ai-generated-${Date.now()}.glb`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -304,15 +313,19 @@ export default function AI3DGenerator() {
         {/* Setup Instructions */}
         {!generatedModel && !isGenerating && (
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-blue-400 mb-2">🚀 Setup Required</h4>
+            <h4 className="text-sm font-semibold text-blue-400 mb-2">🚀 Backend Setup</h4>
             <p className="text-xs text-gray-400 mb-2">
-              To enable real AI generation, you need to:
+              To generate 3D models, start the Python backend:
             </p>
             <ol className="text-xs text-gray-400 space-y-1 ml-4 list-decimal">
-              <li>Get a Hugging Face API key from <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">huggingface.co</a></li>
-              <li>Add it to your .env file: <code className="bg-gray-800 px-1 py-0.5 rounded">VITE_HUGGINGFACE_API_KEY=your_key</code></li>
-              <li>Or set up a local Python backend with TripoSR/TRELLIS</li>
+              <li>Open terminal in <code className="bg-gray-800 px-1 py-0.5 rounded">ai-backend</code> folder</li>
+              <li>Activate venv: <code className="bg-gray-800 px-1 py-0.5 rounded">venv\Scripts\activate</code></li>
+              <li>Run: <code className="bg-gray-800 px-1 py-0.5 rounded">python app.py</code></li>
+              <li>See <code className="bg-gray-800 px-1 py-0.5 rounded">AI_BACKEND_SETUP.md</code> for full setup guide</li>
             </ol>
+            <p className="text-xs text-gray-500 mt-2">
+              Backend should run on <span className="text-cyan-400">http://localhost:5000</span>
+            </p>
           </div>
         )}
       </div>
