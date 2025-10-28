@@ -10,7 +10,13 @@ import tempfile
 import trimesh
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for React frontend
+CORS(app, resources={
+    r"/*": {
+        "origins": ["*"],  # Allow all origins (or specify your Vercel domain)
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Add TripoSR and TRELLIS to path
 sys.path.append('../TripoSR-main')
