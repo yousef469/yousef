@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, ArrowLeftRight, Globe, LayoutDashboard, BookMarked, Users, Upload, Trophy } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, LayoutDashboard, BookMarked, Users, Upload, Trophy } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import CommunityQA from '../components/CommunityQA';
 import Leaderboard from '../components/Leaderboard';
-import GeminiLiveChat from '../components/GeminiLiveChat';
+import VoiceInput, { speakText } from '../components/VoiceInput';
 import ModelComparison from '../components/ModelComparison';
+import { askGemini } from '../services/gemini';
 import LanguageSelector from '../components/LanguageSelector';
 import PricingTiers from '../components/PricingTiers';
 import MixpanelTest from '../components/MixpanelTest';
@@ -16,8 +17,42 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { user, signOut, showLanguageSelector, setShowLanguageSelector } = useAuth();
   const { t } = useTranslation();
+  const [aiInput, setAiInput] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
+
+  const handleAskAI = async (question = aiInput) => {
+    if (!question.trim() || aiLoading) return;
+
+    const q = question.trim();
+    setAiInput('');
+    setAiLoading(true);
+    setAiResponse('');
+
+    try {
+      const result = await askGemini(q, []);
+      setAiResponse(result.response);
+      
+      // Speak the response
+      speakText(result.response);
+    } catch (error) {
+      setAiResponse('Sorry, I had trouble processing that. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleVoiceTranscript = (transcript) => {
+    setAiInput(transcript);
+  };
+
+  const handleVoiceSpeechEnd = (transcript) => {
+    if (transcript.trim()) {
+      handleAskAI(transcript);
+    }
+  };
 
   // Show language selector for new users
   useEffect(() => {
@@ -343,23 +378,63 @@ const HomePage = () => {
         <div className="mt-16">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              🎙️ {t('home.ai.title')} - Live Voice Chat
+              {t('home.ai.title')}
             </h2>
-            <p className="text-gray-300">Real-time voice conversation with AI tutor</p>
+            <p className="text-gray-300">{t('home.ai.subtitle')}</p>
           </div>
 
           <div className="max-w-3xl mx-auto bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
-            <div className="flex flex-col items-center gap-4">
-              {/* Gemini Live Chat */}
-              <GeminiLiveChat />
+            <div className="flex gap-3 mb-4">
+              <input
+                type="text"
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAskAI()}
+                placeholder={t('home.ai.placeholder')}
+                className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
+                disabled={aiLoading}
+              />
               
-              <div className="text-center text-gray-400 text-sm max-w-md">
-                <p className="mb-2">Click the microphone to start a live voice conversation</p>
-                <p className="text-xs text-gray-500">
-                  Powered by Gemini 2.0 Flash with real-time audio streaming
-                </p>
-              </div>
+              {/* Voice Input */}
+              <VoiceInput 
+                onTranscript={handleVoiceTranscript}
+                onSpeechEnd={handleVoiceSpeechEnd}
+              />
+              
+              <button
+                onClick={() => handleAskAI()}
+                disabled={!aiInput.trim() || aiLoading}
+                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-700 disabled:to-gray-700 rounded-lg font-semibold transition-all flex items-center gap-2"
+              >
+                {aiLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>{t('home.ai.thinking')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>{t('home.ai.ask')}</span>
+                  </>
+                )}
+              </button>
             </div>
+
+            {aiResponse && (
+              <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-cyan-400 font-semibold mb-2">
+                  <Bot className="w-5 h-5" />
+                  <span>{t('home.ai.response')}</span>
+                </div>
+                <p className="text-gray-300 whitespace-pre-wrap">{aiResponse}</p>
+              </div>
+            )}
+
+            {!aiResponse && !aiLoading && (
+              <div className="text-center text-gray-500 text-sm">
+                <p>{t('home.ai.examples')}</p>
+              </div>
+            )}
           </div>
         </div>
 
