@@ -76,21 +76,64 @@ def generate_3d():
         output_path = None
         
         if mode == 'text':
-            # Text-to-3D using TripoSR
+            # Text-to-3D: Generate image from text, then convert to 3D
             prompt = data.get('prompt', '')
             if not prompt:
                 return jsonify({'error': 'No prompt provided'}), 400
             
             print(f"Generating 3D model from text: {prompt}")
             
-            # For text-to-3D, we need to first generate an image using Stable Diffusion
-            # Then convert that image to 3D using TripoSR
-            # This is a simplified version - you'd want to integrate with SD API
+            # Step 1: Generate image from text using Replicate API
+            try:
+                import replicate
+                import requests
+                from io import BytesIO
+                
+                # Use Replicate's Stable Diffusion
+                print("Generating image from text...")
+                output = replicate.run(
+                    "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+                    input={
+                        "prompt": prompt,
+                        "negative_prompt": "blurry, low quality, distorted",
+                        "width": 1024,
+                        "height": 1024
+                    }
+                )
+                
+                # Download the generated image
+                image_url = output[0] if isinstance(output, list) else output
+                response = requests.get(image_url)
+                image = Image.open(BytesIO(response.content)).convert('RGB')
+                print("Image generated successfully!")
+                
+            except Exception as e:
+                print(f"Error generating image: {e}")
+                return jsonify({
+                    'error': 'Failed to generate image from text. Make sure REPLICATE_API_TOKEN is set.',
+                    'details': str(e)
+                }), 500
             
-            return jsonify({
-                'error': 'Text-to-3D requires Stable Diffusion integration. Please use image-to-3D for now.',
-                'suggestion': 'Generate an image first, then upload it for 3D conversion'
-            }), 501
+            # Step 2: Convert image to 3D using TripoSR
+            print("Converting image to 3D...")
+            model = load_triposr()
+            if model is None:
+                return jsonify({'error': 'Failed to load TripoSR model'}), 500
+            
+            # Preprocess image
+            from tsr.utils import remove_background, resize_foreground
+            image = remove_background(image)
+            image = resize_foreground(image, 0.85)
+            
+            # Generate 3D
+            with torch.no_grad():
+                scene_codes = model([image], device='cuda' if torch.cuda.is_available() else 'cpu')
+                meshes = model.extract_mesh(scene_codes)
+                mesh = meshes[0]
+            
+            # Save mesh
+            output_path = tempfile.mktemp(suffix='.glb')
+            mesh.export(output_path)
             
         elif mode == 'image':
             # Image-to-3D
