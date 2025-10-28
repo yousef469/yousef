@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, LayoutDashboard, BookMarked, Users, Upload, Trophy } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, User, ChevronDown, LayoutDashboard, BookMarked, Users as UsersIcon, Upload, Trophy } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import CommunityQA from '../components/CommunityQA';
@@ -22,6 +22,7 @@ const HomePage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleAskAI = async (question = aiInput) => {
     if (!question.trim() || aiLoading) return;
@@ -93,17 +94,53 @@ const HomePage = () => {
               </button>
 
               {user ? (
-                <>
-                  <div className="text-sm text-gray-400">
-                    {t('nav.welcome')}, <span className="text-cyan-400 font-semibold">{user.email}</span>
-                  </div>
+                <div className="relative">
                   <button
-                    onClick={() => signOut()}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
+                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
                   >
-                    {t('nav.signOut')}
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{user.email?.split('@')[0]}</span>
+                    <ChevronDown className="w-4 h-4" />
                   </button>
-                </>
+                  
+                  {showProfileMenu && (
+                    <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
+                      <div className="p-3 border-b border-gray-700">
+                        <p className="text-xs text-gray-400">Signed in as</p>
+                        <p className="text-sm text-white truncate">{user.email}</p>
+                      </div>
+                      <div className="py-2">
+                        <button onClick={() => { navigate('/dashboard'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
+                          <LayoutDashboard className="w-4 h-4 text-cyan-400" />
+                          <span className="text-sm">Dashboard</span>
+                        </button>
+                        <button onClick={() => { navigate('/bookmarks'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
+                          <BookMarked className="w-4 h-4 text-purple-400" />
+                          <span className="text-sm">Bookmarks</span>
+                        </button>
+                        <button onClick={() => { navigate('/collaborate'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
+                          <UsersIcon className="w-4 h-4 text-yellow-400" />
+                          <span className="text-sm">Collaborate</span>
+                        </button>
+                        <button onClick={() => { navigate('/upload'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
+                          <Upload className="w-4 h-4 text-green-400" />
+                          <span className="text-sm">Upload</span>
+                        </button>
+                        <button onClick={() => { navigate('/progression'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
+                          <Trophy className="w-4 h-4 text-orange-400" />
+                          <span className="text-sm">Progression</span>
+                        </button>
+                      </div>
+                      <div className="border-t border-gray-700 py-2">
+                        <button onClick={() => { signOut(); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left text-red-400">
+                          <LogIn className="w-4 h-4" />
+                          <span className="text-sm">{t('nav.signOut')}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   <button
@@ -146,34 +183,7 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Quick Features Showcase */}
-        <div className="mb-12 grid grid-cols-2 md:grid-cols-5 gap-4">
-          <button onClick={() => navigate('/dashboard')} className="bg-gray-800/50 border border-cyan-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
-            <LayoutDashboard className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-cyan-400">{t('home.features.dashboard.title')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.dashboard.desc')}</div>
-          </button>
-          <button onClick={() => navigate('/bookmarks')} className="bg-gray-800/50 border border-purple-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
-            <BookMarked className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-purple-400">{t('home.features.bookmarks.title')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.bookmarks.desc')}</div>
-          </button>
-          <button onClick={() => navigate('/collaborate')} className="bg-gray-800/50 border border-yellow-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
-            <Users className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-yellow-400">{t('home.features.collaborate.title')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.collaborate.desc')}</div>
-          </button>
-          <button onClick={() => navigate('/upload')} className="bg-gray-800/50 border border-green-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
-            <Upload className="w-8 h-8 text-green-400 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-green-400">{t('home.features.upload.title')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.upload.desc')}</div>
-          </button>
-          <button onClick={() => navigate('/progression')} className="bg-gray-800/50 border border-orange-500/30 rounded-xl p-4 text-center hover:bg-gray-700/50 transition-all">
-            <Trophy className="w-8 h-8 text-orange-400 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-orange-400">{t('home.features.progression.title')}</div>
-            <div className="text-xs text-gray-400">{t('home.features.progression.desc')}</div>
-          </button>
-        </div>
+
 
         {/* CTA for non-authenticated users */}
         {!user && (
