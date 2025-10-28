@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2 } from 'lucide-react';
+import { Mic, MicOff } from 'lucide-react';
 
 export default function VoiceInput({ onTranscript, onSpeechEnd }) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
   const recognitionRef = useRef(null);
-  const shouldRestartRef = useRef(false);
-  const fullTranscriptRef = useRef('');
+  const silenceTimerRef = useRef(null);
+  const finalTranscriptRef = useRef('');
 
   useEffect(() => {
     // Check if browser supports speech recognition
@@ -24,58 +24,70 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
       recognition.onstart = () => {
         console.log('🎤 Voice recognition started');
         setIsListening(true);
+        finalTranscriptRef.current = '';
       };
 
       recognition.onresult = (event) => {
         let interimTranscript = '';
         let finalTranscript = '';
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcriptPiece = event.results[i][0].transcript;
+        for (let i = 0; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += transcriptPiece + ' ';
+            finalTranscript += transcript;
           } else {
-            interimTranscript += transcriptPiece;
+            interimTranscript += transcript;
           }
         }
 
-        // Accumulate final transcripts
-        if (finalTranscript) {
-          fullTranscriptRef.current += finalTranscript;
-        }
-
-        const displayTranscript = fullTranscriptRef.current + interimTranscript;
-        setTranscript(displayTranscript);
+        // Update the displayed transcript
+        const fullTranscript = finalTranscript || interimTranscript;
+        setTranscript(fullTranscript);
         
         if (onTranscript) {
-          onTranscript(displayTranscript);
+          onTranscript(fullTranscript);
         }
+
+        // Store final transcript
+        if (finalTranscript) {
+          finalTranscriptRef.current = finalTranscript;
+        }
+
+        // Clear any existing silence timer
+        if (silenceTimerRef.current) {
+          clearTimeout(silenceTimerRef.current);
+        }
+
+        // Set a new silence timer (2 seconds of silence = done speaking)
+        silenceTimerRef.current = setTimeout(() => {
+          if (recognitionRef.current && isListening) {
+            console.log('🎤 Silence detected, stopping...');
+            recognitionRef.current.stop();
+          }
+        }, 2000);
       };
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
+        if (silenceTimerRef.current) {
+          clearTimeout(silenceTimerRef.current);
+        }
         setIsListening(false);
       };
 
       recognition.onend = () => {
         console.log('🎤 Voice recognition ended');
-        
-        // If we should keep listening (user didn't manually stop), restart
-        if (shouldRestartRef.current) {
-          console.log('🔄 Auto-restarting recognition...');
-          try {
-            recognition.start();
-          } catch (e) {
-            console.log('Could not restart:', e);
-            setIsListening(false);
-          }
-        } else {
-          setIsListening(false);
-          if (fullTranscriptRef.current && onSpeechEnd) {
-            onSpeechEnd(fullTranscriptRef.current);
-          }
-          fullTranscriptRef.current = '';
+        if (silenceTimerRef.current) {
+          clearTimeout(silenceTimerRef.current);
         }
+        setIsListening(false);
+        
+        const finalText = finalTranscriptRef.current || transcript;
+        if (finalText && onSpeechEnd) {
+          onSpeechEnd(finalText);
+        }
+        setTranscript('');
+        finalTranscriptRef.current = '';
       };
 
       recognitionRef.current = recognition;
@@ -85,46 +97,27 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
     };
-  }, [transcript, onTranscript, onSpeechEnd]);
+  }, []);
 
   const toggleListening = () => {
     if (!recognitionRef.current) return;
 
     if (isListening) {
-      // User manually stopped - don't restart
-      shouldRestartRef.current = false;
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      // User started - enable auto-restart
-      shouldRestartRef.current = true;
-      fullTranscriptRef.current = '';
       setTranscript('');
-      recognitionRef.current.start();
       setIsListening(true);
-    }
-  };
-
-  // Text-to-speech for AI responses
-  const speak = (text) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-      utterance.lang = 'en-US';
-      
-      // Use a more natural voice if available
-      const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(voice => 
-        voice.name.includes('Google') || voice.name.includes('Natural')
-      );
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
+      try {
+        recognitionRef.current.start();
+      } catch (e) {
+        console.error('Could not start recognition:', e);
+        setIsListening(false);
       }
-
-      speechSynthesis.speak(utterance);
     }
   };
 
@@ -169,7 +162,7 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
           <div className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             <span className="text-xs text-gray-400 uppercase tracking-wide">
-              {transcript ? 'Listening... Click mic to stop' : 'Listening... Start speaking'}
+              {transcript ? 'Listening... (2s silence = auto-stop)' : 'Listening... Start speaking'}
             </span>
           </div>
           {transcript && <p className="text-sm text-white">{transcript}</p>}

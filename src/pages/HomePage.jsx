@@ -316,7 +316,7 @@ const HomePage = () => {
             <p className="text-gray-300">{t('home.interactive.subtitle')}</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {/* Games Button */}
             <button
               onClick={() => user ? navigate('/games') : navigate('/auth')}
@@ -373,10 +373,37 @@ const HomePage = () => {
                   <span>🚀 {t('home.compare.rocket')}</span>
                   <span>✈️ {t('home.compare.plane')}</span>
                   <span>🚗 {t('home.compare.car')}</span>
+                  <span>📤 Upload yours</span>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 text-white font-semibold">
                   <span>{t('home.compare.button')}</span>
+                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Collaborate Button */}
+            <button
+              onClick={() => user ? navigate('/collaborate') : navigate('/auth')}
+              className="group relative bg-gradient-to-br from-yellow-500 via-amber-600 to-orange-500 hover:from-yellow-600 hover:via-amber-700 hover:to-orange-600 rounded-2xl p-8 border-2 border-yellow-400/50 hover:border-yellow-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-yellow-500/30"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                    <UsersIcon className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">👥 {t('home.features.collaborate.title')}</h3>
+                <p className="text-white/90 text-center mb-4">
+                  {t('home.features.collaborate.fullDesc')}
+                </p>
+
+                <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                  <span>{t('home.features.collaborate.button')}</span>
                   <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
