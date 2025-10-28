@@ -172,23 +172,48 @@ export default function VoiceInput({ onTranscript, onSpeechEnd }) {
   );
 }
 
-// Export speak function for use in other components
+// Export speak function for use in other components - MALE VOICE
 export const speakText = (text) => {
   if ('speechSynthesis' in window) {
+    // Cancel any ongoing speech
+    speechSynthesis.cancel();
+    
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+    utterance.pitch = 0.8; // Lower pitch for male voice
     utterance.volume = 1.0;
     utterance.lang = 'en-US';
     
-    const voices = speechSynthesis.getVoices();
-    const preferredVoice = voices.find(voice => 
-      voice.name.includes('Google') || voice.name.includes('Natural')
-    );
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
+    // Wait for voices to load
+    const setVoice = () => {
+      const voices = speechSynthesis.getVoices();
+      
+      // Try to find a male voice (priority order)
+      const maleVoice = voices.find(voice => 
+        voice.name.includes('Male') ||
+        voice.name.includes('David') ||
+        voice.name.includes('Mark') ||
+        voice.name.includes('Google US English Male') ||
+        voice.name.includes('Microsoft David') ||
+        (voice.name.includes('Google') && voice.lang === 'en-US' && !voice.name.includes('Female'))
+      );
+      
+      if (maleVoice) {
+        utterance.voice = maleVoice;
+        console.log('🗣️ Using male voice:', maleVoice.name);
+      } else {
+        // Fallback: use lower pitch with any voice
+        console.log('🗣️ No male voice found, using pitch adjustment');
+      }
+      
+      speechSynthesis.speak(utterance);
+    };
+    
+    // Voices might not be loaded yet
+    if (speechSynthesis.getVoices().length > 0) {
+      setVoice();
+    } else {
+      speechSynthesis.onvoiceschanged = setVoice;
     }
-
-    speechSynthesis.speak(utterance);
   }
 };
