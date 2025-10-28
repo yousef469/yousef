@@ -148,7 +148,19 @@ const HomePage = () => {
           </div>
         </div>
 
+        {/* Live AI Chat Assistant - TOP PRIORITY */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              {t('home.ai.title')}
+            </h2>
+            <p className="text-gray-300">{t('home.ai.subtitle')}</p>
+          </div>
 
+          <div className="max-w-4xl mx-auto">
+            <LiveChatBot />
+          </div>
+        </div>
 
         {/* CTA for non-authenticated users */}
         {!user && (
@@ -373,20 +385,6 @@ const HomePage = () => {
                 </div>
               </div>
             </button>
-          </div>
-        </div>
-
-        {/* Live AI Chat Assistant */}
-        <div className="mt-16">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              {t('home.ai.title')}
-            </h2>
-            <p className="text-gray-300">{t('home.ai.subtitle')}</p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <LiveChatBot />
           </div>
         </div>
 
