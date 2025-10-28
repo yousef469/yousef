@@ -185,14 +185,17 @@ def models_info():
     })
 
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    
     print("=" * 50)
     print("AI 3D Model Generator Backend")
     print("=" * 50)
     print(f"CUDA Available: {torch.cuda.is_available()}")
     print(f"Device: {'cuda' if torch.cuda.is_available() else 'cpu'}")
     print("=" * 50)
-    print("\nStarting Flask server on http://localhost:5000")
+    print(f"\nStarting Flask server on port {port}")
     print("Frontend should connect to this URL")
     print("=" * 50)
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
