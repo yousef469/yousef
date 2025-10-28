@@ -42,7 +42,7 @@ export default function AI3DGenerator() {
 
     try {
       // Check if backend is running
-      const BACKEND_URL = 'https://yousef-ai-backend.onrender.com';
+      const BACKEND_URL = 'https://name-ai-3d-backend.onrender.com';
       
       try {
         const healthCheck = await fetch(`${BACKEND_URL}/health`);
