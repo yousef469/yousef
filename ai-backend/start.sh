@@ -23,4 +23,4 @@ echo "Press Ctrl+C to stop the server"
 echo "================================================"
 echo ""
 
-python app.py
+python app_hf.py
