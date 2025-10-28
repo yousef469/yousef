@@ -293,7 +293,7 @@ const HomePage = () => {
             <p className="text-gray-300">{t('home.interactive.subtitle')}</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {/* Games Button */}
             <button
               onClick={() => user ? navigate('/games') : navigate('/auth')}
@@ -381,6 +381,32 @@ const HomePage = () => {
 
                 <div className="flex items-center justify-center gap-2 text-white font-semibold">
                   <span>{t('home.features.collaborate.button')}</span>
+                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                </div>
+              </div>
+            </button>
+
+            {/* AI 3D Generator Button - NEW! */}
+            <button
+              onClick={() => navigate('/ai-generator')}
+              className="group relative bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-500 hover:from-purple-600 hover:via-fuchsia-700 hover:to-pink-600 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur animate-pulse">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">✨ AI 3D Generator</h3>
+                <p className="text-white/90 text-center mb-4">
+                  Create 3D models from text or images using AI
+                </p>
+
+                <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                  <span>Generate Now</span>
                   <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
