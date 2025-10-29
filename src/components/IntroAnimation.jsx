@@ -21,7 +21,7 @@ const IntroAnimation = ({ onComplete }) => {
         <div className="mb-8 animate-pulse">
           <div className="text-8xl mb-4 animate-bounce">🚀</div>
           <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-glow">
-            AeroAI 3D
+            Engineerium
           </h1>
           <p className="text-xl text-gray-400 mt-4 animate-fadeIn">
             Mechanics Redefined

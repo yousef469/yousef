@@ -1,4 +1,4 @@
-# 🚀 AeroAI 3D - Interactive Engineering Education Platform
+# 🚀 Engineerium - Interactive Engineering Education Platform
 
 > Learn aerospace and automotive engineering through interactive 3D models and AI-powered tutoring
 

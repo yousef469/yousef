@@ -1,6 +1,6 @@
 {
     "app": {
-        "title": "AeroAI 3D",
+        "title": "Engineerium",
         "subtitle": "इंटरैक्टिव 3D इंजीनियरिंग मॉडल"
     },
     "nav": {
@@ -184,7 +184,7 @@
             }
         },
         "footer": {
-            "copyright": "© 2025 AeroAI 3D - इंटरैक्टिव इंजीनियरिंग शिक्षा",
+            "copyright": "© 2025 Engineerium - इंटरैक्टिव इंजीनियरिंग शिक्षा",
             "version": "v2.0 - वॉयस AI • मॉडल तुलना • लीडरबोर्ड • PWA"
         }
     }

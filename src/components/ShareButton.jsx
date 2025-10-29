@@ -7,7 +7,7 @@ export default function ShareButton({ title, description, url }) {
 
   const shareUrl = url || window.location.href;
   const shareTitle = title || 'Check out this 3D model!';
-  const shareText = description || 'Interactive 3D engineering models on AeroAI 3D';
+  const shareText = description || 'Interactive 3D engineering models on Engineerium';
 
   const copyLink = async () => {
     try {

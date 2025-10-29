@@ -1,6 +1,6 @@
 {
     "app": {
-        "title": "AeroAI 3D",
+        "title": "Engineerium",
         "subtitle": "Modèles d'ingénierie 3D interactifs"
     },
     "nav": {
@@ -184,7 +184,7 @@
             }
         },
         "footer": {
-            "copyright": "© 2025 AeroAI 3D - Éducation interactive en ingénierie",
+            "copyright": "© 2025 Engineerium - Éducation interactive en ingénierie",
             "version": "v2.0 - IA vocale • Comparaison de modèles • Classements • PWA"
         }
     }

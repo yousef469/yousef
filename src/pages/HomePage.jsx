@@ -34,7 +34,7 @@ const HomePage = () => {
       {/* Sidebar Menu */}
       <SidebarMenu />
       
-      {/* AeroAI 3D - Interactive Engineering Platform */}
+      {/* Engineerium - Interactive Engineering Platform */}
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 py-6">

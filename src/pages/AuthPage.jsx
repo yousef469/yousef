@@ -73,7 +73,7 @@ export default function AuthPage() {
             <div className="p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl">
               <Rocket className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white">AeroAI 3D</h1>
+            <h1 className="text-3xl font-bold text-white">Engineerium</h1>
           </div>
           <p className="text-gray-400">
             {isLogin ? t('auth.welcomeBack') : t('auth.startJourney')}

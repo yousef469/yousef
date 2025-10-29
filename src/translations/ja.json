@@ -1,6 +1,6 @@
 {
     "app": {
-        "title": "AeroAI 3D",
+        "title": "Engineerium",
         "subtitle": "インタラクティブな3Dエンジニアリングモデル"
     },
     "nav": {
@@ -184,7 +184,7 @@
             }
         },
         "footer": {
-            "copyright": "© 2025 AeroAI 3D - インタラクティブエンジニアリング教育",
+            "copyright": "© 2025 Engineerium - インタラクティブエンジニアリング教育",
             "version": "v2.0 - 音声AI • モデル比較 • リーダーボード • PWA"
         }
     }

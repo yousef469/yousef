@@ -1,6 +1,6 @@
-// Service Worker for AeroAI 3D
+// Service Worker for Engineerium
 const CACHE_VERSION = '2.0.1'; // Increment this to force cache refresh
-const CACHE_NAME = `aeroai-3d-v${CACHE_VERSION}`;
+const CACHE_NAME = `engineerium-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `aeroai-runtime-v${CACHE_VERSION}`;
 
 // Assets to cache on install
@@ -168,7 +168,7 @@ async function syncQuestions() {
 // Push notifications (for future use)
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
-  const title = data.title || 'AeroAI 3D';
+  const title = data.title || 'Engineerium';
   const options = {
     body: data.body || 'New content available!',
     icon: '/icon.svg',

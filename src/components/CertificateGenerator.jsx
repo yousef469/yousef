@@ -94,7 +94,7 @@ const CertificateGenerator = ({ courseName, completionDate, score }) => {
     // Footer
     ctx.font = '25px Arial';
     ctx.fillStyle = '#6b7280';
-    ctx.fillText('AeroAI 3D - Interactive Engineering Education', 960, 980);
+    ctx.fillText('Engineerium - Interactive Engineering Education', 960, 980);
 
     // Download
     const link = document.createElement('a');
@@ -142,7 +142,7 @@ const CertificateGenerator = ({ courseName, completionDate, score }) => {
             })}
           </p>
           <div className="text-4xl mb-2">🚀</div>
-          <p className="text-gray-600 text-xs">AeroAI 3D - Interactive Engineering Education</p>
+          <p className="text-gray-600 text-xs">Engineerium - Interactive Engineering Education</p>
         </div>
       </div>
 
@@ -161,7 +161,7 @@ const CertificateGenerator = ({ courseName, completionDate, score }) => {
             if (navigator.share) {
               navigator.share({
                 title: 'My AeroAI Certificate',
-                text: `I just completed ${courseName} on AeroAI 3D!`,
+                text: `I just completed ${courseName} on Engineerium!`,
                 url: window.location.href
               });
             }

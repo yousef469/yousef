@@ -1,6 +1,6 @@
 {
-  "name": "AeroAI 3D - Interactive Engineering Education",
-  "short_name": "AeroAI 3D",
+  "name": "Engineerium - Interactive Engineering Education",
+  "short_name": "Engineerium",
   "description": "Learn aerospace and automotive engineering through interactive 3D models, AI tutoring, and gamified lessons",
   "start_url": "/",
   "display": "standalone",

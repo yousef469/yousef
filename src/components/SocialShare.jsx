@@ -6,7 +6,7 @@ const SocialShare = ({ achievement, stats }) => {
   const [showModal, setShowModal] = useState(false);
 
   const shareData = {
-    title: achievement?.title || `Level ${stats?.level} on AeroAI 3D!`,
+    title: achievement?.title || `Level ${stats?.level} on Engineerium!`,
     text: achievement?.text || `I just reached Level ${stats?.level} and earned ${stats?.totalPoints} points learning aerospace engineering! 🚀`,
     url: window.location.origin,
     hashtags: ['AeroAI3D', 'Engineering', 'Learning', 'STEM']
@@ -54,7 +54,7 @@ const SocialShare = ({ achievement, stats }) => {
     // Title
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 60px Arial';
-    ctx.fillText('AeroAI 3D', 100, 150);
+    ctx.fillText('Engineerium', 100, 150);
 
     // Stats
     ctx.font = 'bold 80px Arial';
