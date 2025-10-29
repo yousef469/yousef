@@ -16,7 +16,9 @@ export const PRICING_PLANS = {
     name: 'Free',
     price: 0,
     credits: 5,
+    lives: 5,
     features: [
+      '5 Game Lives (regenerate every 5h)',
       '5 AI 3D generations per month',
       'TripoSR model only',
       'Basic support',
@@ -29,7 +31,9 @@ export const PRICING_PLANS = {
     name: 'Starter',
     price: 9.99,
     credits: 50,
+    lives: 10,
     features: [
+      '10 Game Lives (regenerate every 5h)',
       '50 AI 3D generations per month',
       'TripoSR + TRELLIS models',
       'Priority support',
@@ -43,7 +47,9 @@ export const PRICING_PLANS = {
     name: 'Pro',
     price: 29.99,
     credits: 200,
+    lives: -1,
     features: [
+      'Unlimited Game Lives per month',
       '200 AI 3D generations per month',
       'All models (TripoSR + TRELLIS)',
       'Priority support',
@@ -57,8 +63,10 @@ export const PRICING_PLANS = {
     priceId: STRIPE_PRICE_UNLIMITED,
     name: 'Master',
     price: 99.99,
-    credits: -1, // Unlimited
+    credits: -1,
+    lives: -1,
     features: [
+      'Unlimited Game Lives Forever',
       'Unlimited AI 3D generations',
       'All models + early access',
       'Dedicated support',

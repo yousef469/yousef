@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Brain, Clock, Trophy, CheckCircle, XCircle } from 'lucide-react';
+import { useLives } from '../contexts/LivesContext';
+import LivesDisplay from '../components/LivesDisplay';
 
 export default function QuizGame() {
   const navigate = useNavigate();
+  const { hasLives, loseLife } = useLives();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
 
   const questions = [
     {
@@ -111,12 +115,27 @@ export default function QuizGame() {
     }
   }, [timeLeft, showResult, gameOver]);
 
-  const handleAnswer = (answerIndex) => {
+  const handleAnswer = async (answerIndex) => {
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     
-    if (answerIndex === questions[currentQuestion].correct) {
+    const isCorrect = answerIndex === questions[currentQuestion].correct;
+    
+    if (isCorrect) {
       setScore(score + 1);
+    } else {
+      // Wrong answer - lose a life
+      const newWrongCount = wrongAnswers + 1;
+      setWrongAnswers(newWrongCount);
+      
+      if (newWrongCount >= 5) {
+        // Lost 5 lives - game over
+        const canContinue = await loseLife();
+        if (!canContinue) {
+          setGameOver(true);
+          return;
+        }
+      }
     }
 
     setTimeout(() => {
@@ -132,12 +151,19 @@ export default function QuizGame() {
   };
 
   const restartGame = () => {
+    if (!hasLives) {
+      alert('Out of lives! Upgrade your plan or wait for lives to regenerate.');
+      navigate('/pricing');
+      return;
+    }
+    
     setCurrentQuestion(0);
     setScore(0);
     setTimeLeft(30);
     setSelectedAnswer(null);
     setShowResult(false);
     setGameOver(false);
+    setWrongAnswers(0);
   };
 
   if (gameOver) {
@@ -176,6 +202,7 @@ export default function QuizGame() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      <LivesDisplay />
       {/* Header */}
       <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">

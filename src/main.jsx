@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './contexts/AuthContext'
+import { LivesProvider } from './contexts/LivesContext'
 import App from './App.jsx'
 import TawkToChat from './components/TawkToChat'
 import './index.css'
@@ -25,9 +26,11 @@ if (MIXPANEL_TOKEN && MIXPANEL_TOKEN !== 'YOUR_MIXPANEL_TOKEN_HERE') {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <App />
-      <Analytics />
-      <TawkToChat />
+      <LivesProvider>
+        <App />
+        <Analytics />
+        <TawkToChat />
+      </LivesProvider>
     </AuthProvider>
   </React.StrictMode>,
 )
