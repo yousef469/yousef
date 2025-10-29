@@ -58,6 +58,21 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- FingerprintJS Pro (optional - for better accuracy) -->
+    <script>
+      // Load FingerprintJS if API key is available
+      (function() {
+        const fpKey = 'VITE_FINGERPRINT_API_KEY'; // Will be replaced by env var
+        if (fpKey && fpKey !== 'VITE_FINGERPRINT_API_KEY') {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs-pro@3/dist/fp.min.js';
+          script.async = true;
+          document.head.appendChild(script);
+        }
+      })();
+    </script>
+    
     <script type="module" src="/src/main.jsx"></script>
     
     <!-- Service Worker Cleanup & Cache Clear -->

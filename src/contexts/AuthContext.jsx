@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser, onAuthStateChange, signIn, signUp, signOut, signInWithGoogle, signInWithApple } from '../services/supabase';
+import { getCurrentUser, onAuthStateChange, signIn, signUp, signOut, signInWithGoogle, signInWithApple, supabase } from '../services/supabase';
 import { identifyUser, resetUser, trackSignUp, trackSignIn, trackSignOut } from '../services/mixpanel';
+import { performFraudCheck } from '../services/fingerprint';
 
 const AuthContext = createContext({});
 
@@ -58,15 +59,99 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     signIn: async (email, password) => {
+      // Perform fraud check on signin
+      const fraudCheck = await performFraudCheck();
+      
       const { data, error } = await signIn(email, password);
       if (error) throw error;
+      
+      // Update fingerprint usage
+      if (data.user) {
+        const { data: existing } = await supabase
+          .from('device_fingerprints')
+          .select('*')
+          .eq('fingerprint', fraudCheck.fingerprint)
+          .single();
+        
+        if (existing) {
+          // Update existing fingerprint
+          await supabase
+            .from('device_fingerprints')
+            .update({
+              last_seen: new Date().toISOString(),
+              usage_count: existing.usage_count + 1,
+              user_id: data.user.id
+            })
+            .eq('fingerprint', fraudCheck.fingerprint);
+        } else {
+          // Create new fingerprint record
+          await supabase.from('device_fingerprints').insert({
+            fingerprint: fraudCheck.fingerprint,
+            user_id: data.user.id,
+            ip_address: fraudCheck.ip,
+            is_vpn: fraudCheck.isVPN,
+            vpn_confidence: fraudCheck.vpnConfidence,
+            risk_score: fraudCheck.riskScore,
+            confidence: fraudCheck.confidence,
+            method: fraudCheck.method,
+            suspicious_flags: fraudCheck.suspiciousFlags,
+            user_agent: navigator.userAgent
+          });
+        }
+        
+        // Check for multi-accounting
+        const { data: links } = await supabase
+          .rpc('detect_multi_accounting', {
+            p_fingerprint: fraudCheck.fingerprint,
+            p_user_id: data.user.id
+          });
+        
+        if (links && links.length > 0) {
+          console.warn('Multi-accounting detected:', links);
+          // You can add additional logic here (e.g., flag account, send alert)
+        }
+      }
+      
       setUser(data.user);
       trackSignIn('email');
       return data;
     },
     signUp: async (email, password, fullName) => {
+      // Perform fraud check before signup
+      const fraudCheck = await performFraudCheck();
+      
+      // Block if high risk
+      if (fraudCheck.riskScore > 0.8) {
+        throw new Error('Account creation blocked due to suspicious activity. Please contact support.');
+      }
+      
       const { data, error } = await signUp(email, password, fullName);
       if (error) throw error;
+      
+      // Store fingerprint in database
+      if (data.user) {
+        await supabase.from('device_fingerprints').insert({
+          fingerprint: fraudCheck.fingerprint,
+          user_id: data.user.id,
+          ip_address: fraudCheck.ip,
+          is_vpn: fraudCheck.isVPN,
+          vpn_confidence: fraudCheck.vpnConfidence,
+          risk_score: fraudCheck.riskScore,
+          confidence: fraudCheck.confidence,
+          method: fraudCheck.method,
+          suspicious_flags: fraudCheck.suspiciousFlags,
+          user_agent: navigator.userAgent
+        });
+        
+        // Create account link
+        await supabase.from('account_links').insert({
+          fingerprint: fraudCheck.fingerprint,
+          user_id: data.user.id,
+          link_type: 'device',
+          confidence: fraudCheck.confidence
+        });
+      }
+      
       setUser(data.user);
       trackSignUp('email');
       // Show language selector for new users
