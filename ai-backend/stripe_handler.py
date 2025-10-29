@@ -20,7 +20,7 @@ def create_checkout_session(price_id, user_id, success_url, cancel_url):
         actual_price_id = PRICE_IDS.get(price_id, price_id)
         
         session = stripe.checkout.Session.create(
-            payment_method_types=['card', 'link'],  # Card and Stripe Link (PayPal requires activation)
+            payment_method_types=['card', 'link'],  # Card and Stripe Link
             line_items=[{
                 'price': actual_price_id,
                 'quantity': 1,

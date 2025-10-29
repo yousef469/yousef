@@ -149,9 +149,7 @@ export default function PricingPage() {
               {/* Payment Methods Info */}
               {plan.id !== 'free' && (
                 <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-400">
-                  <span>💳 Card</span>
-                  <span>•</span>
-                  <span>PayPal</span>
+                  <span>💳 Credit/Debit Card</span>
                   <span>•</span>
                   <span>Apple Pay</span>
                   <span>•</span>
