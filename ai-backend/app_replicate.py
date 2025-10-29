@@ -131,22 +131,46 @@ def generate_3d():
         else:
             return jsonify({'error': f'Unknown mode: {mode}'}), 400
         
-        # Step 2: Generate 3D model using TripoSR
-        print("Generating 3D model with TripoSR...")
+        # Step 2: Generate 3D model using TripoSR or TRELLIS
+        model_choice = data.get('model', 'triposr')  # 'triposr' or 'trellis'
         
-        triposr_response = requests.post(
-            f'{REPLICATE_API_BASE}/predictions',
-            headers=headers,
-            json={
-                "version": "b3e37e8f2e204d8440e6f26e9e0a9e0e0e0a9e0e",  # TripoSR version
-                "input": {
-                    "image": image_url,
-                    "foreground_ratio": 0.85,
-                    "mc_resolution": 256
-                }
-            },
-            timeout=15
-        )
+        if model_choice == 'trellis':
+            print("Generating 3D model with TRELLIS (high quality)...")
+            
+            model_response = requests.post(
+                f'{REPLICATE_API_BASE}/predictions',
+                headers=headers,
+                json={
+                    "version": "5e569c4e8c4f3e0e0e0e0e0e0e0e0e0e",  # TRELLIS version
+                    "input": {
+                        "image": image_url,
+                        "seed": 42,
+                        "slat_sampler_params": {
+                            "steps": 12,
+                            "cfg_strength": 7.5
+                        }
+                    }
+                },
+                timeout=15
+            )
+        else:
+            print("Generating 3D model with TripoSR (fast)...")
+            
+            model_response = requests.post(
+                f'{REPLICATE_API_BASE}/predictions',
+                headers=headers,
+                json={
+                    "version": "b3e37e8f2e204d8440e6f26e9e0a9e0e0e0a9e0e",  # TripoSR version
+                    "input": {
+                        "image": image_url,
+                        "foreground_ratio": 0.85,
+                        "mc_resolution": 256
+                    }
+                },
+                timeout=15
+            )
+        
+        triposr_response = model_response
         
         if triposr_response.status_code != 201:
             return jsonify({

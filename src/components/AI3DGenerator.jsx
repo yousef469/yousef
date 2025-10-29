@@ -4,6 +4,7 @@ import ThreeJSViewer from './ThreeJSViewer';
 
 export default function AI3DGenerator() {
   const [mode, setMode] = useState('text'); // 'text' or 'image'
+  const [modelChoice, setModelChoice] = useState('triposr'); // 'triposr' or 'trellis'
   const [textPrompt, setTextPrompt] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -61,6 +62,7 @@ export default function AI3DGenerator() {
       // Prepare form data
       const formData = new FormData();
       formData.append('mode', mode);
+      formData.append('model', modelChoice);
       
       if (mode === 'text') {
         formData.append('prompt', textPrompt);
@@ -127,7 +129,7 @@ export default function AI3DGenerator() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-white">AI 3D Model Generator</h2>
-            <p className="text-sm text-gray-400">Powered by TripoSR via Replicate - ~$0.01 per model</p>
+            <p className="text-sm text-gray-400">Powered by Replicate - Choose your quality level</p>
           </div>
         </div>
         
@@ -159,11 +161,49 @@ export default function AI3DGenerator() {
       </div>
 
       <div className="p-6 space-y-6">
+        {/* Model Quality Selector */}
+        <div className="bg-gray-800 rounded-lg p-4">
+          <label className="block text-sm font-semibold text-gray-300 mb-3">Choose Quality</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setModelChoice('triposr')}
+              className={`p-4 rounded-lg border-2 transition-all text-left ${
+                modelChoice === 'triposr'
+                  ? 'border-green-500 bg-green-500/10'
+                  : 'border-gray-600 bg-gray-700 hover:border-gray-500'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-white">TripoSR</span>
+                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">Fast</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-1">Good quality, 30-60 sec</p>
+              <p className="text-xs font-semibold text-green-400">~$0.01 per model</p>
+            </button>
+            
+            <button
+              onClick={() => setModelChoice('trellis')}
+              className={`p-4 rounded-lg border-2 transition-all text-left ${
+                modelChoice === 'trellis'
+                  ? 'border-purple-500 bg-purple-500/10'
+                  : 'border-gray-600 bg-gray-700 hover:border-gray-500'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-white">TRELLIS</span>
+                <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded">Best</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-1">Highest quality, 2-3 min</p>
+              <p className="text-xs font-semibold text-purple-400">~$0.05 per model</p>
+            </button>
+          </div>
+        </div>
+
         {/* AI Text Mode */}
         {mode === 'text' && (
           <div className="space-y-4">
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
-              <p className="text-sm text-purple-400">🎨 TripoSR AI generation - Takes 30-60 seconds</p>
+              <p className="text-sm text-purple-400">🎨 AI-powered 3D generation from text</p>
             </div>
             
             <div>
@@ -185,7 +225,7 @@ export default function AI3DGenerator() {
         {mode === 'image' && (
           <div className="space-y-4">
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
-              <p className="text-sm text-purple-400">📸 Turn any image into 3D - Takes 30-60 seconds</p>
+              <p className="text-sm text-purple-400">📸 Turn any image into 3D</p>
             </div>
             
             <div>
@@ -294,7 +334,7 @@ export default function AI3DGenerator() {
                 <span className="font-semibold text-white">Model:</span> {generatedModel.name}
               </p>
               <p className="text-sm text-gray-400 mt-1">
-                <span className="font-semibold text-white">Type:</span> AI Generated (Meshy AI)
+                <span className="font-semibold text-white">Model:</span> {modelChoice === 'trellis' ? 'TRELLIS (Best Quality)' : 'TripoSR (Fast)'}
               </p>
               <p className="text-sm text-gray-400 mt-1">
                 <span className="font-semibold text-white">Generated:</span> {new Date(generatedModel.timestamp).toLocaleString()}
