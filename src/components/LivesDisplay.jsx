@@ -41,7 +41,7 @@ export default function LivesDisplay() {
             <>
               <Heart className="w-6 h-6 text-white fill-white" />
               <span className="text-white font-bold text-xl">∞</span>
-              <span className="text-white/80 text-sm">Unlimited</span>
+              <span className="text-white/80 text-sm">Infinite</span>
             </>
           ) : (
             <>

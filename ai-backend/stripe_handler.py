@@ -10,7 +10,7 @@ stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 PRICE_IDS = {
     'starter': os.environ.get('STRIPE_PRICE_STARTER', 'price_starter'),
     'pro': os.environ.get('STRIPE_PRICE_PRO', 'price_pro'),
-    'unlimited': os.environ.get('STRIPE_PRICE_UNLIMITED', 'price_unlimited')
+    'master': os.environ.get('STRIPE_PRICE_MASTER', 'price_master')
 }
 
 def create_checkout_session(price_id, user_id, success_url, cancel_url):
@@ -71,9 +71,9 @@ def get_subscription_status(user_id):
             elif price_id == PRICE_IDS['pro']:
                 plan_name = 'pro'
                 credits = 200
-            elif price_id == PRICE_IDS['unlimited']:
-                plan_name = 'unlimited'
-                credits = -1  # Unlimited
+            elif price_id == PRICE_IDS['master']:
+                plan_name = 'master'
+                credits = -1  # Infinite
         
         return {
             'plan': plan_name,

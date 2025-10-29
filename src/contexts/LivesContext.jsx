@@ -104,7 +104,7 @@ export function LivesProvider({ children }) {
 
   async function loseLife() {
     if (userTier === 'master') {
-      // Master tier has unlimited lives
+      // Master tier has infinite lives
       return true;
     }
 
@@ -164,8 +164,8 @@ export function LivesProvider({ children }) {
     const tierLimits = {
       free: 5,
       starter: 10,
-      pro: -1, // Unlimited per month
-      master: -1 // Unlimited forever
+      pro: -1, // Infinite per month
+      master: -1 // Infinite forever
     };
 
     const newMaxLives = tierLimits[newTier];

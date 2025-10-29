@@ -24,7 +24,7 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
 2. Create 3 products:
    - **Starter**: $9.99/month, ID: `price_starter`
    - **Pro**: $29.99/month, ID: `price_pro`
-   - **Unlimited**: $99.99/month, ID: `price_unlimited`
+   - **Master**: $99.99/month, ID: `price_master`
 
 **D. Backend API Endpoints Needed:**
 ```

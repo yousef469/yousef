@@ -5,8 +5,8 @@
 ### Lives System Features:
 - **Free Tier**: 5 lives, regenerate 1 every 5 hours
 - **Starter Tier**: 10 lives, regenerate 1 every 5 hours  
-- **Pro Tier**: Unlimited lives per month
-- **Master Tier**: Unlimited lives forever
+- **Pro Tier**: Infinite lives per month
+- **Master Tier**: Infinite lives forever
 
 ### How It Works:
 1. User starts with 5 lives (free tier)
@@ -44,13 +44,13 @@ Go to https://dashboard.stripe.com/test/products and create:
 **Product 2: Pro Plan**
 - Name: `Pro Plan`
 - Price: `$29.99/month` (recurring)
-- Description: `Unlimited lives per month + 200 AI generations`
+- Description: `Infinite lives per month + 200 AI generations`
 - Copy the **Price ID**
 
 **Product 3: Master Plan**
 - Name: `Master Plan`
 - Price: `$99.99/month` (recurring)
-- Description: `Unlimited lives forever + unlimited AI generations`
+- Description: `Infinite lives forever + infinite AI generations`
 - Copy the **Price ID**
 
 ### 3. Add Environment Variables
@@ -60,7 +60,7 @@ Go to https://dashboard.stripe.com/test/products and create:
 STRIPE_SECRET_KEY=sk_test_YOUR_SECRET_KEY
 STRIPE_PRICE_STARTER=price_1ABC...
 STRIPE_PRICE_PRO=price_1DEF...
-STRIPE_PRICE_UNLIMITED=price_1GHI...
+STRIPE_PRICE_MASTER=price_1GHI...
 ```
 
 **Vercel Frontend:**
@@ -68,7 +68,7 @@ STRIPE_PRICE_UNLIMITED=price_1GHI...
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_PUBLISHABLE_KEY
 VITE_STRIPE_PRICE_STARTER=price_1ABC...
 VITE_STRIPE_PRICE_PRO=price_1DEF...
-VITE_STRIPE_PRICE_UNLIMITED=price_1GHI...
+VITE_STRIPE_PRICE_MASTER=price_1GHI...
 ```
 
 ### 4. Test the System
@@ -88,7 +88,7 @@ VITE_STRIPE_PRICE_UNLIMITED=price_1GHI...
 - Gets 5 wrong answers
 - Loses all lives
 - Sees: "Out of lives! Wait 20 hours or upgrade"
-- Can upgrade to Starter (10 lives), Pro (unlimited/month), or Master (unlimited forever)
+- Can upgrade to Starter (10 lives), Pro (infinite/month), or Master (infinite forever)
 
 ### Starter User (10 Lives):
 - Has 10 lives
@@ -96,13 +96,13 @@ VITE_STRIPE_PRICE_UNLIMITED=price_1GHI...
 - Loses all lives
 - Sees upgrade prompt for Pro or Master
 
-### Pro User (Unlimited per month):
-- Unlimited lives for the month
+### Pro User (Infinite per month):
+- Infinite lives for the month
 - Lives reset monthly
 - No waiting time
 
-### Master User (Unlimited forever):
-- Unlimited lives forever
+### Master User (Infinite forever):
+- Infinite lives forever
 - Never runs out
 - Premium experience
 
@@ -117,8 +117,8 @@ VITE_STRIPE_PRICE_UNLIMITED=price_1GHI...
 
 1. **Free users** hit the 5-life limit quickly → encourages upgrades
 2. **Starter tier** ($9.99) gives breathing room with 10 lives
-3. **Pro tier** ($29.99) removes the hassle with unlimited monthly lives
-4. **Master tier** ($99.99) is for power users who want unlimited forever
+3. **Pro tier** ($29.99) removes the hassle with infinite monthly lives
+4. **Master tier** ($99.99) is for power users who want infinite lives forever
 
 ## 🎨 UI Components
 

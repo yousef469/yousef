@@ -7,7 +7,7 @@ const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 // Replace these with your actual Stripe Price IDs from dashboard
 const STRIPE_PRICE_STARTER = import.meta.env.VITE_STRIPE_PRICE_STARTER || 'price_starter';
 const STRIPE_PRICE_PRO = import.meta.env.VITE_STRIPE_PRICE_PRO || 'price_pro';
-const STRIPE_PRICE_UNLIMITED = import.meta.env.VITE_STRIPE_PRICE_UNLIMITED || 'price_unlimited';
+const STRIPE_PRICE_MASTER = import.meta.env.VITE_STRIPE_PRICE_MASTER || 'price_master';
 
 export const PRICING_PLANS = {
   free: {
@@ -49,7 +49,7 @@ export const PRICING_PLANS = {
     credits: 200,
     lives: -1,
     features: [
-      'Unlimited Game Lives per month',
+      'Infinite Game Lives per month',
       '200 AI 3D generations per month',
       'All models (TripoSR + TRELLIS)',
       'Priority support',
@@ -58,16 +58,16 @@ export const PRICING_PLANS = {
       'Custom branding'
     ]
   },
-  unlimited: {
-    id: 'unlimited',
-    priceId: STRIPE_PRICE_UNLIMITED,
+  master: {
+    id: 'master',
+    priceId: STRIPE_PRICE_MASTER,
     name: 'Master',
     price: 99.99,
     credits: -1,
     lives: -1,
     features: [
-      'Unlimited Game Lives Forever',
-      'Unlimited AI 3D generations',
+      'Infinite Game Lives Forever',
+      'Infinite AI 3D generations',
       'All models + early access',
       'Dedicated support',
       'API access',

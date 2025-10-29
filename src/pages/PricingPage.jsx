@@ -50,7 +50,7 @@ export default function PricingPage() {
       case 'free': return <Zap className="w-8 h-8" />;
       case 'starter': return <Rocket className="w-8 h-8" />;
       case 'pro': return <Crown className="w-8 h-8" />;
-      case 'unlimited': return <Crown className="w-8 h-8" />;
+      case 'master': return <Crown className="w-8 h-8" />;
       default: return <Zap className="w-8 h-8" />;
     }
   };
@@ -60,7 +60,7 @@ export default function PricingPage() {
       case 'free': return 'from-gray-500 to-gray-600';
       case 'starter': return 'from-blue-500 to-cyan-600';
       case 'pro': return 'from-purple-500 to-pink-600';
-      case 'unlimited': return 'from-yellow-500 to-orange-600';
+      case 'master': return 'from-yellow-500 to-orange-600';
       default: return 'from-gray-500 to-gray-600';
     }
   };
@@ -112,7 +112,7 @@ export default function PricingPage() {
               {/* Credits */}
               <div className="mb-6 p-3 bg-gray-700 rounded-lg">
                 <p className="text-sm text-gray-300">
-                  {plan.credits === -1 ? 'Unlimited' : plan.credits} AI Generations
+                  {plan.credits === -1 ? 'Infinite' : plan.credits} AI Generations
                 </p>
               </div>
 
