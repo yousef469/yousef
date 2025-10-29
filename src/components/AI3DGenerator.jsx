@@ -127,7 +127,7 @@ export default function AI3DGenerator() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-white">AI 3D Model Generator</h2>
-            <p className="text-sm text-gray-400">Powered by Meshy AI - High Quality 3D Generation</p>
+            <p className="text-sm text-gray-400">Powered by TripoSR via Replicate - ~$0.01 per model</p>
           </div>
         </div>
         
@@ -163,7 +163,7 @@ export default function AI3DGenerator() {
         {mode === 'text' && (
           <div className="space-y-4">
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
-              <p className="text-sm text-purple-400">🎨 High-quality AI generation - Takes 1-2 minutes</p>
+              <p className="text-sm text-purple-400">🎨 TripoSR AI generation - Takes 30-60 seconds</p>
             </div>
             
             <div>
@@ -185,7 +185,7 @@ export default function AI3DGenerator() {
         {mode === 'image' && (
           <div className="space-y-4">
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
-              <p className="text-sm text-purple-400">📸 Turn any image into 3D - Takes 1-2 minutes</p>
+              <p className="text-sm text-purple-400">📸 Turn any image into 3D - Takes 30-60 seconds</p>
             </div>
             
             <div>
