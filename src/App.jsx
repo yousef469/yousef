@@ -1088,6 +1088,7 @@ import AI3DGeneratorPage from './pages/AI3DGeneratorPage';
 import PricingPage from './pages/PricingPage';
 import ProgressionPage from './pages/ProgressionPage';
 import LearnMechanicsPage from './pages/LearnMechanicsPage';
+import PhysicsPage from './pages/PhysicsPage';
 import Leaderboard from './components/Leaderboard';
 import CommunityQA from './components/CommunityQA';
 
@@ -1121,6 +1122,7 @@ export default function App() {
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
+          <Route path="/learn/physics" element={<ProtectedRoute><PhysicsPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
