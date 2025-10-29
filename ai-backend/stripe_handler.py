@@ -20,7 +20,7 @@ def create_checkout_session(price_id, user_id, success_url, cancel_url):
         actual_price_id = PRICE_IDS.get(price_id, price_id)
         
         session = stripe.checkout.Session.create(
-            payment_method_types=['card', 'paypal'],  # Enable card and PayPal
+            payment_method_types=['card', 'paypal', 'link'],  # Card, PayPal, and Stripe Link
             line_items=[{
                 'price': actual_price_id,
                 'quantity': 1,
@@ -29,10 +29,13 @@ def create_checkout_session(price_id, user_id, success_url, cancel_url):
             success_url=success_url,
             cancel_url=cancel_url,
             client_reference_id=user_id,
+            customer_email=None,  # Let Stripe collect email
             metadata={
                 'user_id': user_id
             },
             allow_promotion_codes=True,  # Allow discount codes
+            billing_address_collection='auto',  # Collect billing address
+            automatic_tax={'enabled': True},  # Enable automatic tax calculation
         )
         
         return {'success': True, 'session_id': session.id, 'url': session.url}
