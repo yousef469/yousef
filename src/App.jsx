@@ -1089,6 +1089,9 @@ import PricingPage from './pages/PricingPage';
 import ProgressionPage from './pages/ProgressionPage';
 import LearnMechanicsPage from './pages/LearnMechanicsPage';
 import PhysicsPage from './pages/PhysicsPage';
+import MathematicsPage from './pages/MathematicsPage';
+import ElectronicsPage from './pages/ElectronicsPage';
+import BooksPage from './pages/BooksPage';
 import Leaderboard from './components/Leaderboard';
 import CommunityQA from './components/CommunityQA';
 
@@ -1123,6 +1126,9 @@ export default function App() {
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/physics" element={<ProtectedRoute><PhysicsPage /></ProtectedRoute>} />
+          <Route path="/learn/mathematics" element={<ProtectedRoute><MathematicsPage /></ProtectedRoute>} />
+          <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
+          <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />

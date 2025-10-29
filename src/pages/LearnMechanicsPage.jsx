@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Rocket, Plane, Car, Atom } from 'lucide-react';
+import { ArrowLeft, Rocket, Plane, Car, Atom, Calculator, Cpu, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function LearnMechanicsPage() {
@@ -54,6 +54,42 @@ export default function LearnMechanicsPage() {
             hoverBorderColor: 'hover:border-green-300',
             shadowColor: 'shadow-green-500/30',
             path: '/learn/physics'
+        },
+        {
+            id: 'mathematics',
+            icon: Calculator,
+            title: 'Mathematics',
+            description: 'Master calculus, algebra, trigonometry, and engineering math',
+            gradient: 'from-yellow-500 to-amber-600',
+            hoverGradient: 'from-yellow-600 to-amber-700',
+            borderColor: 'border-yellow-400/50',
+            hoverBorderColor: 'hover:border-yellow-300',
+            shadowColor: 'shadow-yellow-500/30',
+            path: '/learn/mathematics'
+        },
+        {
+            id: 'electronics',
+            icon: Cpu,
+            title: 'Electronics & Circuits',
+            description: 'Learn circuits, microcontrollers, sensors, and embedded systems',
+            gradient: 'from-cyan-500 to-teal-600',
+            hoverGradient: 'from-cyan-600 to-teal-700',
+            borderColor: 'border-cyan-400/50',
+            hoverBorderColor: 'hover:border-cyan-300',
+            shadowColor: 'shadow-cyan-500/30',
+            path: '/learn/electronics'
+        },
+        {
+            id: 'books',
+            icon: BookOpen,
+            title: 'Engineering Books',
+            description: 'Curated collection of essential engineering textbooks and resources',
+            gradient: 'from-rose-500 to-pink-600',
+            hoverGradient: 'from-rose-600 to-pink-700',
+            borderColor: 'border-rose-400/50',
+            hoverBorderColor: 'hover:border-rose-300',
+            shadowColor: 'shadow-rose-500/30',
+            path: '/learn/books'
         }
     ];
 
@@ -76,7 +112,7 @@ export default function LearnMechanicsPage() {
 
             {/* Categories Grid */}
             <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {categories.map((category) => {
                         const Icon = category.icon;
                         return (
