@@ -35,7 +35,9 @@ def health_check():
         'status': 'healthy',
         'api': 'replicate',
         'model': 'TripoSR',
-        'has_token': bool(os.environ.get('REPLICATE_API_TOKEN'))
+        'has_token': bool(os.environ.get('REPLICATE_API_TOKEN')),
+        'stripe_enabled': bool(os.environ.get('STRIPE_SECRET_KEY')),
+        'version': '2.0-stripe'
     })
 
 @app.route('/generate-3d', methods=['POST'])

@@ -32,8 +32,14 @@ export default function PricingPage() {
       await createCheckoutSession(priceId, user.id);
       
     } catch (error) {
-      alert(`Payment Error: ${error.message}\n\nPlease try again or contact support.`);
       console.error('Payment error:', error);
+      
+      // Better error message
+      if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+        alert(`⏳ Backend is starting up...\n\nThe payment server is waking up (this takes ~30 seconds on first request).\n\nPlease try again in a moment!\n\n💬 Or contact: support@yousef.engineering`);
+      } else {
+        alert(`Payment Error: ${error.message}\n\nPlease try again or contact support.`);
+      }
     } finally {
       setLoading(null);
     }
