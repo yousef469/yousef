@@ -76,7 +76,7 @@ export const PRICING_PLANS = {
 export async function createCheckoutSession(priceId, userId) {
   try {
     const API_BASE = import.meta.env.VITE_API_URL || 'https://name-ai-3d-backend.onrender.com';
-    
+
     const response = await fetch(`${API_BASE}/api/create-checkout-session`, {
       method: 'POST',
       headers: {
@@ -96,7 +96,7 @@ export async function createCheckoutSession(priceId, userId) {
     }
 
     const { sessionId, url } = await response.json();
-    
+
     // Redirect directly to Stripe Checkout URL
     if (url) {
       window.location.href = url;
@@ -104,7 +104,7 @@ export async function createCheckoutSession(priceId, userId) {
       // Fallback: use Stripe.js
       const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
       const { error } = await stripe.redirectToCheckout({ sessionId });
-      
+
       if (error) {
         throw error;
       }
@@ -121,7 +121,7 @@ export async function createCheckoutSession(priceId, userId) {
 export async function getSubscriptionStatus(userId) {
   try {
     const response = await fetch(`/api/subscription-status?userId=${userId}`);
-    
+
     if (!response.ok) {
       throw new Error('Failed to get subscription status');
     }
