@@ -119,26 +119,25 @@ export default function PricingPage() {
               {/* CTA Button */}
               <button
                 onClick={() => {
-                  if (plan.id === 'free') return;
+                  console.log('Button clicked!', plan.name);
+                  
+                  if (plan.id === 'free') {
+                    console.log('Free plan - no action');
+                    return;
+                  }
                   
                   // Check if user is logged in
+                  console.log('User:', user);
                   if (!user) {
-                    if (confirm('Please sign in to subscribe. Go to login page?')) {
+                    const goToLogin = confirm('Please sign in to subscribe. Go to login page?');
+                    if (goToLogin) {
                       window.location.href = '/auth';
                     }
                     return;
                   }
                   
-                  // For now, open Tawk.to chat or show contact info
-                  if (window.Tawk_API) {
-                    window.Tawk_API.maximize();
-                    window.Tawk_API.addEvent('Upgrade Request', {
-                      plan: plan.name,
-                      price: plan.price
-                    });
-                  } else {
-                    alert(`Interested in ${plan.name} plan?\n\nContact us:\n📧 Email: support@yousef.engineering\n💬 Use the chat widget (bottom right)\n\nOr we'll set up Stripe payment soon!`);
-                  }
+                  // Show upgrade dialog
+                  alert(`🎉 You selected the ${plan.name} plan!\n\n💰 Price: $${plan.price}/month\n✨ Credits: ${plan.credits === -1 ? 'Unlimited' : plan.credits}\n\n📧 Contact: support@yousef.engineering\n💬 Or use the chat widget!\n\n(Stripe payment coming soon)`);
                 }}
                 disabled={loading === plan.name || plan.id === 'free'}
                 className={`w-full py-3 rounded-lg font-bold transition-all ${
