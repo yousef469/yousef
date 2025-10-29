@@ -10,10 +10,21 @@ export default function PricingPage() {
   const handleSubscribe = async (priceId, planName) => {
     if (!user) {
       alert('Please sign in to subscribe');
+      window.location.href = '/auth';
       return;
     }
 
     setLoading(planName);
+    
+    // For now, show a message until Stripe is fully configured
+    const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    
+    if (!stripeKey || stripeKey === 'YOUR_STRIPE_KEY_HERE') {
+      alert(`You selected the ${planName} plan!\n\nStripe is not yet configured. To complete setup:\n1. Add VITE_STRIPE_PUBLISHABLE_KEY to .env\n2. Create products in Stripe dashboard\n3. Deploy backend API endpoints`);
+      setLoading(null);
+      return;
+    }
+
     try {
       await createCheckoutSession(priceId, user.id);
     } catch (error) {
@@ -107,7 +118,28 @@ export default function PricingPage() {
 
               {/* CTA Button */}
               <button
-                onClick={() => plan.id !== 'free' && handleSubscribe(plan.id, plan.name)}
+                onClick={() => {
+                  if (plan.id === 'free') return;
+                  
+                  // Check if user is logged in
+                  if (!user) {
+                    if (confirm('Please sign in to subscribe. Go to login page?')) {
+                      window.location.href = '/auth';
+                    }
+                    return;
+                  }
+                  
+                  // For now, open Tawk.to chat or show contact info
+                  if (window.Tawk_API) {
+                    window.Tawk_API.maximize();
+                    window.Tawk_API.addEvent('Upgrade Request', {
+                      plan: plan.name,
+                      price: plan.price
+                    });
+                  } else {
+                    alert(`Interested in ${plan.name} plan?\n\nContact us:\n📧 Email: support@yousef.engineering\n💬 Use the chat widget (bottom right)\n\nOr we'll set up Stripe payment soon!`);
+                  }
+                }}
                 disabled={loading === plan.name || plan.id === 'free'}
                 className={`w-full py-3 rounded-lg font-bold transition-all ${
                   plan.id === 'free'
@@ -117,7 +149,7 @@ export default function PricingPage() {
                     : 'bg-gradient-to-r ' + getPlanColor(plan.id) + ' hover:opacity-90'
                 }`}
               >
-                {loading === plan.name ? 'Loading...' : plan.id === 'free' ? 'Current Plan' : 'Subscribe Now'}
+                {loading === plan.name ? 'Loading...' : plan.id === 'free' ? 'Current Plan' : 'Get Started'}
               </button>
               
               {/* Payment Methods Info */}
