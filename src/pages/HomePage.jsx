@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, User, ChevronDown, LayoutDashboard, BookMarked, Users as UsersIcon, Upload, Trophy } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, User, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import CommunityQA from '../components/CommunityQA';
@@ -9,6 +9,7 @@ import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
 import MixpanelTest from '../components/MixpanelTest';
 import LiveChatBot from '../components/LiveChatBot';
+import SidebarMenu from '../components/SidebarMenu';
 
 
 const HomePage = () => {
@@ -32,6 +33,9 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      {/* Sidebar Menu */}
+      <SidebarMenu />
+      
       {/* AeroAI 3D - Interactive Engineering Platform */}
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
@@ -93,25 +97,13 @@ const HomePage = () => {
                         <p className="text-sm text-white truncate">{user.email}</p>
                       </div>
                       <div className="py-2">
-                        <button onClick={() => { navigate('/dashboard'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
-                          <LayoutDashboard className="w-4 h-4 text-cyan-400" />
-                          <span className="text-sm">Dashboard</span>
-                        </button>
-                        <button onClick={() => { navigate('/bookmarks'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
-                          <BookMarked className="w-4 h-4 text-purple-400" />
-                          <span className="text-sm">Bookmarks</span>
+                        <button onClick={() => { navigate('/upload'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
+                          <Upload className="w-4 h-4 text-green-400" />
+                          <span className="text-sm">Upload Model</span>
                         </button>
                         <button onClick={() => { navigate('/collaborate'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
                           <UsersIcon className="w-4 h-4 text-yellow-400" />
                           <span className="text-sm">Collaborate</span>
-                        </button>
-                        <button onClick={() => { navigate('/upload'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
-                          <Upload className="w-4 h-4 text-green-400" />
-                          <span className="text-sm">Upload</span>
-                        </button>
-                        <button onClick={() => { navigate('/progression'); setShowProfileMenu(false); }} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 transition-colors text-left">
-                          <Trophy className="w-4 h-4 text-orange-400" />
-                          <span className="text-sm">Progression</span>
                         </button>
                       </div>
                       <div className="border-t border-gray-700 py-2">

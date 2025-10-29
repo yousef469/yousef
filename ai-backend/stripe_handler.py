@@ -35,7 +35,7 @@ def create_checkout_session(price_id, user_id, success_url, cancel_url):
             },
             allow_promotion_codes=True,  # Allow discount codes
             billing_address_collection='auto',  # Collect billing address
-            automatic_tax={'enabled': True},  # Enable automatic tax calculation
+            # automatic_tax={'enabled': True},  # Disabled - requires business address in Stripe dashboard
         )
         
         return {'success': True, 'session_id': session.id, 'url': session.url}

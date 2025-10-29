@@ -1086,6 +1086,22 @@ import ModelUpload from './components/ModelUpload';
 import GamificationSystem from './components/GamificationSystem';
 import AI3DGeneratorPage from './pages/AI3DGeneratorPage';
 import PricingPage from './pages/PricingPage';
+import ProgressionPage from './pages/ProgressionPage';
+import Leaderboard from './components/Leaderboard';
+import CommunityQA from './components/CommunityQA';
+
+// Wrapper pages for routes
+const LeaderboardPage = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-8">
+    <Leaderboard />
+  </div>
+);
+
+const CommunityPage = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-8">
+    <CommunityQA />
+  </div>
+);
 import ProtectedRoute from './components/ProtectedRoute';
 import { useState as useAppState } from 'react';
 
@@ -1124,7 +1140,9 @@ export default function App() {
           <Route path="/collaborate" element={<ProtectedRoute><CollaborationMode /></ProtectedRoute>} />
           <Route path="/collaborate/:sessionId" element={<ProtectedRoute><CollaborationMode /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
-          <Route path="/progression" element={<ProtectedRoute><GamificationSystem /></ProtectedRoute>} />
+          <Route path="/progression" element={<ProtectedRoute><ProgressionPage /></ProtectedRoute>} />
+          <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
           <Route path="/ai-generator" element={<AI3DGeneratorPage />} />
           <Route path="/pricing" element={<PricingPage />} />
         </Routes>
