@@ -259,6 +259,67 @@ def models_info():
         'speed': '30-60 seconds'
     })
 
+@app.route('/api/send-email', methods=['POST'])
+def send_email_endpoint():
+    """Send email using Resend"""
+    try:
+        from email_service import (
+            send_welcome_email,
+            send_password_reset_email,
+            send_3d_model_notification,
+            send_payment_confirmation,
+            send_cancellation_email,
+            send_email
+        )
+        
+        data = request.json
+        email_type = data.get('type')
+        to_email = data.get('to')
+        email_data = data.get('data', {})
+        
+        if not to_email:
+            return jsonify({'error': 'Email address required'}), 400
+        
+        result = None
+        
+        if email_type == 'welcome':
+            result = send_welcome_email(to_email, email_data.get('name', 'User'))
+        elif email_type == 'password-reset':
+            result = send_password_reset_email(to_email, email_data.get('resetLink'))
+        elif email_type == '3d-model-ready':
+            result = send_3d_model_notification(
+                to_email,
+                email_data.get('modelName'),
+                email_data.get('modelUrl')
+            )
+        elif email_type == 'payment-confirmation':
+            result = send_payment_confirmation(
+                to_email,
+                email_data.get('plan'),
+                email_data.get('amount')
+            )
+        elif email_type == 'subscription-cancelled':
+            result = send_cancellation_email(to_email, email_data.get('name', 'User'))
+        elif email_type == 'custom':
+            result = send_email(
+                to_email,
+                email_data.get('subject'),
+                email_data.get('html')
+            )
+        else:
+            return jsonify({'error': f'Unknown email type: {email_type}'}), 400
+        
+        if result and result.get('success'):
+            return jsonify({'success': True, 'message': 'Email sent successfully'})
+        else:
+            return jsonify({'success': False, 'error': result.get('error', 'Unknown error')}), 500
+            
+    except Exception as e:
+        print(f"Email endpoint error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     
