@@ -9,27 +9,31 @@ export default function PricingPage() {
 
   const handleSubscribe = async (priceId, planName) => {
     if (!user) {
-      alert('Please sign in to subscribe');
-      window.location.href = '/auth';
+      if (confirm('Please sign in to subscribe. Go to login page?')) {
+        window.location.href = '/auth';
+      }
       return;
     }
 
     setLoading(planName);
     
-    // For now, show a message until Stripe is fully configured
-    const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    
-    if (!stripeKey || stripeKey === 'YOUR_STRIPE_KEY_HERE') {
-      alert(`You selected the ${planName} plan!\n\nStripe is not yet configured. To complete setup:\n1. Add VITE_STRIPE_PUBLISHABLE_KEY to .env\n2. Create products in Stripe dashboard\n3. Deploy backend API endpoints`);
-      setLoading(null);
-      return;
-    }
-
     try {
+      // Check if Stripe is configured
+      const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+      
+      if (!stripeKey) {
+        // Fallback: show contact info
+        alert(`🎉 You selected the ${planName} plan!\n\n💰 Price: $${PRICING_PLANS[priceId]?.price || 'N/A'}/month\n\n📧 Contact: support@yousef.engineering\n💬 Or use the chat widget!\n\n(Stripe payment will be available soon)`);
+        setLoading(null);
+        return;
+      }
+      
+      // Create Stripe checkout session
       await createCheckoutSession(priceId, user.id);
+      
     } catch (error) {
-      alert('Failed to start checkout. Please try again.');
-      console.error(error);
+      alert(`Payment Error: ${error.message}\n\nPlease try again or contact support.`);
+      console.error('Payment error:', error);
     } finally {
       setLoading(null);
     }
@@ -119,25 +123,10 @@ export default function PricingPage() {
               {/* CTA Button */}
               <button
                 onClick={() => {
-                  console.log('Button clicked!', plan.name);
-                  
                   if (plan.id === 'free') {
-                    console.log('Free plan - no action');
                     return;
                   }
-                  
-                  // Check if user is logged in
-                  console.log('User:', user);
-                  if (!user) {
-                    const goToLogin = confirm('Please sign in to subscribe. Go to login page?');
-                    if (goToLogin) {
-                      window.location.href = '/auth';
-                    }
-                    return;
-                  }
-                  
-                  // Show upgrade dialog
-                  alert(`🎉 You selected the ${plan.name} plan!\n\n💰 Price: $${plan.price}/month\n✨ Credits: ${plan.credits === -1 ? 'Unlimited' : plan.credits}\n\n📧 Contact: support@yousef.engineering\n💬 Or use the chat widget!\n\n(Stripe payment coming soon)`);
+                  handleSubscribe(plan.priceId, plan.name);
                 }}
                 disabled={loading === plan.name || plan.id === 'free'}
                 className={`w-full py-3 rounded-lg font-bold transition-all ${

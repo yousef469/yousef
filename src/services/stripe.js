@@ -4,9 +4,15 @@
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 // Pricing plans
+// Replace these with your actual Stripe Price IDs from dashboard
+const STRIPE_PRICE_STARTER = import.meta.env.VITE_STRIPE_PRICE_STARTER || 'price_starter';
+const STRIPE_PRICE_PRO = import.meta.env.VITE_STRIPE_PRICE_PRO || 'price_pro';
+const STRIPE_PRICE_UNLIMITED = import.meta.env.VITE_STRIPE_PRICE_UNLIMITED || 'price_unlimited';
+
 export const PRICING_PLANS = {
   free: {
     id: 'free',
+    priceId: null,
     name: 'Free',
     price: 0,
     credits: 5,
@@ -18,7 +24,8 @@ export const PRICING_PLANS = {
     ]
   },
   starter: {
-    id: 'price_starter',
+    id: 'starter',
+    priceId: STRIPE_PRICE_STARTER,
     name: 'Starter',
     price: 9.99,
     credits: 50,
@@ -31,7 +38,8 @@ export const PRICING_PLANS = {
     ]
   },
   pro: {
-    id: 'price_pro',
+    id: 'pro',
+    priceId: STRIPE_PRICE_PRO,
     name: 'Pro',
     price: 29.99,
     credits: 200,
@@ -45,8 +53,9 @@ export const PRICING_PLANS = {
     ]
   },
   unlimited: {
-    id: 'price_unlimited',
-    name: 'Unlimited',
+    id: 'unlimited',
+    priceId: STRIPE_PRICE_UNLIMITED,
+    name: 'Master',
     price: 99.99,
     credits: -1, // Unlimited
     features: [
@@ -66,7 +75,9 @@ export const PRICING_PLANS = {
  */
 export async function createCheckoutSession(priceId, userId) {
   try {
-    const response = await fetch('/api/create-checkout-session', {
+    const API_BASE = import.meta.env.VITE_API_URL || 'https://name-ai-3d-backend.onrender.com';
+    
+    const response = await fetch(`${API_BASE}/api/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,17 +91,23 @@ export async function createCheckoutSession(priceId, userId) {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create checkout session');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create checkout session');
     }
 
-    const { sessionId } = await response.json();
+    const { sessionId, url } = await response.json();
     
-    // Redirect to Stripe Checkout
-    const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
-    const { error } = await stripe.redirectToCheckout({ sessionId });
-    
-    if (error) {
-      throw error;
+    // Redirect directly to Stripe Checkout URL
+    if (url) {
+      window.location.href = url;
+    } else {
+      // Fallback: use Stripe.js
+      const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+      
+      if (error) {
+        throw error;
+      }
     }
   } catch (error) {
     console.error('Stripe checkout error:', error);
