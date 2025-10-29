@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, User, ChevronDown, Users as UsersIcon, Upload } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import CommunityQA from '../components/CommunityQA';
-import Leaderboard from '../components/Leaderboard';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
 import MixpanelTest from '../components/MixpanelTest';
@@ -220,73 +218,33 @@ const HomePage = () => {
             </div>
           </button>
 
-          {/* Learn Rocket Mechanics */}
+          {/* Learn Mechanics - Single Button */}
           <button
-            onClick={() => user ? navigate('/learn/rockets') : navigate('/auth')}
-            className="group relative bg-gradient-to-br from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
+            onClick={() => user ? navigate('/learn') : navigate('/auth')}
+            className="group relative bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
             
             <div className="relative z-10">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
-                <Rocket className="w-8 h-8 text-white" />
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Rocket className="w-6 h-6 text-white" />
+                </div>
+                <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Plane className="w-6 h-6 text-white" />
+                </div>
+                <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Car className="w-6 h-6 text-white" />
+                </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.learn.rockets')}</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Mechanics</h3>
               <p className="text-white/90 text-center text-sm mb-4">
-                {t('home.learn.rocketsDesc')}
+                Choose from Rockets, Planes, or Cars to start learning
               </p>
               
               <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>{t('home.learn.button')}</span>
-                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Learn Plane Mechanics */}
-          <button
-            onClick={() => user ? navigate('/learn/planes') : navigate('/auth')}
-            className="group relative bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-2xl p-8 border-2 border-blue-400/50 hover:border-blue-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-blue-500/30"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-            
-            <div className="relative z-10">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
-                <Plane className="w-8 h-8 text-white" />
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.learn.planes')}</h3>
-              <p className="text-white/90 text-center text-sm mb-4">
-                {t('home.learn.planesDesc')}
-              </p>
-              
-              <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>{t('home.learn.button')}</span>
-                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Learn Car Mechanics */}
-          <button
-            onClick={() => user ? navigate('/learn/cars') : navigate('/auth')}
-            className="group relative bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-            
-            <div className="relative z-10">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
-                <Car className="w-8 h-8 text-white" />
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.learn.cars')}</h3>
-              <p className="text-white/90 text-center text-sm mb-4">
-                {t('home.learn.carsDesc')}
-              </p>
-              
-              <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-                <span>{t('home.learn.button')}</span>
+                <span>Explore Categories</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -423,24 +381,7 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Leaderboard & Community Section */}
-        <div className="mt-16 grid lg:grid-cols-2 gap-8">
-          {/* Leaderboard */}
-          <div>
-            <Leaderboard />
-          </div>
 
-          {/* Community Q&A */}
-          <div>
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-                {t('home.community.title')}
-              </h2>
-              <p className="text-gray-400 text-sm">{t('home.community.subtitle')}</p>
-            </div>
-            <CommunityQA />
-          </div>
-        </div>
       </div>
 
       {/* Footer */}

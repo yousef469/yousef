@@ -1087,6 +1087,7 @@ import GamificationSystem from './components/GamificationSystem';
 import AI3DGeneratorPage from './pages/AI3DGeneratorPage';
 import PricingPage from './pages/PricingPage';
 import ProgressionPage from './pages/ProgressionPage';
+import LearnMechanicsPage from './pages/LearnMechanicsPage';
 import Leaderboard from './components/Leaderboard';
 import CommunityQA from './components/CommunityQA';
 
@@ -1116,6 +1117,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+          <Route path="/learn" element={<ProtectedRoute><LearnMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
