@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './contexts/AuthContext'
 import App from './App.jsx'
+import TawkToChat from './components/TawkToChat'
 import './index.css'
 import './i18n/config'
 import mixpanel from 'mixpanel-browser'
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <App />
       <Analytics />
+      <TawkToChat />
     </AuthProvider>
   </React.StrictMode>,
 )

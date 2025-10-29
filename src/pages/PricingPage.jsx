@@ -117,8 +117,21 @@ export default function PricingPage() {
                     : 'bg-gradient-to-r ' + getPlanColor(plan.id) + ' hover:opacity-90'
                 }`}
               >
-                {loading === plan.name ? 'Loading...' : plan.id === 'free' ? 'Current Plan' : 'Subscribe'}
+                {loading === plan.name ? 'Loading...' : plan.id === 'free' ? 'Current Plan' : 'Subscribe Now'}
               </button>
+              
+              {/* Payment Methods Info */}
+              {plan.id !== 'free' && (
+                <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <span>💳 Card</span>
+                  <span>•</span>
+                  <span>PayPal</span>
+                  <span>•</span>
+                  <span>Apple Pay</span>
+                  <span>•</span>
+                  <span>Google Pay</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

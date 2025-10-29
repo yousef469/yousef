@@ -1085,6 +1085,7 @@ import CollaborationMode from './components/CollaborationMode';
 import ModelUpload from './components/ModelUpload';
 import GamificationSystem from './components/GamificationSystem';
 import AI3DGeneratorPage from './pages/AI3DGeneratorPage';
+import PricingPage from './pages/PricingPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useState as useAppState } from 'react';
 
@@ -1125,6 +1126,7 @@ export default function App() {
           <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
           <Route path="/progression" element={<ProtectedRoute><GamificationSystem /></ProtectedRoute>} />
           <Route path="/ai-generator" element={<AI3DGeneratorPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
         </Routes>
       </Router>
     </>
