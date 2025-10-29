@@ -37,12 +37,30 @@ const HomePage = () => {
       <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Sparkles className="w-8 h-8 text-cyan-400" />
-              <div>
-                <h1 className="text-3xl font-bold">{t('app.title')}</h1>
-                <p className="text-gray-400 text-sm mt-1">{t('app.subtitle')}</p>
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-8 h-8 text-cyan-400" />
+                <div>
+                  <h1 className="text-3xl font-bold">{t('app.title')}</h1>
+                  <p className="text-gray-400 text-sm mt-1">{t('app.subtitle')}</p>
+                </div>
               </div>
+              
+              {/* Navigation Links */}
+              <nav className="hidden md:flex items-center gap-6">
+                <button
+                  onClick={() => navigate('/ai-generator')}
+                  className="text-white hover:text-cyan-400 transition-colors font-medium"
+                >
+                  AI 3D
+                </button>
+                <button
+                  onClick={() => navigate('/pricing')}
+                  className="text-white hover:text-cyan-400 transition-colors font-medium"
+                >
+                  Pricing
+                </button>
+              </nav>
             </div>
             
             {/* Auth Buttons */}
