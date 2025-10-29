@@ -7,7 +7,6 @@ import CommunityQA from '../components/CommunityQA';
 import Leaderboard from '../components/Leaderboard';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
-import PricingTiers from '../components/PricingTiers';
 import MixpanelTest from '../components/MixpanelTest';
 import LiveChatBot from '../components/LiveChatBot';
 
@@ -411,11 +410,34 @@ const HomePage = () => {
                 </div>
               </div>
             </button>
+
+            {/* Pricing Button - NEW! */}
+            <button
+              onClick={() => navigate('/pricing')}
+              className="group relative bg-gradient-to-br from-yellow-500 via-orange-600 to-red-500 hover:from-yellow-600 hover:via-orange-700 hover:to-red-600 rounded-2xl p-8 border-2 border-yellow-400/50 hover:border-yellow-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-yellow-500/30"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur animate-pulse">
+                    <span className="text-4xl">💎</span>
+                  </div>
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3 text-white text-center">💎 Pricing Plans</h3>
+                <p className="text-white/90 text-center mb-4">
+                  Choose your plan and unlock premium features
+                </p>
+
+                <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                  <span>View Plans</span>
+                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                </div>
+              </div>
+            </button>
           </div>
         </div>
-
-        {/* Pricing Tiers Section */}
-        <PricingTiers />
 
         {/* Leaderboard & Community Section */}
         <div className="mt-16 grid lg:grid-cols-2 gap-8">
