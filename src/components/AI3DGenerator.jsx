@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Wand2, Upload, Image, Zap, Download, Loader2, Sparkles, AlertCircle, Rocket, Car, Plane } from 'lucide-react';
+import { Wand2, Upload, Image, Download, Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import ThreeJSViewer from './ThreeJSViewer';
 
 export default function AI3DGenerator() {
-  const [mode, setMode] = useState('quick'); // 'quick', 'text', or 'image'
-  const [modelType, setModelType] = useState('rocket'); // 'rocket', 'car', 'plane'
+  const [mode, setMode] = useState('text'); // 'text' or 'image'
   const [textPrompt, setTextPrompt] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -12,11 +11,6 @@ export default function AI3DGenerator() {
   const [generatedModel, setGeneratedModel] = useState(null);
   const [error, setError] = useState(null);
   const [progress, setProgress] = useState(0);
-  
-  // Procedural parameters
-  const [rocketParams, setRocketParams] = useState({ stages: 2, fins: 4, height: 10 });
-  const [carParams, setCarParams] = useState({ style: 'sports', spoiler: true });
-  const [planeParams, setPlaneParams] = useState({ wingspan: 10, engines: 2 });
 
   // Handle image upload
   const handleImageUpload = (e) => {
@@ -61,38 +55,17 @@ export default function AI3DGenerator() {
 
       // Simulate progress
       const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + (mode === 'quick' ? 20 : 5), 90));
-      }, mode === 'quick' ? 100 : 1000);
+        setProgress(prev => Math.min(prev + 3, 90));
+      }, 2000);
 
       // Prepare form data
       const formData = new FormData();
+      formData.append('mode', mode);
       
-      if (mode === 'quick') {
-        // Procedural generation
-        formData.append('type', 'procedural');
-        formData.append('model_type', modelType);
-        
-        if (modelType === 'rocket') {
-          formData.append('stages', rocketParams.stages);
-          formData.append('fins', rocketParams.fins);
-          formData.append('height', rocketParams.height);
-        } else if (modelType === 'car') {
-          formData.append('style', carParams.style);
-          formData.append('spoiler', carParams.spoiler);
-        } else if (modelType === 'plane') {
-          formData.append('wingspan', planeParams.wingspan);
-          formData.append('engines', planeParams.engines);
-        }
+      if (mode === 'text') {
+        formData.append('prompt', textPrompt);
       } else {
-        // AI generation
-        formData.append('type', 'ai');
-        formData.append('mode', mode);
-        
-        if (mode === 'text') {
-          formData.append('prompt', textPrompt);
-        } else {
-          formData.append('image', imageFile);
-        }
+        formData.append('image', imageFile);
       }
 
       // Call backend API
@@ -116,8 +89,8 @@ export default function AI3DGenerator() {
 
       // Set generated model
       setGeneratedModel({
-        name: mode === 'quick' ? `${modelType} (procedural)` : (mode === 'text' ? textPrompt : 'Generated from image'),
-        type: mode === 'quick' ? 'procedural' : 'ai',
+        name: mode === 'text' ? textPrompt : 'Generated from image',
+        type: 'ai',
         path: url,
         timestamp: new Date().toISOString(),
         blob: blob,
@@ -154,23 +127,12 @@ export default function AI3DGenerator() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-white">AI 3D Model Generator</h2>
-            <p className="text-sm text-gray-400">Free procedural + Premium AI generation</p>
+            <p className="text-sm text-gray-400">Powered by Meshy AI - High Quality 3D Generation</p>
           </div>
         </div>
         
         {/* Mode Selector */}
         <div className="flex gap-3 mt-4">
-          <button
-            onClick={() => setMode('quick')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-              mode === 'quick'
-                ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            <Zap className="w-4 h-4" />
-            Quick Build (Free)
-          </button>
           <button
             onClick={() => setMode('text')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
@@ -180,7 +142,7 @@ export default function AI3DGenerator() {
             }`}
           >
             <Sparkles className="w-4 h-4" />
-            AI Text-to-3D
+            Text to 3D
           </button>
           <button
             onClick={() => setMode('image')}
@@ -191,158 +153,17 @@ export default function AI3DGenerator() {
             }`}
           >
             <Image className="w-4 h-4" />
-            AI Image-to-3D
+            Image to 3D
           </button>
         </div>
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Quick Build Mode */}
-        {mode === 'quick' && (
-          <div className="space-y-4">
-            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-              <p className="text-sm text-green-400">✨ Instant & Unlimited - Perfect for learning!</p>
-            </div>
-            
-            {/* Model Type Selector */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">Choose Model Type</label>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={() => setModelType('rocket')}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    modelType === 'rocket'
-                      ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                  }`}
-                >
-                  <Rocket className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-                  <p className="text-sm font-semibold text-white">Rocket</p>
-                </button>
-                <button
-                  onClick={() => setModelType('car')}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    modelType === 'car'
-                      ? 'border-blue-500 bg-blue-500/10'
-                      : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                  }`}
-                >
-                  <Car className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-                  <p className="text-sm font-semibold text-white">Car</p>
-                </button>
-                <button
-                  onClick={() => setModelType('plane')}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    modelType === 'plane'
-                      ? 'border-cyan-500 bg-cyan-500/10'
-                      : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                  }`}
-                >
-                  <Plane className="w-8 h-8 mx-auto mb-2 text-cyan-400" />
-                  <p className="text-sm font-semibold text-white">Plane</p>
-                </button>
-              </div>
-            </div>
-
-            {/* Parameters */}
-            {modelType === 'rocket' && (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-gray-400">Stages: {rocketParams.stages}</label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="4"
-                    value={rocketParams.stages}
-                    onChange={(e) => setRocketParams({...rocketParams, stages: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Fins: {rocketParams.fins}</label>
-                  <input
-                    type="range"
-                    min="3"
-                    max="8"
-                    value={rocketParams.fins}
-                    onChange={(e) => setRocketParams({...rocketParams, fins: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Height: {rocketParams.height}m</label>
-                  <input
-                    type="range"
-                    min="5"
-                    max="20"
-                    value={rocketParams.height}
-                    onChange={(e) => setRocketParams({...rocketParams, height: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-            )}
-
-            {modelType === 'car' && (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-gray-400 block mb-2">Style</label>
-                  <select
-                    value={carParams.style}
-                    onChange={(e) => setCarParams({...carParams, style: e.target.value})}
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white"
-                  >
-                    <option value="sports">Sports</option>
-                    <option value="suv">SUV</option>
-                    <option value="sedan">Sedan</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={carParams.spoiler}
-                    onChange={(e) => setCarParams({...carParams, spoiler: e.target.checked})}
-                    className="w-4 h-4"
-                  />
-                  <label className="text-sm text-gray-400">Add Spoiler</label>
-                </div>
-              </div>
-            )}
-
-            {modelType === 'plane' && (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-gray-400">Wingspan: {planeParams.wingspan}m</label>
-                  <input
-                    type="range"
-                    min="5"
-                    max="20"
-                    value={planeParams.wingspan}
-                    onChange={(e) => setPlaneParams({...planeParams, wingspan: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Engines: {planeParams.engines}</label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="4"
-                    value={planeParams.engines}
-                    onChange={(e) => setPlaneParams({...planeParams, engines: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* AI Text Mode */}
         {mode === 'text' && (
           <div className="space-y-4">
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
-              <p className="text-sm text-purple-400">🎨 AI-powered realistic models (2 free per day)</p>
+              <p className="text-sm text-purple-400">🎨 High-quality AI generation - Takes 1-2 minutes</p>
             </div>
             
             <div>
@@ -364,7 +185,7 @@ export default function AI3DGenerator() {
         {mode === 'image' && (
           <div className="space-y-4">
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
-              <p className="text-sm text-purple-400">📸 Turn any image into 3D (2 free per day)</p>
+              <p className="text-sm text-purple-400">📸 Turn any image into 3D - Takes 1-2 minutes</p>
             </div>
             
             <div>
@@ -473,7 +294,7 @@ export default function AI3DGenerator() {
                 <span className="font-semibold text-white">Model:</span> {generatedModel.name}
               </p>
               <p className="text-sm text-gray-400 mt-1">
-                <span className="font-semibold text-white">Type:</span> {generatedModel.type === 'procedural' ? 'Procedural (Free)' : 'AI Generated (Premium)'}
+                <span className="font-semibold text-white">Type:</span> AI Generated (Meshy AI)
               </p>
               <p className="text-sm text-gray-400 mt-1">
                 <span className="font-semibold text-white">Generated:</span> {new Date(generatedModel.timestamp).toLocaleString()}
