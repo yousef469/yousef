@@ -10,7 +10,8 @@ CORS(app, resources={
     r"/*": {
         "origins": ["*"],
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type", "Stripe-Signature"],
+        "expose_headers": ["Content-Type"]
     }
 })
 
@@ -29,7 +30,9 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'api': 'meshy',
-        'has_token': bool(os.environ.get('MESHY_API_KEY'))
+        'has_token': bool(os.environ.get('MESHY_API_KEY')),
+        'stripe_enabled': bool(os.environ.get('STRIPE_SECRET_KEY')),
+        'version': '2.0-stripe'
     })
 
 @app.route('/generate-3d', methods=['POST'])
@@ -202,6 +205,154 @@ def models_info():
         'quality': 'High',
         'speed': '1-2 minutes'
     })
+
+@app.route('/api/create-checkout-session', methods=['POST'])
+def create_checkout_session_endpoint():
+    """Create Stripe checkout session"""
+    try:
+        from stripe_handler import create_checkout_session
+        
+        data = request.json
+        price_id = data.get('priceId')
+        user_id = data.get('userId')
+        success_url = data.get('successUrl')
+        cancel_url = data.get('cancelUrl')
+        
+        if not all([price_id, user_id, success_url, cancel_url]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+        
+        result = create_checkout_session(price_id, user_id, success_url, cancel_url)
+        
+        if result.get('success'):
+            return jsonify({'sessionId': result['session_id'], 'url': result['url']})
+        else:
+            return jsonify({'error': result.get('error', 'Failed to create checkout session')}), 500
+            
+    except Exception as e:
+        print(f"Checkout session error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/subscription-status', methods=['GET'])
+def subscription_status_endpoint():
+    """Get user's subscription status"""
+    try:
+        from stripe_handler import get_subscription_status
+        
+        user_id = request.args.get('userId')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        status = get_subscription_status(user_id)
+        return jsonify(status)
+        
+    except Exception as e:
+        print(f"Subscription status error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/cancel-subscription', methods=['POST'])
+def cancel_subscription_endpoint():
+    """Cancel user's subscription"""
+    try:
+        from stripe_handler import cancel_subscription
+        
+        data = request.json
+        user_id = data.get('userId')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        result = cancel_subscription(user_id)
+        
+        if result.get('success'):
+            return jsonify({'message': result['message']})
+        else:
+            return jsonify({'error': result.get('error', 'Failed to cancel subscription')}), 500
+            
+    except Exception as e:
+        print(f"Cancel subscription error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/stripe-webhook', methods=['POST'])
+def stripe_webhook_endpoint():
+    """Handle Stripe webhook events"""
+    try:
+        from stripe_handler import handle_webhook
+        
+        payload = request.data
+        sig_header = request.headers.get('Stripe-Signature')
+        
+        result = handle_webhook(payload, sig_header)
+        
+        if result.get('success'):
+            return jsonify({'status': 'success'})
+        else:
+            return jsonify({'error': result.get('error', 'Webhook failed')}), 400
+            
+    except Exception as e:
+        print(f"Webhook error: {str(e)}")
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/send-email', methods=['POST'])
+def send_email_endpoint():
+    """Send email using Resend"""
+    try:
+        from email_service import (
+            send_welcome_email,
+            send_password_reset_email,
+            send_3d_model_notification,
+            send_payment_confirmation,
+            send_cancellation_email,
+            send_email
+        )
+        
+        data = request.json
+        email_type = data.get('type')
+        to_email = data.get('to')
+        email_data = data.get('data', {})
+        
+        if not to_email:
+            return jsonify({'error': 'Email address required'}), 400
+        
+        result = None
+        
+        if email_type == 'welcome':
+            result = send_welcome_email(to_email, email_data.get('name', 'User'))
+        elif email_type == 'password-reset':
+            result = send_password_reset_email(to_email, email_data.get('resetLink'))
+        elif email_type == '3d-model-ready':
+            result = send_3d_model_notification(
+                to_email,
+                email_data.get('modelName'),
+                email_data.get('modelUrl')
+            )
+        elif email_type == 'payment-confirmation':
+            result = send_payment_confirmation(
+                to_email,
+                email_data.get('plan'),
+                email_data.get('amount')
+            )
+        elif email_type == 'subscription-cancelled':
+            result = send_cancellation_email(to_email, email_data.get('name', 'User'))
+        elif email_type == 'custom':
+            result = send_email(
+                to_email,
+                email_data.get('subject'),
+                email_data.get('html')
+            )
+        else:
+            return jsonify({'error': f'Unknown email type: {email_type}'}), 400
+        
+        if result and result.get('success'):
+            return jsonify({'success': True, 'message': 'Email sent successfully'})
+        else:
+            return jsonify({'success': False, 'error': result.get('error', 'Unknown error')}), 500
+            
+    except Exception as e:
+        print(f"Email endpoint error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
