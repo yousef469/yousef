@@ -3,7 +3,9 @@ import { Wand2, Upload, Image, Type, Download, Loader2, Sparkles, AlertCircle } 
 import ThreeJSViewer from './ThreeJSViewer';
 
 export default function AI3DGenerator() {
-  const [mode, setMode] = useState('text'); // 'text' or 'image'
+  const [mode, setMode] = useState('quick'); // 'quick', 'text', or 'image'
+  const [generationType, setGenerationType] = useState('procedural'); // 'procedural' or 'ai'
+  const [modelType, setModelType] = useState('rocket'); // 'rocket', 'car', 'plane'
   const [textPrompt, setTextPrompt] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -11,6 +13,11 @@ export default function AI3DGenerator() {
   const [generatedModel, setGeneratedModel] = useState(null);
   const [error, setError] = useState(null);
   const [progress, setProgress] = useState(0);
+  
+  // Procedural parameters
+  const [rocketParams, setRocketParams] = useState({ stages: 2, fins: 4, height: 10 });
+  const [carParams, setCarParams] = useState({ style: 'sports', spoiler: true });
+  const [planeParams, setPlaneParams] = useState({ wingspan: 10, engines: 2 });
 
   // Handle image upload
   const handleImageUpload = (e) => {

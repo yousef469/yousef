@@ -5,6 +5,7 @@ import requests
 from PIL import Image
 import io
 import tempfile
+from procedural_models import create_rocket_glb, create_car_glb, create_plane_glb
 
 app = Flask(__name__)
 CORS(app, resources={
@@ -96,10 +97,53 @@ def health_check():
 
 @app.route('/generate-3d', methods=['POST'])
 def generate_3d():
-    """Generate 3D model from text or image using Hugging Face API"""
+    """Generate 3D model - procedural or AI-based"""
     try:
         data = request.form
         mode = data.get('mode', 'text')
+        generation_type = data.get('type', 'procedural')  # 'procedural' or 'ai'
+        
+        # PROCEDURAL GENERATION (Free, Instant, Unlimited)
+        if generation_type == 'procedural':
+            model_type = data.get('model_type', 'rocket')  # rocket, car, plane
+            
+            print(f"Generating procedural {model_type}...")
+            
+            if model_type == 'rocket':
+                stages = int(data.get('stages', 2))
+                fins = int(data.get('fins', 4))
+                color = data.get('color', 'red')
+                height = float(data.get('height', 10))
+                glb_data = create_rocket_glb(stages, fins, color, height)
+                
+            elif model_type == 'car':
+                style = data.get('style', 'sports')
+                color = data.get('color', 'blue')
+                spoiler = data.get('spoiler', 'true').lower() == 'true'
+                glb_data = create_car_glb(style, color, spoiler)
+                
+            elif model_type == 'plane':
+                wingspan = float(data.get('wingspan', 10))
+                style = data.get('style', 'fighter')
+                engines = int(data.get('engines', 2))
+                glb_data = create_plane_glb(wingspan, style, engines)
+            else:
+                return jsonify({'error': 'Unknown model type'}), 400
+            
+            output_path = tempfile.mktemp(suffix='.glb')
+            with open(output_path, 'wb') as f:
+                f.write(glb_data)
+            
+            print(f"Procedural {model_type} generated successfully!")
+            
+            return send_file(
+                output_path,
+                mimetype='model/gltf-binary',
+                as_attachment=True,
+                download_name=f'{model_type}_generated.glb'
+            )
+        
+        # AI GENERATION (Limited, High Quality)
         
         output_path = None
         
@@ -147,19 +191,77 @@ def generate_3d():
         else:
             return jsonify({'error': f'Unknown mode: {mode}'}), 400
         
-        # Step 2: Generate a simple 3D model (placeholder)
-        # Note: Real 3D generation requires local models or paid APIs
-        print("Generating 3D model...")
+        # Step 2: Generate 3D model using Meshy AI API
+        print("Generating 3D model with Meshy AI...")
         
-        # Create a simple GLB file (cube) as proof of concept
-        # In production, you'd use a real 3D generation service
-        glb_data = create_simple_cube_glb()
-        
-        output_path = tempfile.mktemp(suffix='.glb')
-        with open(output_path, 'wb') as f:
-            f.write(glb_data)
-        
-        print("3D model generated successfully!")
+        meshy_api_key = os.environ.get('MESHY_API_KEY')
+        if not meshy_api_key:
+            # Fallback to simple cube if no API key
+            print("No Meshy API key found, using placeholder cube")
+            glb_data = create_simple_cube_glb()
+            output_path = tempfile.mktemp(suffix='.glb')
+            with open(output_path, 'wb') as f:
+                f.write(glb_data)
+        else:
+            # Use Meshy AI for real 3D generation
+            try:
+                # Step 1: Create text-to-3D task
+                task_response = requests.post(
+                    'https://api.meshy.ai/v2/text-to-3d',
+                    headers={
+                        'Authorization': f'Bearer {meshy_api_key}',
+                        'Content-Type': 'application/json'
+                    },
+                    json={
+                        'mode': 'preview',  # Fast preview mode
+                        'prompt': data.get('prompt', 'a simple object'),
+                        'art_style': 'realistic',
+                        'negative_prompt': 'low quality, blurry'
+                    },
+                    timeout=10
+                )
+                
+                if task_response.status_code != 202:
+                    raise Exception(f"Meshy API error: {task_response.text}")
+                
+                task_id = task_response.json()['result']
+                print(f"Meshy task created: {task_id}")
+                
+                # Step 2: Poll for completion (preview mode is fast, ~1 minute)
+                max_attempts = 60
+                for attempt in range(max_attempts):
+                    status_response = requests.get(
+                        f'https://api.meshy.ai/v2/text-to-3d/{task_id}',
+                        headers={'Authorization': f'Bearer {meshy_api_key}'},
+                        timeout=10
+                    )
+                    
+                    status_data = status_response.json()
+                    if status_data['status'] == 'SUCCEEDED':
+                        # Download the GLB file
+                        glb_url = status_data['model_urls']['glb']
+                        glb_response = requests.get(glb_url, timeout=30)
+                        
+                        output_path = tempfile.mktemp(suffix='.glb')
+                        with open(output_path, 'wb') as f:
+                            f.write(glb_response.content)
+                        
+                        print("3D model generated successfully with Meshy AI!")
+                        break
+                    elif status_data['status'] == 'FAILED':
+                        raise Exception("Meshy AI generation failed")
+                    
+                    import time
+                    time.sleep(2)
+                else:
+                    raise Exception("Meshy AI generation timeout")
+                    
+            except Exception as e:
+                print(f"Meshy AI error: {e}, falling back to cube")
+                glb_data = create_simple_cube_glb()
+                output_path = tempfile.mktemp(suffix='.glb')
+                with open(output_path, 'wb') as f:
+                    f.write(glb_data)
         
         # Return the generated file
         return send_file(

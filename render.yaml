@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: yousef-ai-backend
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: ai-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app_hf.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: HUGGINGFACE_API_TOKEN
+        sync: false
