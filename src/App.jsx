@@ -1088,6 +1088,8 @@ import AI3DGeneratorPage from './pages/AI3DGeneratorPage';
 import PricingPage from './pages/PricingPage';
 import ProgressionPage from './pages/ProgressionPage';
 import LearnMechanicsPage from './pages/LearnMechanicsPage';
+import LearnSectionsPage from './pages/LearnSectionsPage';
+import LearnInformationPage from './pages/LearnInformationPage';
 import PhysicsPage from './pages/PhysicsPage';
 import MathematicsPage from './pages/MathematicsPage';
 import ElectronicsPage from './pages/ElectronicsPage';
@@ -1122,9 +1124,14 @@ export default function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/learn" element={<ProtectedRoute><LearnMechanicsPage /></ProtectedRoute>} />
+          <Route path="/learn/sections" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
+          <Route path="/learn/information" element={<ProtectedRoute><LearnInformationPage /></ProtectedRoute>} />
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
+          <Route path="/mechanics/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
+          <Route path="/mechanics/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
+          <Route path="/mechanics/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/physics" element={<ProtectedRoute><PhysicsPage /></ProtectedRoute>} />
           <Route path="/learn/mathematics" element={<ProtectedRoute><MathematicsPage /></ProtectedRoute>} />
           <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />

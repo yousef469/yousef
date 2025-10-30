@@ -251,7 +251,7 @@ const HomePage = () => {
           </button>
         </div>
 
-        {/* Learn by Games & Compare Models Section */}
+        {/* Interactive Features Section */}
         <div className="mt-16">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
@@ -260,40 +260,7 @@ const HomePage = () => {
             <p className="text-gray-300">{t('home.interactive.subtitle')}</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {/* Games Button */}
-            <button
-              onClick={() => user ? navigate('/games') : navigate('/auth')}
-              className="group relative bg-gradient-to-br from-purple-500 via-blue-600 to-cyan-500 hover:from-purple-600 hover:via-blue-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-              
-              <div className="relative z-10">
-                <div className="flex justify-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur animate-bounce">
-                    <Rocket className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 {t('home.journey.title')}</h3>
-                <p className="text-white/90 text-center mb-4">
-                  {t('home.journey.desc')}
-                </p>
-                
-                <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
-                  <span>🧠 {t('home.journey.quiz')}</span>
-                  <span>🧩 {t('home.journey.matching')}</span>
-                  <span>⚙️ {t('home.journey.simulation')}</span>
-                  <span>🔧 {t('home.journey.building')}</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <span>{t('home.journey.button')}</span>
-                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-              </div>
-            </button>
-
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
             {/* Compare Models Button */}
             <button
               onClick={() => navigate('/compare')}

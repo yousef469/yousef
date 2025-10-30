@@ -1,95 +1,35 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Rocket, Plane, Car, Atom, Calculator, Cpu, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen, Info, Gamepad2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function LearnMechanicsPage() {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const categories = [
+    const mainOptions = [
         {
-            id: 'rockets',
-            icon: Rocket,
-            title: t('home.learn.rockets'),
-            description: t('home.learn.rocketsDesc'),
+            id: 'sections',
+            icon: Gamepad2,
+            title: 'Engineering Sections',
+            description: 'Interactive lessons and games for Rockets, Planes, and Cars',
+            gradient: 'from-purple-500 via-blue-600 to-cyan-500',
+            hoverGradient: 'from-purple-600 via-blue-700 to-cyan-600',
+            borderColor: 'border-cyan-400/50',
+            hoverBorderColor: 'hover:border-cyan-300',
+            shadowColor: 'shadow-cyan-500/30',
+            path: '/learn/sections'
+        },
+        {
+            id: 'information',
+            icon: Info,
+            title: 'Information',
+            description: 'Detailed mechanics pages, physics, mathematics, electronics, and books',
             gradient: 'from-orange-500 to-red-600',
             hoverGradient: 'from-orange-600 to-red-700',
             borderColor: 'border-orange-400/50',
             hoverBorderColor: 'hover:border-orange-300',
             shadowColor: 'shadow-orange-500/30',
-            path: '/learn/rockets'
-        },
-        {
-            id: 'planes',
-            icon: Plane,
-            title: t('home.learn.planes'),
-            description: t('home.learn.planesDesc'),
-            gradient: 'from-blue-500 to-indigo-600',
-            hoverGradient: 'from-blue-600 to-indigo-700',
-            borderColor: 'border-blue-400/50',
-            hoverBorderColor: 'hover:border-blue-300',
-            shadowColor: 'shadow-blue-500/30',
-            path: '/learn/planes'
-        },
-        {
-            id: 'cars',
-            icon: Car,
-            title: t('home.learn.cars'),
-            description: t('home.learn.carsDesc'),
-            gradient: 'from-purple-500 to-pink-600',
-            hoverGradient: 'from-purple-600 to-pink-700',
-            borderColor: 'border-purple-400/50',
-            hoverBorderColor: 'hover:border-purple-300',
-            shadowColor: 'shadow-purple-500/30',
-            path: '/learn/cars'
-        },
-        {
-            id: 'physics',
-            icon: Atom,
-            title: 'Physics Fundamentals',
-            description: 'Learn core physics: motion, forces, energy, and thermodynamics',
-            gradient: 'from-green-500 to-emerald-600',
-            hoverGradient: 'from-green-600 to-emerald-700',
-            borderColor: 'border-green-400/50',
-            hoverBorderColor: 'hover:border-green-300',
-            shadowColor: 'shadow-green-500/30',
-            path: '/learn/physics'
-        },
-        {
-            id: 'mathematics',
-            icon: Calculator,
-            title: 'Mathematics',
-            description: 'Master calculus, algebra, trigonometry, and engineering math',
-            gradient: 'from-yellow-500 to-amber-600',
-            hoverGradient: 'from-yellow-600 to-amber-700',
-            borderColor: 'border-yellow-400/50',
-            hoverBorderColor: 'hover:border-yellow-300',
-            shadowColor: 'shadow-yellow-500/30',
-            path: '/learn/mathematics'
-        },
-        {
-            id: 'electronics',
-            icon: Cpu,
-            title: 'Electronics & Circuits',
-            description: 'Learn circuits, microcontrollers, sensors, and embedded systems',
-            gradient: 'from-cyan-500 to-teal-600',
-            hoverGradient: 'from-cyan-600 to-teal-700',
-            borderColor: 'border-cyan-400/50',
-            hoverBorderColor: 'hover:border-cyan-300',
-            shadowColor: 'shadow-cyan-500/30',
-            path: '/learn/electronics'
-        },
-        {
-            id: 'books',
-            icon: BookOpen,
-            title: 'Engineering Books',
-            description: 'Curated collection of essential engineering textbooks and resources',
-            gradient: 'from-rose-500 to-pink-600',
-            hoverGradient: 'from-rose-600 to-pink-700',
-            borderColor: 'border-rose-400/50',
-            hoverBorderColor: 'hover:border-rose-300',
-            shadowColor: 'shadow-rose-500/30',
-            path: '/learn/books'
+            path: '/learn/information'
         }
     ];
 
@@ -106,35 +46,37 @@ export default function LearnMechanicsPage() {
                         Back to Home
                     </button>
                     <h1 className="text-4xl font-bold mb-2">Learn Mechanics</h1>
-                    <p className="text-gray-400">Choose a category to start learning</p>
+                    <p className="text-gray-400">Choose how you want to learn</p>
                 </div>
             </div>
 
-            {/* Categories Grid */}
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {categories.map((category) => {
-                        const Icon = category.icon;
+            {/* Main Options */}
+            <div className="max-w-5xl mx-auto px-4 py-16">
+                <div className="grid md:grid-cols-2 gap-8">
+                    {mainOptions.map((option) => {
+                        const Icon = option.icon;
                         return (
                             <button
-                                key={category.id}
-                                onClick={() => navigate(category.path)}
-                                className={`group relative bg-gradient-to-br ${category.gradient} hover:${category.hoverGradient} rounded-2xl p-8 border-2 ${category.borderColor} ${category.hoverBorderColor} transition-all cursor-pointer hover:scale-105 hover:shadow-xl ${category.shadowColor}`}
+                                key={option.id}
+                                onClick={() => navigate(option.path)}
+                                className={`group relative bg-gradient-to-br ${option.gradient} hover:${option.hoverGradient} rounded-3xl p-12 border-2 ${option.borderColor} ${option.hoverBorderColor} transition-all cursor-pointer hover:scale-105 hover:shadow-2xl ${option.shadowColor}`}
                             >
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity" />
+                                
                                 <div className="relative z-10">
-                                    <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
-                                        <Icon className="w-10 h-10 text-white" />
+                                    <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform">
+                                        <Icon className="w-12 h-12 text-white" />
                                     </div>
 
-                                    <h3 className="text-2xl font-bold mb-3 text-white text-center">{category.title}</h3>
+                                    <h3 className="text-3xl font-bold mb-4 text-white text-center">{option.title}</h3>
 
-                                    <p className="text-white/90 text-center text-sm mb-4">
-                                        {category.description}
+                                    <p className="text-white/90 text-center text-lg mb-6">
+                                        {option.description}
                                     </p>
 
-                                    <div className="flex items-center justify-center gap-2 text-white/80 text-sm">
-                                        <span>Start Learning</span>
-                                        <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
+                                    <div className="flex items-center justify-center gap-2 text-white font-semibold text-lg">
+                                        <span>Explore</span>
+                                        <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                 </div>
                             </button>
