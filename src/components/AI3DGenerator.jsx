@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Wand2, Upload, Image, Download, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ThreeJSViewer from './ThreeJSViewer';
+import GenerationsDisplay from './GenerationsDisplay';
+import { useGenerations } from '../contexts/GenerationsContext';
 
 export default function AI3DGenerator() {
+  const navigate = useNavigate();
+  const { canGenerate, useGeneration, generationError } = useGenerations();
   const [mode, setMode] = useState('text'); // 'text' or 'image'
   const [modelChoice, setModelChoice] = useState('triposr'); // 'triposr' or 'trellis'
   const [textPrompt, setTextPrompt] = useState('');
@@ -37,11 +42,24 @@ export default function AI3DGenerator() {
       return;
     }
 
+    // Check if user can generate
+    if (!canGenerate) {
+      setError(generationError);
+      return;
+    }
+
     setIsGenerating(true);
     setError(null);
     setProgress(0);
 
     try {
+      // Use a generation credit
+      const result = await useGeneration();
+      if (!result.success) {
+        setError(result.error);
+        setIsGenerating(false);
+        return;
+      }
       const BACKEND_URL = 'https://name-ai-3d-backend.onrender.com';
       
       // Check backend health
@@ -161,6 +179,9 @@ export default function AI3DGenerator() {
       </div>
 
       <div className="p-6 space-y-6">
+        {/* Generations Display */}
+        <GenerationsDisplay />
+
         {/* Model Quality Selector */}
         <div className="bg-gray-800 rounded-lg p-4">
           <label className="block text-sm font-semibold text-gray-300 mb-3">Choose Quality</label>

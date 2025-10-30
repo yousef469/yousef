@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './contexts/AuthContext'
 import { LivesProvider } from './contexts/LivesContext'
+import { GenerationsProvider } from './contexts/GenerationsContext'
 import App from './App.jsx'
 import TawkToChat from './components/TawkToChat'
 import './index.css'
@@ -27,9 +28,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
       <LivesProvider>
-        <App />
-        <Analytics />
-        <TawkToChat />
+        <GenerationsProvider>
+          <App />
+          <Analytics />
+          <TawkToChat />
+        </GenerationsProvider>
       </LivesProvider>
     </AuthProvider>
   </React.StrictMode>,
