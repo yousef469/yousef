@@ -112,9 +112,12 @@ export default function PDFViewer({ book, onClose }) {
               </div>
             }
             error={
-              <div className="text-red-400 text-center py-20">
+              <div className="text-red-400 text-center py-20 px-8">
                 <p className="text-xl mb-2">Failed to load PDF</p>
-                <p className="text-sm">Please try again or contact support</p>
+                <p className="text-sm mb-4">The book file could not be found or loaded.</p>
+                <p className="text-xs text-gray-400">
+                  This may be due to file size limitations. Try downloading the book instead, or contact support if the issue persists.
+                </p>
               </div>
             }
           >
