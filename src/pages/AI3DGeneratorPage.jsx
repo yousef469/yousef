@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Wand2 } from 'lucide-react';
 import AI3DGenerator from '../components/AI3DGenerator';
+import AdBanner from '../components/AdBanner';
 
 export default function AI3DGeneratorPage() {
   const navigate = useNavigate();
@@ -36,6 +37,9 @@ export default function AI3DGeneratorPage() {
             Generate models from text descriptions or convert images into 3D objects.
           </p>
         </div>
+
+        {/* Ad Banner - Only shows for free users */}
+        <AdBanner />
 
         <AI3DGenerator />
 

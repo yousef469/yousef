@@ -6,7 +6,6 @@ import GenerationsDisplay from './GenerationsDisplay';
 import { useGenerations } from '../contexts/GenerationsContext';
 
 export default function AI3DGenerator() {
-  const navigate = useNavigate();
   const { canGenerate, useGeneration, generationError } = useGenerations();
   const [mode, setMode] = useState('text'); // 'text' or 'image'
   const [modelChoice, setModelChoice] = useState('triposr'); // 'triposr' or 'trellis'
