@@ -1110,6 +1110,7 @@ const CommunityPage = () => (
   </div>
 );
 import ProtectedRoute from './components/ProtectedRoute';
+import FloatingAIHelper from './components/FloatingAIHelper';
 import { useState as useAppState } from 'react';
 
 export default function App() {
@@ -1118,6 +1119,7 @@ export default function App() {
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
+      <FloatingAIHelper />
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
