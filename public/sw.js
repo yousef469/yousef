@@ -1,7 +1,7 @@
 // Service Worker for Engineerium
-const CACHE_VERSION = '2.0.1'; // Increment this to force cache refresh
+const CACHE_VERSION = '2.0.2'; // Increment this to force cache refresh
 const CACHE_NAME = `engineerium-v${CACHE_VERSION}`;
-const RUNTIME_CACHE = `aeroai-runtime-v${CACHE_VERSION}`;
+const RUNTIME_CACHE = `engineerium-runtime-v${CACHE_VERSION}`;
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [

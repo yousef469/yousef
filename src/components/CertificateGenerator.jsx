@@ -98,7 +98,7 @@ const CertificateGenerator = ({ courseName, completionDate, score }) => {
 
     // Download
     const link = document.createElement('a');
-    link.download = `AeroAI-Certificate-${courseName.replace(/\s+/g, '-')}.png`;
+    link.download = `Engineerium-Certificate-${courseName.replace(/\s+/g, '-')}.png`;
     link.href = canvas.toDataURL('image/png', 1.0);
     link.click();
   };
@@ -160,7 +160,7 @@ const CertificateGenerator = ({ courseName, completionDate, score }) => {
             // Share functionality
             if (navigator.share) {
               navigator.share({
-                title: 'My AeroAI Certificate',
+                title: 'My Engineerium Certificate',
                 text: `I just completed ${courseName} on Engineerium!`,
                 url: window.location.href
               });

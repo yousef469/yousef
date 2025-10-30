@@ -9,7 +9,7 @@ const SocialShare = ({ achievement, stats }) => {
     title: achievement?.title || `Level ${stats?.level} on Engineerium!`,
     text: achievement?.text || `I just reached Level ${stats?.level} and earned ${stats?.totalPoints} points learning aerospace engineering! 🚀`,
     url: window.location.origin,
-    hashtags: ['AeroAI3D', 'Engineering', 'Learning', 'STEM']
+    hashtags: ['Engineerium', 'Engineering', 'Learning', 'STEM']
   };
 
   const handleTwitterShare = () => {
@@ -69,7 +69,7 @@ const SocialShare = ({ achievement, stats }) => {
 
     // Download
     const link = document.createElement('a');
-    link.download = 'aeroai-achievement.png';
+    link.download = 'engineerium-achievement.png';
     link.href = canvas.toDataURL();
     link.click();
   };
