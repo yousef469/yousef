@@ -17,10 +17,12 @@ export const PRICING_PLANS = {
     price: 0,
     credits: 5,
     lives: 5,
+    modelUploads: 0,
     features: [
       '5 Game Lives (regenerate every 5h)',
       '5 AI 3D generations per month',
       'TripoSR model only',
+      'No model comparison uploads',
       'Basic support',
       'Community access'
     ]
@@ -32,9 +34,11 @@ export const PRICING_PLANS = {
     price: 9.99,
     credits: 50,
     lives: 10,
+    modelUploads: 5,
     features: [
       '10 Game Lives (regenerate every 5h)',
       '50 AI 3D generations per month',
+      '5 model uploads per week for comparison',
       'TripoSR + TRELLIS models',
       'Priority support',
       'Download all models',
@@ -48,9 +52,11 @@ export const PRICING_PLANS = {
     price: 29.99,
     credits: 200,
     lives: -1,
+    modelUploads: 25,
     features: [
       'Infinite Game Lives per month',
       '200 AI 3D generations per month',
+      '25 model uploads per week for comparison',
       'All models (TripoSR + TRELLIS)',
       'Priority support',
       'API access',
@@ -65,9 +71,11 @@ export const PRICING_PLANS = {
     price: 99.99,
     credits: -1,
     lives: -1,
+    modelUploads: -1,
     features: [
-      'Infinite Game Lives Forever',
-      'Infinite AI 3D generations',
+      'Infinite Game Lives per month',
+      'Infinite AI 3D generations per month',
+      'Unlimited model uploads per month',
       'All models + early access',
       'Dedicated support',
       'API access',

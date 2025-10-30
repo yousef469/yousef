@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, User, ChevronDown, Users as UsersIcon, Upload } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, LogIn, UserPlus, Send, Bot, ArrowLeftRight, Globe, User, ChevronDown, Users as UsersIcon, Upload, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import ModelComparison from '../components/ModelComparison';
@@ -246,38 +246,49 @@ const HomePage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {/* Compare Models Button */}
-            <button
-              onClick={() => navigate('/compare')}
-              className="group relative bg-gradient-to-br from-orange-500 via-pink-600 to-purple-500 hover:from-orange-600 hover:via-pink-700 hover:to-purple-600 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-              
-              <div className="relative z-10">
-                <div className="flex justify-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                    <ArrowLeftRight className="w-8 h-8 text-white" />
+            {/* Compare Models Button - Locked for Free Users */}
+            <div className="relative group">
+              <button
+                onClick={() => navigate('/pricing')}
+                className="w-full relative bg-gradient-to-br from-red-500 via-pink-600 to-purple-500 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 rounded-2xl p-8 border-2 border-red-400/50 hover:border-gray-500 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-red-500/30"
+              >
+                {/* Lock Icon Overlay */}
+                <div className="absolute top-4 right-4 w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Lock className="w-6 h-6 text-white" />
+                </div>
+                
+                <div className="relative z-10 opacity-75 group-hover:opacity-100 transition-opacity">
+                  <div className="flex justify-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                      <ArrowLeftRight className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ {t('home.compare.title')}</h3>
+                  <p className="text-white/90 text-center mb-4">
+                    {t('home.compare.desc')}
+                  </p>
+                  
+                  <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
+                    <span>🚀 {t('home.compare.rocket')}</span>
+                    <span>✈️ {t('home.compare.plane')}</span>
+                    <span>🚗 {t('home.compare.car')}</span>
+                    <span>📤 Upload yours</span>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                    <Lock className="w-4 h-4" />
+                    <span>Upgrade to Unlock</span>
                   </div>
                 </div>
-                
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ {t('home.compare.title')}</h3>
-                <p className="text-white/90 text-center mb-4">
-                  {t('home.compare.desc')}
-                </p>
-                
-                <div className="flex justify-center gap-4 text-xs text-white/80 mb-4">
-                  <span>🚀 {t('home.compare.rocket')}</span>
-                  <span>✈️ {t('home.compare.plane')}</span>
-                  <span>🚗 {t('home.compare.car')}</span>
-                  <span>📤 Upload yours</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <span>{t('home.compare.button')}</span>
-                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-                </div>
+              </button>
+              
+              {/* Tooltip */}
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-gray-700 shadow-xl">
+                🔒 Upgrade to use this feature
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900 border-r border-b border-gray-700"></div>
               </div>
-            </button>
+            </div>
 
             {/* Collaborate Button */}
             <button
