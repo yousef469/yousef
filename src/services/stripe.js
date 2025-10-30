@@ -18,9 +18,11 @@ export const PRICING_PLANS = {
     credits: 5,
     lives: 5,
     modelUploads: 0,
+    bookDownloads: 1,
     features: [
       '5 Game Lives (regenerate every 5h)',
       '5 AI 3D generations per month',
+      '1 book download per month',
       'TripoSR model only',
       'No model comparison uploads',
       'Basic support',
@@ -35,9 +37,11 @@ export const PRICING_PLANS = {
     credits: 50,
     lives: 10,
     modelUploads: 5,
+    bookDownloads: -1,
     features: [
       '10 Game Lives (regenerate every 5h)',
       '50 AI 3D generations per month',
+      'Unlimited book downloads per month',
       '5 model uploads per week for comparison',
       'TripoSR + TRELLIS models',
       'Priority support',

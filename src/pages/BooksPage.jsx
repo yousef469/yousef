@@ -1,60 +1,86 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Download, Search } from 'lucide-react';
+import { ArrowLeft, BookOpen, Download, Search, Lock, Star } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function BooksPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
+    const [downloadsUsed, setDownloadsUsed] = useState(0);
+    
+    // Free users: 1 download, Starter+: unlimited
+    const userTier = 'free'; // This should come from user subscription data
+    const maxDownloads = userTier === 'free' ? 1 : -1; // -1 means unlimited
+    const canDownload = maxDownloads === -1 || downloadsUsed < maxDownloads;
+
+    const handleDownload = (bookFile, bookName) => {
+        if (!canDownload) {
+            if (confirm('You\'ve reached your download limit. Upgrade to Starter plan for unlimited downloads?')) {
+                navigate('/pricing');
+            }
+            return;
+        }
+        
+        // Track download
+        setDownloadsUsed(prev => prev + 1);
+        
+        // Trigger download
+        const link = document.createElement('a');
+        link.href = `/books section/${bookFile}`;
+        link.download = bookFile;
+        link.click();
+    };
 
     const bookCategories = [
         {
             title: 'Classical Mechanics & Dynamics',
             color: 'from-blue-500 to-cyan-600',
             books: [
-                { name: 'Classical Mechanics', author: 'Goldstein', file: '[Goldstein] Classical mechanics.pdf' },
-                { name: 'Analytical Mechanics (7th Edition)', author: 'Grant R. Fowles', file: '1665496444-analytical.mechanics.by.grant.r.fowles.7th.edition.solutions-yasdl.com.pdf' },
-                { name: 'Engineering Mechanics: Dynamics (7th Edition)', author: 'J.L. Meriam & L.G. Kraige', file: 'engineering-mechanics-dynamics-7th-edition-j-l-meriam-l-g-kraige.pdf' },
-                { name: 'Vector Mechanics for Engineers: Statics', author: 'Beer, Johnston, Mazurek', file: 'Vector-Mechanics-For-Engineers-Statics-By-Ferdinand-P.-Beer-E.-Russell-Johnston-Jr-David-F.-Mazurek-.pdf' },
-                { name: 'Continuum Mechanics & Plasticity', author: 'Various', file: 'Continuum Mechnics & Plasticity.pdf' }
+                { name: 'Classical Mechanics', author: 'Herbert Goldstein', file: '[Goldstein] Classical mechanics.pdf', level: 'Advanced', recommended: true },
+                { name: 'Analytical Mechanics (7th Edition)', author: 'Grant R. Fowles', file: '1665496444-analytical.mechanics.by.grant.r.fowles.7th.edition.solutions-yasdl.com.pdf', level: 'Intermediate' },
+                { name: 'Engineering Mechanics: Statics & Dynamics (7th Edition)', author: 'J.L. Meriam & L.G. Kraige', file: 'engineering-mechanics-dynamics-7th-edition-j-l-meriam-l-g-kraige.pdf', level: 'Beginner', recommended: true },
+                { name: 'Vector Mechanics for Engineers: Statics', author: 'Beer, Johnston, Mazurek', file: 'Vector-Mechanics-For-Engineers-Statics-By-Ferdinand-P.-Beer-E.-Russell-Johnston-Jr-David-F.-Mazurek-.pdf', level: 'Beginner' },
+                { name: 'Continuum Mechanics & Plasticity', author: 'Various', file: 'Continuum Mechnics & Plasticity.pdf', level: 'Advanced' }
             ]
         },
         {
             title: 'Physics',
             color: 'from-purple-500 to-pink-600',
             books: [
-                { name: 'Fundamentals of Physics (9th Extended)', author: 'Halliday, Resnick, Walker', file: 'Fundamentals of Physics 9th Extended.pdf' },
-                { name: 'University Physics with Modern Physics (15th Edition)', author: 'Hugh D. Young', file: 'University Physics with Modern Physics 15th Edition By Hugh D. Young_compressed.pdf' },
-                { name: 'Physics for Scientists & Engineers with Modern Physics (9th Ed)', author: 'Serway & Jewett', file: 'Serway_Physics_for_Scientists_Engineers_Modern Physics_9th Ed_Serway_Jewett.pdf' },
-                { name: 'The Feynman Lectures on Physics (Vol. I, II, III)', author: 'Richard P. Feynman', file: 'The Feynman Lectures on Physics, Vol. I,II,III The New Millennium Edition by Richard P. Feynman (z-lib.org).pdf' },
-                { name: 'Introduction to Quantum Mechanics', author: 'Griffiths', file: 'Griffiths - Introduction to quantum mechanics.pdf' },
-                { name: 'Statistical Mechanics', author: 'R.K. Pathria', file: 'Pathria, R. K.  Statistical Mechanics.pdf' }
+                { name: 'Fundamentals of Physics (9th Extended)', author: 'Halliday, Resnick, Walker', file: 'Fundamentals of Physics 9th Extended.pdf', level: 'Beginner', recommended: true },
+                { name: 'University Physics with Modern Physics (15th Edition)', author: 'Hugh D. Young', file: 'University Physics with Modern Physics 15th Edition By Hugh D. Young_compressed.pdf', level: 'Intermediate' },
+                { name: 'Physics for Scientists & Engineers with Modern Physics (9th Ed)', author: 'Serway & Jewett', file: 'Serway_Physics_for_Scientists_Engineers_Modern Physics_9th Ed_Serway_Jewett.pdf', level: 'Intermediate' },
+                { name: 'The Feynman Lectures on Physics (Vol. I, II, III)', author: 'Richard P. Feynman', file: 'The Feynman Lectures on Physics, Vol. I,II,III The New Millennium Edition by Richard P. Feynman (z-lib.org).pdf', level: 'Advanced', recommended: true },
+                { name: 'Introduction to Quantum Mechanics', author: 'Griffiths', file: 'Griffiths - Introduction to quantum mechanics.pdf', level: 'Advanced' },
+                { name: 'Statistical Mechanics', author: 'R.K. Pathria', file: 'Pathria, R. K.  Statistical Mechanics.pdf', level: 'Advanced' }
             ]
         },
         {
             title: 'Mathematics',
             color: 'from-green-500 to-emerald-600',
             books: [
-                { name: 'Calculus: Early Transcendentals (6th Edition)', author: 'Stewart', file: 'Calculus - Early Transcendentals 6e.pdf' },
-                { name: 'Linear Algebra and Its Applications', author: 'Gilbert Strang', file: 'Gilbert_Strang_Linear_Algebra_and_Its_Applicatio_230928_225121.pdf' },
-                { name: 'Principles of Mathematical Analysis', author: 'Rudin', file: 'Principles_of_Mathematical_Analysis-Rudin.pdf' },
-                { name: 'Concrete Mathematics: A Foundation for Computer Science', author: 'Graham, Knuth, Patashnik', file: 'Concrete Mathematics A Foundation for Computer Science~tqw~_darksiderg.pdf' },
-                { name: 'Introduction to Probability', author: 'Bertsekas & Tsitsiklis', file: 'Math--Bertsekas_Tsitsiklis_Introduction_to_probability.pdf' },
-                { name: 'Discrete Mathematics and Its Applications (7th Edition)', author: 'Rosen', file: 'rosen_discrete_mathematics_and_its_applications_7th_edition.pdf' },
-                { name: 'Mathematics Textbook (Math 111)', author: 'Various', file: 'textbook-math111.pdf' }
+                { name: 'Calculus: Early Transcendentals (6th Edition)', author: 'James Stewart', file: 'Calculus - Early Transcendentals 6e.pdf', level: 'Beginner', recommended: true },
+                { name: 'Linear Algebra and Its Applications', author: 'Gilbert Strang', file: 'Gilbert_Strang_Linear_Algebra_and_Its_Applicatio_230928_225121.pdf', level: 'Advanced', recommended: true },
+                { name: 'Principles of Mathematical Analysis', author: 'Walter Rudin', file: 'Principles_of_Mathematical_Analysis-Rudin.pdf', level: 'Advanced' },
+                { name: 'Concrete Mathematics: A Foundation for Computer Science', author: 'Graham, Knuth, Patashnik', file: 'Concrete Mathematics A Foundation for Computer Science~tqw~_darksiderg.pdf', level: 'Intermediate' },
+                { name: 'Introduction to Probability', author: 'Bertsekas & Tsitsiklis', file: 'Math--Bertsekas_Tsitsiklis_Introduction_to_probability.pdf', level: 'Intermediate' },
+                { name: 'Discrete Mathematics and Its Applications (7th Edition)', author: 'Kenneth Rosen', file: 'rosen_discrete_mathematics_and_its_applications_7th_edition.pdf', level: 'Beginner' },
+                { name: 'Mathematics Textbook (Math 111)', author: 'Various', file: 'textbook-math111.pdf', level: 'Beginner' }
             ]
         },
         {
             title: 'Aerospace Engineering',
             color: 'from-orange-500 to-red-600',
             books: [
-                { name: 'Introduction to Flight (8th Edition)', author: 'John D. Anderson', file: 'introduction-to-flight-8th-edition-pdf-free.pdf' }
+                { name: 'Introduction to Flight (8th Edition)', author: 'John D. Anderson', file: 'introduction-to-flight-8th-edition-pdf-free.pdf', level: 'Beginner', recommended: true }
             ]
         },
         {
             title: 'Algebra',
             color: 'from-yellow-500 to-amber-600',
             books: [
-                { name: 'Algebra', author: 'Artin', file: 'ArtinAlgebra.pdf' }
+                { name: 'Algebra', author: 'Michael Artin', file: 'ArtinAlgebra.pdf', level: 'Advanced' }
             ]
         }
     ];
@@ -82,11 +108,29 @@ export default function BooksPage() {
                     Back to Learn
                 </button>
 
-                <div className="flex items-center gap-4 mb-8">
-                    <BookOpen className="w-12 h-12 text-rose-400" />
-                    <div>
-                        <h1 className="text-4xl font-bold">Engineering Books Library</h1>
-                        <p className="text-gray-400">{allBooks.length} essential textbooks and resources</p>
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                        <BookOpen className="w-12 h-12 text-rose-400" />
+                        <div>
+                            <h1 className="text-4xl font-bold">Engineering Books Library</h1>
+                            <p className="text-gray-400">{allBooks.length} essential textbooks and resources</p>
+                        </div>
+                    </div>
+                    
+                    {/* Download Counter */}
+                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+                        <p className="text-sm text-gray-400 mb-1">Downloads Used</p>
+                        <p className="text-2xl font-bold">
+                            {downloadsUsed} / {maxDownloads === -1 ? '∞' : maxDownloads}
+                        </p>
+                        {userTier === 'free' && (
+                            <button
+                                onClick={() => navigate('/pricing')}
+                                className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+                            >
+                                Upgrade for unlimited →
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -119,20 +163,41 @@ export default function BooksPage() {
                                     <div key={index} className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-rose-500 transition-all">
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1">
-                                                <h3 className="text-xl font-bold mb-2">{book.name}</h3>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <h3 className="text-xl font-bold">{book.name}</h3>
+                                                    {book.recommended && (
+                                                        <span className="flex items-center gap-1 px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-semibold">
+                                                            <Star className="w-3 h-3" />
+                                                            Recommended
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <p className="text-gray-400 mb-2">by {book.author}</p>
-                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${book.color} text-white`}>
-                                                    {book.category}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${book.color} text-white`}>
+                                                        {book.category}
+                                                    </span>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        book.level === 'Beginner' ? 'bg-green-500/20 text-green-400' :
+                                                        book.level === 'Intermediate' ? 'bg-blue-500/20 text-blue-400' :
+                                                        'bg-purple-500/20 text-purple-400'
+                                                    }`}>
+                                                        {book.level}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <a
-                                                href={`/books section/${book.file}`}
-                                                download
-                                                className="flex items-center gap-2 px-4 py-2 bg-rose-500 hover:bg-rose-600 rounded-lg transition-colors whitespace-nowrap"
+                                            <button
+                                                onClick={() => handleDownload(book.file, book.name)}
+                                                disabled={!canDownload}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+                                                    canDownload 
+                                                        ? 'bg-rose-500 hover:bg-rose-600' 
+                                                        : 'bg-gray-600 cursor-not-allowed opacity-50'
+                                                }`}
                                             >
-                                                <Download className="w-4 h-4" />
-                                                Download
-                                            </a>
+                                                {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                                                {canDownload ? 'Download' : 'Locked'}
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -151,17 +216,33 @@ export default function BooksPage() {
                                         <div key={bookIndex} className="bg-gray-900 rounded-lg p-4 hover:bg-gray-700 transition-all">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="flex-1">
-                                                    <h4 className="font-bold mb-1 text-white">{book.name}</h4>
-                                                    <p className="text-sm text-gray-400">{book.author}</p>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h4 className="font-bold text-white">{book.name}</h4>
+                                                        {book.recommended && (
+                                                            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-gray-400 mb-2">{book.author}</p>
+                                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                                                        book.level === 'Beginner' ? 'bg-green-500/20 text-green-400' :
+                                                        book.level === 'Intermediate' ? 'bg-blue-500/20 text-blue-400' :
+                                                        'bg-purple-500/20 text-purple-400'
+                                                    }`}>
+                                                        {book.level}
+                                                    </span>
                                                 </div>
-                                                <a
-                                                    href={`/books section/${book.file}`}
-                                                    download
-                                                    className="flex items-center gap-1 px-3 py-2 bg-rose-500 hover:bg-rose-600 rounded-lg transition-colors text-sm whitespace-nowrap"
+                                                <button
+                                                    onClick={() => handleDownload(book.file, book.name)}
+                                                    disabled={!canDownload}
+                                                    className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors text-sm whitespace-nowrap ${
+                                                        canDownload 
+                                                            ? 'bg-rose-500 hover:bg-rose-600' 
+                                                            : 'bg-gray-600 cursor-not-allowed opacity-50'
+                                                    }`}
                                                 >
-                                                    <Download className="w-4 h-4" />
+                                                    {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                                                     PDF
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     ))}
