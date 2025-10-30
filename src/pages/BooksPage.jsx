@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Download, Search, Lock, Star, Eye, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, Download, Search, Lock, Star, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import PDFViewer from '../components/PDFViewer';
 
 export default function BooksPage() {
     const navigate = useNavigate();
@@ -299,35 +300,10 @@ export default function BooksPage() {
 
             {/* PDF Viewer Modal */}
             {selectedBook && (
-                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-                    <div className="w-full h-full max-w-7xl bg-gray-900 rounded-xl overflow-hidden flex flex-col">
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
-                            <div className="flex items-center gap-3">
-                                <BookOpen className="w-6 h-6 text-rose-400" />
-                                <div>
-                                    <h3 className="font-bold text-lg">{selectedBook.name}</h3>
-                                    <p className="text-sm text-gray-400">{selectedBook.author}</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setSelectedBook(null)}
-                                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        {/* PDF Viewer */}
-                        <div className="flex-1 overflow-hidden">
-                            <iframe
-                                src={`/books/${encodeURIComponent(selectedBook.file)}`}
-                                className="w-full h-full"
-                                title={selectedBook.name}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PDFViewer 
+                    book={selectedBook} 
+                    onClose={() => setSelectedBook(null)} 
+                />
             )}
         </div>
     );
