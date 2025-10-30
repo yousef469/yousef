@@ -1,18 +1,32 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Download, Search, Lock, Star } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, BookOpen, Download, Search, Lock, Star, Eye, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function BooksPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
-    const [downloadsUsed, setDownloadsUsed] = useState(0);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [downloadsUsed, setDownloadsUsed] = useState(() => {
+        // Load from localStorage
+        const saved = localStorage.getItem('bookDownloadsUsed');
+        return saved ? parseInt(saved) : 0;
+    });
     
     // Free users: 1 download, Starter+: unlimited
     const userTier = 'free'; // This should come from user subscription data
     const maxDownloads = userTier === 'free' ? 1 : -1; // -1 means unlimited
     const canDownload = maxDownloads === -1 || downloadsUsed < maxDownloads;
+
+    // Save downloads to localStorage
+    useEffect(() => {
+        localStorage.setItem('bookDownloadsUsed', downloadsUsed.toString());
+    }, [downloadsUsed]);
+
+    const handleRead = (book) => {
+        setSelectedBook(book);
+    };
 
     const handleDownload = (bookFile, bookName) => {
         if (!canDownload) {
@@ -27,9 +41,12 @@ export default function BooksPage() {
         
         // Trigger download
         const link = document.createElement('a');
-        link.href = `/books section/${bookFile}`;
+        link.href = `/books/${encodeURIComponent(bookFile)}`;
         link.download = bookFile;
+        link.target = '_blank';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     };
 
     const bookCategories = [
@@ -186,18 +203,27 @@ export default function BooksPage() {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => handleDownload(book.file, book.name)}
-                                                disabled={!canDownload}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
-                                                    canDownload 
-                                                        ? 'bg-rose-500 hover:bg-rose-600' 
-                                                        : 'bg-gray-600 cursor-not-allowed opacity-50'
-                                                }`}
-                                            >
-                                                {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                                                {canDownload ? 'Download' : 'Locked'}
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleRead(book)}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors whitespace-nowrap"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    Read
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDownload(book.file, book.name)}
+                                                    disabled={!canDownload}
+                                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+                                                        canDownload 
+                                                            ? 'bg-rose-500 hover:bg-rose-600' 
+                                                            : 'bg-gray-600 cursor-not-allowed opacity-50'
+                                                    }`}
+                                                >
+                                                    {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                                                    {canDownload ? 'Download' : 'Locked'}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -231,18 +257,26 @@ export default function BooksPage() {
                                                         {book.level}
                                                     </span>
                                                 </div>
-                                                <button
-                                                    onClick={() => handleDownload(book.file, book.name)}
-                                                    disabled={!canDownload}
-                                                    className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors text-sm whitespace-nowrap ${
-                                                        canDownload 
-                                                            ? 'bg-rose-500 hover:bg-rose-600' 
-                                                            : 'bg-gray-600 cursor-not-allowed opacity-50'
-                                                    }`}
-                                                >
-                                                    {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                                                    PDF
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleRead(book)}
+                                                        className="flex items-center gap-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors text-sm whitespace-nowrap"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                        Read
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDownload(book.file, book.name)}
+                                                        disabled={!canDownload}
+                                                        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors text-sm whitespace-nowrap ${
+                                                            canDownload 
+                                                                ? 'bg-rose-500 hover:bg-rose-600' 
+                                                                : 'bg-gray-600 cursor-not-allowed opacity-50'
+                                                        }`}
+                                                    >
+                                                        {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -258,10 +292,43 @@ export default function BooksPage() {
                         About This Library
                     </h3>
                     <p className="text-gray-300">
-                        All books are available for download in PDF format. These are essential textbooks for engineering students covering mechanics, physics, mathematics, and aerospace engineering. Click the download button to save any book to your device.
+                        All books are available for reading online or download in PDF format. These are essential textbooks for engineering students covering mechanics, physics, mathematics, and aerospace engineering. Click "Read" to view in browser or "Download" to save to your device.
                     </p>
                 </div>
             </div>
+
+            {/* PDF Viewer Modal */}
+            {selectedBook && (
+                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+                    <div className="w-full h-full max-w-7xl bg-gray-900 rounded-xl overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
+                            <div className="flex items-center gap-3">
+                                <BookOpen className="w-6 h-6 text-rose-400" />
+                                <div>
+                                    <h3 className="font-bold text-lg">{selectedBook.name}</h3>
+                                    <p className="text-sm text-gray-400">{selectedBook.author}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setSelectedBook(null)}
+                                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {/* PDF Viewer */}
+                        <div className="flex-1 overflow-hidden">
+                            <iframe
+                                src={`/books/${encodeURIComponent(selectedBook.file)}`}
+                                className="w-full h-full"
+                                title={selectedBook.name}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
