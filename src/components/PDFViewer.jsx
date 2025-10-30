@@ -103,7 +103,7 @@ export default function PDFViewer({ book, onClose }) {
           style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
         >
           <Document
-            file={`/books/${encodeURIComponent(book.file)}`}
+            file={book.url || `/books/${encodeURIComponent(book.file)}`}
             onLoadSuccess={onDocumentLoadSuccess}
             loading={
               <div className="text-white text-center py-20">

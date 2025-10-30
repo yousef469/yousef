@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Download, Search, Lock, Star, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getBookUrl } from '../services/supabase';
 import PDFViewer from '../components/PDFViewer';
 
 export default function BooksPage() {
@@ -14,7 +15,7 @@ export default function BooksPage() {
         const saved = localStorage.getItem('bookDownloadsUsed');
         return saved ? parseInt(saved) : 0;
     });
-    
+
     // Free users: 1 download, Starter+: unlimited
     const userTier = 'free'; // This should come from user subscription data
     const maxDownloads = userTier === 'free' ? 1 : -1; // -1 means unlimited
@@ -26,23 +27,25 @@ export default function BooksPage() {
     }, [downloadsUsed]);
 
     const handleRead = (book) => {
-        setSelectedBook(book);
+        const bookUrl = getBookUrl(book.file);
+        setSelectedBook({ ...book, url: bookUrl });
     };
 
-    const handleDownload = (bookFile, bookName) => {
+    const handleDownload = (bookFile) => {
         if (!canDownload) {
             if (confirm('You\'ve reached your download limit. Upgrade to Starter plan for unlimited downloads?')) {
                 navigate('/pricing');
             }
             return;
         }
-        
+
         // Track download
         setDownloadsUsed(prev => prev + 1);
-        
-        // Trigger download
+
+        // Get Supabase URL and trigger download
+        const bookUrl = getBookUrl(bookFile);
         const link = document.createElement('a');
-        link.href = `/books/${encodeURIComponent(bookFile)}`;
+        link.href = bookUrl;
         link.download = bookFile;
         link.target = '_blank';
         document.body.appendChild(link);
@@ -103,16 +106,16 @@ export default function BooksPage() {
         }
     ];
 
-    const allBooks = bookCategories.flatMap(cat => 
+    const allBooks = bookCategories.flatMap(cat =>
         cat.books.map(book => ({ ...book, category: cat.title, color: cat.color }))
     );
 
-    const filteredBooks = searchTerm 
-        ? allBooks.filter(book => 
+    const filteredBooks = searchTerm
+        ? allBooks.filter(book =>
             book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
             book.category.toLowerCase().includes(searchTerm.toLowerCase())
-          )
+        )
         : null;
 
     return (
@@ -134,7 +137,7 @@ export default function BooksPage() {
                             <p className="text-gray-400">{allBooks.length} essential textbooks and resources</p>
                         </div>
                     </div>
-                    
+
                     {/* Download Counter */}
                     <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
                         <p className="text-sm text-gray-400 mb-1">Downloads Used</p>
@@ -195,11 +198,10 @@ export default function BooksPage() {
                                                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${book.color} text-white`}>
                                                         {book.category}
                                                     </span>
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                                        book.level === 'Beginner' ? 'bg-green-500/20 text-green-400' :
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${book.level === 'Beginner' ? 'bg-green-500/20 text-green-400' :
                                                         book.level === 'Intermediate' ? 'bg-blue-500/20 text-blue-400' :
-                                                        'bg-purple-500/20 text-purple-400'
-                                                    }`}>
+                                                            'bg-purple-500/20 text-purple-400'
+                                                        }`}>
                                                         {book.level}
                                                     </span>
                                                 </div>
@@ -215,11 +217,10 @@ export default function BooksPage() {
                                                 <button
                                                     onClick={() => handleDownload(book.file, book.name)}
                                                     disabled={!canDownload}
-                                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
-                                                        canDownload 
-                                                            ? 'bg-rose-500 hover:bg-rose-600' 
-                                                            : 'bg-gray-600 cursor-not-allowed opacity-50'
-                                                    }`}
+                                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${canDownload
+                                                        ? 'bg-rose-500 hover:bg-rose-600'
+                                                        : 'bg-gray-600 cursor-not-allowed opacity-50'
+                                                        }`}
                                                 >
                                                     {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                                                     {canDownload ? 'Download' : 'Locked'}
@@ -250,11 +251,10 @@ export default function BooksPage() {
                                                         )}
                                                     </div>
                                                     <p className="text-sm text-gray-400 mb-2">{book.author}</p>
-                                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-                                                        book.level === 'Beginner' ? 'bg-green-500/20 text-green-400' :
+                                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${book.level === 'Beginner' ? 'bg-green-500/20 text-green-400' :
                                                         book.level === 'Intermediate' ? 'bg-blue-500/20 text-blue-400' :
-                                                        'bg-purple-500/20 text-purple-400'
-                                                    }`}>
+                                                            'bg-purple-500/20 text-purple-400'
+                                                        }`}>
                                                         {book.level}
                                                     </span>
                                                 </div>
@@ -269,11 +269,10 @@ export default function BooksPage() {
                                                     <button
                                                         onClick={() => handleDownload(book.file, book.name)}
                                                         disabled={!canDownload}
-                                                        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors text-sm whitespace-nowrap ${
-                                                            canDownload 
-                                                                ? 'bg-rose-500 hover:bg-rose-600' 
-                                                                : 'bg-gray-600 cursor-not-allowed opacity-50'
-                                                        }`}
+                                                        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors text-sm whitespace-nowrap ${canDownload
+                                                            ? 'bg-rose-500 hover:bg-rose-600'
+                                                            : 'bg-gray-600 cursor-not-allowed opacity-50'
+                                                            }`}
                                                     >
                                                         {canDownload ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                                                     </button>
@@ -287,22 +286,37 @@ export default function BooksPage() {
                     </div>
                 )}
 
-                <div className="mt-8 bg-gradient-to-r from-rose-500/10 to-pink-500/10 border border-rose-500/30 rounded-xl p-6">
-                    <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                        <BookOpen className="w-5 h-5" />
-                        About This Library
-                    </h3>
-                    <p className="text-gray-300">
-                        All books are available for reading online or download in PDF format. These are essential textbooks for engineering students covering mechanics, physics, mathematics, and aerospace engineering. Click "Read" to view in browser or "Download" to save to your device.
-                    </p>
+                <div className="mt-8 space-y-4">
+                    <div className="bg-gradient-to-r from-rose-500/10 to-pink-500/10 border border-rose-500/30 rounded-xl p-6">
+                        <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                            <BookOpen className="w-5 h-5" />
+                            About This Library
+                        </h3>
+                        <p className="text-gray-300">
+                            All books are available for reading online or download in PDF format. These are essential textbooks for engineering students covering mechanics, physics, mathematics, and aerospace engineering. Click "Read" to view in browser or "Download" to save to your device.
+                        </p>
+                    </div>
+
+                    {/* Temporary Notice */}
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+                        <h3 className="text-xl font-bold mb-2 text-yellow-400">📚 Books Currently Being Migrated</h3>
+                        <p className="text-gray-300 mb-3">
+                            We're moving our book library to cloud storage for better performance. In the meantime:
+                        </p>
+                        <ul className="text-gray-300 space-y-2 ml-4">
+                            <li>• Books work perfectly in local development</li>
+                            <li>• Production deployment is being optimized</li>
+                            <li>• Alternative: Search for these books on <a href="https://libgen.is" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Library Genesis</a> or <a href="https://archive.org" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Internet Archive</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             {/* PDF Viewer Modal */}
             {selectedBook && (
-                <PDFViewer 
-                    book={selectedBook} 
-                    onClose={() => setSelectedBook(null)} 
+                <PDFViewer
+                    book={selectedBook}
+                    onClose={() => setSelectedBook(null)}
                 />
             )}
         </div>

@@ -217,3 +217,23 @@ export const getUserStats = async (userId) => {
 
   return { stats };
 };
+
+// ============================================
+// STORAGE - BOOKS
+// ============================================
+
+export const getBookUrl = (filename) => {
+  const { data } = supabase.storage
+    .from('books')
+    .getPublicUrl(filename);
+  
+  return data.publicUrl;
+};
+
+export const listBooks = async () => {
+  const { data, error } = await supabase.storage
+    .from('books')
+    .list();
+  
+  return { data, error };
+};
