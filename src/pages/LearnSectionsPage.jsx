@@ -57,7 +57,7 @@ export default function LearnSectionsPage() {
                         <ArrowLeft className="w-5 h-5" />
                         Back to Learn
                     </button>
-                    <h1 className="text-4xl font-bold mb-2">Engineering Sections</h1>
+                    <h1 className="text-4xl font-bold mb-2">Journey</h1>
                     <p className="text-gray-400">Choose a vehicle type to start your journey</p>
                 </div>
             </div>

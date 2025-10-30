@@ -251,18 +251,26 @@ Adjustments:
       {/* Header */}
       <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <Car className="w-8 h-8 text-blue-400" />
-            <div>
-              <h1 className="text-2xl font-bold">Car Mechanics & Engineering</h1>
-              <p className="text-sm text-gray-400">Learn how cars work from engine to wheels</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/')}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <Car className="w-8 h-8 text-blue-400" />
+              <div>
+                <h1 className="text-2xl font-bold">Car Mechanics & Engineering</h1>
+                <p className="text-sm text-gray-400">Learn how cars work from engine to wheels</p>
+              </div>
             </div>
+            <button
+              onClick={() => navigate('/games/map/cars')}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-lg font-semibold transition-all"
+            >
+              Lesson Map
+            </button>
           </div>
         </div>
       </div>

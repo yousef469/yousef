@@ -343,18 +343,26 @@ Autopilot:
       {/* Header */}
       <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <Plane className="w-8 h-8 text-cyan-400" />
-            <div>
-              <h1 className="text-2xl font-bold">Aircraft Mechanics & Engineering</h1>
-              <p className="text-sm text-gray-400">Master the principles of flight and aviation</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/')}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <Plane className="w-8 h-8 text-cyan-400" />
+              <div>
+                <h1 className="text-2xl font-bold">Aircraft Mechanics & Engineering</h1>
+                <p className="text-sm text-gray-400">Master the principles of flight and aviation</p>
+              </div>
             </div>
+            <button
+              onClick={() => navigate('/games/map/planes')}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-lg font-semibold transition-all"
+            >
+              Lesson Map
+            </button>
           </div>
         </div>
       </div>

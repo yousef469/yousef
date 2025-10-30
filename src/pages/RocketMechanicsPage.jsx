@@ -232,7 +232,12 @@ const RocketMechanicsPage = () => {
               🚀 Rocket Mechanics
             </h1>
             
-            <div className="w-24" /> {/* Spacer */}
+            <button
+              onClick={() => navigate('/games/map/rockets')}
+              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-lg font-semibold transition-all"
+            >
+              Lesson Map
+            </button>
           </div>
 
           {/* Tabs */}

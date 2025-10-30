@@ -10,7 +10,7 @@ export default function LearnMechanicsPage() {
         {
             id: 'sections',
             icon: Gamepad2,
-            title: 'Engineering Sections',
+            title: 'Journey',
             description: 'Interactive lessons and games for Rockets, Planes, and Cars',
             gradient: 'from-purple-500 via-blue-600 to-cyan-500',
             hoverGradient: 'from-purple-600 via-blue-700 to-cyan-600',
@@ -22,7 +22,7 @@ export default function LearnMechanicsPage() {
         {
             id: 'information',
             icon: Info,
-            title: 'Information',
+            title: 'Quick Information',
             description: 'Detailed mechanics pages, physics, mathematics, electronics, and books',
             gradient: 'from-orange-500 to-red-600',
             hoverGradient: 'from-orange-600 to-red-700',
