@@ -1090,6 +1090,7 @@ import ProgressionPage from './pages/ProgressionPage';
 import LearnMechanicsPage from './pages/LearnMechanicsPage';
 import LearnSectionsPage from './pages/LearnSectionsPage';
 import LearnInformationPage from './pages/LearnInformationPage';
+import CollaboratePage from './pages/CollaboratePage';
 import PhysicsPage from './pages/PhysicsPage';
 import MathematicsPage from './pages/MathematicsPage';
 import ElectronicsPage from './pages/ElectronicsPage';
@@ -1139,6 +1140,7 @@ export default function App() {
           <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
           <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route path="/collaborate" element={<ProtectedRoute><CollaboratePage /></ProtectedRoute>} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
