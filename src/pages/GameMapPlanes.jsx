@@ -11,14 +11,14 @@ export default function GameMapPlanes() {
     const levels = [];
     let levelId = 0;
 
-    // BEGINNER - 6 units, 6 lessons each = 36 lessons (1 quiz per lesson after completion)
+    // BEGINNER - 6 units, 6 lessons each = 36 lessons (1 quiz per lesson)
     const beginnerUnits = [
-      { name: 'Introduction to Flight', emoji: '🛫', quizzesPerLesson: 1 },
-      { name: 'Basic Aerodynamics', emoji: '💨', quizzesPerLesson: 1 },
-      { name: 'Aircraft Parts', emoji: '✈️', quizzesPerLesson: 1 },
-      { name: 'Forces of Flight', emoji: '⬆️', quizzesPerLesson: 1 },
-      { name: 'Takeoff & Landing', emoji: '🛬', quizzesPerLesson: 1 },
-      { name: 'Basic Navigation', emoji: '🧭', quizzesPerLesson: 1 }
+      { name: 'Introduction to Engineering', emoji: '🎓', quizzesPerLesson: 1 },
+      { name: 'Physics Fundamentals', emoji: '⚛️', quizzesPerLesson: 1 },
+      { name: 'Basic Math for Engineers', emoji: '📐', quizzesPerLesson: 1 },
+      { name: 'Introduction to Aerodynamics', emoji: '💨', quizzesPerLesson: 1 },
+      { name: 'Aircraft Components & Systems', emoji: '✈️', quizzesPerLesson: 1 },
+      { name: 'Materials & Tools', emoji: '🔧', quizzesPerLesson: 1 }
     ];
 
     beginnerUnits.forEach((unit) => {
@@ -36,14 +36,14 @@ export default function GameMapPlanes() {
       }
     });
 
-    // INTERMEDIATE - 6 units, 7 lessons each = 42 lessons (2 quizzes per lesson)
+    // INTERMEDIATE (Applied Mechanics & Design) - 6 units, 7 lessons each = 42 lessons (2 quizzes per lesson)
     const intermediateUnits = [
-      { name: 'Wing Design', emoji: '🪽', quizzesPerLesson: 2 },
-      { name: 'Engine Systems', emoji: '⚙️', quizzesPerLesson: 2 },
-      { name: 'Flight Controls', emoji: '🎮', quizzesPerLesson: 2 },
-      { name: 'Weather & Flight', emoji: '⛈️', quizzesPerLesson: 2 },
-      { name: 'Instrument Flying', emoji: '📊', quizzesPerLesson: 2 },
-      { name: 'Air Traffic Control', emoji: '📡', quizzesPerLesson: 2 }
+      { name: 'Statics', emoji: '⚖️', quizzesPerLesson: 2 },
+      { name: 'Dynamics', emoji: '🔄', quizzesPerLesson: 2 },
+      { name: 'Strength of Materials', emoji: '💪', quizzesPerLesson: 2 },
+      { name: 'Fluid Mechanics I', emoji: '🌊', quizzesPerLesson: 2 },
+      { name: 'Thermodynamics', emoji: '🔥', quizzesPerLesson: 2 },
+      { name: 'Computer-Aided Design (CAD)', emoji: '💻', quizzesPerLesson: 2 }
     ];
 
     intermediateUnits.forEach((unit) => {
@@ -61,14 +61,14 @@ export default function GameMapPlanes() {
       }
     });
 
-    // ADVANCED - 6 units, 8 lessons each = 48 lessons (2 quizzes per lesson)
+    // ADVANCED (Aerospace Systems & Design) - 6 units, 8 lessons each = 48 lessons (2 quizzes per lesson)
     const advancedUnits = [
-      { name: 'Advanced Aerodynamics', emoji: '🌪️', quizzesPerLesson: 2 },
-      { name: 'Jet Propulsion', emoji: '🚀', quizzesPerLesson: 2 },
-      { name: 'High-Speed Flight', emoji: '⚡', quizzesPerLesson: 2 },
-      { name: 'Aircraft Performance', emoji: '📈', quizzesPerLesson: 2 },
-      { name: 'Emergency Procedures', emoji: '🚨', quizzesPerLesson: 2 },
-      { name: 'Complex Systems', emoji: '🔧', quizzesPerLesson: 2 }
+      { name: 'Aerodynamics II', emoji: '🌪️', quizzesPerLesson: 2 },
+      { name: 'Propulsion Systems', emoji: '🚀', quizzesPerLesson: 2 },
+      { name: 'Flight Mechanics', emoji: '🛫', quizzesPerLesson: 2 },
+      { name: 'Avionics & Control Systems', emoji: '📡', quizzesPerLesson: 2 },
+      { name: 'Manufacturing & Assembly', emoji: '🏭', quizzesPerLesson: 2 },
+      { name: 'Structural Analysis', emoji: '🏗️', quizzesPerLesson: 2 }
     ];
 
     advancedUnits.forEach((unit) => {
@@ -86,18 +86,17 @@ export default function GameMapPlanes() {
       }
     });
 
-    // EXPERT - 5 units, 8 lessons each = 40 lessons (2-3 quizzes per lesson)
+    // EXPERT (Simulation & Systems Integration) - 5 units, 8 lessons each = 40 lessons (2-3 quizzes per lesson)
     const expertUnits = [
-      { name: 'Supersonic Flight', emoji: '💥' },
-      { name: 'Military Aviation', emoji: '🎖️' },
-      { name: 'Test Pilot Training', emoji: '🧪' },
-      { name: 'Aerobatic Maneuvers', emoji: '🎪' },
-      { name: 'Advanced Navigation', emoji: '🗺️' }
+      { name: 'CFD Simulation', emoji: '💻', quizzesPerLesson: 3 },
+      { name: 'FEA Analysis', emoji: '📊', quizzesPerLesson: 3 },
+      { name: 'Systems Integration', emoji: '🔗', quizzesPerLesson: 2 },
+      { name: 'Testing & Validation', emoji: '🧪', quizzesPerLesson: 2 },
+      { name: 'Performance Optimization', emoji: '⚡', quizzesPerLesson: 2 }
     ];
 
     expertUnits.forEach((unit, unitIdx) => {
       for (let i = 0; i < 8; i++) {
-        const quizCount = (unitIdx * 8 + i) < 10 ? 3 : 2;
         levels.push({
           id: levelId++,
           type: 'lesson',
@@ -106,23 +105,22 @@ export default function GameMapPlanes() {
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-orange-400 to-red-500',
-          quizzesAfter: quizCount
+          quizzesAfter: unit.quizzesPerLesson
         });
       }
     });
 
-    // MASTER - 5 units, 9 lessons each = 45 lessons (2-3 quizzes per lesson)
+    // MASTER (Professional Engineering) - 5 units, 9 lessons each = 45 lessons (2-3 quizzes per lesson)
     const masterUnits = [
-      { name: 'Aircraft Design', emoji: '📐' },
-      { name: 'Future of Aviation', emoji: '🔮' },
-      { name: 'Space Planes', emoji: '🛸' },
-      { name: 'Aviation Engineering', emoji: '🏗️' },
-      { name: 'Master Certification', emoji: '🏆' }
+      { name: 'Aircraft Design Project', emoji: '✈️', quizzesPerLesson: 3 },
+      { name: 'Certification & Regulations', emoji: '📋', quizzesPerLesson: 2 },
+      { name: 'Advanced Materials', emoji: '🔬', quizzesPerLesson: 2 },
+      { name: 'Innovation & Research', emoji: '💡', quizzesPerLesson: 3 },
+      { name: 'Master Certification', emoji: '🏆', quizzesPerLesson: 2 }
     ];
 
     masterUnits.forEach((unit) => {
       for (let i = 0; i < 9; i++) {
-        const quizCount = i % 3 === 0 ? 3 : 2;
         levels.push({
           id: levelId++,
           type: 'lesson',
@@ -131,7 +129,7 @@ export default function GameMapPlanes() {
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-yellow-400 to-amber-500',
-          quizzesAfter: quizCount
+          quizzesAfter: unit.quizzesPerLesson
         });
       }
     });
@@ -254,21 +252,54 @@ export default function GameMapPlanes() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         <div className="space-y-12">
           {units.map((unit, unitIndex) => {
+            // Show level header at the start of each level
+            const showLevelHeader = 
+              (unitIndex === 0) || // Beginner
+              (unitIndex === 6) || // Intermediate
+              (unitIndex === 12) || // Advanced
+              (unitIndex === 18) || // Expert
+              (unitIndex === 23); // Master
+            
+            const levelSubtitles = {
+              'Beginner': 'Foundation',
+              'Intermediate': 'Applied Mechanics & Design',
+              'Advanced': 'Aerospace Systems & Design',
+              'Expert': 'Simulation & Systems Integration',
+              'Master': 'Professional Engineering'
+            };
             const row = unit.isReversed ? [...unit.lessons].reverse() : unit.lessons;
             
             return (
               <div key={unitIndex} className="relative">
+                {/* Level Header */}
+                {showLevelHeader && (
+                  <div className="mb-12 text-center">
+                    <div className={`inline-block px-12 py-6 rounded-3xl border-4 shadow-2xl ${
+                      unit.level === 'Beginner' ? 'bg-gradient-to-r from-green-500 to-emerald-600 border-green-300' :
+                      unit.level === 'Intermediate' ? 'bg-gradient-to-r from-blue-500 to-cyan-600 border-blue-300' :
+                      unit.level === 'Advanced' ? 'bg-gradient-to-r from-purple-500 to-pink-600 border-purple-300' :
+                      unit.level === 'Expert' ? 'bg-gradient-to-r from-orange-500 to-red-600 border-orange-300' :
+                      'bg-gradient-to-r from-yellow-500 to-amber-600 border-yellow-300'
+                    }`}>
+                      <div className="text-4xl font-bold text-white mb-2">{unit.level}</div>
+                      <div className="text-lg text-white/90">{levelSubtitles[unit.level]}</div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Unit Header */}
                 <div className="mb-6 text-center">
-                  <div className={`inline-block px-6 py-2 rounded-full border-2 ${
+                  <div className={`inline-block px-8 py-3 rounded-2xl border-2 ${
                     unit.level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
                     unit.level === 'Intermediate' ? 'bg-blue-500/20 border-blue-400' :
                     unit.level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :
                     unit.level === 'Expert' ? 'bg-orange-500/20 border-orange-400' :
                     'bg-yellow-500/20 border-yellow-400'
                   }`}>
-                    <span className="font-bold text-lg">{unit.level}</span>
-                    <span className="text-sm ml-2 opacity-80">• Unit {unitIndex + 1}</span>
+                    <div className="font-bold text-2xl mb-1">{unit.lessons[0].unit}</div>
+                    <div className="text-sm opacity-80">
+                      {unit.level} • Unit {(unitIndex % (unit.level === 'Beginner' ? 6 : unit.level === 'Intermediate' ? 6 : unit.level === 'Advanced' ? 6 : 5)) + 1}
+                    </div>
                   </div>
                 </div>
 
