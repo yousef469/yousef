@@ -65,10 +65,10 @@ export default function GameMapPlanes() {
     const advancedUnits = [
       { name: 'Aerodynamics II', emoji: '🌪️', quizzesPerLesson: 2 },
       { name: 'Propulsion Systems', emoji: '🚀', quizzesPerLesson: 2 },
+      { name: 'Aircraft Structures', emoji: '🏗️', quizzesPerLesson: 2 },
       { name: 'Flight Mechanics', emoji: '🛫', quizzesPerLesson: 2 },
       { name: 'Avionics & Control Systems', emoji: '📡', quizzesPerLesson: 2 },
-      { name: 'Manufacturing & Assembly', emoji: '🏭', quizzesPerLesson: 2 },
-      { name: 'Structural Analysis', emoji: '🏗️', quizzesPerLesson: 2 }
+      { name: 'Manufacturing & Assembly', emoji: '🏭', quizzesPerLesson: 2 }
     ];
 
     advancedUnits.forEach((unit) => {
@@ -88,11 +88,11 @@ export default function GameMapPlanes() {
 
     // EXPERT (Simulation & Systems Integration) - 5 units, 8 lessons each = 40 lessons (2-3 quizzes per lesson)
     const expertUnits = [
-      { name: 'CFD Simulation', emoji: '💻', quizzesPerLesson: 3 },
-      { name: 'FEA Analysis', emoji: '📊', quizzesPerLesson: 3 },
+      { name: 'Finite Element Analysis (FEA)', emoji: '📊', quizzesPerLesson: 3 },
+      { name: 'Computational Fluid Dynamics (CFD)', emoji: '💻', quizzesPerLesson: 3 },
       { name: 'Systems Integration', emoji: '🔗', quizzesPerLesson: 2 },
-      { name: 'Testing & Validation', emoji: '🧪', quizzesPerLesson: 2 },
-      { name: 'Performance Optimization', emoji: '⚡', quizzesPerLesson: 2 }
+      { name: 'Certification & Safety', emoji: '✅', quizzesPerLesson: 2 },
+      { name: 'Maintenance Engineering', emoji: '🔧', quizzesPerLesson: 2 }
     ];
 
     expertUnits.forEach((unit, unitIdx) => {
@@ -110,13 +110,13 @@ export default function GameMapPlanes() {
       }
     });
 
-    // MASTER (Professional Engineering) - 5 units, 9 lessons each = 45 lessons (2-3 quizzes per lesson)
+    // MASTER (Innovation & Research) - 5 units, 9 lessons each = 45 lessons (2-3 quizzes per lesson)
     const masterUnits = [
-      { name: 'Aircraft Design Project', emoji: '✈️', quizzesPerLesson: 3 },
-      { name: 'Certification & Regulations', emoji: '📋', quizzesPerLesson: 2 },
-      { name: 'Advanced Materials', emoji: '🔬', quizzesPerLesson: 2 },
-      { name: 'Innovation & Research', emoji: '💡', quizzesPerLesson: 3 },
-      { name: 'Master Certification', emoji: '🏆', quizzesPerLesson: 2 }
+      { name: 'Advanced Propulsion', emoji: '🚀', quizzesPerLesson: 3 },
+      { name: 'Flight Control Algorithms', emoji: '🎮', quizzesPerLesson: 2 },
+      { name: 'Unmanned Aerial Systems (Drones)', emoji: '🛸', quizzesPerLesson: 2 },
+      { name: 'Spacecraft Design & Orbital Mechanics', emoji: '🌌', quizzesPerLesson: 3 },
+      { name: 'AI & Sustainability in Aerospace', emoji: '🌱', quizzesPerLesson: 2 }
     ];
 
     masterUnits.forEach((unit) => {
@@ -261,11 +261,11 @@ export default function GameMapPlanes() {
               (unitIndex === 23); // Master
             
             const levelSubtitles = {
-              'Beginner': 'Foundation',
+              'Beginner': 'Foundations',
               'Intermediate': 'Applied Mechanics & Design',
               'Advanced': 'Aerospace Systems & Design',
               'Expert': 'Simulation & Systems Integration',
-              'Master': 'Professional Engineering'
+              'Master': 'Innovation & Research'
             };
             const row = unit.isReversed ? [...unit.lessons].reverse() : unit.lessons;
             
