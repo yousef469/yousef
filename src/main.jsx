@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './contexts/AuthContext'
 import { LivesProvider } from './contexts/LivesContext'
 import { GenerationsProvider } from './contexts/GenerationsContext'
+import { ProgressProvider } from './contexts/ProgressContext'
 import App from './App.jsx'
 import TawkToChat from './components/TawkToChat'
 import './index.css'
@@ -29,9 +30,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <LivesProvider>
         <GenerationsProvider>
-          <App />
-          <Analytics />
-          <TawkToChat />
+          <ProgressProvider>
+            <App />
+            <Analytics />
+            <TawkToChat />
+          </ProgressProvider>
         </GenerationsProvider>
       </LivesProvider>
     </AuthProvider>

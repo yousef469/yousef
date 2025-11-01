@@ -88,6 +88,8 @@ export function ProgressProvider({ children }) {
   useEffect(() => {
     if (user) {
       loadUserProgress();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
