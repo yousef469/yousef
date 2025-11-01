@@ -29,7 +29,7 @@ export default function GameMapPlanes() {
         position: { top: `${yPosition}%`, left: `${xPos}%` }
       });
       
-      yPosition -= 3; // Move up for next level
+      yPosition -= 4.5; // Move up for next level (211 lessons need more space)
     };
 
     // BEGINNER - 6 units, 6 lessons each = 36 lessons (1 quiz per lesson after completion)
@@ -254,7 +254,7 @@ export default function GameMapPlanes() {
           </div>
         </div>
 
-        <div className="relative h-[6500px] bg-gradient-to-b from-transparent via-white/5 to-transparent rounded-3xl">
+        <div className="relative h-[12000px] bg-gradient-to-b from-transparent via-white/5 to-transparent rounded-3xl">
           {/* Path Lines */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none">
             {levels.slice(0, -1).map((level, index) => {
