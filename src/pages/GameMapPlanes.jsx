@@ -255,6 +255,9 @@ export default function GameMapPlanes() {
   const nodes = generateNodes();
   const isNodeUnlocked = (nodeId) => nodeId === 0 || completedNodes.includes(nodeId - 1);
   const isNodeCompleted = (nodeId) => completedNodes.includes(nodeId);
+  
+  // Find current lesson (first unlocked but not completed)
+  const currentNodeId = nodes.findIndex(node => isNodeUnlocked(node.id) && !isNodeCompleted(node.id));
 
   const handleNodeClick = (node) => {
     if (isNodeUnlocked(node.id)) {
@@ -270,6 +273,13 @@ export default function GameMapPlanes() {
   const getNodePosition = (index) => {
     const pattern = index % 6;
     const positions = ['50%', '30%', '20%', '40%', '60%', '70%'];
+    return positions[pattern];
+  };
+
+  // Get numeric position for SVG paths
+  const getNumericPosition = (index) => {
+    const pattern = index % 6;
+    const positions = [50, 30, 20, 40, 60, 70];
     return positions[pattern];
   };
 
@@ -304,11 +314,77 @@ export default function GameMapPlanes() {
 
       {/* Vertical Path */}
       <div className="max-w-2xl mx-auto px-4 py-12 relative">
-        {/* Connecting Line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-white/20 -translate-x-1/2" />
+        {/* SVG for curved connections */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+          <defs>
+            {/* Gradient for airflow */}
+            <linearGradient id="airflowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
+              <stop offset="50%" stopColor="rgba(147,197,253,0.8)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.6)" />
+            </linearGradient>
+            
+            {/* Animated dash for airflow effect */}
+            <pattern id="airflowPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.5)">
+                <animate attributeName="cy" from="0" to="20" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </pattern>
+          </defs>
+
+          {/* Draw curved paths between nodes */}
+          {nodes.map((node, index) => {
+            if (index === 0 || node.type === 'unit') return null;
+            
+            const prevNode = nodes[index - 1];
+            if (prevNode.type === 'unit') return null;
+
+            const x1 = getNumericPosition(index - 1);
+            const y1 = (index - 1) * 140 + 70;
+            const x2 = getNumericPosition(index);
+            const y2 = index * 140 + 70;
+            
+            const midY = (y1 + y2) / 2;
+            const completed = isNodeCompleted(prevNode.id);
+            
+            return (
+              <g key={`path-${index}`}>
+                {/* Main curved path */}
+                <path
+                  d={`M ${x1}% ${y1} Q ${x1}% ${midY}, ${(x1 + x2) / 2}% ${midY} T ${x2}% ${y2}`}
+                  stroke={completed ? "url(#airflowGradient)" : "rgba(255,255,255,0.3)"}
+                  strokeWidth="4"
+                  fill="none"
+                  strokeLinecap="round"
+                  className="transition-all duration-500"
+                />
+                
+                {/* Animated airflow dots for completed paths */}
+                {completed && (
+                  <path
+                    d={`M ${x1}% ${y1} Q ${x1}% ${midY}, ${(x1 + x2) / 2}% ${midY} T ${x2}% ${y2}`}
+                    stroke="rgba(255,255,255,0.6)"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeDasharray="10,20"
+                    strokeLinecap="round"
+                  >
+                    <animate
+                      attributeName="stroke-dashoffset"
+                      from="0"
+                      to="30"
+                      dur="1.5s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                )}
+              </g>
+            );
+          })}
+        </svg>
 
         {/* Nodes */}
-        <div className="relative space-y-6">
+        <div className="relative space-y-6" style={{ zIndex: 1 }}>
           {nodes.map((node, index) => {
             const unlocked = isNodeUnlocked(node.id);
             const completed = isNodeCompleted(node.id);
@@ -345,6 +421,23 @@ export default function GameMapPlanes() {
                   {/* Glow effect */}
                   {unlocked && !completed && (
                     <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-50 animate-pulse" />
+                  )}
+
+                  {/* Plane indicator on current lesson */}
+                  {node.id === currentNodeId && unlocked && !completed && (
+                    <div className="absolute -top-16 left-1/2 -translate-x-1/2 animate-bounce">
+                      <div className="relative">
+                        <Plane 
+                          className="w-12 h-12 text-white drop-shadow-lg" 
+                          style={{ 
+                            transform: 'rotate(-45deg)',
+                            filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8))'
+                          }} 
+                        />
+                        {/* Contrail effect */}
+                        <div className="absolute top-1/2 -right-8 w-8 h-1 bg-gradient-to-r from-white/60 to-transparent rounded-full" />
+                      </div>
+                    </div>
                   )}
 
                   {/* Node Circle */}
