@@ -1,228 +1,401 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plane, Star, Lock, CheckCircle, Cloud, Trophy } from 'lucide-react';
+import { ArrowLeft, Plane, Star, Lock, CheckCircle, Trophy, BookOpen, Brain } from 'lucide-react';
 
 export default function GameMapPlanes() {
   const navigate = useNavigate();
-  const [completedUnits, setCompletedUnits] = useState([]);
+  const [completedNodes, setCompletedNodes] = useState([0]);
 
-  // 28 units total with 211 lessons
-  const units = [
-    // BEGINNER - 6 units, 6 lessons each = 36 lessons
-    { id: 1, level: 'Beginner', name: 'Introduction to Flight', lessons: 6, emoji: '🛫', color: 'from-green-400 to-emerald-500' },
-    { id: 2, level: 'Beginner', name: 'Basic Aerodynamics', lessons: 6, emoji: '💨', color: 'from-green-400 to-emerald-500' },
-    { id: 3, level: 'Beginner', name: 'Aircraft Parts', lessons: 6, emoji: '✈️', color: 'from-green-400 to-emerald-500' },
-    { id: 4, level: 'Beginner', name: 'Forces of Flight', lessons: 6, emoji: '⬆️', color: 'from-green-400 to-emerald-500' },
-    { id: 5, level: 'Beginner', name: 'Takeoff & Landing', lessons: 6, emoji: '🛬', color: 'from-green-400 to-emerald-500' },
-    { id: 6, level: 'Beginner', name: 'Basic Navigation', lessons: 6, emoji: '🧭', color: 'from-green-400 to-emerald-500' },
-    
-    // INTERMEDIATE - 6 units, 7 lessons each = 42 lessons
-    { id: 7, level: 'Intermediate', name: 'Wing Design', lessons: 7, emoji: '🪽', color: 'from-blue-400 to-cyan-500' },
-    { id: 8, level: 'Intermediate', name: 'Engine Systems', lessons: 7, emoji: '⚙️', color: 'from-blue-400 to-cyan-500' },
-    { id: 9, level: 'Intermediate', name: 'Flight Controls', lessons: 7, emoji: '🎮', color: 'from-blue-400 to-cyan-500' },
-    { id: 10, level: 'Intermediate', name: 'Weather & Flight', lessons: 7, emoji: '⛈️', color: 'from-blue-400 to-cyan-500' },
-    { id: 11, level: 'Intermediate', name: 'Instrument Flying', lessons: 7, emoji: '📊', color: 'from-blue-400 to-cyan-500' },
-    { id: 12, level: 'Intermediate', name: 'Air Traffic Control', lessons: 7, emoji: '📡', color: 'from-blue-400 to-cyan-500' },
-    
-    // ADVANCED - 6 units, 8 lessons each = 48 lessons
-    { id: 13, level: 'Advanced', name: 'Advanced Aerodynamics', lessons: 8, emoji: '🌪️', color: 'from-purple-400 to-pink-500' },
-    { id: 14, level: 'Advanced', name: 'Jet Propulsion', lessons: 8, emoji: '🚀', color: 'from-purple-400 to-pink-500' },
-    { id: 15, level: 'Advanced', name: 'High-Speed Flight', lessons: 8, emoji: '⚡', color: 'from-purple-400 to-pink-500' },
-    { id: 16, level: 'Advanced', name: 'Aircraft Performance', lessons: 8, emoji: '📈', color: 'from-purple-400 to-pink-500' },
-    { id: 17, level: 'Advanced', name: 'Emergency Procedures', lessons: 8, emoji: '🚨', color: 'from-purple-400 to-pink-500' },
-    { id: 18, level: 'Advanced', name: 'Complex Systems', lessons: 8, emoji: '🔧', color: 'from-purple-400 to-pink-500' },
-    
-    // EXPERT - 5 units, 8 lessons each = 40 lessons
-    { id: 19, level: 'Expert', name: 'Supersonic Flight', lessons: 8, emoji: '💥', color: 'from-orange-400 to-red-500' },
-    { id: 20, level: 'Expert', name: 'Military Aviation', lessons: 8, emoji: '🎖️', color: 'from-orange-400 to-red-500' },
-    { id: 21, level: 'Expert', name: 'Test Pilot Training', lessons: 8, emoji: '🧪', color: 'from-orange-400 to-red-500' },
-    { id: 22, level: 'Expert', name: 'Aerobatic Maneuvers', lessons: 8, emoji: '🎪', color: 'from-orange-400 to-red-500' },
-    { id: 23, level: 'Expert', name: 'Advanced Navigation', lessons: 8, emoji: '🗺️', color: 'from-orange-400 to-red-500' },
-    
-    // MASTER - 5 units, 9 lessons each = 45 lessons
-    { id: 24, level: 'Master', name: 'Aircraft Design', lessons: 9, emoji: '📐', color: 'from-yellow-400 to-amber-500' },
-    { id: 25, level: 'Master', name: 'Future of Aviation', lessons: 9, emoji: '🔮', color: 'from-yellow-400 to-amber-500' },
-    { id: 26, level: 'Master', name: 'Space Planes', lessons: 9, emoji: '🛸', color: 'from-yellow-400 to-amber-500' },
-    { id: 27, level: 'Master', name: 'Aviation Engineering', lessons: 9, emoji: '🏗️', color: 'from-yellow-400 to-amber-500' },
-    { id: 28, level: 'Master', name: 'Master Certification', lessons: 9, emoji: '🏆', color: 'from-yellow-400 to-amber-500' }
-  ];
+  // Generate all nodes (lessons + quizzes)
+  const generateNodes = () => {
+    const nodes = [];
+    let nodeId = 0;
 
-  const totalLessons = units.reduce((sum, unit) => sum + unit.lessons, 0);
-  const levelStats = {
-    'Beginner': { units: 6, lessons: 36, color: 'text-green-400' },
-    'Intermediate': { units: 6, lessons: 42, color: 'text-blue-400' },
-    'Advanced': { units: 6, lessons: 48, color: 'text-purple-400' },
-    'Expert': { units: 5, lessons: 40, color: 'text-orange-400' },
-    'Master': { units: 5, lessons: 45, color: 'text-yellow-400' }
+    // BEGINNER - 36 lessons + 36 quizzes (1 quiz per lesson)
+    const beginnerUnits = [
+      { name: 'Introduction to Flight', emoji: '🛫' },
+      { name: 'Basic Aerodynamics', emoji: '💨' },
+      { name: 'Aircraft Parts', emoji: '✈️' },
+      { name: 'Forces of Flight', emoji: '⬆️' },
+      { name: 'Takeoff & Landing', emoji: '🛬' },
+      { name: 'Basic Navigation', emoji: '🧭' }
+    ];
+
+    beginnerUnits.forEach((unit, unitIndex) => {
+      // Unit header
+      nodes.push({
+        id: nodeId++,
+        type: 'unit',
+        level: 'Beginner',
+        unitNumber: unitIndex + 1,
+        name: unit.name,
+        emoji: unit.emoji,
+        color: 'from-green-400 to-emerald-500'
+      });
+
+      // 6 lessons per unit
+      for (let i = 0; i < 6; i++) {
+        nodes.push({
+          id: nodeId++,
+          type: 'lesson',
+          level: 'Beginner',
+          unitNumber: unitIndex + 1,
+          lessonNumber: i + 1,
+          name: `${unit.name} - Part ${i + 1}`,
+          emoji: unit.emoji,
+          color: 'from-green-400 to-emerald-500'
+        });
+
+        // 1 quiz after each lesson
+        nodes.push({
+          id: nodeId++,
+          type: 'quiz',
+          level: 'Beginner',
+          unitNumber: unitIndex + 1,
+          quizNumber: i + 1,
+          name: `Quiz ${i + 1}`,
+          color: 'from-green-500 to-green-600'
+        });
+      }
+    });
+
+    // INTERMEDIATE - 42 lessons + 84 quizzes (2 quizzes per lesson)
+    const intermediateUnits = [
+      { name: 'Wing Design', emoji: '🪽' },
+      { name: 'Engine Systems', emoji: '⚙️' },
+      { name: 'Flight Controls', emoji: '🎮' },
+      { name: 'Weather & Flight', emoji: '⛈️' },
+      { name: 'Instrument Flying', emoji: '📊' },
+      { name: 'Air Traffic Control', emoji: '📡' }
+    ];
+
+    intermediateUnits.forEach((unit, unitIndex) => {
+      nodes.push({
+        id: nodeId++,
+        type: 'unit',
+        level: 'Intermediate',
+        unitNumber: unitIndex + 7,
+        name: unit.name,
+        emoji: unit.emoji,
+        color: 'from-blue-400 to-cyan-500'
+      });
+
+      for (let i = 0; i < 7; i++) {
+        nodes.push({
+          id: nodeId++,
+          type: 'lesson',
+          level: 'Intermediate',
+          unitNumber: unitIndex + 7,
+          lessonNumber: i + 1,
+          name: `${unit.name} - Part ${i + 1}`,
+          emoji: unit.emoji,
+          color: 'from-blue-400 to-cyan-500'
+        });
+
+        // 2 quizzes per lesson
+        for (let q = 0; q < 2; q++) {
+          nodes.push({
+            id: nodeId++,
+            type: 'quiz',
+            level: 'Intermediate',
+            unitNumber: unitIndex + 7,
+            quizNumber: (i * 2) + q + 1,
+            name: `Quiz ${(i * 2) + q + 1}`,
+            color: 'from-blue-500 to-blue-600'
+          });
+        }
+      }
+    });
+
+    // ADVANCED - 48 lessons + 96 quizzes (2 quizzes per lesson)
+    const advancedUnits = [
+      { name: 'Advanced Aerodynamics', emoji: '🌪️' },
+      { name: 'Jet Propulsion', emoji: '🚀' },
+      { name: 'High-Speed Flight', emoji: '⚡' },
+      { name: 'Aircraft Performance', emoji: '📈' },
+      { name: 'Emergency Procedures', emoji: '🚨' },
+      { name: 'Complex Systems', emoji: '🔧' }
+    ];
+
+    advancedUnits.forEach((unit, unitIndex) => {
+      nodes.push({
+        id: nodeId++,
+        type: 'unit',
+        level: 'Advanced',
+        unitNumber: unitIndex + 13,
+        name: unit.name,
+        emoji: unit.emoji,
+        color: 'from-purple-400 to-pink-500'
+      });
+
+      for (let i = 0; i < 8; i++) {
+        nodes.push({
+          id: nodeId++,
+          type: 'lesson',
+          level: 'Advanced',
+          unitNumber: unitIndex + 13,
+          lessonNumber: i + 1,
+          name: `${unit.name} - Part ${i + 1}`,
+          emoji: unit.emoji,
+          color: 'from-purple-400 to-pink-500'
+        });
+
+        // 2 quizzes per lesson
+        for (let q = 0; q < 2; q++) {
+          nodes.push({
+            id: nodeId++,
+            type: 'quiz',
+            level: 'Advanced',
+            unitNumber: unitIndex + 13,
+            quizNumber: (i * 2) + q + 1,
+            name: `Quiz ${(i * 2) + q + 1}`,
+            color: 'from-purple-500 to-purple-600'
+          });
+        }
+      }
+    });
+
+    // EXPERT - 40 lessons + 90 quizzes
+    const expertUnits = [
+      { name: 'Supersonic Flight', emoji: '💥' },
+      { name: 'Military Aviation', emoji: '🎖️' },
+      { name: 'Test Pilot Training', emoji: '🧪' },
+      { name: 'Aerobatic Maneuvers', emoji: '🎪' },
+      { name: 'Advanced Navigation', emoji: '🗺️' }
+    ];
+
+    expertUnits.forEach((unit, unitIndex) => {
+      nodes.push({
+        id: nodeId++,
+        type: 'unit',
+        level: 'Expert',
+        unitNumber: unitIndex + 19,
+        name: unit.name,
+        emoji: unit.emoji,
+        color: 'from-orange-400 to-red-500'
+      });
+
+      for (let i = 0; i < 8; i++) {
+        nodes.push({
+          id: nodeId++,
+          type: 'lesson',
+          level: 'Expert',
+          unitNumber: unitIndex + 19,
+          lessonNumber: i + 1,
+          name: `${unit.name} - Part ${i + 1}`,
+          emoji: unit.emoji,
+          color: 'from-orange-400 to-red-500'
+        });
+
+        // Distribute 90 quizzes across 40 lessons (some lessons have 2, some have 3)
+        const quizzesForThisLesson = (unitIndex * 8 + i) < 10 ? 3 : 2;
+        for (let q = 0; q < quizzesForThisLesson; q++) {
+          nodes.push({
+            id: nodeId++,
+            type: 'quiz',
+            level: 'Expert',
+            unitNumber: unitIndex + 19,
+            name: `Quiz`,
+            color: 'from-orange-500 to-red-600'
+          });
+        }
+      }
+    });
+
+    // MASTER - 45 lessons + 120 quizzes
+    const masterUnits = [
+      { name: 'Aircraft Design', emoji: '📐' },
+      { name: 'Future of Aviation', emoji: '🔮' },
+      { name: 'Space Planes', emoji: '🛸' },
+      { name: 'Aviation Engineering', emoji: '🏗️' },
+      { name: 'Master Certification', emoji: '🏆' }
+    ];
+
+    masterUnits.forEach((unit, unitIndex) => {
+      nodes.push({
+        id: nodeId++,
+        type: 'unit',
+        level: 'Master',
+        unitNumber: unitIndex + 24,
+        name: unit.name,
+        emoji: unit.emoji,
+        color: 'from-yellow-400 to-amber-500'
+      });
+
+      for (let i = 0; i < 9; i++) {
+        nodes.push({
+          id: nodeId++,
+          type: 'lesson',
+          level: 'Master',
+          unitNumber: unitIndex + 24,
+          lessonNumber: i + 1,
+          name: `${unit.name} - Part ${i + 1}`,
+          emoji: unit.emoji,
+          color: 'from-yellow-400 to-amber-500'
+        });
+
+        // Distribute 120 quizzes across 45 lessons (average 2.67 per lesson)
+        const quizzesForThisLesson = i % 3 === 0 ? 3 : 2;
+        for (let q = 0; q < quizzesForThisLesson; q++) {
+          nodes.push({
+            id: nodeId++,
+            type: 'quiz',
+            level: 'Master',
+            unitNumber: unitIndex + 24,
+            name: `Quiz`,
+            color: 'from-yellow-500 to-amber-600'
+          });
+        }
+      }
+    });
+
+    return nodes;
   };
 
-  const isUnitUnlocked = (unitId) => {
-    if (unitId === 1) return true;
-    return completedUnits.includes(unitId - 1);
-  };
+  const nodes = generateNodes();
+  const isNodeUnlocked = (nodeId) => nodeId === 0 || completedNodes.includes(nodeId - 1);
+  const isNodeCompleted = (nodeId) => completedNodes.includes(nodeId);
 
-  const isUnitCompleted = (unitId) => completedUnits.includes(unitId);
-
-  const handleUnitClick = (unit) => {
-    if (isUnitUnlocked(unit.id)) {
-      navigate(`/games/play/planes/unit/${unit.id}`);
+  const handleNodeClick = (node) => {
+    if (isNodeUnlocked(node.id)) {
+      if (node.type === 'lesson') {
+        navigate(`/games/play/planes/lesson/${node.id}`);
+      } else if (node.type === 'quiz') {
+        navigate(`/games/play/planes/quiz/${node.id}`);
+      }
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 via-blue-600 to-indigo-900 text-white">
-      {/* Clouds Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute opacity-10"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${15 + Math.random() * 15}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`
-            }}
-          >
-            <Cloud className="w-40 h-40 text-white" />
-          </div>
-        ))}
-      </div>
+  // Calculate position for zigzag pattern
+  const getNodePosition = (index) => {
+    const pattern = index % 6;
+    const positions = ['50%', '30%', '20%', '40%', '60%', '70%'];
+    return positions[pattern];
+  };
 
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-sky-300 via-blue-400 to-indigo-600 text-white">
       {/* Header */}
-      <div className="relative z-10 border-b border-blue-700 bg-blue-900/80 backdrop-blur-sm sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="sticky top-0 z-50 border-b border-white/20 bg-blue-900/90 backdrop-blur-lg">
+        <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate('/learn')}
-                className="p-2 hover:bg-blue-800 rounded-lg transition-colors"
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <Plane className="w-8 h-8 text-cyan-300" />
+              <Plane className="w-7 h-7 text-cyan-300" />
               <div>
-                <h1 className="text-2xl font-bold">Aircraft Journey</h1>
-                <p className="text-sm text-blue-200">28 Units • {totalLessons} Lessons</p>
+                <h1 className="text-xl font-bold">Aircraft Journey</h1>
+                <p className="text-xs text-blue-200">211 Lessons • 426 Quizzes</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-300" />
-                <span className="text-lg font-bold">{completedUnits.length}/{units.length}</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full">
+                <Star className="w-4 h-4 text-yellow-300" />
+                <span className="text-sm font-bold">{completedNodes.length}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Level Stats */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-5 gap-4 mb-8">
-          {Object.entries(levelStats).map(([level, stats]) => (
-            <div key={level} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-              <div className={`text-lg font-bold ${stats.color}`}>{level}</div>
-              <div className="text-sm text-white/80">{stats.units} units • {stats.lessons} lessons</div>
-            </div>
-          ))}
-        </div>
+      {/* Vertical Path */}
+      <div className="max-w-2xl mx-auto px-4 py-12 relative">
+        {/* Connecting Line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-white/20 -translate-x-1/2" />
 
-        {/* Units Grid */}
-        <div className="space-y-12">
-          {['Beginner', 'Intermediate', 'Advanced', 'Expert', 'Master'].map((level) => {
-            const levelUnits = units.filter(u => u.level === level);
-            const stats = levelStats[level];
-            
+        {/* Nodes */}
+        <div className="relative space-y-6">
+          {nodes.map((node, index) => {
+            const unlocked = isNodeUnlocked(node.id);
+            const completed = isNodeCompleted(node.id);
+            const leftPosition = getNodePosition(index);
+
+            if (node.type === 'unit') {
+              return (
+                <div key={node.id} className="relative flex justify-center">
+                  <div className="bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30 max-w-md w-full">
+                    <div className="flex items-center gap-4">
+                      <div className="text-5xl">{node.emoji}</div>
+                      <div className="flex-1">
+                        <div className="text-xs text-white/60 mb-1">Unit {node.unitNumber} • {node.level}</div>
+                        <div className="text-lg font-bold">{node.name}</div>
+                      </div>
+                      <Trophy className="w-6 h-6 text-yellow-300" />
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             return (
-              <div key={level} className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className={`text-3xl font-bold ${stats.color}`}>{level}</div>
-                  <div className="flex-1 h-1 bg-white/20 rounded-full">
-                    <div 
-                      className={`h-full bg-gradient-to-r ${levelUnits[0].color} rounded-full transition-all`}
-                      style={{ 
-                        width: `${(completedUnits.filter(id => levelUnits.find(u => u.id === id)).length / levelUnits.length) * 100}%` 
-                      }}
-                    />
+              <div
+                key={node.id}
+                className="relative flex items-center"
+                style={{ justifyContent: leftPosition === '50%' ? 'center' : leftPosition < '50%' ? 'flex-start' : 'flex-end' }}
+              >
+                <button
+                  onClick={() => handleNodeClick(node)}
+                  disabled={!unlocked}
+                  className={`group relative transition-all ${unlocked ? 'hover:scale-110' : ''}`}
+                >
+                  {/* Glow effect */}
+                  {unlocked && !completed && (
+                    <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-50 animate-pulse" />
+                  )}
+
+                  {/* Node Circle */}
+                  <div
+                    className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${
+                      completed
+                        ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 shadow-lg shadow-green-500/50'
+                        : unlocked
+                        ? `bg-gradient-to-br ${node.color} border-white shadow-lg shadow-blue-500/50`
+                        : 'bg-gray-700 border-gray-600'
+                    }`}
+                  >
+                    {completed ? (
+                      <CheckCircle className="w-10 h-10 text-white" />
+                    ) : unlocked ? (
+                      node.type === 'lesson' ? (
+                        <BookOpen className="w-8 h-8 text-white" />
+                      ) : (
+                        <Brain className="w-8 h-8 text-white" />
+                      )
+                    ) : (
+                      <Lock className="w-7 h-7 text-gray-400" />
+                    )}
                   </div>
-                  <div className="text-sm text-white/60">
-                    {completedUnits.filter(id => levelUnits.find(u => u.id === id)).length}/{levelUnits.length}
+
+                  {/* Label */}
+                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                    <div className={`text-sm font-bold ${unlocked ? 'text-white' : 'text-gray-400'}`}>
+                      {node.type === 'lesson' ? `Lesson ${node.lessonNumber}` : 'Quiz'}
+                    </div>
+                    {node.type === 'lesson' && (
+                      <div className="text-xs text-white/60">{node.emoji}</div>
+                    )}
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {levelUnits.map((unit) => {
-                    const unlocked = isUnitUnlocked(unit.id);
-                    const completed = isUnitCompleted(unit.id);
-
-                    return (
-                      <button
-                        key={unit.id}
-                        onClick={() => handleUnitClick(unit)}
-                        disabled={!unlocked}
-                        className={`group relative p-6 rounded-2xl border-2 transition-all ${
-                          completed
-                            ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-400'
-                            : unlocked
-                            ? `bg-gradient-to-br ${unit.color}/20 border-white/30 hover:scale-105 hover:shadow-xl`
-                            : 'bg-gray-800/50 border-gray-700'
-                        }`}
-                      >
-                        {/* Glow Effect */}
-                        {unlocked && !completed && (
-                          <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                        )}
-
-                        <div className="relative space-y-3">
-                          {/* Icon */}
-                          <div className="text-5xl mb-2">{unit.emoji}</div>
-
-                          {/* Status Icon */}
-                          <div className="absolute top-0 right-0">
-                            {completed ? (
-                              <CheckCircle className="w-6 h-6 text-green-400" />
-                            ) : !unlocked ? (
-                              <Lock className="w-6 h-6 text-gray-500" />
-                            ) : null}
-                          </div>
-
-                          {/* Unit Info */}
-                          <div>
-                            <div className="text-xs text-white/60 mb-1">Unit {unit.id}</div>
-                            <div className={`font-bold text-sm mb-2 ${unlocked ? 'text-white' : 'text-gray-500'}`}>
-                              {unit.name}
-                            </div>
-                            <div className="text-xs text-white/60">
-                              {unit.lessons} lessons
-                            </div>
-                          </div>
-
-                          {/* Progress Bar */}
-                          {unlocked && (
-                            <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full bg-gradient-to-r ${unit.color} transition-all`}
-                                style={{ width: completed ? '100%' : '0%' }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                </button>
               </div>
             );
           })}
+
+          {/* Final Trophy */}
+          <div className="relative flex justify-center pt-12">
+            <div className="bg-gradient-to-r from-yellow-400 to-amber-500 rounded-3xl p-8 border-4 border-yellow-300 shadow-2xl shadow-yellow-500/50">
+              <div className="text-center">
+                <Trophy className="w-16 h-16 text-white mx-auto mb-3" />
+                <div className="text-2xl font-bold text-white">Journey Complete!</div>
+                <div className="text-sm text-white/90 mt-1">Master Pilot Certified</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          50% { transform: translateY(-30px) translateX(40px); }
-        }
-      `}</style>
     </div>
   );
 }
