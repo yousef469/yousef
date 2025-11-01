@@ -21,7 +21,7 @@ export const units = {
     color: "from-purple-600 to-pink-600",
     level: "Beginner",
     totalLessons: 6,
-    unlocked: false
+    unlocked: true
   },
   
   unit3: {
@@ -32,7 +32,7 @@ export const units = {
     color: "from-green-600 to-emerald-600",
     level: "Beginner",
     totalLessons: 6,
-    unlocked: false
+    unlocked: true
   },
   
   unit4: {
@@ -54,7 +54,7 @@ export const units = {
     color: "from-orange-600 to-red-600",
     level: "Beginner",
     totalLessons: 6,
-    unlocked: false
+    unlocked: true
   },
   
   unit6: {
@@ -65,7 +65,7 @@ export const units = {
     color: "from-yellow-600 to-orange-600",
     level: "Beginner",
     totalLessons: 6,
-    unlocked: false
+    unlocked: true
   }
 };
 
