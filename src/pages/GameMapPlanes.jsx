@@ -11,116 +11,97 @@ export default function GameMapPlanes() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }, []);
 
-  // Generate all levels (lessons + quizzes)
+  // Generate all lessons (quizzes happen after lessons, not on map)
   const generateLevels = () => {
     const levels = [];
     let levelId = 0;
     let yPosition = 98; // Start from bottom
 
     // Helper to add levels with zigzag positioning
-    const addLevel = (type, data) => {
+    const addLesson = (data) => {
       const xPositions = [50, 30, 20, 40, 60, 70, 50, 35, 65, 45];
       const xPos = xPositions[levelId % xPositions.length];
       
       levels.push({
         id: levelId++,
-        type,
+        type: 'lesson',
         ...data,
         position: { top: `${yPosition}%`, left: `${xPos}%` }
       });
       
-      yPosition -= 1.5; // Move up for next level
+      yPosition -= 3; // Move up for next level
     };
 
-    // BEGINNER - 6 units, 6 lessons each + 1 quiz per lesson
+    // BEGINNER - 6 units, 6 lessons each = 36 lessons (1 quiz per lesson after completion)
     const beginnerUnits = [
-      { name: 'Introduction to Flight', emoji: '🛫' },
-      { name: 'Basic Aerodynamics', emoji: '💨' },
-      { name: 'Aircraft Parts', emoji: '✈️' },
-      { name: 'Forces of Flight', emoji: '⬆️' },
-      { name: 'Takeoff & Landing', emoji: '🛬' },
-      { name: 'Basic Navigation', emoji: '🧭' }
+      { name: 'Introduction to Flight', emoji: '🛫', quizzesPerLesson: 1 },
+      { name: 'Basic Aerodynamics', emoji: '💨', quizzesPerLesson: 1 },
+      { name: 'Aircraft Parts', emoji: '✈️', quizzesPerLesson: 1 },
+      { name: 'Forces of Flight', emoji: '⬆️', quizzesPerLesson: 1 },
+      { name: 'Takeoff & Landing', emoji: '🛬', quizzesPerLesson: 1 },
+      { name: 'Basic Navigation', emoji: '🧭', quizzesPerLesson: 1 }
     ];
 
-    beginnerUnits.forEach((unit, unitIdx) => {
+    beginnerUnits.forEach((unit) => {
       for (let i = 0; i < 6; i++) {
-        addLevel('lesson', {
+        addLesson({
           level: 'Beginner',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
-          color: 'from-green-400 to-emerald-500'
-        });
-        addLevel('quiz', {
-          level: 'Beginner',
-          unit: unit.name,
-          quiz: `Quiz ${i + 1}`,
-          color: 'from-green-500 to-green-600'
+          color: 'from-green-400 to-emerald-500',
+          quizzesAfter: unit.quizzesPerLesson
         });
       }
     });
 
-    // INTERMEDIATE - 6 units, 7 lessons each + 2 quizzes per lesson
+    // INTERMEDIATE - 6 units, 7 lessons each = 42 lessons (2 quizzes per lesson)
     const intermediateUnits = [
-      { name: 'Wing Design', emoji: '🪽' },
-      { name: 'Engine Systems', emoji: '⚙️' },
-      { name: 'Flight Controls', emoji: '🎮' },
-      { name: 'Weather & Flight', emoji: '⛈️' },
-      { name: 'Instrument Flying', emoji: '📊' },
-      { name: 'Air Traffic Control', emoji: '📡' }
+      { name: 'Wing Design', emoji: '🪽', quizzesPerLesson: 2 },
+      { name: 'Engine Systems', emoji: '⚙️', quizzesPerLesson: 2 },
+      { name: 'Flight Controls', emoji: '🎮', quizzesPerLesson: 2 },
+      { name: 'Weather & Flight', emoji: '⛈️', quizzesPerLesson: 2 },
+      { name: 'Instrument Flying', emoji: '📊', quizzesPerLesson: 2 },
+      { name: 'Air Traffic Control', emoji: '📡', quizzesPerLesson: 2 }
     ];
 
     intermediateUnits.forEach((unit) => {
       for (let i = 0; i < 7; i++) {
-        addLevel('lesson', {
+        addLesson({
           level: 'Intermediate',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
-          color: 'from-blue-400 to-cyan-500'
+          color: 'from-blue-400 to-cyan-500',
+          quizzesAfter: unit.quizzesPerLesson
         });
-        for (let q = 0; q < 2; q++) {
-          addLevel('quiz', {
-            level: 'Intermediate',
-            unit: unit.name,
-            quiz: `Quiz ${q + 1}`,
-            color: 'from-blue-500 to-blue-600'
-          });
-        }
       }
     });
 
-    // ADVANCED - 6 units, 8 lessons each + 2 quizzes per lesson
+    // ADVANCED - 6 units, 8 lessons each = 48 lessons (2 quizzes per lesson)
     const advancedUnits = [
-      { name: 'Advanced Aerodynamics', emoji: '🌪️' },
-      { name: 'Jet Propulsion', emoji: '🚀' },
-      { name: 'High-Speed Flight', emoji: '⚡' },
-      { name: 'Aircraft Performance', emoji: '📈' },
-      { name: 'Emergency Procedures', emoji: '🚨' },
-      { name: 'Complex Systems', emoji: '🔧' }
+      { name: 'Advanced Aerodynamics', emoji: '🌪️', quizzesPerLesson: 2 },
+      { name: 'Jet Propulsion', emoji: '🚀', quizzesPerLesson: 2 },
+      { name: 'High-Speed Flight', emoji: '⚡', quizzesPerLesson: 2 },
+      { name: 'Aircraft Performance', emoji: '📈', quizzesPerLesson: 2 },
+      { name: 'Emergency Procedures', emoji: '🚨', quizzesPerLesson: 2 },
+      { name: 'Complex Systems', emoji: '🔧', quizzesPerLesson: 2 }
     ];
 
     advancedUnits.forEach((unit) => {
       for (let i = 0; i < 8; i++) {
-        addLevel('lesson', {
+        addLesson({
           level: 'Advanced',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
-          color: 'from-purple-400 to-pink-500'
+          color: 'from-purple-400 to-pink-500',
+          quizzesAfter: unit.quizzesPerLesson
         });
-        for (let q = 0; q < 2; q++) {
-          addLevel('quiz', {
-            level: 'Advanced',
-            unit: unit.name,
-            quiz: `Quiz ${q + 1}`,
-            color: 'from-purple-500 to-purple-600'
-          });
-        }
       }
     });
 
-    // EXPERT - 5 units, 8 lessons each + varying quizzes
+    // EXPERT - 5 units, 8 lessons each = 40 lessons (2-3 quizzes per lesson)
     const expertUnits = [
       { name: 'Supersonic Flight', emoji: '💥' },
       { name: 'Military Aviation', emoji: '🎖️' },
@@ -131,26 +112,19 @@ export default function GameMapPlanes() {
 
     expertUnits.forEach((unit, unitIdx) => {
       for (let i = 0; i < 8; i++) {
-        addLevel('lesson', {
+        const quizCount = (unitIdx * 8 + i) < 10 ? 3 : 2;
+        addLesson({
           level: 'Expert',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
-          color: 'from-orange-400 to-red-500'
+          color: 'from-orange-400 to-red-500',
+          quizzesAfter: quizCount
         });
-        const quizCount = (unitIdx * 8 + i) < 10 ? 3 : 2;
-        for (let q = 0; q < quizCount; q++) {
-          addLevel('quiz', {
-            level: 'Expert',
-            unit: unit.name,
-            quiz: `Quiz ${q + 1}`,
-            color: 'from-orange-500 to-red-600'
-          });
-        }
       }
     });
 
-    // MASTER - 5 units, 9 lessons each + varying quizzes
+    // MASTER - 5 units, 9 lessons each = 45 lessons (2-3 quizzes per lesson)
     const masterUnits = [
       { name: 'Aircraft Design', emoji: '📐' },
       { name: 'Future of Aviation', emoji: '🔮' },
@@ -161,22 +135,15 @@ export default function GameMapPlanes() {
 
     masterUnits.forEach((unit) => {
       for (let i = 0; i < 9; i++) {
-        addLevel('lesson', {
+        const quizCount = i % 3 === 0 ? 3 : 2;
+        addLesson({
           level: 'Master',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
-          color: 'from-yellow-400 to-amber-500'
+          color: 'from-yellow-400 to-amber-500',
+          quizzesAfter: quizCount
         });
-        const quizCount = i % 3 === 0 ? 3 : 2;
-        for (let q = 0; q < quizCount; q++) {
-          addLevel('quiz', {
-            level: 'Master',
-            unit: unit.name,
-            quiz: `Quiz ${q + 1}`,
-            color: 'from-yellow-500 to-amber-600'
-          });
-        }
       }
     });
 
@@ -287,7 +254,7 @@ export default function GameMapPlanes() {
           </div>
         </div>
 
-        <div className="relative h-[9000px] bg-gradient-to-b from-transparent via-white/5 to-transparent rounded-3xl">
+        <div className="relative h-[6500px] bg-gradient-to-b from-transparent via-white/5 to-transparent rounded-3xl">
           {/* Path Lines */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none">
             {levels.slice(0, -1).map((level, index) => {
@@ -342,11 +309,7 @@ export default function GameMapPlanes() {
                   {completed ? (
                     <CheckCircle className="w-10 h-10 text-white" />
                   ) : unlocked ? (
-                    level.type === 'lesson' ? (
-                      <span className="text-3xl">{level.emoji}</span>
-                    ) : (
-                      <span className="text-2xl">❓</span>
-                    )
+                    <span className="text-3xl">{level.emoji}</span>
                   ) : (
                     <Lock className="w-7 h-7 text-gray-400" />
                   )}
@@ -358,8 +321,13 @@ export default function GameMapPlanes() {
                     {level.level}
                   </div>
                   <div className={`font-bold text-sm ${unlocked ? 'text-white' : 'text-gray-500'}`}>
-                    {level.lesson || level.quiz}
+                    {level.lesson}
                   </div>
+                  {level.quizzesAfter > 0 && (
+                    <div className="text-xs text-cyan-300">
+                      +{level.quizzesAfter} {level.quizzesAfter === 1 ? 'quiz' : 'quizzes'}
+                    </div>
+                  )}
                 </div>
 
                 {/* Plane Animation for Current Level */}
