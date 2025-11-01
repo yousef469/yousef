@@ -677,20 +677,29 @@ const beginnerLessons = {
     }
   ],
   
-  // UNIT 2: Physics Basics (Placeholder - to be expanded)
+  // UNIT 2: Physics Basics - Import from complete units
   unit2: [],
   
-  // UNIT 3: Mathematics for Engineers (Placeholder)
+  // UNIT 3: Mathematics for Engineers - Import from complete units
   unit3: [],
   
   // UNIT 4: Basics of Flight (Already exists in planesLessonsData.js)
   unit4: [], // Will reference existing data
   
-  // UNIT 5: Aircraft Components (Placeholder)
+  // UNIT 5: Aircraft Components - Import from complete units
   unit5: [],
   
-  // UNIT 6: Materials & Tools (Placeholder)
+  // UNIT 6: Materials & Tools - Import from complete units
   unit6: []
 };
+
+// Import and merge complete units
+import allUnitsComplete from './allUnitsComplete.js';
+
+// Merge the units
+beginnerLessons.unit2 = allUnitsComplete.unit2 || [];
+beginnerLessons.unit3 = allUnitsComplete.unit3 || [];
+beginnerLessons.unit5 = allUnitsComplete.unit5 || [];
+beginnerLessons.unit6 = allUnitsComplete.unit6 || [];
 
 export default beginnerLessons;
