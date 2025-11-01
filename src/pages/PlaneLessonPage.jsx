@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle, Clock } from 'lucide-react';
 import planesLessons from '../data/planesLessonsData';
+import { useProgress } from '../contexts/ProgressContext';
 
 export default function PlaneLessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
   const [currentSection, setCurrentSection] = useState(0);
+  const [lessonCompleted, setLessonCompleted] = useState(false);
   
   const lesson = planesLessons[parseInt(lessonId)];
+  const { completeLesson } = useProgress();
   
   if (!lesson) {
     return (
@@ -29,8 +32,13 @@ export default function PlaneLessonPage() {
   const totalSections = lesson.content.sections.length;
   const isLastSection = currentSection === totalSections - 1;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLastSection) {
+      // Record lesson completion before going to quiz
+      if (!lessonCompleted) {
+        await completeLesson(parseInt(lessonId), 3, 0); // 3 stars, 0 time for now
+        setLessonCompleted(true);
+      }
       // Go to quiz
       navigate(`/games/play/planes/quiz/${lessonId}`);
     } else {

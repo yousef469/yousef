@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Star, Trophy } from 'lucide-react';
+import { ArrowLeft, Clock, Star, Trophy } from 'lucide-react';
 import planesLessons from '../data/planesLessonsData';
 import MultipleChoiceQuestion from '../components/quiz/MultipleChoiceQuestion';
 import DiagramLabelQuestion from '../components/quiz/DiagramLabelQuestion';
 import CalculationQuestion from '../components/quiz/CalculationQuestion';
 import TrueFalseQuestion from '../components/quiz/TrueFalseQuestion';
 import DragDropQuestion from '../components/quiz/DragDropQuestion';
+import { useProgress } from '../contexts/ProgressContext';
 
 export default function PlaneQuizPage() {
   const { lessonId } = useParams();
@@ -16,8 +17,10 @@ export default function PlaneQuizPage() {
   const [showResults, setShowResults] = useState(false);
   const [timeStarted] = useState(Date.now());
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [progressSaved, setProgressSaved] = useState(false);
   
   const lesson = planesLessons[parseInt(lessonId)];
+  const { completeQuiz } = useProgress();
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,12 +57,26 @@ export default function PlaneQuizPage() {
     });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       // Show results
       setShowResults(true);
+      
+      // Save progress to database
+      if (!progressSaved) {
+        const results = calculateResults();
+        await completeQuiz(
+          parseInt(lessonId),
+          1, // quiz number
+          results.correct,
+          results.total,
+          timeElapsed,
+          answers
+        );
+        setProgressSaved(true);
+      }
     }
   };
 

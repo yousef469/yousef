@@ -11,7 +11,8 @@ import {
   TrendingUp,
   User,
   LogOut,
-  Settings
+  Settings,
+  Award
 } from 'lucide-react';
 
 export default function SidebarMenu() {
@@ -21,6 +22,7 @@ export default function SidebarMenu() {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Award, label: 'Progress & XP', path: '/progress' },
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
     { icon: MessageCircle, label: 'Community Help', path: '/community' },
     { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
