@@ -24,7 +24,7 @@ function combineLessonsWithQuizzes(lessons, quizzes) {
       ...lesson,
       level: "Beginner",
       unit: units[`unit${lesson.unitNumber}`].title,
-      locked: index === 0 ? false : true, // First lesson unlocked
+      locked: false, // ALL LESSONS UNLOCKED FOR REVIEW
       quiz: {
         questions: quiz ? quiz.questions : []
       }
