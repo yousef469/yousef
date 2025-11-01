@@ -1,17 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plane, Star, Lock, CheckCircle, Trophy, BookOpen, Brain } from 'lucide-react';
+import { ArrowLeft, Plane, Star, Lock, CheckCircle, ArrowUp, Cloud } from 'lucide-react';
 
 export default function GameMapPlanes() {
   const navigate = useNavigate();
-  const [completedNodes, setCompletedNodes] = useState([0]);
+  const [completedLevels, setCompletedLevels] = useState([0]);
 
-  // Generate all nodes (lessons + quizzes)
-  const generateNodes = () => {
-    const nodes = [];
-    let nodeId = 0;
+  // Auto-scroll to bottom on mount (start position)
+  useEffect(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }, []);
 
-    // BEGINNER - 36 lessons + 36 quizzes (1 quiz per lesson)
+  // Generate all levels (lessons + quizzes)
+  const generateLevels = () => {
+    const levels = [];
+    let levelId = 0;
+    let yPosition = 98; // Start from bottom
+
+    // Helper to add levels with zigzag positioning
+    const addLevel = (type, data) => {
+      const xPositions = [50, 30, 20, 40, 60, 70, 50, 35, 65, 45];
+      const xPos = xPositions[levelId % xPositions.length];
+      
+      levels.push({
+        id: levelId++,
+        type,
+        ...data,
+        position: { top: `${yPosition}%`, left: `${xPos}%` }
+      });
+      
+      yPosition -= 1.5; // Move up for next level
+    };
+
+    // BEGINNER - 6 units, 6 lessons each + 1 quiz per lesson
     const beginnerUnits = [
       { name: 'Introduction to Flight', emoji: '🛫' },
       { name: 'Basic Aerodynamics', emoji: '💨' },
@@ -21,45 +42,25 @@ export default function GameMapPlanes() {
       { name: 'Basic Navigation', emoji: '🧭' }
     ];
 
-    beginnerUnits.forEach((unit, unitIndex) => {
-      // Unit header
-      nodes.push({
-        id: nodeId++,
-        type: 'unit',
-        level: 'Beginner',
-        unitNumber: unitIndex + 1,
-        name: unit.name,
-        emoji: unit.emoji,
-        color: 'from-green-400 to-emerald-500'
-      });
-
-      // 6 lessons per unit
+    beginnerUnits.forEach((unit, unitIdx) => {
       for (let i = 0; i < 6; i++) {
-        nodes.push({
-          id: nodeId++,
-          type: 'lesson',
+        addLevel('lesson', {
           level: 'Beginner',
-          unitNumber: unitIndex + 1,
-          lessonNumber: i + 1,
-          name: `${unit.name} - Part ${i + 1}`,
+          unit: unit.name,
+          lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-green-400 to-emerald-500'
         });
-
-        // 1 quiz after each lesson
-        nodes.push({
-          id: nodeId++,
-          type: 'quiz',
+        addLevel('quiz', {
           level: 'Beginner',
-          unitNumber: unitIndex + 1,
-          quizNumber: i + 1,
-          name: `Quiz ${i + 1}`,
+          unit: unit.name,
+          quiz: `Quiz ${i + 1}`,
           color: 'from-green-500 to-green-600'
         });
       }
     });
 
-    // INTERMEDIATE - 42 lessons + 84 quizzes (2 quizzes per lesson)
+    // INTERMEDIATE - 6 units, 7 lessons each + 2 quizzes per lesson
     const intermediateUnits = [
       { name: 'Wing Design', emoji: '🪽' },
       { name: 'Engine Systems', emoji: '⚙️' },
@@ -69,45 +70,27 @@ export default function GameMapPlanes() {
       { name: 'Air Traffic Control', emoji: '📡' }
     ];
 
-    intermediateUnits.forEach((unit, unitIndex) => {
-      nodes.push({
-        id: nodeId++,
-        type: 'unit',
-        level: 'Intermediate',
-        unitNumber: unitIndex + 7,
-        name: unit.name,
-        emoji: unit.emoji,
-        color: 'from-blue-400 to-cyan-500'
-      });
-
+    intermediateUnits.forEach((unit) => {
       for (let i = 0; i < 7; i++) {
-        nodes.push({
-          id: nodeId++,
-          type: 'lesson',
+        addLevel('lesson', {
           level: 'Intermediate',
-          unitNumber: unitIndex + 7,
-          lessonNumber: i + 1,
-          name: `${unit.name} - Part ${i + 1}`,
+          unit: unit.name,
+          lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-blue-400 to-cyan-500'
         });
-
-        // 2 quizzes per lesson
         for (let q = 0; q < 2; q++) {
-          nodes.push({
-            id: nodeId++,
-            type: 'quiz',
+          addLevel('quiz', {
             level: 'Intermediate',
-            unitNumber: unitIndex + 7,
-            quizNumber: (i * 2) + q + 1,
-            name: `Quiz ${(i * 2) + q + 1}`,
+            unit: unit.name,
+            quiz: `Quiz ${q + 1}`,
             color: 'from-blue-500 to-blue-600'
           });
         }
       }
     });
 
-    // ADVANCED - 48 lessons + 96 quizzes (2 quizzes per lesson)
+    // ADVANCED - 6 units, 8 lessons each + 2 quizzes per lesson
     const advancedUnits = [
       { name: 'Advanced Aerodynamics', emoji: '🌪️' },
       { name: 'Jet Propulsion', emoji: '🚀' },
@@ -117,45 +100,27 @@ export default function GameMapPlanes() {
       { name: 'Complex Systems', emoji: '🔧' }
     ];
 
-    advancedUnits.forEach((unit, unitIndex) => {
-      nodes.push({
-        id: nodeId++,
-        type: 'unit',
-        level: 'Advanced',
-        unitNumber: unitIndex + 13,
-        name: unit.name,
-        emoji: unit.emoji,
-        color: 'from-purple-400 to-pink-500'
-      });
-
+    advancedUnits.forEach((unit) => {
       for (let i = 0; i < 8; i++) {
-        nodes.push({
-          id: nodeId++,
-          type: 'lesson',
+        addLevel('lesson', {
           level: 'Advanced',
-          unitNumber: unitIndex + 13,
-          lessonNumber: i + 1,
-          name: `${unit.name} - Part ${i + 1}`,
+          unit: unit.name,
+          lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-purple-400 to-pink-500'
         });
-
-        // 2 quizzes per lesson
         for (let q = 0; q < 2; q++) {
-          nodes.push({
-            id: nodeId++,
-            type: 'quiz',
+          addLevel('quiz', {
             level: 'Advanced',
-            unitNumber: unitIndex + 13,
-            quizNumber: (i * 2) + q + 1,
-            name: `Quiz ${(i * 2) + q + 1}`,
+            unit: unit.name,
+            quiz: `Quiz ${q + 1}`,
             color: 'from-purple-500 to-purple-600'
           });
         }
       }
     });
 
-    // EXPERT - 40 lessons + 90 quizzes
+    // EXPERT - 5 units, 8 lessons each + varying quizzes
     const expertUnits = [
       { name: 'Supersonic Flight', emoji: '💥' },
       { name: 'Military Aviation', emoji: '🎖️' },
@@ -164,45 +129,28 @@ export default function GameMapPlanes() {
       { name: 'Advanced Navigation', emoji: '🗺️' }
     ];
 
-    expertUnits.forEach((unit, unitIndex) => {
-      nodes.push({
-        id: nodeId++,
-        type: 'unit',
-        level: 'Expert',
-        unitNumber: unitIndex + 19,
-        name: unit.name,
-        emoji: unit.emoji,
-        color: 'from-orange-400 to-red-500'
-      });
-
+    expertUnits.forEach((unit, unitIdx) => {
       for (let i = 0; i < 8; i++) {
-        nodes.push({
-          id: nodeId++,
-          type: 'lesson',
+        addLevel('lesson', {
           level: 'Expert',
-          unitNumber: unitIndex + 19,
-          lessonNumber: i + 1,
-          name: `${unit.name} - Part ${i + 1}`,
+          unit: unit.name,
+          lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-orange-400 to-red-500'
         });
-
-        // Distribute 90 quizzes across 40 lessons (some lessons have 2, some have 3)
-        const quizzesForThisLesson = (unitIndex * 8 + i) < 10 ? 3 : 2;
-        for (let q = 0; q < quizzesForThisLesson; q++) {
-          nodes.push({
-            id: nodeId++,
-            type: 'quiz',
+        const quizCount = (unitIdx * 8 + i) < 10 ? 3 : 2;
+        for (let q = 0; q < quizCount; q++) {
+          addLevel('quiz', {
             level: 'Expert',
-            unitNumber: unitIndex + 19,
-            name: `Quiz`,
+            unit: unit.name,
+            quiz: `Quiz ${q + 1}`,
             color: 'from-orange-500 to-red-600'
           });
         }
       }
     });
 
-    // MASTER - 45 lessons + 120 quizzes
+    // MASTER - 5 units, 9 lessons each + varying quizzes
     const masterUnits = [
       { name: 'Aircraft Design', emoji: '📐' },
       { name: 'Future of Aviation', emoji: '🔮' },
@@ -211,284 +159,233 @@ export default function GameMapPlanes() {
       { name: 'Master Certification', emoji: '🏆' }
     ];
 
-    masterUnits.forEach((unit, unitIndex) => {
-      nodes.push({
-        id: nodeId++,
-        type: 'unit',
-        level: 'Master',
-        unitNumber: unitIndex + 24,
-        name: unit.name,
-        emoji: unit.emoji,
-        color: 'from-yellow-400 to-amber-500'
-      });
-
+    masterUnits.forEach((unit) => {
       for (let i = 0; i < 9; i++) {
-        nodes.push({
-          id: nodeId++,
-          type: 'lesson',
+        addLevel('lesson', {
           level: 'Master',
-          unitNumber: unitIndex + 24,
-          lessonNumber: i + 1,
-          name: `${unit.name} - Part ${i + 1}`,
+          unit: unit.name,
+          lesson: `Lesson ${i + 1}`,
           emoji: unit.emoji,
           color: 'from-yellow-400 to-amber-500'
         });
-
-        // Distribute 120 quizzes across 45 lessons (average 2.67 per lesson)
-        const quizzesForThisLesson = i % 3 === 0 ? 3 : 2;
-        for (let q = 0; q < quizzesForThisLesson; q++) {
-          nodes.push({
-            id: nodeId++,
-            type: 'quiz',
+        const quizCount = i % 3 === 0 ? 3 : 2;
+        for (let q = 0; q < quizCount; q++) {
+          addLevel('quiz', {
             level: 'Master',
-            unitNumber: unitIndex + 24,
-            name: `Quiz`,
+            unit: unit.name,
+            quiz: `Quiz ${q + 1}`,
             color: 'from-yellow-500 to-amber-600'
           });
         }
       }
     });
 
-    return nodes;
+    return levels;
   };
 
-  const nodes = generateNodes();
-  const isNodeUnlocked = (nodeId) => nodeId === 0 || completedNodes.includes(nodeId - 1);
-  const isNodeCompleted = (nodeId) => completedNodes.includes(nodeId);
-  
-  // Find current lesson (first unlocked but not completed)
-  const currentNodeId = nodes.findIndex(node => isNodeUnlocked(node.id) && !isNodeCompleted(node.id));
+  const levels = generateLevels();
+  const isLevelUnlocked = (levelId) => levelId === 0 || completedLevels.includes(levelId - 1);
+  const isLevelCompleted = (levelId) => completedLevels.includes(levelId) && completedLevels.includes(levelId + 1);
 
-  const handleNodeClick = (node) => {
-    if (isNodeUnlocked(node.id)) {
-      if (node.type === 'lesson') {
-        navigate(`/games/play/planes/lesson/${node.id}`);
-      } else if (node.type === 'quiz') {
-        navigate(`/games/play/planes/quiz/${node.id}`);
-      }
+  const handleLevelClick = (level) => {
+    if (isLevelUnlocked(level.id)) {
+      navigate(`/games/play/planes/${level.type}/${level.id}`);
     }
   };
 
-  // Calculate position for zigzag pattern
-  const getNodePosition = (index) => {
-    const pattern = index % 6;
-    const positions = ['50%', '30%', '20%', '40%', '60%', '70%'];
-    return positions[pattern];
-  };
-
-  // Get numeric position for SVG paths
-  const getNumericPosition = (index) => {
-    const pattern = index % 6;
-    const positions = [50, 30, 20, 40, 60, 70];
-    return positions[pattern];
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-300 via-blue-400 to-indigo-600 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-sky-300 via-blue-400 to-indigo-600 text-white overflow-hidden">
+      {/* Clouds Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute opacity-20"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${15 + Math.random() * 15}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          >
+            <Cloud className="w-32 h-32 text-white" />
+          </div>
+        ))}
+      </div>
+
       {/* Header */}
-      <div className="sticky top-0 z-50 border-b border-white/20 bg-blue-900/90 backdrop-blur-lg">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="relative z-10 border-b border-white/20 bg-blue-900/80 backdrop-blur-sm sticky top-0">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate('/learn')}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <Plane className="w-7 h-7 text-cyan-300" />
+              <Plane className="w-8 h-8 text-cyan-300" />
               <div>
                 <h1 className="text-xl font-bold">Aircraft Journey</h1>
-                <p className="text-xs text-blue-200">211 Lessons • 426 Quizzes</p>
+                <p className="text-sm text-blue-200">Soar through the skies</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full">
-                <Star className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm font-bold">{completedNodes.length}</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-300" />
+                <span className="text-xl font-bold">{completedLevels.length}/{levels.length}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Vertical Path */}
-      <div className="max-w-2xl mx-auto px-4 py-12 relative">
-        {/* SVG for curved connections */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-          <defs>
-            {/* Gradient for airflow */}
-            <linearGradient id="airflowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
-              <stop offset="50%" stopColor="rgba(147,197,253,0.8)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0.6)" />
-            </linearGradient>
-            
-            {/* Animated dash for airflow effect */}
-            <pattern id="airflowPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.5)">
-                <animate attributeName="cy" from="0" to="20" dur="2s" repeatCount="indefinite" />
-              </circle>
-            </pattern>
-          </defs>
+      {/* Scroll to Top Button */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-8 right-8 z-20 p-4 bg-cyan-500 hover:bg-cyan-600 rounded-full shadow-lg transition-all hover:scale-110"
+        title="Scroll to Top"
+      >
+        <ArrowUp className="w-6 h-6 text-white" />
+      </button>
 
-          {/* Draw curved paths between nodes */}
-          {nodes.map((node, index) => {
-            if (index === 0 || node.type === 'unit') return null;
-            
-            const prevNode = nodes[index - 1];
-            if (prevNode.type === 'unit') return null;
+      {/* Journey Direction Indicator */}
+      <div className="fixed left-8 top-1/2 -translate-y-1/2 z-20 bg-blue-900/90 backdrop-blur border border-cyan-500/30 rounded-lg p-4 text-center">
+        <ArrowUp className="w-8 h-8 text-cyan-300 mx-auto mb-2 animate-bounce" />
+        <div className="text-xs text-white">Fly</div>
+        <div className="text-xs text-white">Upward</div>
+      </div>
 
-            const x1 = getNumericPosition(index - 1);
-            const y1 = (index - 1) * 140 + 70;
-            const x2 = getNumericPosition(index);
-            const y2 = index * 140 + 70;
-            
-            const midY = (y1 + y2) / 2;
-            const completed = isNodeCompleted(prevNode.id);
-            
-            return (
-              <g key={`path-${index}`}>
-                {/* Main curved path */}
-                <path
-                  d={`M ${x1}% ${y1} Q ${x1}% ${midY}, ${(x1 + x2) / 2}% ${midY} T ${x2}% ${y2}`}
-                  stroke={completed ? "url(#airflowGradient)" : "rgba(255,255,255,0.3)"}
-                  strokeWidth="4"
-                  fill="none"
-                  strokeLinecap="round"
+      {/* Map Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
+        {/* Level Headers */}
+        <div className="mb-8 grid grid-cols-5 gap-4">
+          <div className="bg-green-500/20 border border-green-400/30 rounded-lg p-3 text-center">
+            <div className="text-2xl mb-1">🛫</div>
+            <div className="font-bold text-sm">Beginner</div>
+            <div className="text-xs text-white/80">36 Lessons</div>
+          </div>
+          <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-3 text-center">
+            <div className="text-2xl mb-1">🪽</div>
+            <div className="font-bold text-sm">Intermediate</div>
+            <div className="text-xs text-white/80">42 Lessons</div>
+          </div>
+          <div className="bg-purple-500/20 border border-purple-400/30 rounded-lg p-3 text-center">
+            <div className="text-2xl mb-1">🌪️</div>
+            <div className="font-bold text-sm">Advanced</div>
+            <div className="text-xs text-white/80">48 Lessons</div>
+          </div>
+          <div className="bg-orange-500/20 border border-orange-400/30 rounded-lg p-3 text-center">
+            <div className="text-2xl mb-1">💥</div>
+            <div className="font-bold text-sm">Expert</div>
+            <div className="text-xs text-white/80">40 Lessons</div>
+          </div>
+          <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-3 text-center">
+            <div className="text-2xl mb-1">🏆</div>
+            <div className="font-bold text-sm">Master</div>
+            <div className="text-xs text-white/80">45 Lessons</div>
+          </div>
+        </div>
+
+        <div className="relative h-[9000px] bg-gradient-to-b from-transparent via-white/5 to-transparent rounded-3xl">
+          {/* Path Lines */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+            {levels.slice(0, -1).map((level, index) => {
+              const nextLevel = levels[index + 1];
+              const completed = isLevelCompleted(level.id);
+              
+              return (
+                <line
+                  key={index}
+                  x1={level.position.left}
+                  y1={level.position.top}
+                  x2={nextLevel.position.left}
+                  y2={nextLevel.position.top}
+                  stroke={completed ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)'}
+                  strokeWidth="3"
+                  strokeDasharray={completed ? '0' : '10,5'}
                   className="transition-all duration-500"
                 />
-                
-                {/* Animated airflow dots for completed paths */}
-                {completed && (
-                  <path
-                    d={`M ${x1}% ${y1} Q ${x1}% ${midY}, ${(x1 + x2) / 2}% ${midY} T ${x2}% ${y2}`}
-                    stroke="rgba(255,255,255,0.6)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeDasharray="10,20"
-                    strokeLinecap="round"
-                  >
-                    <animate
-                      attributeName="stroke-dashoffset"
-                      from="0"
-                      to="30"
-                      dur="1.5s"
-                      repeatCount="indefinite"
-                    />
-                  </path>
-                )}
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* Nodes */}
-        <div className="relative space-y-6" style={{ zIndex: 1 }}>
-          {nodes.map((node, index) => {
-            const unlocked = isNodeUnlocked(node.id);
-            const completed = isNodeCompleted(node.id);
-            const leftPosition = getNodePosition(index);
-
-            if (node.type === 'unit') {
-              return (
-                <div key={node.id} className="relative flex justify-center">
-                  <div className="bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30 max-w-md w-full">
-                    <div className="flex items-center gap-4">
-                      <div className="text-5xl">{node.emoji}</div>
-                      <div className="flex-1">
-                        <div className="text-xs text-white/60 mb-1">Unit {node.unitNumber} • {node.level}</div>
-                        <div className="text-lg font-bold">{node.name}</div>
-                      </div>
-                      <Trophy className="w-6 h-6 text-yellow-300" />
-                    </div>
-                  </div>
-                </div>
               );
-            }
+            })}
+          </svg>
+
+          {/* Level Nodes */}
+          {levels.map((level) => {
+            const unlocked = isLevelUnlocked(level.id);
+            const completed = isLevelCompleted(level.id);
+            const isCurrent = unlocked && !completed;
 
             return (
-              <div
-                key={node.id}
-                className="relative flex items-center"
-                style={{ justifyContent: leftPosition === '50%' ? 'center' : leftPosition < '50%' ? 'flex-start' : 'flex-end' }}
+              <button
+                key={level.id}
+                onClick={() => handleLevelClick(level)}
+                disabled={!unlocked}
+                className="absolute -translate-x-1/2 -translate-y-1/2 group"
+                style={{ top: level.position.top, left: level.position.left }}
               >
-                <button
-                  onClick={() => handleNodeClick(node)}
-                  disabled={!unlocked}
-                  className={`group relative transition-all ${unlocked ? 'hover:scale-110' : ''}`}
+                {/* Glow Effect */}
+                {isCurrent && (
+                  <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-50 animate-pulse" />
+                )}
+
+                {/* Node Circle */}
+                <div
+                  className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${
+                    completed
+                      ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 scale-100'
+                      : unlocked
+                      ? `bg-gradient-to-br ${level.color} border-white scale-110 group-hover:scale-125`
+                      : 'bg-gray-700 border-gray-600 scale-90'
+                  }`}
                 >
-                  {/* Glow effect */}
-                  {unlocked && !completed && (
-                    <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-50 animate-pulse" />
-                  )}
-
-                  {/* Plane indicator on current lesson */}
-                  {node.id === currentNodeId && unlocked && !completed && (
-                    <div className="absolute -top-16 left-1/2 -translate-x-1/2 animate-bounce">
-                      <div className="relative">
-                        <Plane 
-                          className="w-12 h-12 text-white drop-shadow-lg" 
-                          style={{ 
-                            transform: 'rotate(-45deg)',
-                            filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8))'
-                          }} 
-                        />
-                        {/* Contrail effect */}
-                        <div className="absolute top-1/2 -right-8 w-8 h-1 bg-gradient-to-r from-white/60 to-transparent rounded-full" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Node Circle */}
-                  <div
-                    className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${
-                      completed
-                        ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 shadow-lg shadow-green-500/50'
-                        : unlocked
-                        ? `bg-gradient-to-br ${node.color} border-white shadow-lg shadow-blue-500/50`
-                        : 'bg-gray-700 border-gray-600'
-                    }`}
-                  >
-                    {completed ? (
-                      <CheckCircle className="w-10 h-10 text-white" />
-                    ) : unlocked ? (
-                      node.type === 'lesson' ? (
-                        <BookOpen className="w-8 h-8 text-white" />
-                      ) : (
-                        <Brain className="w-8 h-8 text-white" />
-                      )
+                  {completed ? (
+                    <CheckCircle className="w-10 h-10 text-white" />
+                  ) : unlocked ? (
+                    level.type === 'lesson' ? (
+                      <span className="text-3xl">{level.emoji}</span>
                     ) : (
-                      <Lock className="w-7 h-7 text-gray-400" />
-                    )}
-                  </div>
+                      <span className="text-2xl">❓</span>
+                    )
+                  ) : (
+                    <Lock className="w-7 h-7 text-gray-400" />
+                  )}
+                </div>
 
-                  {/* Label */}
-                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
-                    <div className={`text-sm font-bold ${unlocked ? 'text-white' : 'text-gray-400'}`}>
-                      {node.type === 'lesson' ? `Lesson ${node.lessonNumber}` : 'Quiz'}
-                    </div>
-                    {node.type === 'lesson' && (
-                      <div className="text-xs text-white/60">{node.emoji}</div>
-                    )}
+                {/* Label */}
+                <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                  <div className={`text-xs font-semibold ${unlocked ? 'text-white' : 'text-gray-400'}`}>
+                    {level.level}
                   </div>
-                </button>
-              </div>
+                  <div className={`font-bold text-sm ${unlocked ? 'text-white' : 'text-gray-500'}`}>
+                    {level.lesson || level.quiz}
+                  </div>
+                </div>
+
+                {/* Plane Animation for Current Level */}
+                {isCurrent && (
+                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 animate-bounce">
+                    <Plane 
+                      className="w-10 h-10 text-white drop-shadow-lg" 
+                      style={{ 
+                        transform: 'rotate(-45deg)',
+                        filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8))'
+                      }} 
+                    />
+                  </div>
+                )}
+              </button>
             );
           })}
-
-          {/* Final Trophy */}
-          <div className="relative flex justify-center pt-12">
-            <div className="bg-gradient-to-r from-yellow-400 to-amber-500 rounded-3xl p-8 border-4 border-yellow-300 shadow-2xl shadow-yellow-500/50">
-              <div className="text-center">
-                <Trophy className="w-16 h-16 text-white mx-auto mb-3" />
-                <div className="text-2xl font-bold text-white">Journey Complete!</div>
-                <div className="text-sm text-white/90 mt-1">Master Pilot Certified</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          50% { transform: translateY(-30px) translateX(40px); }
+        }
+      `}</style>
     </div>
   );
 }
