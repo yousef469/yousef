@@ -17,7 +17,7 @@ export default function LearnSectionsPage() {
             borderColor: 'border-orange-400/50',
             hoverBorderColor: 'hover:border-orange-300',
             shadowColor: 'shadow-orange-500/30',
-            path: '/learn/rockets'
+            path: '/games/map/rockets'
         },
         {
             id: 'planes',
@@ -29,7 +29,7 @@ export default function LearnSectionsPage() {
             borderColor: 'border-blue-400/50',
             hoverBorderColor: 'hover:border-blue-300',
             shadowColor: 'shadow-blue-500/30',
-            path: '/learn/planes'
+            path: '/games/map/planes'
         },
         {
             id: 'cars',
@@ -41,7 +41,7 @@ export default function LearnSectionsPage() {
             borderColor: 'border-purple-400/50',
             hoverBorderColor: 'hover:border-purple-300',
             shadowColor: 'shadow-purple-500/30',
-            path: '/learn/cars'
+            path: '/games/map/cars'
         }
     ];
 
@@ -58,7 +58,7 @@ export default function LearnSectionsPage() {
                         Back to Learn
                     </button>
                     <h1 className="text-4xl font-bold mb-2">Journey</h1>
-                    <p className="text-gray-400">Choose a vehicle type to start your journey</p>
+                    <p className="text-gray-400">Choose a lesson map to start your interactive learning journey</p>
                 </div>
             </div>
 
@@ -87,7 +87,7 @@ export default function LearnSectionsPage() {
                                     </p>
 
                                     <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                                        <span>Start Learning</span>
+                                        <span>Open Lesson Map</span>
                                         <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                 </div>
