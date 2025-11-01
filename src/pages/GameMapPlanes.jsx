@@ -149,17 +149,58 @@ export default function GameMapPlanes() {
     }
   };
 
-  // Organize lessons into rows of 6 (snake pattern)
-  const LESSONS_PER_ROW = 6;
-  const rows = [];
-  for (let i = 0; i < levels.length; i += LESSONS_PER_ROW) {
-    const row = levels.slice(i, i + LESSONS_PER_ROW);
-    const rowIndex = Math.floor(i / LESSONS_PER_ROW);
-    // Reverse every other row for snake pattern
-    if (rowIndex % 2 === 1) {
-      row.reverse();
-    }
-    rows.push(row);
+  // Organize lessons by units (each unit = 6 lessons in a row)
+  const units = [];
+  let currentIndex = 0;
+  
+  // BEGINNER - 6 units × 6 lessons = 36 lessons
+  for (let i = 0; i < 6; i++) {
+    units.push({
+      level: 'Beginner',
+      lessons: levels.slice(currentIndex, currentIndex + 6),
+      isReversed: i % 2 === 1
+    });
+    currentIndex += 6;
+  }
+  
+  // INTERMEDIATE - 6 units × 7 lessons = 42 lessons
+  for (let i = 0; i < 6; i++) {
+    units.push({
+      level: 'Intermediate',
+      lessons: levels.slice(currentIndex, currentIndex + 7),
+      isReversed: (6 + i) % 2 === 1
+    });
+    currentIndex += 7;
+  }
+  
+  // ADVANCED - 6 units × 8 lessons = 48 lessons
+  for (let i = 0; i < 6; i++) {
+    units.push({
+      level: 'Advanced',
+      lessons: levels.slice(currentIndex, currentIndex + 8),
+      isReversed: (12 + i) % 2 === 1
+    });
+    currentIndex += 8;
+  }
+  
+  // EXPERT - 5 units × 8 lessons = 40 lessons
+  for (let i = 0; i < 5; i++) {
+    units.push({
+      level: 'Expert',
+      lessons: levels.slice(currentIndex, currentIndex + 8),
+      isReversed: (18 + i) % 2 === 1
+    });
+    currentIndex += 8;
+  }
+  
+  // MASTER - 5 units × 9 lessons = 45 lessons
+  for (let i = 0; i < 5; i++) {
+    units.push({
+      level: 'Master',
+      lessons: levels.slice(currentIndex, currentIndex + 9),
+      isReversed: (23 + i) % 2 === 1
+    });
+    currentIndex += 9;
   }
 
   return (
@@ -211,12 +252,29 @@ export default function GameMapPlanes() {
 
       {/* Grid Layout */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
-        <div className="space-y-8">
-          {rows.map((row, rowIndex) => (
-            <div key={rowIndex} className="relative">
-              {/* Row of lessons */}
-              <div className="grid grid-cols-6 gap-6">
-                {row.map((level) => {
+        <div className="space-y-12">
+          {units.map((unit, unitIndex) => {
+            const row = unit.isReversed ? [...unit.lessons].reverse() : unit.lessons;
+            
+            return (
+              <div key={unitIndex} className="relative">
+                {/* Unit Header */}
+                <div className="mb-6 text-center">
+                  <div className={`inline-block px-6 py-2 rounded-full border-2 ${
+                    unit.level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
+                    unit.level === 'Intermediate' ? 'bg-blue-500/20 border-blue-400' :
+                    unit.level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :
+                    unit.level === 'Expert' ? 'bg-orange-500/20 border-orange-400' :
+                    'bg-yellow-500/20 border-yellow-400'
+                  }`}>
+                    <span className="font-bold text-lg">{unit.level}</span>
+                    <span className="text-sm ml-2 opacity-80">• Unit {unitIndex + 1}</span>
+                  </div>
+                </div>
+
+                {/* Row of lessons */}
+                <div className={`grid gap-6`} style={{ gridTemplateColumns: `repeat(${unit.lessons.length}, minmax(0, 1fr))` }}>
+                  {row.map((level) => {
                   const unlocked = isLevelUnlocked(level.id);
                   const completed = isLevelCompleted(level.id);
                   const isCurrent = unlocked && !completed;
@@ -229,7 +287,7 @@ export default function GameMapPlanes() {
                           <Plane 
                             className="w-10 h-10 text-white drop-shadow-lg" 
                             style={{ 
-                              transform: rowIndex % 2 === 0 ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transform: unit.isReversed ? 'rotate(180deg)' : 'rotate(0deg)',
                               filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8))'
                             }} 
                           />
@@ -286,14 +344,15 @@ export default function GameMapPlanes() {
                 })}
               </div>
 
-              {/* Connecting line to next row */}
-              {rowIndex < rows.length - 1 && (
-                <div className="flex justify-center my-4">
-                  <div className="w-1 h-8 bg-white/30 rounded-full" />
-                </div>
-              )}
-            </div>
-          ))}
+                {/* Connecting line to next unit */}
+                {unitIndex < units.length - 1 && (
+                  <div className="flex justify-center my-8">
+                    <div className="w-1 h-12 bg-white/30 rounded-full" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           {/* Final Trophy */}
           <div className="flex justify-center mt-12">
