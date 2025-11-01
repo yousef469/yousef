@@ -1,36 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plane, Star, Lock, CheckCircle, ArrowUp, Cloud } from 'lucide-react';
+import { ArrowLeft, Plane, Star, Lock, CheckCircle, Cloud, ArrowRight } from 'lucide-react';
 
 export default function GameMapPlanes() {
   const navigate = useNavigate();
   const [completedLevels, setCompletedLevels] = useState([0]);
 
-  // Auto-scroll to bottom on mount (start position)
-  useEffect(() => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  }, []);
-
   // Generate all lessons (quizzes happen after lessons, not on map)
   const generateLevels = () => {
     const levels = [];
     let levelId = 0;
-    let yPosition = 98; // Start from bottom
-
-    // Helper to add levels with zigzag positioning
-    const addLesson = (data) => {
-      const xPositions = [50, 30, 20, 40, 60, 70, 50, 35, 65, 45];
-      const xPos = xPositions[levelId % xPositions.length];
-      
-      levels.push({
-        id: levelId++,
-        type: 'lesson',
-        ...data,
-        position: { top: `${yPosition}%`, left: `${xPos}%` }
-      });
-      
-      yPosition -= 4.5; // Move up for next level (211 lessons need more space)
-    };
 
     // BEGINNER - 6 units, 6 lessons each = 36 lessons (1 quiz per lesson after completion)
     const beginnerUnits = [
@@ -44,7 +23,9 @@ export default function GameMapPlanes() {
 
     beginnerUnits.forEach((unit) => {
       for (let i = 0; i < 6; i++) {
-        addLesson({
+        levels.push({
+          id: levelId++,
+          type: 'lesson',
           level: 'Beginner',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
@@ -67,7 +48,9 @@ export default function GameMapPlanes() {
 
     intermediateUnits.forEach((unit) => {
       for (let i = 0; i < 7; i++) {
-        addLesson({
+        levels.push({
+          id: levelId++,
+          type: 'lesson',
           level: 'Intermediate',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
@@ -90,7 +73,9 @@ export default function GameMapPlanes() {
 
     advancedUnits.forEach((unit) => {
       for (let i = 0; i < 8; i++) {
-        addLesson({
+        levels.push({
+          id: levelId++,
+          type: 'lesson',
           level: 'Advanced',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
@@ -113,7 +98,9 @@ export default function GameMapPlanes() {
     expertUnits.forEach((unit, unitIdx) => {
       for (let i = 0; i < 8; i++) {
         const quizCount = (unitIdx * 8 + i) < 10 ? 3 : 2;
-        addLesson({
+        levels.push({
+          id: levelId++,
+          type: 'lesson',
           level: 'Expert',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
@@ -136,7 +123,9 @@ export default function GameMapPlanes() {
     masterUnits.forEach((unit) => {
       for (let i = 0; i < 9; i++) {
         const quizCount = i % 3 === 0 ? 3 : 2;
-        addLesson({
+        levels.push({
+          id: levelId++,
+          type: 'lesson',
           level: 'Master',
           unit: unit.name,
           lesson: `Lesson ${i + 1}`,
@@ -161,10 +150,10 @@ export default function GameMapPlanes() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-300 via-blue-400 to-indigo-600 text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-sky-300 via-blue-400 to-indigo-600 text-white">
       {/* Clouds Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(30)].map((_, i) => (
+        {[...Array(20)].map((_, i) => (
           <div
             key={i}
             className="absolute opacity-20"
@@ -182,7 +171,7 @@ export default function GameMapPlanes() {
 
       {/* Header */}
       <div className="relative z-10 border-b border-white/20 bg-blue-900/80 backdrop-blur-sm sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-full px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -194,157 +183,138 @@ export default function GameMapPlanes() {
               <Plane className="w-8 h-8 text-cyan-300" />
               <div>
                 <h1 className="text-xl font-bold">Aircraft Journey</h1>
-                <p className="text-sm text-blue-200">Soar through the skies</p>
+                <p className="text-sm text-blue-200">211 Lessons • Scroll right to progress →</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                 <Star className="w-5 h-5 text-yellow-300" />
-                <span className="text-xl font-bold">{completedLevels.length}/{levels.length}</span>
+                <span className="text-lg font-bold">{completedLevels.length}/{levels.length}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Scroll to Top Button */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 z-20 p-4 bg-cyan-500 hover:bg-cyan-600 rounded-full shadow-lg transition-all hover:scale-110"
-        title="Scroll to Top"
-      >
-        <ArrowUp className="w-6 h-6 text-white" />
-      </button>
-
-      {/* Journey Direction Indicator */}
-      <div className="fixed left-8 top-1/2 -translate-y-1/2 z-20 bg-blue-900/90 backdrop-blur border border-cyan-500/30 rounded-lg p-4 text-center">
-        <ArrowUp className="w-8 h-8 text-cyan-300 mx-auto mb-2 animate-bounce" />
-        <div className="text-xs text-white">Fly</div>
-        <div className="text-xs text-white">Upward</div>
+      {/* Scroll Indicator */}
+      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-20 bg-blue-900/90 backdrop-blur border border-cyan-500/30 rounded-lg p-4 text-center animate-pulse">
+        <ArrowRight className="w-8 h-8 text-cyan-300 mx-auto mb-2" />
+        <div className="text-xs text-white">Scroll</div>
+        <div className="text-xs text-white">Right</div>
       </div>
 
-      {/* Map Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
-        {/* Level Headers */}
-        <div className="mb-8 grid grid-cols-5 gap-4">
-          <div className="bg-green-500/20 border border-green-400/30 rounded-lg p-3 text-center">
-            <div className="text-2xl mb-1">🛫</div>
-            <div className="font-bold text-sm">Beginner</div>
-            <div className="text-xs text-white/80">36 Lessons</div>
-          </div>
-          <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-3 text-center">
-            <div className="text-2xl mb-1">🪽</div>
-            <div className="font-bold text-sm">Intermediate</div>
-            <div className="text-xs text-white/80">42 Lessons</div>
-          </div>
-          <div className="bg-purple-500/20 border border-purple-400/30 rounded-lg p-3 text-center">
-            <div className="text-2xl mb-1">🌪️</div>
-            <div className="font-bold text-sm">Advanced</div>
-            <div className="text-xs text-white/80">48 Lessons</div>
-          </div>
-          <div className="bg-orange-500/20 border border-orange-400/30 rounded-lg p-3 text-center">
-            <div className="text-2xl mb-1">💥</div>
-            <div className="font-bold text-sm">Expert</div>
-            <div className="text-xs text-white/80">40 Lessons</div>
-          </div>
-          <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-3 text-center">
-            <div className="text-2xl mb-1">🏆</div>
-            <div className="font-bold text-sm">Master</div>
-            <div className="text-xs text-white/80">45 Lessons</div>
-          </div>
-        </div>
-
-        <div className="relative h-[12000px] bg-gradient-to-b from-transparent via-white/5 to-transparent rounded-3xl">
-          {/* Path Lines */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+      {/* Horizontal Scrolling Container */}
+      <div className="relative z-10 overflow-x-auto overflow-y-hidden py-12 px-6" style={{ height: 'calc(100vh - 80px)' }}>
+        <div className="relative flex items-center gap-8 pb-8" style={{ width: 'max-content' }}>
+          {/* Connecting Path */}
+          <svg className="absolute top-1/2 left-0 -translate-y-1/2 pointer-events-none" style={{ width: `${levels.length * 180}px`, height: '400px' }}>
             {levels.slice(0, -1).map((level, index) => {
-              const nextLevel = levels[index + 1];
               const completed = isLevelCompleted(level.id);
+              const x1 = index * 180 + 90;
+              const x2 = (index + 1) * 180 + 90;
+              const y = 200;
+              
+              // Create wavy path
+              const yOffset = index % 2 === 0 ? -30 : 30;
               
               return (
-                <line
+                <path
                   key={index}
-                  x1={level.position.left}
-                  y1={level.position.top}
-                  x2={nextLevel.position.left}
-                  y2={nextLevel.position.top}
+                  d={`M ${x1} ${y} Q ${(x1 + x2) / 2} ${y + yOffset}, ${x2} ${y}`}
                   stroke={completed ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)'}
-                  strokeWidth="3"
-                  strokeDasharray={completed ? '0' : '10,5'}
+                  strokeWidth="4"
+                  fill="none"
+                  strokeLinecap="round"
                   className="transition-all duration-500"
                 />
               );
             })}
           </svg>
 
-          {/* Level Nodes */}
-          {levels.map((level) => {
+          {/* Lesson Nodes */}
+          {levels.map((level, index) => {
             const unlocked = isLevelUnlocked(level.id);
             const completed = isLevelCompleted(level.id);
             const isCurrent = unlocked && !completed;
+            
+            // Alternate up and down
+            const yOffset = index % 2 === 0 ? -30 : 30;
 
             return (
-              <button
-                key={level.id}
-                onClick={() => handleLevelClick(level)}
-                disabled={!unlocked}
-                className="absolute -translate-x-1/2 -translate-y-1/2 group"
-                style={{ top: level.position.top, left: level.position.left }}
-              >
-                {/* Glow Effect */}
+              <div key={level.id} className="relative flex flex-col items-center" style={{ minWidth: '180px', transform: `translateY(${yOffset}px)` }}>
+                {/* Plane indicator on current lesson */}
                 {isCurrent && (
-                  <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-50 animate-pulse" />
-                )}
-
-                {/* Node Circle */}
-                <div
-                  className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${
-                    completed
-                      ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 scale-100'
-                      : unlocked
-                      ? `bg-gradient-to-br ${level.color} border-white scale-110 group-hover:scale-125`
-                      : 'bg-gray-700 border-gray-600 scale-90'
-                  }`}
-                >
-                  {completed ? (
-                    <CheckCircle className="w-10 h-10 text-white" />
-                  ) : unlocked ? (
-                    <span className="text-3xl">{level.emoji}</span>
-                  ) : (
-                    <Lock className="w-7 h-7 text-gray-400" />
-                  )}
-                </div>
-
-                {/* Label */}
-                <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
-                  <div className={`text-xs font-semibold ${unlocked ? 'text-white' : 'text-gray-400'}`}>
-                    {level.level}
-                  </div>
-                  <div className={`font-bold text-sm ${unlocked ? 'text-white' : 'text-gray-500'}`}>
-                    {level.lesson}
-                  </div>
-                  {level.quizzesAfter > 0 && (
-                    <div className="text-xs text-cyan-300">
-                      +{level.quizzesAfter} {level.quizzesAfter === 1 ? 'quiz' : 'quizzes'}
-                    </div>
-                  )}
-                </div>
-
-                {/* Plane Animation for Current Level */}
-                {isCurrent && (
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 animate-bounce">
+                  <div className="absolute -top-20 left-1/2 -translate-x-1/2 animate-bounce">
                     <Plane 
-                      className="w-10 h-10 text-white drop-shadow-lg" 
+                      className="w-12 h-12 text-white drop-shadow-lg" 
                       style={{ 
-                        transform: 'rotate(-45deg)',
+                        transform: 'rotate(0deg)',
                         filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.8))'
                       }} 
                     />
                   </div>
                 )}
-              </button>
+
+                {/* Lesson Node */}
+                <button
+                  onClick={() => handleLevelClick(level)}
+                  disabled={!unlocked}
+                  className="group relative"
+                >
+                  {/* Glow Effect */}
+                  {isCurrent && (
+                    <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-50 animate-pulse" />
+                  )}
+
+                  {/* Node Circle */}
+                  <div
+                    className={`relative w-24 h-24 rounded-full border-4 flex items-center justify-center transition-all ${
+                      completed
+                        ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 shadow-lg shadow-green-500/50'
+                        : unlocked
+                        ? `bg-gradient-to-br ${level.color} border-white shadow-lg shadow-blue-500/50 hover:scale-110`
+                        : 'bg-gray-700 border-gray-600'
+                    }`}
+                  >
+                    {completed ? (
+                      <CheckCircle className="w-12 h-12 text-white" />
+                    ) : unlocked ? (
+                      <span className="text-4xl">{level.emoji}</span>
+                    ) : (
+                      <Lock className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                </button>
+
+                {/* Label */}
+                <div className="mt-4 text-center">
+                  <div className={`text-xs font-semibold mb-1 ${unlocked ? 'text-white' : 'text-gray-400'}`}>
+                    {level.level}
+                  </div>
+                  <div className={`font-bold text-sm ${unlocked ? 'text-white' : 'text-gray-500'}`}>
+                    {level.lesson}
+                  </div>
+                  <div className="text-xs text-white/60 mt-1">{level.unit}</div>
+                  {level.quizzesAfter > 0 && (
+                    <div className="text-xs text-cyan-300 mt-1">
+                      +{level.quizzesAfter} {level.quizzesAfter === 1 ? 'quiz' : 'quizzes'}
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
+
+          {/* Final Trophy */}
+          <div className="relative flex flex-col items-center ml-12" style={{ minWidth: '200px' }}>
+            <div className="bg-gradient-to-r from-yellow-400 to-amber-500 rounded-3xl p-8 border-4 border-yellow-300 shadow-2xl shadow-yellow-500/50">
+              <div className="text-center">
+                <div className="text-6xl mb-3">🏆</div>
+                <div className="text-2xl font-bold text-white">Complete!</div>
+                <div className="text-sm text-white/90 mt-1">Master Pilot</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
