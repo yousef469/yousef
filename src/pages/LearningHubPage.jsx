@@ -23,8 +23,7 @@ export default function LearningHubPage() {
       lessons: 6,
       emoji: "⚡",
       color: "from-purple-600 to-pink-600",
-      unlocked: false,
-      comingSoon: true
+      unlocked: true
     },
     {
       id: 3,
@@ -33,8 +32,7 @@ export default function LearningHubPage() {
       lessons: 6,
       emoji: "📐",
       color: "from-green-600 to-emerald-600",
-      unlocked: false,
-      comingSoon: true
+      unlocked: true
     },
     {
       id: 4,
@@ -43,8 +41,7 @@ export default function LearningHubPage() {
       lessons: 6,
       emoji: "✈️",
       color: "from-sky-600 to-blue-600",
-      unlocked: false,
-      comingSoon: true
+      unlocked: true
     },
     {
       id: 5,
@@ -53,8 +50,7 @@ export default function LearningHubPage() {
       lessons: 6,
       emoji: "🛩️",
       color: "from-orange-600 to-red-600",
-      unlocked: false,
-      comingSoon: true
+      unlocked: true
     },
     {
       id: 6,
@@ -63,8 +59,7 @@ export default function LearningHubPage() {
       lessons: 6,
       emoji: "🔨",
       color: "from-yellow-600 to-orange-600",
-      unlocked: false,
-      comingSoon: true
+      unlocked: true
     }
   ];
 

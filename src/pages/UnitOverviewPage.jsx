@@ -38,12 +38,9 @@ export default function UnitOverviewPage() {
     description: getUnitDescription(parseInt(unitId))
   };
   
-  // Check if lesson is unlocked
+  // Check if lesson is unlocked - ALL LESSONS UNLOCKED FOR TESTING
   const isLessonUnlocked = (lessonIndex) => {
-    if (lessonIndex === 0) return true; // First lesson always unlocked
-    // Check if previous lesson is completed
-    const previousLessonId = lessons[lessonIndex - 1].id;
-    return lessonsCompleted > previousLessonId;
+    return true; // All lessons unlocked
   };
   
   return (
