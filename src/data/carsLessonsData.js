@@ -8,19 +8,19 @@ const generatedLessons = generateAllAutomotiveLessons();
 // Helper function to get unit name
 function getUnitName(lessonId) {
   if (lessonId < 36) {
-    const units = ['Intro to Mechanics', 'Vehicle Systems', 'Basic Physics', 'Simple Circuits', 'Materials & Tools', 'Vehicle Maintenance'];
+    const units = ['Introduction to Engineering', 'Physics Fundamentals', 'Basic Mathematics for Engineers', 'Introduction to Mechanics', 'Materials & Tools', 'Vehicle Basics'];
     return units[Math.floor(lessonId / 6)];
   } else if (lessonId < 78) {
-    const units = ['Thermodynamics', 'Internal Combustion Engines', 'Vehicle Dynamics', 'Fluid Mechanics', 'Design Principles', 'CAD for Automotive'];
+    const units = ['Statics & Dynamics', 'Strength of Materials', 'Fluid Mechanics I', 'Thermodynamics', 'Electrical Fundamentals', 'Computer-Aided Design (CAD)'];
     return units[Math.floor((lessonId - 36) / 7)];
   } else if (lessonId < 126) {
-    const units = ['Hybrid & Electric Vehicles', 'Powertrain Systems', 'Vehicle Structures', 'Suspension & Braking', 'Control Systems', 'Automotive Aerodynamics'];
+    const units = ['Vehicle Dynamics', 'Powertrain Systems', 'Vehicle Structures', 'Thermal Systems', 'Control Systems & Sensors', 'Manufacturing & Assembly'];
     return units[Math.floor((lessonId - 78) / 8)];
   } else if (lessonId < 166) {
-    const units = ['Autonomous Driving', 'FEA for Automotive', 'Advanced Manufacturing', 'Diagnostics & Safety', 'Performance Tuning'];
+    const units = ['Finite Element Analysis (FEA)', 'Computational Fluid Dynamics (CFD)', 'Automotive Electronics', 'Systems Integration', 'Safety and Certification'];
     return units[Math.floor((lessonId - 126) / 8)];
   } else {
-    const units = ['Smart Mobility', 'Sustainable Design', 'AI in Automotive', 'Simulation-Based Design', 'Future Technologies'];
+    const units = ['Electric & Hybrid Powertrains', 'Autonomous & AI Systems', 'Advanced Vehicle Design', 'Manufacturing Innovation', 'Capstone / Research Project'];
     return units[Math.floor((lessonId - 166) / 9)];
   }
 }

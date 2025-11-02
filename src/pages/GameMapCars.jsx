@@ -13,12 +13,12 @@ export default function GameMapCars() {
 
     // BEGINNER - 6 units, 6 lessons each = 36 lessons
     const beginnerUnits = [
-      { name: 'Intro to Mechanics', emoji: '⚙️', quizzesPerLesson: 1 },
-      { name: 'Vehicle Systems', emoji: '🚗', quizzesPerLesson: 1 },
-      { name: 'Basic Physics', emoji: '⚛️', quizzesPerLesson: 1 },
-      { name: 'Simple Circuits', emoji: '🔌', quizzesPerLesson: 1 },
+      { name: 'Introduction to Engineering', emoji: '🎓', quizzesPerLesson: 1 },
+      { name: 'Physics Fundamentals', emoji: '⚛️', quizzesPerLesson: 1 },
+      { name: 'Basic Mathematics for Engineers', emoji: '📐', quizzesPerLesson: 1 },
+      { name: 'Introduction to Mechanics', emoji: '⚙️', quizzesPerLesson: 1 },
       { name: 'Materials & Tools', emoji: '🔧', quizzesPerLesson: 1 },
-      { name: 'Vehicle Maintenance', emoji: '🛠️', quizzesPerLesson: 1 }
+      { name: 'Vehicle Basics', emoji: '🚗', quizzesPerLesson: 1 }
     ];
 
     beginnerUnits.forEach((unit) => {
@@ -38,12 +38,12 @@ export default function GameMapCars() {
 
     // INTERMEDIATE - 6 units, 7 lessons each = 42 lessons
     const intermediateUnits = [
+      { name: 'Statics & Dynamics', emoji: '⚖️', quizzesPerLesson: 2 },
+      { name: 'Strength of Materials', emoji: '💪', quizzesPerLesson: 2 },
+      { name: 'Fluid Mechanics I', emoji: '🌊', quizzesPerLesson: 2 },
       { name: 'Thermodynamics', emoji: '🔥', quizzesPerLesson: 2 },
-      { name: 'Internal Combustion Engines', emoji: '🏎️', quizzesPerLesson: 2 },
-      { name: 'Vehicle Dynamics', emoji: '🏁', quizzesPerLesson: 2 },
-      { name: 'Fluid Mechanics', emoji: '🌊', quizzesPerLesson: 2 },
-      { name: 'Design Principles', emoji: '📐', quizzesPerLesson: 2 },
-      { name: 'CAD for Automotive', emoji: '💻', quizzesPerLesson: 2 }
+      { name: 'Electrical Fundamentals', emoji: '🔌', quizzesPerLesson: 2 },
+      { name: 'Computer-Aided Design (CAD)', emoji: '💻', quizzesPerLesson: 2 }
     ];
 
     intermediateUnits.forEach((unit) => {
@@ -63,12 +63,12 @@ export default function GameMapCars() {
 
     // ADVANCED - 6 units, 8 lessons each = 48 lessons
     const advancedUnits = [
-      { name: 'Hybrid & Electric Vehicles', emoji: '⚡', quizzesPerLesson: 2 },
+      { name: 'Vehicle Dynamics', emoji: '🏁', quizzesPerLesson: 2 },
       { name: 'Powertrain Systems', emoji: '⚙️', quizzesPerLesson: 2 },
       { name: 'Vehicle Structures', emoji: '🏗️', quizzesPerLesson: 2 },
-      { name: 'Suspension & Braking', emoji: '🛞', quizzesPerLesson: 2 },
-      { name: 'Control Systems', emoji: '🎮', quizzesPerLesson: 2 },
-      { name: 'Automotive Aerodynamics', emoji: '💨', quizzesPerLesson: 2 }
+      { name: 'Thermal Systems', emoji: '🔥', quizzesPerLesson: 2 },
+      { name: 'Control Systems & Sensors', emoji: '🎮', quizzesPerLesson: 2 },
+      { name: 'Manufacturing & Assembly', emoji: '🏭', quizzesPerLesson: 2 }
     ];
 
     advancedUnits.forEach((unit) => {
@@ -88,11 +88,11 @@ export default function GameMapCars() {
 
     // EXPERT - 5 units, 8 lessons each = 40 lessons
     const expertUnits = [
-      { name: 'Autonomous Driving', emoji: '🤖', quizzesPerLesson: 3 },
-      { name: 'FEA for Automotive', emoji: '📊', quizzesPerLesson: 3 },
-      { name: 'Advanced Manufacturing', emoji: '🏭', quizzesPerLesson: 2 },
-      { name: 'Diagnostics & Safety', emoji: '✅', quizzesPerLesson: 2 },
-      { name: 'Performance Tuning', emoji: '🏎️', quizzesPerLesson: 2 }
+      { name: 'Finite Element Analysis (FEA)', emoji: '📊', quizzesPerLesson: 3 },
+      { name: 'Computational Fluid Dynamics (CFD)', emoji: '💨', quizzesPerLesson: 3 },
+      { name: 'Automotive Electronics', emoji: '🔌', quizzesPerLesson: 2 },
+      { name: 'Systems Integration', emoji: '🔗', quizzesPerLesson: 2 },
+      { name: 'Safety and Certification', emoji: '✅', quizzesPerLesson: 2 }
     ];
 
     expertUnits.forEach((unit) => {
@@ -112,11 +112,11 @@ export default function GameMapCars() {
 
     // MASTER - 5 units, 9 lessons each = 45 lessons
     const masterUnits = [
-      { name: 'Smart Mobility', emoji: '🌐', quizzesPerLesson: 3 },
-      { name: 'Sustainable Design', emoji: '🌱', quizzesPerLesson: 2 },
-      { name: 'AI in Automotive', emoji: '🧠', quizzesPerLesson: 2 },
-      { name: 'Simulation-Based Design', emoji: '💻', quizzesPerLesson: 3 },
-      { name: 'Future Technologies', emoji: '🚀', quizzesPerLesson: 2 }
+      { name: 'Electric & Hybrid Powertrains', emoji: '⚡', quizzesPerLesson: 3 },
+      { name: 'Autonomous & AI Systems', emoji: '🤖', quizzesPerLesson: 2 },
+      { name: 'Advanced Vehicle Design', emoji: '🎨', quizzesPerLesson: 2 },
+      { name: 'Manufacturing Innovation', emoji: '🏭', quizzesPerLesson: 3 },
+      { name: 'Capstone / Research Project', emoji: '🎓', quizzesPerLesson: 2 }
     ];
 
     masterUnits.forEach((unit) => {
