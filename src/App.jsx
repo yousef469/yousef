@@ -30,6 +30,7 @@ import UnitOverviewPage from './pages/UnitOverviewPage';
 import BeginnerLessonPage from './pages/BeginnerLessonPage';
 import BeginnerQuizPage from './pages/BeginnerQuizPage';
 import LearningHubPage from './pages/LearningHubPage';
+import TestCurriculumPage from './pages/TestCurriculumPage';
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1157,6 +1158,7 @@ export default function App() {
           <Route path="/games/play/planes/lesson/:lessonId" element={<ProtectedRoute><PlaneLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/planes/quiz/:lessonId" element={<ProtectedRoute><PlaneQuizPage /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
+          <Route path="/test-curriculum" element={<TestCurriculumPage />} />
           <Route path="/learn/hub" element={<ProtectedRoute><LearningHubPage /></ProtectedRoute>} />
           <Route path="/learn/unit/:unitId" element={<ProtectedRoute><UnitOverviewPage /></ProtectedRoute>} />
           <Route path="/learn/beginner/lesson/:lessonId" element={<ProtectedRoute><BeginnerLessonPage /></ProtectedRoute>} />
