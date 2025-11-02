@@ -6,23 +6,19 @@ export default function GameMapCars() {
   const navigate = useNavigate();
   const [completedLevels, setCompletedLevels] = useState([0]);
 
-  // Generate all lessons
+  // Generate all 80 lessons (10 units)
   const generateLevels = () => {
     const levels = [];
     let levelId = 0;
 
-    // BEGINNER - 6 units, 6 lessons each = 36 lessons
+    // BEGINNER - 2 units, 15 lessons total
     const beginnerUnits = [
-      { name: 'Introduction to Engineering', emoji: '🎓', quizzesPerLesson: 1 },
-      { name: 'Physics Fundamentals', emoji: '⚛️', quizzesPerLesson: 1 },
-      { name: 'Basic Mathematics for Engineers', emoji: '📐', quizzesPerLesson: 1 },
-      { name: 'Introduction to Mechanics', emoji: '⚙️', quizzesPerLesson: 1 },
-      { name: 'Materials & Tools', emoji: '🔧', quizzesPerLesson: 1 },
-      { name: 'Vehicle Basics', emoji: '🚗', quizzesPerLesson: 1 }
+      { name: 'Introduction to Automotive Engineering', emoji: '🎓', lessons: 7, quizzesPerLesson: 1 },
+      { name: 'Physics & Math Fundamentals', emoji: '⚛️', lessons: 8, quizzesPerLesson: 1 }
     ];
 
     beginnerUnits.forEach((unit) => {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < unit.lessons; i++) {
         levels.push({
           id: levelId++,
           type: 'lesson',
@@ -36,18 +32,15 @@ export default function GameMapCars() {
       }
     });
 
-    // INTERMEDIATE - 6 units, 7 lessons each = 42 lessons
+    // INTERMEDIATE - 3 units, 24 lessons total
     const intermediateUnits = [
-      { name: 'Statics & Dynamics', emoji: '⚖️', quizzesPerLesson: 2 },
-      { name: 'Strength of Materials', emoji: '💪', quizzesPerLesson: 2 },
-      { name: 'Fluid Mechanics I', emoji: '🌊', quizzesPerLesson: 2 },
-      { name: 'Thermodynamics', emoji: '🔥', quizzesPerLesson: 2 },
-      { name: 'Electrical Fundamentals', emoji: '🔌', quizzesPerLesson: 2 },
-      { name: 'Computer-Aided Design (CAD)', emoji: '💻', quizzesPerLesson: 2 }
+      { name: 'Mechanics & Materials', emoji: '⚙️', lessons: 8, quizzesPerLesson: 2 },
+      { name: 'Thermodynamics & Fluids', emoji: '🔥', lessons: 8, quizzesPerLesson: 2 },
+      { name: 'Electrical Systems & CAD', emoji: '🔌', lessons: 8, quizzesPerLesson: 2 }
     ];
 
     intermediateUnits.forEach((unit) => {
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < unit.lessons; i++) {
         levels.push({
           id: levelId++,
           type: 'lesson',
@@ -61,18 +54,15 @@ export default function GameMapCars() {
       }
     });
 
-    // ADVANCED - 6 units, 8 lessons each = 48 lessons
+    // ADVANCED - 3 units, 27 lessons total
     const advancedUnits = [
-      { name: 'Vehicle Dynamics', emoji: '🏁', quizzesPerLesson: 2 },
-      { name: 'Powertrain Systems', emoji: '⚙️', quizzesPerLesson: 2 },
-      { name: 'Vehicle Structures', emoji: '🏗️', quizzesPerLesson: 2 },
-      { name: 'Thermal Systems', emoji: '🔥', quizzesPerLesson: 2 },
-      { name: 'Control Systems & Sensors', emoji: '🎮', quizzesPerLesson: 2 },
-      { name: 'Manufacturing & Assembly', emoji: '🏭', quizzesPerLesson: 2 }
+      { name: 'Vehicle Dynamics & Powertrain', emoji: '🏁', lessons: 9, quizzesPerLesson: 2 },
+      { name: 'Structures & Thermal Systems', emoji: '🏗️', lessons: 9, quizzesPerLesson: 2 },
+      { name: 'Control Systems & Manufacturing', emoji: '🎮', lessons: 9, quizzesPerLesson: 2 }
     ];
 
     advancedUnits.forEach((unit) => {
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < unit.lessons; i++) {
         levels.push({
           id: levelId++,
           type: 'lesson',
@@ -86,41 +76,14 @@ export default function GameMapCars() {
       }
     });
 
-    // EXPERT - 5 units, 8 lessons each = 40 lessons
-    const expertUnits = [
-      { name: 'Finite Element Analysis (FEA)', emoji: '📊', quizzesPerLesson: 3 },
-      { name: 'Computational Fluid Dynamics (CFD)', emoji: '💨', quizzesPerLesson: 3 },
-      { name: 'Automotive Electronics', emoji: '🔌', quizzesPerLesson: 2 },
-      { name: 'Systems Integration', emoji: '🔗', quizzesPerLesson: 2 },
-      { name: 'Safety and Certification', emoji: '✅', quizzesPerLesson: 2 }
-    ];
-
-    expertUnits.forEach((unit) => {
-      for (let i = 0; i < 8; i++) {
-        levels.push({
-          id: levelId++,
-          type: 'lesson',
-          level: 'Expert',
-          unit: unit.name,
-          lesson: `Lesson ${i + 1}`,
-          emoji: unit.emoji,
-          color: 'from-orange-400 to-red-500',
-          quizzesAfter: unit.quizzesPerLesson
-        });
-      }
-    });
-
-    // MASTER - 5 units, 9 lessons each = 45 lessons
+    // MASTER - 2 units, 14 lessons total
     const masterUnits = [
-      { name: 'Electric & Hybrid Powertrains', emoji: '⚡', quizzesPerLesson: 3 },
-      { name: 'Autonomous & AI Systems', emoji: '🤖', quizzesPerLesson: 2 },
-      { name: 'Advanced Vehicle Design', emoji: '🎨', quizzesPerLesson: 2 },
-      { name: 'Manufacturing Innovation', emoji: '🏭', quizzesPerLesson: 3 },
-      { name: 'Capstone / Research Project', emoji: '🎓', quizzesPerLesson: 2 }
+      { name: 'Electric & Autonomous Vehicles', emoji: '⚡', lessons: 7, quizzesPerLesson: 3 },
+      { name: 'Innovation & Future Tech', emoji: '🚀', lessons: 7, quizzesPerLesson: 3 }
     ];
 
     masterUnits.forEach((unit) => {
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < unit.lessons; i++) {
         levels.push({
           id: levelId++,
           type: 'lesson',
@@ -147,59 +110,18 @@ export default function GameMapCars() {
     }
   };
 
-  // Organize lessons by units
+  // Organize lessons by units - 80 lessons total across 10 units
   const units = [];
+  const lessonCounts = [7, 8, 8, 8, 8, 9, 9, 9, 7, 7]; // Lessons per unit
   let currentIndex = 0;
-
-  // BEGINNER - 6 units × 6 lessons = 36 lessons
-  for (let i = 0; i < 6; i++) {
+  
+  lessonCounts.forEach((count, i) => {
     units.push({
-      level: 'Beginner',
-      lessons: levels.slice(currentIndex, currentIndex + 6),
+      lessons: levels.slice(currentIndex, currentIndex + count),
       isReversed: i % 2 === 1
     });
-    currentIndex += 6;
-  }
-
-  // INTERMEDIATE - 6 units × 7 lessons = 42 lessons
-  for (let i = 0; i < 6; i++) {
-    units.push({
-      level: 'Intermediate',
-      lessons: levels.slice(currentIndex, currentIndex + 7),
-      isReversed: (6 + i) % 2 === 1
-    });
-    currentIndex += 7;
-  }
-
-  // ADVANCED - 6 units × 8 lessons = 48 lessons
-  for (let i = 0; i < 6; i++) {
-    units.push({
-      level: 'Advanced',
-      lessons: levels.slice(currentIndex, currentIndex + 8),
-      isReversed: (12 + i) % 2 === 1
-    });
-    currentIndex += 8;
-  }
-
-  // EXPERT - 5 units × 8 lessons = 40 lessons
-  for (let i = 0; i < 5; i++) {
-    units.push({
-      level: 'Expert',
-      lessons: levels.slice(currentIndex, currentIndex + 8),
-      isReversed: (18 + i) % 2 === 1
-    });
-    currentIndex += 8;
-  }
-
-  // MASTER - 5 units × 9 lessons = 45 lessons
-  for (let i = 0; i < 5; i++) {
-    units.push({
-      level: 'Master',
-      lessons: levels.slice(currentIndex, currentIndex + 9),
-      isReversed: (23 + i) % 2 === 1
-    });
-    currentIndex += 9;
-  }
+    currentIndex += count;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-900 via-gray-900 to-black text-white">
@@ -236,7 +158,7 @@ export default function GameMapCars() {
               <Car className="w-8 h-8 text-orange-400" />
               <div>
                 <h1 className="text-xl font-bold">Automotive Journey</h1>
-                <p className="text-sm text-orange-200">76 Lessons • Drive through the curriculum</p>
+                <p className="text-sm text-orange-200">80 Lessons • Drive through the curriculum</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -254,7 +176,7 @@ export default function GameMapCars() {
         <div className="space-y-12">
           {units.map((unit, unitIndex) => {
             const row = unit.isReversed ? [...unit.lessons].reverse() : unit.lessons;
-            
+
             // Show level header at start of each difficulty level
             const showLevelHeader = unitIndex === 0 || unitIndex === 2 || unitIndex === 5 || unitIndex === 8;
             const levelInfo = {
