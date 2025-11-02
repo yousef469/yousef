@@ -118,29 +118,287 @@ export const rocketLessons = {
   },
   2: {
     module: 1,
-    title: "Newton's Third Law in Rockets",
-    concept: "For every action, there's an equal and opposite reaction",
-    questions: [
-      { q: "What pushes the rocket upward?", a: "Exhaust gases pushing down", options: ["Exhaust gases pushing down", "Air pressure", "Gravity", "Wind"] },
-      { q: "What direction do exhaust gases move?", a: "Downward", options: ["Upward", "Downward", "Sideways", "All directions"] },
-      { q: "What happens if a rocket has no exhaust gas?", a: "No thrust", options: ["Still flies", "No thrust", "Goes faster", "Explodes"] },
-      { q: "Why does air not matter in space for thrust?", a: "Rockets push against exhaust, not air", options: ["No gravity", "Rockets push against exhaust, not air", "Space is cold", "No friction"] },
-      { q: "If exhaust speed increases, what happens to thrust?", a: "Thrust increases", options: ["Thrust decreases", "Thrust increases", "No change", "Rocket stops"] },
-      { q: "What everyday object shows Newton's third law?", a: "Balloon flying when released", options: ["Falling ball", "Balloon flying when released", "Rolling wheel", "Floating boat"] }
-    ]
+    title: "Inside the Rocket: The Engine & Fuel",
+    duration: "5-7 min",
+    concept: "Understanding rocket engines and propellant types",
+    
+    // 1️⃣ Hook (0-1 min)
+    hook: {
+      question: "What's happening inside that glowing fire tail?",
+      animation: "3D cutaway view of rocket showing fuel tanks, combustion chamber, and nozzle",
+      points: [
+        "What's inside a rocket engine",
+        "The difference between solid, liquid, and hybrid fuels",
+        "How thrust is created by burning propellant",
+        "Why liquid engines are used in most modern rockets"
+      ]
+    },
+    
+    // 2️⃣ Concept Breakdown (1-3 min)
+    concepts: [
+      {
+        title: "Fuel & Oxidizer",
+        description: "Stored in tanks since there's no oxygen in space",
+        icon: "⛽",
+        details: "Rockets carry their own oxygen supply (oxidizer) to burn fuel"
+      },
+      {
+        title: "Combustion Chamber",
+        description: "Where fuel + oxidizer burn at extreme temperatures",
+        icon: "💥",
+        details: "Temperatures can reach 3,000°C creating high-pressure gases"
+      },
+      {
+        title: "Nozzle",
+        description: "Shapes the exhaust to produce powerful thrust",
+        icon: "🎯",
+        details: "The nozzle accelerates gases to supersonic speeds"
+      }
+    ],
+    
+    engineTypes: [
+      {
+        type: "Solid Fuel",
+        icon: "🔥",
+        pros: "Simple, reliable, instant ignition",
+        cons: "Can't be turned off once lit",
+        uses: "Space Shuttle boosters, military missiles",
+        control: "None",
+        reusability: "Low"
+      },
+      {
+        type: "Liquid Fuel",
+        icon: "💧",
+        pros: "Throttle control, can restart, reusable",
+        cons: "Complex plumbing and pumps",
+        uses: "Falcon 9, Saturn V, most orbital rockets",
+        control: "High",
+        reusability: "High"
+      },
+      {
+        type: "Hybrid",
+        icon: "⚙️",
+        pros: "Balance of simplicity and control",
+        cons: "Less efficient than liquid",
+        uses: "SpaceShipOne, experimental rockets",
+        control: "Medium",
+        reusability: "Medium"
+      }
+    ],
+    
+    // 3️⃣ Interactive Demo (3-5 min)
+    simulation: {
+      title: "Choose Your Engine Type",
+      instruction: "Select an engine type and ignite to see how it performs",
+      options: {
+        solid: {
+          ignition: "Instant",
+          throttle: false,
+          shutdown: false,
+          thrust: "High but fixed"
+        },
+        liquid: {
+          ignition: "Controlled start",
+          throttle: true,
+          shutdown: true,
+          thrust: "Variable 0-100%"
+        },
+        hybrid: {
+          ignition: "Steady",
+          throttle: "Limited",
+          shutdown: true,
+          thrust: "Medium, some control"
+        }
+      },
+      metrics: ["Thrust", "Control", "Reusability"]
+    },
+    
+    // 4️⃣ Wrap-Up (5-6 min)
+    summary: {
+      text: "Engines turn propellant into thrust. Liquid engines are the most efficient and controllable type, which is why they're used in modern reusable rockets.",
+      icons: {
+        explosion: "💥",
+        tanks: "🧯",
+        control: "🎛️"
+      },
+      keyTakeaway: "Liquid engines can be throttled and reused, making them ideal for precision missions and cost savings!"
+    },
+    
+    // 🧠 Quiz (3 questions)
+    quiz: [
+      {
+        type: "drag-drop",
+        question: "Label the rocket engine parts",
+        instruction: "Drag labels to: fuel tank, oxidizer tank, combustion chamber, nozzle",
+        goal: "Reinforce engine components",
+        correctAnswer: { top: "fuel/oxidizer tanks", middle: "combustion chamber", bottom: "nozzle" }
+      },
+      {
+        type: "multiple-choice",
+        question: "Which engine type can be turned off mid-flight?",
+        options: [
+          "Liquid fuel engine",
+          "Solid fuel engine",
+          "Both types",
+          "Neither type"
+        ],
+        correctAnswer: "Liquid fuel engine",
+        goal: "Check understanding of engine control"
+      },
+      {
+        type: "simulation",
+        question: "Adjust fuel flow to balance thrust at 75%",
+        instruction: "Use the throttle to maintain steady 75% thrust",
+        goal: "Apply learning about engine control",
+        successRange: [70, 80]
+      }
+    ],
+    
+    // ✅ Learning Outcomes
+    outcomes: [
+      "Learner can explain how a rocket engine produces thrust",
+      "Understands the differences between solid, liquid, and hybrid engines",
+      "Knows why liquid engines are preferred for modern rockets"
+    ],
+    
+    // 🔓 Unlocks
+    unlocks: "Lesson 3: Stages — Why Rockets Fall Apart on Purpose"
   },
   3: {
     module: 1,
-    title: "Changing Mass & Fuel Burn",
-    concept: "As fuel burns, mass decreases → acceleration increases",
-    questions: [
-      { q: "When a rocket burns fuel, does its mass increase or decrease?", a: "Decrease", options: ["Increase", "Decrease", "Stay same", "Double"] },
-      { q: "If mass gets smaller but thrust stays the same, what happens to acceleration?", a: "Acceleration increases", options: ["Decreases", "Acceleration increases", "Stays same", "Stops"] },
-      { q: "Why does the rocket speed up faster later in flight?", a: "Less mass to push", options: ["More fuel", "Less mass to push", "More thrust", "Less drag"] },
-      { q: "What's the tradeoff between carrying more fuel and more mass?", a: "More fuel = more mass to lift", options: ["No tradeoff", "More fuel = more mass to lift", "More fuel = less mass", "Fuel has no mass"] },
-      { q: "What happens if you burn fuel too fast?", a: "Run out early", options: ["Go faster forever", "Run out early", "Get more thrust", "Nothing"] },
-      { q: "What's one reason multi-stage rockets exist?", a: "Drop empty mass", options: ["Look cool", "Drop empty mass", "Carry more crew", "Go slower"] }
-    ]
+    title: "Stages: Why Rockets Fall Apart on Purpose",
+    duration: "6-8 min",
+    concept: "Understanding staging and mass ratio for efficiency",
+    
+    // 1️⃣ Hook (0-1 min)
+    hook: {
+      question: "Wait — did it just break apart?! Why would engineers throw away a part of the rocket mid-flight?",
+      animation: "Rocket launches → splits → first stage falls → second stage continues",
+      points: [
+        "Why rockets use staging",
+        "How it improves performance",
+        "The concept of mass ratio and efficiency",
+        "Real examples: Falcon 9, Saturn V staging"
+      ]
+    },
+    
+    // 2️⃣ Concept Breakdown (1-3 min)
+    concepts: [
+      {
+        title: "The Weight Problem",
+        description: "The heavier the rocket, the more fuel it needs",
+        icon: "⚖️",
+        details: "Carrying empty fuel tanks = wasted energy and fuel"
+      },
+      {
+        title: "Staging Solution",
+        description: "Dropping empty sections to go faster",
+        icon: "🚀",
+        details: "Each stage has its own engine and fuel supply"
+      },
+      {
+        title: "Mass Ratio",
+        description: "The ratio of fuel mass to total mass",
+        icon: "📊",
+        details: "Higher mass ratio = more efficient rocket"
+      }
+    ],
+    
+    analogy: {
+      text: "Imagine riding a bike with three backpacks full of fuel. Each time one's empty, you drop it — now you move faster!",
+      icon: "🚴"
+    },
+    
+    // 3️⃣ Interactive Simulation (3-5 min)
+    simulation: {
+      title: "Launch with Different Staging",
+      instruction: "Compare rocket performance with 1, 2, or 3 stages",
+      options: [
+        {
+          stages: 1,
+          description: "Single stage to orbit (very difficult)",
+          maxHeight: "Low orbit only",
+          fuelEfficiency: "Poor",
+          complexity: "Simple"
+        },
+        {
+          stages: 2,
+          description: "Most common for orbital missions",
+          maxHeight: "High orbit",
+          fuelEfficiency: "Good",
+          complexity: "Moderate"
+        },
+        {
+          stages: 3,
+          description: "For deep space missions",
+          maxHeight: "Escape velocity",
+          fuelEfficiency: "Excellent",
+          complexity: "High"
+        }
+      ],
+      metrics: {
+        heightReached: "Altitude achieved",
+        speedGained: "Final velocity",
+        fuelUsed: "Propellant efficiency"
+      },
+      graph: "Height reached vs. Stages used"
+    },
+    
+    // 4️⃣ Wrap-Up (5-6 min)
+    summary: {
+      text: "Rockets use stages to drop weight and save fuel. More stages = higher efficiency, but more complexity. Most modern rockets use 2-3 stages.",
+      icons: {
+        stage1: "🚀",
+        stage2: "🔥",
+        stage3: "⭐"
+      },
+      keyTakeaway: "Staging is why we can reach space! Without it, rockets would be too heavy to escape Earth's gravity.",
+      examples: [
+        "Falcon 9: 2 stages (1st stage reusable)",
+        "Saturn V: 3 stages (sent humans to the Moon)",
+        "Space Shuttle: 2 stages + boosters"
+      ]
+    },
+    
+    // 🧠 Quiz (3 questions)
+    quiz: [
+      {
+        type: "animation-order",
+        question: "Arrange the launch sequence in correct order",
+        instruction: "Put these events in order: Launch → Stage 1 drop → Stage 2 ignition → Orbit",
+        goal: "Sequential understanding of staging",
+        correctOrder: ["Launch", "Stage 1 drop", "Stage 2 ignition", "Orbit achieved"]
+      },
+      {
+        type: "multiple-choice",
+        question: "Why do rockets use multiple stages?",
+        options: [
+          "To reduce weight mid-flight",
+          "To look more impressive",
+          "To carry more astronauts",
+          "To go slower and safer"
+        ],
+        correctAnswer: "To reduce weight mid-flight",
+        goal: "Concept check on staging purpose"
+      },
+      {
+        type: "simulation",
+        question: "Compare 1-stage vs 2-stage performance",
+        instruction: "Launch both and observe which reaches higher altitude",
+        goal: "Apply logic about staging efficiency",
+        expectedResult: "2-stage reaches significantly higher"
+      }
+    ],
+    
+    // ✅ Learning Outcomes
+    outcomes: [
+      "Learner understands staging and rocket efficiency",
+      "Can explain why dropping stages improves performance",
+      "Knows the tradeoff between stages and complexity"
+    ],
+    
+    // 🔓 Unlocks
+    unlocks: "Lesson 4: Forces in Flight — Gravity vs Thrust vs Drag"
   },
   4: {
     module: 1,
