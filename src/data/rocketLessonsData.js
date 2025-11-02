@@ -6,15 +6,115 @@ export const rocketLessons = {
   1: {
     module: 1,
     title: "What Makes Rockets Fly?",
+    duration: "5-6 min",
     concept: "Introduce thrust, gravity, drag — the 3 main forces",
-    questions: [
-      { q: "What is the upward force that moves a rocket?", a: "Thrust", options: ["Thrust", "Lift", "Pressure", "Wind"] },
-      { q: "What pulls the rocket back toward Earth?", a: "Gravity", options: ["Gravity", "Drag", "Weight", "Friction"] },
-      { q: "What is the air resistance that slows it down called?", a: "Drag", options: ["Friction", "Drag", "Resistance", "Pull"] },
-      { q: "When thrust > gravity, what happens?", a: "Rocket accelerates upward", options: ["Rocket accelerates upward", "Rocket falls", "Rocket hovers", "Nothing"] },
-      { q: "When thrust = gravity, what happens?", a: "Rocket hovers", options: ["Rocket falls", "Rocket hovers", "Rocket accelerates", "Rocket explodes"] },
-      { q: "When thrust < gravity, what happens?", a: "Rocket falls", options: ["Rocket rises", "Rocket falls", "Rocket hovers", "Rocket spins"] }
-    ]
+    
+    // 1️⃣ Hook (30 sec)
+    hook: {
+      question: "How does a rocket fly without wings?",
+      points: [
+        "What thrust is",
+        "What resistance (drag, gravity) is",
+        "Why rockets work even in space (no air needed)",
+        "Newton's Third Law (action–reaction) — in a fun, intuitive way"
+      ],
+      visual: "Falcon 9 3D model showing thrust demonstration"
+    },
+    
+    // 2️⃣ Concept Breakdown (1-3 min)
+    concepts: [
+      {
+        title: "Force",
+        description: "A push or pull that can change an object's motion",
+        icon: "💪"
+      },
+      {
+        title: "Newton's Third Law",
+        description: "For every action, there's an equal and opposite reaction",
+        icon: "⚖️"
+      },
+      {
+        title: "Thrust",
+        description: "The reaction force from hot gases leaving the rocket nozzle",
+        icon: "🔥",
+        interactive: "Drag a slider to control thrust → watch rocket rise or fall"
+      },
+      {
+        title: "Gravity & Drag",
+        description: "The forces working against the rocket",
+        icon: "🪨",
+        details: "Gravity pulls down, drag slows the rocket through air"
+      }
+    ],
+    
+    // 3️⃣ Mini Simulation (3-5 min)
+    simulation: {
+      title: "Launch Your Rocket",
+      instruction: "Increase the thrust until your rocket lifts off",
+      parameters: {
+        weight: 1000, // Newtons
+        thrustMin: 0,
+        thrustMax: 2000,
+        thrustStart: 500
+      },
+      rules: [
+        "When thrust > weight → rocket launches 🚀",
+        "When thrust < weight → rocket falls 📉",
+        "When thrust = weight → rocket hovers ⏸️"
+      ],
+      feedback: "This makes the physics felt, not just explained"
+    },
+    
+    // 4️⃣ Wrap-Up Summary (5-6 min)
+    summary: {
+      text: "A rocket flies because it pushes gases downward, and the gases push the rocket upward. This push is called thrust, and it must overcome gravity and drag.",
+      icons: {
+        thrust: "🔥",
+        gravity: "🪨",
+        drag: "🌬️"
+      },
+      keyTakeaway: "Rockets work in space because they push against their own exhaust gases, not air!"
+    },
+    
+    // 🧠 Quiz (3 questions, ~20 seconds each)
+    quiz: [
+      {
+        type: "visual-match",
+        question: "Match the force arrows to their correct direction",
+        instruction: "Drag the arrows to show: thrust (up), gravity (down), drag (opposing motion)",
+        goal: "Reinforce force directions",
+        correctAnswer: { thrust: "up", gravity: "down", drag: "opposite" }
+      },
+      {
+        type: "multiple-choice",
+        question: "Why can rockets work in space?",
+        options: [
+          "They push against gases, not air",
+          "Space has no gravity",
+          "They use solar power",
+          "They push against stars"
+        ],
+        correctAnswer: "They push against gases, not air",
+        goal: "Clear Newton's law understanding"
+      },
+      {
+        type: "mini-simulation",
+        question: "Adjust thrust to escape Earth gravity",
+        instruction: "Set thrust high enough to overcome 1000N of weight",
+        goal: "Apply concept practically",
+        successThreshold: 1000
+      }
+    ],
+    
+    // ✅ Learning Outcomes
+    outcomes: [
+      "Learner can explain why rockets fly, in one sentence",
+      "Understands the relationship between thrust, gravity, and drag",
+      "Can apply Newton's Third Law to rocket propulsion"
+    ],
+    
+    // 🔓 Unlocks
+    unlocks: "Lesson 2: Inside the Rocket — The Engine and Fuel"
   },
   2: {
     module: 1,
