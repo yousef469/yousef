@@ -200,7 +200,7 @@ export default function GameMapCars() {
                 )}
 
                 {/* Unit Header */}
-                <div className="mb-12 text-center">
+                <div className="mb-20 text-center">
                   <div className={`inline-block px-8 py-3 rounded-2xl border-2 ${unit.level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
                     unit.level === 'Intermediate' ? 'bg-blue-500/20 border-blue-400' :
                       unit.level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :

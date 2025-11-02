@@ -140,7 +140,7 @@ export default function GameMapPlanes() {
                 )}
                 
                 {/* Unit Header */}
-                <div className="mb-12 text-center">
+                <div className="mb-20 text-center">
                   <div className="inline-block px-8 py-3 rounded-2xl border-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-blue-400">
                     <div className="font-bold text-2xl mb-1">{unit.lessons[0].unit}</div>
                     <div className="text-sm opacity-80">
