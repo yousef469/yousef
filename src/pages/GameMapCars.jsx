@@ -236,7 +236,7 @@ export default function GameMapCars() {
               <Car className="w-8 h-8 text-orange-400" />
               <div>
                 <h1 className="text-xl font-bold">Automotive Journey</h1>
-                <p className="text-sm text-orange-200">211 Lessons • Drive through the curriculum</p>
+                <p className="text-sm text-orange-200">76 Lessons • Drive through the curriculum</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -298,7 +298,7 @@ export default function GameMapCars() {
                   }`}>
                     <div className="font-bold text-2xl mb-1">{unit.lessons[0].unit}</div>
                     <div className="text-sm opacity-80">
-                      {unit.level} • Unit {(unitIndex % (unit.level === 'Beginner' ? 6 : unit.level === 'Intermediate' ? 6 : unit.level === 'Advanced' ? 6 : 5)) + 1}
+                      {unit.lessons[0].level} • Unit {unitIndex + 1} • {unit.lessons.length} Lessons
                     </div>
                   </div>
                 </div>

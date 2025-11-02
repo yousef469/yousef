@@ -7,22 +7,26 @@ const generatedLessons = generateAllAutomotiveLessons();
 
 // Helper function to get unit name
 function getUnitName(lessonId) {
-  if (lessonId < 36) {
-    const units = ['Introduction to Engineering', 'Physics Fundamentals', 'Basic Mathematics for Engineers', 'Introduction to Mechanics', 'Materials & Tools', 'Vehicle Basics'];
-    return units[Math.floor(lessonId / 6)];
-  } else if (lessonId < 78) {
-    const units = ['Statics & Dynamics', 'Strength of Materials', 'Fluid Mechanics I', 'Thermodynamics', 'Electrical Fundamentals', 'Computer-Aided Design (CAD)'];
-    return units[Math.floor((lessonId - 36) / 7)];
-  } else if (lessonId < 126) {
-    const units = ['Vehicle Dynamics', 'Powertrain Systems', 'Vehicle Structures', 'Thermal Systems', 'Control Systems & Sensors', 'Manufacturing & Assembly'];
-    return units[Math.floor((lessonId - 78) / 8)];
-  } else if (lessonId < 166) {
-    const units = ['Finite Element Analysis (FEA)', 'Computational Fluid Dynamics (CFD)', 'Automotive Electronics', 'Systems Integration', 'Safety and Certification'];
-    return units[Math.floor((lessonId - 126) / 8)];
-  } else {
-    const units = ['Electric & Hybrid Powertrains', 'Autonomous & AI Systems', 'Advanced Vehicle Design', 'Manufacturing Innovation', 'Capstone / Research Project'];
-    return units[Math.floor((lessonId - 166) / 9)];
+  const unitBoundaries = [7, 15, 23, 30, 38, 47, 54, 62, 70, 76];
+  const units = [
+    'Fundamentals of Cars',
+    'Vehicle Mechanics',
+    'Vehicle Dynamics',
+    'Automotive Materials & Design',
+    'Electrical and Electronic Systems',
+    'Powertrain & Energy Systems',
+    'Control Systems & Automation',
+    'Manufacturing & Design Process',
+    'Maintenance & Diagnostics',
+    'Future of Automotive Engineering'
+  ];
+  
+  for (let i = 0; i < unitBoundaries.length; i++) {
+    if (lessonId < unitBoundaries[i]) {
+      return units[i];
+    }
   }
+  return units[units.length - 1];
 }
 
 // Format lessons for the lesson page
