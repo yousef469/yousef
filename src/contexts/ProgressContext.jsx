@@ -97,69 +97,82 @@ export function ProgressProvider({ children }) {
     try {
       setLoading(true);
       
-      // Load XP data
-      const { data: xpData, error: xpError } = await supabase
-        .from('user_xp')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Load XP data - silently fail if table doesn't exist
+      try {
+        const { data: xpData, error: xpError } = await supabase
+          .from('user_xp')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-      if (xpError && xpError.code !== 'PGRST116') {
-        console.error('Error loading XP:', xpError);
+        if (xpError && xpError.code !== 'PGRST116' && xpError.code !== '42P01') {
+          console.warn('XP table not ready:', xpError.message);
+        }
+
+        if (xpData) {
+          setTotalXP(xpData.total_xp);
+          setCurrentRank(xpData.current_rank);
+          setRankLevel(xpData.rank_level);
+          setLessonsCompleted(xpData.lessons_completed);
+          setQuizzesCompleted(xpData.quizzes_completed);
+          setPerfectQuizzes(xpData.perfect_quizzes);
+          setUnitsCompleted(xpData.units_completed);
+          setLevelsCompleted(xpData.levels_completed);
+        }
+      } catch (err) {
+        console.warn('Progress tables not set up yet - using defaults');
       }
 
-      if (xpData) {
-        setTotalXP(xpData.total_xp);
-        setCurrentRank(xpData.current_rank);
-        setRankLevel(xpData.rank_level);
-        setLessonsCompleted(xpData.lessons_completed);
-        setQuizzesCompleted(xpData.quizzes_completed);
-        setPerfectQuizzes(xpData.perfect_quizzes);
-        setUnitsCompleted(xpData.units_completed);
-        setLevelsCompleted(xpData.levels_completed);
-      } else {
-        // Initialize XP record
-        await initializeProgress();
+      // Load streak data - silently fail if table doesn't exist
+      try {
+        const { data: streakData } = await supabase
+          .from('user_streaks')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (streakData) {
+          setCurrentStreak(streakData.current_streak);
+          setLongestStreak(streakData.longest_streak);
+        }
+      } catch (err) {
+        // Silently ignore - table doesn't exist yet
       }
 
-      // Load streak data
-      const { data: streakData } = await supabase
-        .from('user_streaks')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Load badges - silently fail if table doesn't exist
+      try {
+        const { data: badgesData } = await supabase
+          .from('user_badges')
+          .select('*')
+          .eq('user_id', user.id);
 
-      if (streakData) {
-        setCurrentStreak(streakData.current_streak);
-        setLongestStreak(streakData.longest_streak);
+        if (badgesData) {
+          setBadges(badgesData);
+        }
+      } catch (err) {
+        // Silently ignore - table doesn't exist yet
       }
 
-      // Load badges
-      const { data: badgesData } = await supabase
-        .from('user_badges')
-        .select('*')
-        .eq('user_id', user.id);
+      // Load stats - silently fail if table doesn't exist
+      try {
+        const { data: statsData } = await supabase
+          .from('user_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-      if (badgesData) {
-        setBadges(badgesData);
-      }
-
-      // Load stats
-      const { data: statsData } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (statsData) {
-        setTotalTimeSpent(statsData.total_time_spent);
-        setAverageQuizScore(statsData.average_quiz_score);
-        setTotalStars(statsData.total_stars);
-        setCoins(statsData.coins);
+        if (statsData) {
+          setTotalTimeSpent(statsData.total_time_spent);
+          setAverageQuizScore(statsData.average_quiz_score);
+          setTotalStars(statsData.total_stars);
+          setCoins(statsData.coins);
+        }
+      } catch (err) {
+        // Silently ignore - table doesn't exist yet
       }
 
     } catch (error) {
-      console.error('Error loading progress:', error);
+      console.warn('Progress system not fully set up - using defaults');
     } finally {
       setLoading(false);
     }

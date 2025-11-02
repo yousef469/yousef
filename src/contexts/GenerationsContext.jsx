@@ -39,8 +39,9 @@ export function GenerationsProvider({ children }) {
         .eq('user_id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading generations:', error);
+      if (error && error.code !== 'PGRST116' && error.code !== '42P01') {
+        console.warn('Generations table not ready:', error.message);
+        setLoading(false);
         return;
       }
 
