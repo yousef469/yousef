@@ -1,7 +1,9 @@
 // Complete Aircraft Engineering Curriculum - All 211 Lessons
 // Using real curriculum content for first 36 lessons (Beginner level)
+// Using generated content for remaining 175 lessons
 
 import curriculum from './curriculum/index.js';
+import { generateAllLessons } from './generateLessons.js';
 
 // Flatten curriculum into array format for game map (36 beginner lessons)
 const beginnerLessons = [];
@@ -10,7 +12,10 @@ for (let unitNum = 1; unitNum <= 6; unitNum++) {
   beginnerLessons.push(...unitLessons);
 }
 
-// Generate placeholder lessons for intermediate through master levels (175 lessons)
+// Generate lessons for intermediate through master levels (175 lessons)
+const generatedLessons = generateAllLessons();
+
+// Legacy placeholder function (kept for reference)
 const generatePlaceholderLessons = () => {
   const placeholders = {};
   
@@ -124,16 +129,58 @@ const generatePlaceholderLessons = () => {
   return placeholders;
 };
 
-// Combine real beginner lessons with placeholders
+// Combine real beginner lessons with generated content
 export const planesLessons = {
   // Real curriculum content (lessons 0-35)
   ...beginnerLessons.reduce((acc, lesson, index) => {
-    acc[index] = lesson;
+    acc[index] = {
+      ...lesson,
+      content: {
+        introduction: lesson.content.introduction,
+        sections: lesson.content.sections,
+        keyTakeaways: lesson.content.keyTakeaways,
+        vocabulary: lesson.content.vocabulary
+      }
+    };
     return acc;
   }, {}),
   
-  // Placeholder lessons (lessons 36-210)
-  ...generatePlaceholderLessons()
+  // Generated lessons with full content (lessons 36-210)
+  ...Object.keys(generatedLessons).reduce((acc, key) => {
+    const lesson = generatedLessons[key];
+    acc[key] = {
+      ...lesson,
+      level: lesson.id < 78 ? 'Intermediate' : lesson.id < 126 ? 'Advanced' : lesson.id < 166 ? 'Expert' : 'Master',
+      unit: getUnitName(lesson.id),
+      content: {
+        introduction: lesson.introduction,
+        sections: lesson.sections,
+        keyTakeaways: lesson.keyTakeaways,
+        vocabulary: lesson.vocabulary
+      },
+      quiz: {
+        questions: []
+      }
+    };
+    return acc;
+  }, {})
 };
+
+// Helper function to get unit name
+function getUnitName(lessonId) {
+  if (lessonId < 78) {
+    const units = ['Statics', 'Dynamics', 'Strength of Materials', 'Fluid Mechanics I', 'Thermodynamics', 'Computer-Aided Design (CAD)'];
+    return units[Math.floor((lessonId - 36) / 7)];
+  } else if (lessonId < 126) {
+    const units = ['Aerodynamics II', 'Propulsion Systems', 'Aircraft Structures', 'Flight Mechanics', 'Avionics & Control Systems', 'Manufacturing & Assembly'];
+    return units[Math.floor((lessonId - 78) / 8)];
+  } else if (lessonId < 166) {
+    const units = ['Finite Element Analysis (FEA)', 'Computational Fluid Dynamics (CFD)', 'Systems Integration', 'Certification & Safety', 'Maintenance Engineering'];
+    return units[Math.floor((lessonId - 126) / 8)];
+  } else {
+    const units = ['Advanced Propulsion', 'Flight Control Algorithms', 'Unmanned Aerial Systems (Drones)', 'Spacecraft Design & Orbital Mechanics', 'AI & Sustainability in Aerospace'];
+    return units[Math.floor((lessonId - 166) / 9)];
+  }
+}
 
 export default planesLessons;
