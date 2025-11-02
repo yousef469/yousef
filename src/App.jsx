@@ -23,6 +23,7 @@ import GameMapCars from './pages/GameMapCars';
 import GameMapPlanes from './pages/GameMapPlanes';
 import LessonsDemoPage from './pages/LessonsDemoPage';
 import RocketLessonPage from './pages/RocketLessonPage';
+import RocketLessonPageNew from './pages/RocketLessonPageNew';
 import PlaneLessonPage from './pages/PlaneLessonPage';
 import CarLessonPage from './pages/CarLessonPage';
 import PlaneQuizPage from './pages/PlaneQuizPage';
@@ -1155,11 +1156,13 @@ export default function App() {
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
           <Route path="/games/map/planes" element={<ProtectedRoute><GameMapPlanes /></ProtectedRoute>} />
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
+          <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
           <Route path="/lessons/demo" element={<ProtectedRoute><LessonsDemoPage /></ProtectedRoute>} />
           <Route path="/lessons/rockets/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/planes/lesson/:lessonId" element={<ProtectedRoute><PlaneLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/planes/quiz/:lessonId" element={<ProtectedRoute><PlaneQuizPage /></ProtectedRoute>} />
           <Route path="/games/play/cars/lesson/:lessonId" element={<ProtectedRoute><CarLessonPage /></ProtectedRoute>} />
+          <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPageNew /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
           <Route path="/test-curriculum" element={<TestCurriculumPage />} />
           <Route path="/learn/hub" element={<ProtectedRoute><LearningHubPage /></ProtectedRoute>} />
