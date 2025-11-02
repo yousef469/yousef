@@ -150,7 +150,7 @@ export default function GameMapCars() {
   // Organize lessons by units
   const units = [];
   let currentIndex = 0;
-  
+
   // BEGINNER - 6 units × 6 lessons = 36 lessons
   for (let i = 0; i < 6; i++) {
     units.push({
@@ -160,7 +160,7 @@ export default function GameMapCars() {
     });
     currentIndex += 6;
   }
-  
+
   // INTERMEDIATE - 6 units × 7 lessons = 42 lessons
   for (let i = 0; i < 6; i++) {
     units.push({
@@ -170,7 +170,7 @@ export default function GameMapCars() {
     });
     currentIndex += 7;
   }
-  
+
   // ADVANCED - 6 units × 8 lessons = 48 lessons
   for (let i = 0; i < 6; i++) {
     units.push({
@@ -180,7 +180,7 @@ export default function GameMapCars() {
     });
     currentIndex += 8;
   }
-  
+
   // EXPERT - 5 units × 8 lessons = 40 lessons
   for (let i = 0; i < 5; i++) {
     units.push({
@@ -190,7 +190,7 @@ export default function GameMapCars() {
     });
     currentIndex += 8;
   }
-  
+
   // MASTER - 5 units × 9 lessons = 45 lessons
   for (let i = 0; i < 5; i++) {
     units.push({
@@ -253,49 +253,38 @@ export default function GameMapCars() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         <div className="space-y-12">
           {units.map((unit, unitIndex) => {
-            const showLevelHeader = 
-              (unitIndex === 0) || 
-              (unitIndex === 6) || 
-              (unitIndex === 12) || 
-              (unitIndex === 18) || 
-              (unitIndex === 23);
-            
-            const levelSubtitles = {
-              'Beginner': 'Foundations',
-              'Intermediate': 'Applied Engineering',
-              'Advanced': 'Modern Automotive Systems',
-              'Expert': 'Cutting-Edge Technology',
-              'Master': 'Innovation & Future'
-            };
-            
             const row = unit.isReversed ? [...unit.lessons].reverse() : unit.lessons;
             
+            // Show level header at start of each difficulty level
+            const showLevelHeader = unitIndex === 0 || unitIndex === 2 || unitIndex === 5 || unitIndex === 8;
+            const levelInfo = {
+              0: { name: 'BEGINNER', subtitle: 'How cars move, mechanical basics', color: 'from-green-500 to-emerald-600', icon: '🟢' },
+              2: { name: 'INTERMEDIATE', subtitle: 'Dynamics, materials, and electronics', color: 'from-yellow-500 to-orange-600', icon: '🟡' },
+              5: { name: 'ADVANCED', subtitle: 'Energy systems, automation, design', color: 'from-blue-500 to-cyan-600', icon: '🔵' },
+              8: { name: 'MASTER', subtitle: 'Maintenance, innovation, sustainability', color: 'from-red-500 to-pink-600', icon: '🔴' }
+            };
+
             return (
               <div key={unitIndex} className="relative">
+                {/* Level Header */}
                 {showLevelHeader && (
-                  <div className="mb-12 text-center">
-                    <div className={`inline-block px-12 py-6 rounded-3xl border-4 shadow-2xl ${
-                      unit.level === 'Beginner' ? 'bg-gradient-to-r from-green-500 to-emerald-600 border-green-300' :
-                      unit.level === 'Intermediate' ? 'bg-gradient-to-r from-blue-500 to-cyan-600 border-blue-300' :
-                      unit.level === 'Advanced' ? 'bg-gradient-to-r from-purple-500 to-pink-600 border-purple-300' :
-                      unit.level === 'Expert' ? 'bg-gradient-to-r from-orange-500 to-red-600 border-orange-300' :
-                      'bg-gradient-to-r from-yellow-500 to-amber-600 border-yellow-300'
-                    }`}>
-                      <div className="text-4xl font-bold text-white mb-2">{unit.level}</div>
-                      <div className="text-lg text-white/90">{levelSubtitles[unit.level]}</div>
+                  <div className="mb-16 text-center">
+                    <div className={`inline-block px-16 py-8 rounded-3xl border-4 shadow-2xl bg-gradient-to-r ${levelInfo[unitIndex].color} border-white/30`}>
+                      <div className="text-5xl mb-2">{levelInfo[unitIndex].icon}</div>
+                      <div className="text-4xl font-bold text-white mb-2">{levelInfo[unitIndex].name}</div>
+                      <div className="text-lg text-white/90">{levelInfo[unitIndex].subtitle}</div>
                     </div>
                   </div>
                 )}
 
                 {/* Unit Header */}
                 <div className="mb-6 text-center">
-                  <div className={`inline-block px-8 py-3 rounded-2xl border-2 ${
-                    unit.level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
+                  <div className={`inline-block px-8 py-3 rounded-2xl border-2 ${unit.level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
                     unit.level === 'Intermediate' ? 'bg-blue-500/20 border-blue-400' :
-                    unit.level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :
-                    unit.level === 'Expert' ? 'bg-orange-500/20 border-orange-400' :
-                    'bg-yellow-500/20 border-yellow-400'
-                  }`}>
+                      unit.level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :
+                        unit.level === 'Expert' ? 'bg-orange-500/20 border-orange-400' :
+                          'bg-yellow-500/20 border-yellow-400'
+                    }`}>
                     <div className="font-bold text-2xl mb-1">{unit.lessons[0].unit}</div>
                     <div className="text-sm opacity-80">
                       {unit.lessons[0].level} • Unit {unitIndex + 1} • {unit.lessons.length} Lessons
@@ -314,12 +303,12 @@ export default function GameMapCars() {
                       <div key={level.id} className="relative flex flex-col items-center">
                         {isCurrent && (
                           <div className="absolute -top-16 left-1/2 -translate-x-1/2 animate-bounce z-10">
-                            <Car 
-                              className="w-10 h-10 text-white drop-shadow-lg" 
-                              style={{ 
+                            <Car
+                              className="w-10 h-10 text-white drop-shadow-lg"
+                              style={{
                                 transform: unit.isReversed ? 'scaleX(-1)' : 'scaleX(1)',
                                 filter: 'drop-shadow(0 0 10px rgba(249, 115, 22, 0.8))'
-                              }} 
+                              }}
                             />
                           </div>
                         )}
@@ -334,13 +323,12 @@ export default function GameMapCars() {
                           )}
 
                           <div
-                            className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${
-                              completed
-                                ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 shadow-lg shadow-green-500/50'
-                                : unlocked
+                            className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${completed
+                              ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-300 shadow-lg shadow-green-500/50'
+                              : unlocked
                                 ? `bg-gradient-to-br ${level.color} border-white shadow-lg shadow-orange-500/50 hover:scale-110`
                                 : 'bg-gray-700 border-gray-600'
-                            }`}
+                              }`}
                           >
                             {completed ? (
                               <CheckCircle className="w-10 h-10 text-white" />

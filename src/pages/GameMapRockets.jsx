@@ -118,8 +118,28 @@ export default function GameMapRockets() {
           {units.map((unit, unitIndex) => {
             const row = unit.isReversed ? [...unit.lessons].reverse() : unit.lessons;
             
+            // Determine if we should show a level header
+            const showLevelHeader = unitIndex === 0 || unitIndex === 2 || unitIndex === 5 || unitIndex === 8;
+            const levelInfo = {
+              0: { name: 'BEGINNER', subtitle: 'Build foundation — how it works', color: 'from-green-500 to-emerald-600', icon: '🟢' },
+              2: { name: 'INTERMEDIATE', subtitle: 'Learn systems and physics', color: 'from-yellow-500 to-orange-600', icon: '🟡' },
+              5: { name: 'ADVANCED', subtitle: 'Design, simulate, analyze', color: 'from-blue-500 to-cyan-600', icon: '🔵' },
+              8: { name: 'MASTER', subtitle: 'Innovate and optimize', color: 'from-red-500 to-pink-600', icon: '🔴' }
+            };
+            
             return (
               <div key={unitIndex} className="relative">
+                {/* Level Header */}
+                {showLevelHeader && (
+                  <div className="mb-16 text-center">
+                    <div className={`inline-block px-16 py-8 rounded-3xl border-4 shadow-2xl bg-gradient-to-r ${levelInfo[unitIndex].color} border-white/30`}>
+                      <div className="text-5xl mb-2">{levelInfo[unitIndex].icon}</div>
+                      <div className="text-4xl font-bold text-white mb-2">{levelInfo[unitIndex].name}</div>
+                      <div className="text-lg text-white/90">{levelInfo[unitIndex].subtitle}</div>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Unit Header */}
                 <div className="mb-6 text-center">
                   <div className="inline-block px-8 py-3 rounded-2xl border-2 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-purple-400">
