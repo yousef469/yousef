@@ -138,8 +138,9 @@ export default function GameMapPlanes() {
   };
 
   const levels = generateLevels();
-  const isLevelUnlocked = (levelId) => levelId === 0 || completedLevels.includes(levelId - 1);
-  const isLevelCompleted = (levelId) => completedLevels.includes(levelId) && completedLevels.includes(levelId + 1);
+  // UNLOCK ALL LESSONS FOR TESTING
+  const isLevelUnlocked = (levelId) => true; // All lessons unlocked
+  const isLevelCompleted = (levelId) => false; // None completed yet
 
   const handleLevelClick = (level) => {
     if (isLevelUnlocked(level.id)) {
