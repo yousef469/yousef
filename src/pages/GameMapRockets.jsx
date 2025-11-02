@@ -86,7 +86,7 @@ export default function GameMapRockets() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 border-b border-purple-700 bg-purple-900/80 backdrop-blur-sm sticky top-0">
+      <div className="relative z-50 border-b border-purple-700 bg-purple-900/90 backdrop-blur-md sticky top-0 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
