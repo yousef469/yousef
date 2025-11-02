@@ -21,10 +21,21 @@ function combineLessonsWithQuizzes(lessons, quizzes) {
   return lessons.map((lesson, index) => {
     const quiz = quizzes.find(q => q.lessonId === lesson.id);
     return {
-      ...lesson,
+      id: lesson.id,
+      title: lesson.title,
+      unitNumber: lesson.unitNumber,
+      lessonNumber: lesson.lessonNumber,
+      duration: lesson.duration,
+      emoji: lesson.emoji,
       level: "Beginner",
       unit: units[`unit${lesson.unitNumber}`].title,
-      locked: false, // ALL LESSONS UNLOCKED FOR REVIEW
+      locked: false,
+      content: {
+        introduction: lesson.introduction,
+        sections: lesson.sections,
+        keyTakeaways: lesson.keyTakeaways,
+        vocabulary: lesson.vocabulary
+      },
       quiz: {
         questions: quiz ? quiz.questions : []
       }
