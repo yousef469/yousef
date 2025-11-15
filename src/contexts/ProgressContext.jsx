@@ -125,6 +125,7 @@ export function ProgressProvider({ children }) {
       console.log(`⚠️ No user logged in, skipping Supabase update`);
     }
     
+    // ALWAYS update localStorage progress (this is the fallback)
     setProgress(prev => {
       const newProgress = {
         ...prev,
@@ -163,8 +164,22 @@ export function ProgressProvider({ children }) {
         setNewAchievement(getAchievementInfo(newAchievements[0]));
       }
 
+      console.log(`✅ Progress updated in localStorage:`, {
+        key,
+        completedLessons: Object.keys(newProgress.completedLessons)
+      });
+
       return newProgress;
     });
+    
+    // Force a re-render by updating userProfile with localStorage data if Supabase failed
+    if (!user || !result?.data) {
+      console.log(`⚠️ Using localStorage as primary source`);
+      setUserProfile(prev => ({
+        ...prev,
+        completed_lessons: [...(prev.completed_lessons || []), key].filter((v, i, a) => a.indexOf(v) === i)
+      }));
+    }
     
     return { xpEarned };
   };
@@ -335,26 +350,33 @@ export function ProgressProvider({ children }) {
     if (lessonNum === 1) return true;
     
     try {
+      const previousLessonKey = `${subject}-${lessonNum - 1}`;
+      
       // Check if user is logged in
       if (user) {
         const { unlocked } = await checkLessonUnlocked(user.id, subject, lessonNum);
         
+        // ALSO check localStorage as fallback
+        const unlockedInLocalStorage = !!progress.completedLessons[previousLessonKey];
+        const finalUnlocked = unlocked || unlockedInLocalStorage;
+        
         if (import.meta.env.DEV) {
           console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}):`, {
-            unlocked,
+            unlockedInSupabase: unlocked,
+            unlockedInLocalStorage,
+            finalUnlocked,
             userId: user.id
           });
         }
         
-        return unlocked;
+        return finalUnlocked;
       }
       
       // Fallback to localStorage check
-      const previousLessonKey = `${subject}-${lessonNum - 1}`;
       const unlocked = !!progress.completedLessons[previousLessonKey];
       
       if (import.meta.env.DEV) {
-        console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}) [localStorage]:`, {
+        console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}) [localStorage only]:`, {
           previousLessonKey,
           unlocked
         });
@@ -363,8 +385,9 @@ export function ProgressProvider({ children }) {
       return unlocked;
     } catch (error) {
       console.error('Error checking lesson unlock:', error);
-      // On error, only unlock lesson 1
-      return lessonNum === 1;
+      // On error, check localStorage
+      const previousLessonKey = `${subject}-${lessonNum - 1}`;
+      return !!progress.completedLessons[previousLessonKey] || lessonNum === 1;
     }
   };
 
