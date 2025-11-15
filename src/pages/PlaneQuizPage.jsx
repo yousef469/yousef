@@ -170,10 +170,10 @@ export default function PlaneQuizPage() {
             {/* Actions */}
             <div className="flex gap-4">
               <button
-                onClick={() => navigate(`/games/play/planes/lesson/${lessonId}`)}
+                onClick={() => navigate(`/games/play/planes/lesson/${parseInt(lessonId) + 1}`)}
                 className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-colors"
               >
-                Back to Lesson
+                Next Lesson →
               </button>
               <button
                 onClick={() => navigate('/games/map/planes')}

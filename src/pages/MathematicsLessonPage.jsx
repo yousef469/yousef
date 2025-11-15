@@ -315,12 +315,6 @@ export default function MathematicsLessonPage() {
                                     Take Quiz
                                 </button>
                                 <button
-                                    onClick={() => navigate(`/learn/mathematics/engineering/lesson/${parseInt(lessonId) + 1}`)}
-                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-colors"
-                                >
-                                    Next Lesson →
-                                </button>
-                                <button
                                     onClick={() => navigate('/learn/mathematics/engineering/map')}
                                     className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition-colors"
                                 >

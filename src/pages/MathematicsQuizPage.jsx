@@ -151,10 +151,10 @@ export default function MathematicsQuizPage() {
 
             <div className="flex gap-4">
               <button
-                onClick={() => navigate(`/learn/mathematics/engineering/lesson/${lessonId}`)}
+                onClick={() => navigate(`/learn/mathematics/engineering/lesson/${parseInt(lessonId) + 1}`)}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
               >
-                Back to Lesson
+                Next Lesson →
               </button>
               <button
                 onClick={() => navigate('/learn/mathematics/engineering/map')}
