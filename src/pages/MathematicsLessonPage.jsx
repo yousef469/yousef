@@ -9,7 +9,7 @@ import { useProgress } from '../contexts/ProgressContext';
 export default function MathematicsLessonPage() {
     const { lessonId } = useParams();
     const navigate = useNavigate();
-    const { completeLesson, isLessonCompleted, isLessonUnlocked, userProfile } = useProgress();
+    const { completeLesson, isLessonCompleted, isLessonUnlocked, userProfile, getQuizScore } = useProgress();
     
     // Initialize as true for lesson 1, false for others
     const [lessonUnlocked, setLessonUnlocked] = useState(parseInt(lessonId) === 1);
@@ -108,11 +108,16 @@ export default function MathematicsLessonPage() {
         if (result) {
             setXPEarned(result.xpEarned);
             setShowXPReward(true);
-            setTimeout(() => setShowXPReward(false), 3000);
+            setTimeout(() => {
+                setShowXPReward(false);
+                // Navigate back to map after completing
+                navigate('/learn/mathematics/engineering/map');
+            }, 3000);
         }
     };
 
     const completed = isLessonCompleted('mathematics', parseInt(lessonId));
+    const quizScore = getQuizScore('mathematics', parseInt(lessonId));
 
     // Check if lesson uses new structure (physics-style) or old structure
     const hasNewStructure = lesson.content && lesson.content.intro && lesson.content.concepts;
@@ -323,14 +328,15 @@ export default function MathematicsLessonPage() {
                                 </button>
                             </div>
                         </>
-                    ) : (
+                    ) : quizScore ? (
+                        // Quiz completed, show complete lesson button
                         <>
                             <div className="flex items-center gap-4 mb-4">
                                 <Star className="w-8 h-8 text-purple-400" />
                                 <h2 className="text-2xl font-bold">Ready to Complete?</h2>
                             </div>
                             <p className="text-gray-200 mb-6">
-                                You've reached the end of this lesson. Click below to mark it complete and earn XP!
+                                Great job on the quiz! Click below to complete this lesson and earn your XP.
                             </p>
                             <div className="flex gap-4">
                                 <button
@@ -338,7 +344,33 @@ export default function MathematicsLessonPage() {
                                     className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold text-lg flex items-center gap-3 transition-all transform hover:scale-105 shadow-lg"
                                 >
                                     <Star className="w-6 h-6" />
-                                    Complete Lesson & Earn 100 XP
+                                    Complete Lesson & Earn {quizScore.percentage === 100 ? '150' : quizScore.percentage >= 80 ? '130' : '110'} XP
+                                </button>
+                                <button
+                                    onClick={() => navigate('/learn/mathematics/engineering/map')}
+                                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition-colors"
+                                >
+                                    Back to Map
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        // Quiz not completed yet, show take quiz button
+                        <>
+                            <div className="flex items-center gap-4 mb-4">
+                                <CheckCircle className="w-8 h-8 text-green-400" />
+                                <h2 className="text-2xl font-bold">Take the Quiz!</h2>
+                            </div>
+                            <p className="text-gray-200 mb-6">
+                                You've reached the end of this lesson. Take the quiz to test your knowledge and unlock the complete button!
+                            </p>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => navigate(`/learn/mathematics/engineering/quiz/${lessonId}`)}
+                                    className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-bold text-lg flex items-center gap-3 transition-all transform hover:scale-105 shadow-lg"
+                                >
+                                    <CheckCircle className="w-6 h-6" />
+                                    Take Quiz Now
                                 </button>
                                 <button
                                     onClick={() => navigate('/learn/mathematics/engineering/map')}
