@@ -16,7 +16,7 @@ export default function BeginnerQuizPage() {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [progressSaved, setProgressSaved] = useState(false);
   
-  const { completeQuiz } = useProgress();
+  const { completeLesson } = useProgress();
   
   // Find lesson
   let lesson = null;
@@ -72,14 +72,10 @@ export default function BeginnerQuizPage() {
       // Save progress
       if (!progressSaved) {
         const results = calculateResults();
-        await completeQuiz(
-          parseInt(lessonId),
-          1,
-          results.correct,
-          results.total,
-          timeElapsed,
-          answers
-        );
+        await completeLesson('beginner', parseInt(lessonId), {
+          score: results.correct,
+          totalQuestions: results.total
+        });
         setProgressSaved(true);
       }
     }
@@ -165,16 +161,16 @@ export default function BeginnerQuizPage() {
 
             <div className="flex gap-4">
               <button
-                onClick={() => navigate(`/learn/unit/${lesson.unitNumber}`)}
-                className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-colors"
+                onClick={() => navigate(`/learn/beginner/lesson/${lessonId}`)}
+                className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-colors"
               >
-                Back to Unit
+                Back to Lesson
               </button>
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => navigate(`/learn/unit/${lesson.unitNumber}`)}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all"
               >
-                Retake Quiz
+                Back to Map
               </button>
             </div>
           </div>

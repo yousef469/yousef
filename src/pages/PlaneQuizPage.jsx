@@ -20,7 +20,7 @@ export default function PlaneQuizPage() {
   const [progressSaved, setProgressSaved] = useState(false);
   
   const lesson = planesLessons[parseInt(lessonId)];
-  const { completeQuiz } = useProgress();
+  const { completeLesson } = useProgress();
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -67,14 +67,10 @@ export default function PlaneQuizPage() {
       // Save progress to database
       if (!progressSaved) {
         const results = calculateResults();
-        await completeQuiz(
-          parseInt(lessonId),
-          1, // quiz number
-          results.correct,
-          results.total,
-          timeElapsed,
-          answers
-        );
+        await completeLesson('planes', parseInt(lessonId), {
+          score: results.correct,
+          totalQuestions: results.total
+        });
         setProgressSaved(true);
       }
     }
@@ -174,16 +170,16 @@ export default function PlaneQuizPage() {
             {/* Actions */}
             <div className="flex gap-4">
               <button
-                onClick={() => navigate('/games/map/planes')}
-                className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-colors"
+                onClick={() => navigate(`/games/play/planes/lesson/${lessonId}`)}
+                className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-colors"
               >
-                Back to Map
+                Back to Lesson
               </button>
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => navigate('/games/map/planes')}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all"
               >
-                Retake Quiz
+                Back to Map
               </button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle, XCircle, Award } from 'lucide-react';
 import { mathematicsQuizzes } from '../data/mathematics/quizzes/mathematicsQuizzes';
 import MultipleChoiceQuestion from '../components/quiz/MultipleChoiceQuestion';
 import TrueFalseQuestion from '../components/quiz/TrueFalseQuestion';
+import { useProgress } from '../contexts/ProgressContext';
 
 export default function MathematicsQuizPage() {
   const { lessonId } = useParams();
@@ -12,6 +13,9 @@ export default function MathematicsQuizPage() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const [progressSaved, setProgressSaved] = useState(false);
+  
+  const { completeLesson } = useProgress();
 
   const quiz = mathematicsQuizzes[parseInt(lessonId)];
 
@@ -30,12 +34,21 @@ export default function MathematicsQuizPage() {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(prev => prev + 1);
     } else {
-      calculateScore();
+      const correct = calculateScore();
       setShowResults(true);
+      
+      // Save progress
+      if (!progressSaved) {
+        await completeLesson('mathematics', parseInt(lessonId), {
+          score: correct,
+          totalQuestions: totalQuestions
+        });
+        setProgressSaved(true);
+      }
     }
   };
 
@@ -53,13 +66,7 @@ export default function MathematicsQuizPage() {
       }
     });
     setScore(correct);
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setAnswers({});
-    setShowResults(false);
-    setScore(0);
+    return correct;
   };
 
   const question = questions[currentQuestion];
@@ -150,16 +157,10 @@ export default function MathematicsQuizPage() {
                 Back to Lesson
               </button>
               <button
-                onClick={() => navigate(`/learn/mathematics/engineering/lesson/${parseInt(lessonId) + 1}`)}
+                onClick={() => navigate('/learn/mathematics/engineering/map')}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
               >
-                Next Lesson →
-              </button>
-              <button
-                onClick={resetQuiz}
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
-              >
-                Retake Quiz
+                Back to Map
               </button>
             </div>
           </div>
