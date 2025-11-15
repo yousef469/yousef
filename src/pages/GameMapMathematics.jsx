@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calculator, Star, Lock, CheckCircle } from 'lucide-react';
 import { useProgress } from '../contexts/ProgressContext';
@@ -9,8 +9,8 @@ export default function GameMapMathematics() {
   // Initialize with lesson 1 unlocked
   const [lessonStates, setLessonStates] = useState({ 1: { completed: false, unlocked: true } });
 
-  // Generate all 37 lessons across 7 units
-  const generateLevels = () => {
+  // Generate all 37 lessons across 7 units - memoized to prevent recreation
+  const levels = useMemo(() => {
     const levels = [];
     let levelId = 1; // Start from 1 instead of 0
 
@@ -127,9 +127,7 @@ export default function GameMapMathematics() {
     });
 
     return levels;
-  };
-
-  const levels = generateLevels();
+  }, []);
 
   // Load lesson states on mount and when progress changes
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Zap, Star, Lock, CheckCircle } from 'lucide-react';
 import { useProgress } from '../contexts/ProgressContext';
@@ -9,7 +9,7 @@ export default function GameMapPhysics() {
   // Initialize with lesson 1 unlocked
   const [lessonStates, setLessonStates] = useState({ 1: { completed: false, unlocked: true } });
 
-  const generateLevels = () => {
+  const levels = useMemo(() => {
     const levels = [];
     let levelId = 1;
     let sequentialLessonNumber = 1; // Global counter for sequential numbering 1-33
@@ -114,9 +114,7 @@ export default function GameMapPhysics() {
     });
 
     return levels;
-  };
-
-  const levels = generateLevels();
+  }, []);
 
   // Load lesson states on mount and when progress changes
   useEffect(() => {
