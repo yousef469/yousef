@@ -160,7 +160,11 @@ export function ProgressProvider({ children }) {
 
   // Check if lesson is completed
   const isLessonCompleted = (subject, lessonId) => {
-    return !!progress.completedLessons[`${subject}-${lessonId}`];
+    const key = `${subject}-${lessonId}`;
+    // Check both localStorage and Supabase profile
+    const inLocalStorage = !!progress.completedLessons[key];
+    const inSupabase = userProfile.completed_lessons?.includes(key) || false;
+    return inLocalStorage || inSupabase;
   };
 
   // Get quiz score for a lesson

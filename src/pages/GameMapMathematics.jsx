@@ -5,7 +5,7 @@ import { useProgress } from '../contexts/ProgressContext';
 
 export default function GameMapMathematics() {
   const navigate = useNavigate();
-  const { isLessonCompleted, isLessonUnlocked, progress } = useProgress();
+  const { isLessonCompleted, isLessonUnlocked, progress, userProfile } = useProgress();
   // Initialize with lesson 1 unlocked
   const [lessonStates, setLessonStates] = useState({ 1: { completed: false, unlocked: true } });
 
@@ -142,7 +142,7 @@ export default function GameMapMathematics() {
       setLessonStates(states);
     };
     loadStates();
-  }, [levels, isLessonCompleted, isLessonUnlocked, progress]);
+  }, [levels, isLessonCompleted, isLessonUnlocked, progress, userProfile]);
 
   const handleLevelClick = (level) => {
     const state = lessonStates[level.id];
