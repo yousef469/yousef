@@ -67,6 +67,8 @@ export function ProgressProvider({ children }) {
   const completeLesson = async (subject, lessonId, quizScore = null) => {
     const key = `${subject}-${lessonId}`;
     
+    console.log(`✅ completeLesson called:`, { subject, lessonId, quizScore, key, user: !!user });
+    
     // Calculate XP based on quiz score
     let xpEarned = 100; // Base XP for completing lesson
     if (quizScore !== null) {
@@ -81,10 +83,18 @@ export function ProgressProvider({ children }) {
     
     // Update Supabase if user is logged in
     if (user) {
+      console.log(`💾 Calling addXP:`, { userId: user.id, xpEarned, lessonId, subject });
       const result = await addXP(user.id, xpEarned, lessonId, subject);
+      console.log(`💾 addXP result:`, result);
+      
       if (result.data) {
         setUserProfile(result.data);
         leveledUp = result.leveledUp || false;
+        
+        console.log(`✅ UserProfile updated:`, { 
+          completed_lessons: result.data.completed_lessons,
+          total_xp: result.data.total_xp 
+        });
         
         // Show level up notification
         if (leveledUp) {
@@ -95,7 +105,11 @@ export function ProgressProvider({ children }) {
             icon: '⭐'
           });
         }
+      } else if (result.error) {
+        console.error(`❌ addXP error:`, result.error);
       }
+    } else {
+      console.log(`⚠️ No user logged in, skipping Supabase update`);
     }
     
     setProgress(prev => {
