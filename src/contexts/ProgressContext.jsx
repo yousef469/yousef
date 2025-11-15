@@ -91,35 +91,36 @@ export function ProgressProvider({ children }) {
       else if (percentage >= 60) xpEarned += 10; // Small bonus
     }
     
-    // Track if user leveled up
+    // Track if user leveled up and Supabase result
     let leveledUp = false;
+    let supabaseResult = null;
     
     // Update Supabase if user is logged in
     if (user) {
       console.log(`💾 Calling addXP:`, { userId: user.id, xpEarned, lessonId, subject });
-      const result = await addXP(user.id, xpEarned, lessonId, subject);
-      console.log(`💾 addXP result:`, result);
+      supabaseResult = await addXP(user.id, xpEarned, lessonId, subject);
+      console.log(`💾 addXP result:`, supabaseResult);
       
-      if (result.data) {
-        setUserProfile(result.data);
-        leveledUp = result.leveledUp || false;
+      if (supabaseResult.data) {
+        setUserProfile(supabaseResult.data);
+        leveledUp = supabaseResult.leveledUp || false;
         
         console.log(`✅ UserProfile updated:`, { 
-          completed_lessons: result.data.completed_lessons,
-          total_xp: result.data.total_xp 
+          completed_lessons: supabaseResult.data.completed_lessons,
+          total_xp: supabaseResult.data.total_xp 
         });
         
         // Show level up notification
         if (leveledUp) {
           setNewAchievement({
             id: 'level_up',
-            title: `Level ${result.data.level} Reached!`,
+            title: `Level ${supabaseResult.data.level} Reached!`,
             description: `You've earned ${xpEarned} XP and leveled up!`,
             icon: '⭐'
           });
         }
-      } else if (result.error) {
-        console.error(`❌ addXP error:`, result.error);
+      } else if (supabaseResult.error) {
+        console.error(`❌ addXP error:`, supabaseResult.error);
       }
     } else {
       console.log(`⚠️ No user logged in, skipping Supabase update`);
@@ -173,7 +174,7 @@ export function ProgressProvider({ children }) {
     });
     
     // Force a re-render by updating userProfile with localStorage data if Supabase failed
-    if (!user || !result?.data) {
+    if (!user || !supabaseResult?.data) {
       console.log(`⚠️ Using localStorage as primary source`);
       setUserProfile(prev => ({
         ...prev,
