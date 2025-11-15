@@ -98,6 +98,8 @@ export default function MathematicsQuizPage() {
               {questions.map((q, idx) => {
                 const userAnswer = answers[q.id];
                 const isCorrect = userAnswer === q.correctAnswer;
+                const userAnswerText = q.options ? q.options[userAnswer] : (userAnswer ? 'True' : 'False');
+                const correctAnswerText = q.options ? q.options[q.correctAnswer] : (q.correctAnswer ? 'True' : 'False');
                 
                 return (
                   <div
@@ -116,8 +118,22 @@ export default function MathematicsQuizPage() {
                       )}
                       <div className="flex-1">
                         <p className="font-semibold mb-2">Question {idx + 1}: {q.question}</p>
-                        {!isCorrect && (
-                          <p className="text-sm text-green-200">{q.explanation}</p>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm">
+                            <span className="font-semibold">Your answer:</span>{' '}
+                            <span className={isCorrect ? 'text-green-300' : 'text-red-300'}>
+                              {userAnswerText}
+                            </span>
+                          </p>
+                          {!isCorrect && (
+                            <p className="text-sm">
+                              <span className="font-semibold">Correct answer:</span>{' '}
+                              <span className="text-green-300">{correctAnswerText}</span>
+                            </p>
+                          )}
+                        </div>
+                        {!isCorrect && q.explanation && (
+                          <p className="text-sm text-green-200 mt-2">{q.explanation}</p>
                         )}
                       </div>
                     </div>

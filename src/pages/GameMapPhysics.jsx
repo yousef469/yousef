@@ -5,7 +5,7 @@ import { useProgress } from '../contexts/ProgressContext';
 
 export default function GameMapPhysics() {
   const navigate = useNavigate();
-  const { isLessonCompleted, isLessonUnlocked } = useProgress();
+  const { isLessonCompleted, isLessonUnlocked, progress } = useProgress();
   // Initialize with lesson 1 unlocked
   const [lessonStates, setLessonStates] = useState({ 1: { completed: false, unlocked: true } });
 
@@ -118,7 +118,7 @@ export default function GameMapPhysics() {
 
   const levels = generateLevels();
 
-  // Load lesson states on mount
+  // Load lesson states on mount and when progress changes
   useEffect(() => {
     const loadStates = async () => {
       const states = {};
@@ -131,7 +131,7 @@ export default function GameMapPhysics() {
       setLessonStates(states);
     };
     loadStates();
-  }, [levels, isLessonCompleted, isLessonUnlocked]);
+  }, [levels, isLessonCompleted, isLessonUnlocked, progress]);
 
   const handleLevelClick = (level) => {
     const state = lessonStates[level.id];
