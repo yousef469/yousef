@@ -10,13 +10,13 @@ export default function MultipleChoiceQuestion({ question, answer, onAnswer }) {
             onClick={() => onAnswer(index)}
             className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
               answer === index
-                ? 'border-cyan-400 bg-cyan-400/20'
+                ? 'border-green-400 bg-green-400/20'
                 : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                answer === index ? 'border-cyan-400 bg-cyan-400' : 'border-white/40'
+                answer === index ? 'border-green-400 bg-green-400' : 'border-white/40'
               }`}>
                 {answer === index && (
                   <div className="w-3 h-3 rounded-full bg-white" />
