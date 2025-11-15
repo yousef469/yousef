@@ -178,10 +178,26 @@ export const getUserProfile = async (userId) => {
 };
 
 export const addXP = async (userId, xpAmount, lessonId, subject) => {
-  // Get current profile
-  const { data: profile } = await getUserProfile(userId);
+  console.log(`💾 addXP called:`, { userId, xpAmount, lessonId, subject });
   
-  if (!profile) return { error: 'Profile not found' };
+  // Get current profile
+  const { data: profile, error: profileError } = await getUserProfile(userId);
+  
+  if (profileError) {
+    console.error(`❌ Error getting profile:`, profileError);
+    return { error: profileError };
+  }
+  
+  if (!profile) {
+    console.error(`❌ Profile not found for user:`, userId);
+    return { error: 'Profile not found' };
+  }
+  
+  console.log(`📊 Current profile:`, {
+    total_xp: profile.total_xp,
+    level: profile.level,
+    completed_lessons: profile.completed_lessons
+  });
   
   const newXP = (profile.total_xp || 0) + xpAmount;
   const newLevel = Math.floor(newXP / 1000) + 1; // Level up every 1000 XP
@@ -191,19 +207,32 @@ export const addXP = async (userId, xpAmount, lessonId, subject) => {
   const lessonKey = `${subject}-${lessonId}`;
   if (!completedLessons.includes(lessonKey)) {
     completedLessons.push(lessonKey);
+    console.log(`➕ Adding lesson to completed:`, lessonKey);
+  } else {
+    console.log(`ℹ️ Lesson already completed:`, lessonKey);
   }
+  
+  const updateData = {
+    total_xp: newXP,
+    level: newLevel,
+    completed_lessons: completedLessons,
+    updated_at: new Date().toISOString()
+  };
+  
+  console.log(`💾 Updating profile with:`, updateData);
   
   const { data, error } = await supabase
     .from('user_profiles')
-    .update({
-      total_xp: newXP,
-      level: newLevel,
-      completed_lessons: completedLessons,
-      updated_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq('user_id', userId)
     .select()
     .single();
+  
+  if (error) {
+    console.error(`❌ Error updating profile:`, error);
+  } else {
+    console.log(`✅ Profile updated successfully:`, data);
+  }
   
   return { data, error, leveledUp: newLevel > profile.level };
 };

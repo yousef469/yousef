@@ -52,9 +52,22 @@ export function ProgressProvider({ children }) {
   const loadUserProfile = async () => {
     if (!user) return;
     
+    console.log(`📥 Loading user profile for user:`, user.id);
     const { data, error } = await getUserProfile(user.id);
+    
+    if (error) {
+      console.error(`❌ Error loading profile:`, error);
+    }
+    
     if (data && !error) {
+      console.log(`✅ Profile loaded:`, {
+        total_xp: data.total_xp,
+        level: data.level,
+        completed_lessons: data.completed_lessons
+      });
       setUserProfile(data);
+    } else {
+      console.log(`⚠️ No profile data returned`);
     }
   };
 
