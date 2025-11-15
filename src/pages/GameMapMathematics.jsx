@@ -137,21 +137,27 @@ export default function GameMapMathematics() {
   }, []);
 
   useEffect(() => {
-    const loadStates = async () => {
-      const states = {};
-      for (const level of levels) {
-        const completed = isLessonCompleted('mathematics', level.id);
-        // Lesson 1 is ALWAYS unlocked, others check if previous is completed
-        let unlocked = level.id === 1;
-        if (!unlocked) {
-          unlocked = await isLessonUnlocked('mathematics', level.id);
-        }
-        states[level.id] = { completed, unlocked };
+    // Calculate states synchronously without async calls
+    const states = {};
+    for (const level of levels) {
+      const completed = isLessonCompleted('mathematics', level.id);
+      
+      // Lesson 1 is ALWAYS unlocked
+      let unlocked = level.id === 1;
+      
+      // For other lessons, check if previous lesson is completed
+      if (!unlocked) {
+        const previousLessonKey = `mathematics-${level.id - 1}`;
+        // Check both localStorage and userProfile
+        const inLocalStorage = !!progress.completedLessons[previousLessonKey];
+        const inSupabase = userProfile.completed_lessons?.includes(previousLessonKey) || false;
+        unlocked = inLocalStorage || inSupabase;
       }
-      setLessonStates(states);
-    };
-    loadStates();
-  }, [levels, progress, userProfile, refreshKey]);
+      
+      states[level.id] = { completed, unlocked };
+    }
+    setLessonStates(states);
+  }, [levels, progress, userProfile, refreshKey, isLessonCompleted]);
 
   const handleLevelClick = (level) => {
     const state = lessonStates[level.id];
