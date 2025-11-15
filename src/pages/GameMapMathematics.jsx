@@ -8,6 +8,7 @@ export default function GameMapMathematics() {
   const { isLessonCompleted, isLessonUnlocked, progress, userProfile } = useProgress();
   // Initialize with lesson 1 unlocked
   const [lessonStates, setLessonStates] = useState({ 1: { completed: false, unlocked: true } });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Generate all 37 lessons across 7 units - memoized to prevent recreation
   const levels = useMemo(() => {
@@ -130,19 +131,27 @@ export default function GameMapMathematics() {
   }, []);
 
   // Load lesson states on mount and when progress changes
+  // Force refresh when component mounts
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
+
   useEffect(() => {
     const loadStates = async () => {
       const states = {};
       for (const level of levels) {
         const completed = isLessonCompleted('mathematics', level.id);
-        // Lesson 1 is ALWAYS unlocked
-        const unlocked = level.id === 1 ? true : await isLessonUnlocked('mathematics', level.id);
+        // Lesson 1 is ALWAYS unlocked, others check if previous is completed
+        let unlocked = level.id === 1;
+        if (!unlocked) {
+          unlocked = await isLessonUnlocked('mathematics', level.id);
+        }
         states[level.id] = { completed, unlocked };
       }
       setLessonStates(states);
     };
     loadStates();
-  }, [levels, isLessonCompleted, isLessonUnlocked, progress, userProfile]);
+  }, [levels, progress, userProfile, refreshKey]);
 
   const handleLevelClick = (level) => {
     const state = lessonStates[level.id];
