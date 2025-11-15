@@ -164,7 +164,19 @@ export function ProgressProvider({ children }) {
     // Check both localStorage and Supabase profile
     const inLocalStorage = !!progress.completedLessons[key];
     const inSupabase = userProfile.completed_lessons?.includes(key) || false;
-    return inLocalStorage || inSupabase;
+    const result = inLocalStorage || inSupabase;
+    
+    if (import.meta.env.DEV) {
+      console.log(`🔍 isLessonCompleted(${subject}, ${lessonId}):`, {
+        key,
+        inLocalStorage,
+        inSupabase,
+        result,
+        completedLessons: userProfile.completed_lessons
+      });
+    }
+    
+    return result;
   };
 
   // Get quiz score for a lesson
@@ -299,12 +311,29 @@ export function ProgressProvider({ children }) {
       // Check if user is logged in
       if (user) {
         const { unlocked } = await checkLessonUnlocked(user.id, subject, lessonNum);
+        
+        if (import.meta.env.DEV) {
+          console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}):`, {
+            unlocked,
+            userId: user.id
+          });
+        }
+        
         return unlocked;
       }
       
       // Fallback to localStorage check
       const previousLessonKey = `${subject}-${lessonNum - 1}`;
-      return !!progress.completedLessons[previousLessonKey];
+      const unlocked = !!progress.completedLessons[previousLessonKey];
+      
+      if (import.meta.env.DEV) {
+        console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}) [localStorage]:`, {
+          previousLessonKey,
+          unlocked
+        });
+      }
+      
+      return unlocked;
     } catch (error) {
       console.error('Error checking lesson unlock:', error);
       // On error, only unlock lesson 1

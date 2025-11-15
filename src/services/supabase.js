@@ -239,6 +239,13 @@ export const isLessonUnlocked = async (userId, subject, lessonId) => {
     // Check if previous lesson is completed
     const previousLessonCompleted = completedLessons && completedLessons.includes(lessonNum - 1);
     
+    console.log(`🔐 Supabase isLessonUnlocked(${subject}, ${lessonNum}):`, {
+      completedLessons,
+      previousLesson: lessonNum - 1,
+      previousLessonCompleted,
+      unlocked: previousLessonCompleted
+    });
+    
     return { unlocked: previousLessonCompleted };
   } catch (error) {
     console.error('Error checking lesson unlock:', error);
