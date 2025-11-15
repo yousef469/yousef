@@ -1,4 +1,6 @@
-export default function MultipleChoiceQuestion({ question, answer, onAnswer }) {
+export default function MultipleChoiceQuestion({ question, answer, selectedAnswer, onAnswer }) {
+  // Use selectedAnswer if provided, otherwise fall back to answer
+  const currentAnswer = selectedAnswer !== undefined ? selectedAnswer : answer;
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">{question.question}</h2>
@@ -9,16 +11,16 @@ export default function MultipleChoiceQuestion({ question, answer, onAnswer }) {
             key={index}
             onClick={() => onAnswer(index)}
             className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-              answer === index
+              currentAnswer === index
                 ? 'border-green-400 bg-green-400/20'
                 : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                answer === index ? 'border-green-400 bg-green-400' : 'border-white/40'
+                currentAnswer === index ? 'border-green-400 bg-green-400' : 'border-white/40'
               }`}>
-                {answer === index && (
+                {currentAnswer === index && (
                   <div className="w-3 h-3 rounded-full bg-white" />
                 )}
               </div>

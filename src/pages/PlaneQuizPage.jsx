@@ -198,7 +198,7 @@ export default function PlaneQuizPage() {
         return (
           <MultipleChoiceQuestion
             question={currentQ}
-            answer={answers[currentQuestion]}
+            selectedAnswer={answers[currentQuestion]}
             onAnswer={handleAnswer}
           />
         );
@@ -206,7 +206,7 @@ export default function PlaneQuizPage() {
         return (
           <TrueFalseQuestion
             question={currentQ}
-            answer={answers[currentQuestion]}
+            selectedAnswer={answers[currentQuestion]}
             onAnswer={handleAnswer}
           />
         );

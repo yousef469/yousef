@@ -189,7 +189,7 @@ export default function BeginnerQuizPage() {
         return (
           <MultipleChoiceQuestion
             question={currentQ}
-            answer={answers[currentQuestion]}
+            selectedAnswer={answers[currentQuestion]}
             onAnswer={handleAnswer}
           />
         );
@@ -197,7 +197,7 @@ export default function BeginnerQuizPage() {
         return (
           <TrueFalseQuestion
             question={currentQ}
-            answer={answers[currentQuestion]}
+            selectedAnswer={answers[currentQuestion]}
             onAnswer={handleAnswer}
           />
         );
