@@ -76,17 +76,21 @@ export function ProgressProvider({ children }) {
       else if (percentage >= 60) xpEarned += 10; // Small bonus
     }
     
+    // Track if user leveled up
+    let leveledUp = false;
+    
     // Update Supabase if user is logged in
     if (user) {
-      const { data, leveledUp } = await addXP(user.id, xpEarned, lessonId, subject);
-      if (data) {
-        setUserProfile(data);
+      const result = await addXP(user.id, xpEarned, lessonId, subject);
+      if (result.data) {
+        setUserProfile(result.data);
+        leveledUp = result.leveledUp || false;
         
         // Show level up notification
         if (leveledUp) {
           setNewAchievement({
             id: 'level_up',
-            title: `Level ${data.level} Reached!`,
+            title: `Level ${result.data.level} Reached!`,
             description: `You've earned ${xpEarned} XP and leveled up!`,
             icon: '⭐'
           });
