@@ -52,22 +52,9 @@ export function ProgressProvider({ children }) {
   const loadUserProfile = async () => {
     if (!user) return;
     
-    console.log(`📥 Loading user profile for user:`, user.id);
     const { data, error } = await getUserProfile(user.id);
-    
-    if (error) {
-      console.error(`❌ Error loading profile:`, error);
-    }
-    
     if (data && !error) {
-      console.log(`✅ Profile loaded:`, {
-        total_xp: data.total_xp,
-        level: data.level,
-        completed_lessons: data.completed_lessons
-      });
       setUserProfile(data);
-    } else {
-      console.log(`⚠️ No profile data returned`);
     }
   };
 
@@ -79,8 +66,6 @@ export function ProgressProvider({ children }) {
   // Mark lesson as completed with XP reward
   const completeLesson = async (subject, lessonId, quizScore = null) => {
     const key = `${subject}-${lessonId}`;
-    
-    console.log(`✅ completeLesson called:`, { subject, lessonId, quizScore, key, user: !!user });
     
     // Calculate XP based on quiz score
     let xpEarned = 100; // Base XP for completing lesson
@@ -97,18 +82,11 @@ export function ProgressProvider({ children }) {
     
     // Update Supabase if user is logged in
     if (user) {
-      console.log(`💾 Calling addXP:`, { userId: user.id, xpEarned, lessonId, subject });
       supabaseResult = await addXP(user.id, xpEarned, lessonId, subject);
-      console.log(`💾 addXP result:`, supabaseResult);
       
       if (supabaseResult.data) {
         setUserProfile(supabaseResult.data);
         leveledUp = supabaseResult.leveledUp || false;
-        
-        console.log(`✅ UserProfile updated:`, { 
-          completed_lessons: supabaseResult.data.completed_lessons,
-          total_xp: supabaseResult.data.total_xp 
-        });
         
         // Show level up notification
         if (leveledUp) {
@@ -119,11 +97,7 @@ export function ProgressProvider({ children }) {
             icon: '⭐'
           });
         }
-      } else if (supabaseResult.error) {
-        console.error(`❌ addXP error:`, supabaseResult.error);
       }
-    } else {
-      console.log(`⚠️ No user logged in, skipping Supabase update`);
     }
     
     // ALWAYS update localStorage progress (this is the fallback)
@@ -165,17 +139,11 @@ export function ProgressProvider({ children }) {
         setNewAchievement(getAchievementInfo(newAchievements[0]));
       }
 
-      console.log(`✅ Progress updated in localStorage:`, {
-        key,
-        completedLessons: Object.keys(newProgress.completedLessons)
-      });
-
       return newProgress;
     });
     
     // Force a re-render by updating userProfile with localStorage data if Supabase failed
     if (!user || !supabaseResult?.data) {
-      console.log(`⚠️ Using localStorage as primary source`);
       setUserProfile(prev => ({
         ...prev,
         completed_lessons: [...(prev.completed_lessons || []), key].filter((v, i, a) => a.indexOf(v) === i)
@@ -207,19 +175,7 @@ export function ProgressProvider({ children }) {
     // Check both localStorage and Supabase profile
     const inLocalStorage = !!progress.completedLessons[key];
     const inSupabase = userProfile.completed_lessons?.includes(key) || false;
-    const result = inLocalStorage || inSupabase;
-    
-    if (import.meta.env.DEV) {
-      console.log(`🔍 isLessonCompleted(${subject}, ${lessonId}):`, {
-        key,
-        inLocalStorage,
-        inSupabase,
-        result,
-        completedLessons: userProfile.completed_lessons
-      });
-    }
-    
-    return result;
+    return inLocalStorage || inSupabase;
   };
 
   // Get quiz score for a lesson
@@ -356,34 +312,13 @@ export function ProgressProvider({ children }) {
       // Check if user is logged in
       if (user) {
         const { unlocked } = await checkLessonUnlocked(user.id, subject, lessonNum);
-        
         // ALSO check localStorage as fallback
         const unlockedInLocalStorage = !!progress.completedLessons[previousLessonKey];
-        const finalUnlocked = unlocked || unlockedInLocalStorage;
-        
-        if (import.meta.env.DEV) {
-          console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}):`, {
-            unlockedInSupabase: unlocked,
-            unlockedInLocalStorage,
-            finalUnlocked,
-            userId: user.id
-          });
-        }
-        
-        return finalUnlocked;
+        return unlocked || unlockedInLocalStorage;
       }
       
       // Fallback to localStorage check
-      const unlocked = !!progress.completedLessons[previousLessonKey];
-      
-      if (import.meta.env.DEV) {
-        console.log(`🔓 isLessonUnlocked(${subject}, ${lessonNum}) [localStorage only]:`, {
-          previousLessonKey,
-          unlocked
-        });
-      }
-      
-      return unlocked;
+      return !!progress.completedLessons[previousLessonKey];
     } catch (error) {
       console.error('Error checking lesson unlock:', error);
       // On error, check localStorage
