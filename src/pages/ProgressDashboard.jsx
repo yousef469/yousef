@@ -7,37 +7,46 @@ export default function ProgressDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   
-  const {
-    loading,
-    totalXP,
-    currentRank,
-    rankLevel,
-    lessonsCompleted,
-    quizzesCompleted,
-    perfectQuizzes,
-    currentStreak,
-    longestStreak,
-    badges,
-    totalTimeSpent,
-    averageQuizScore,
-    totalStars,
-    getNextRankProgress
-  } = useProgress();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
-      </div>
-    );
-  }
-
-  const nextRankProgress = getNextRankProgress();
+  const { progress, userProfile } = useProgress();
+  
+  // Calculate stats from progress
+  const totalXP = userProfile.total_xp || 0;
+  const rankLevel = userProfile.level || 1;
+  const lessonsCompleted = Object.keys(progress.completedLessons).length;
+  const quizzesCompleted = Object.keys(progress.quizScores).length;
+  const perfectQuizzes = Object.values(progress.quizScores).filter(q => q.percentage === 100).length;
+  const badges = progress.achievements?.length || 0;
+  
+  const getRank = (level) => {
+    if (level >= 20) return 'Diamond';
+    if (level >= 15) return 'Platinum';
+    if (level >= 10) return 'Gold';
+    if (level >= 5) return 'Silver';
+    return 'Bronze';
+  };
+  
+  const currentRank = getRank(rankLevel);
+  const getNextRankProgress = () => {
+    const xpInLevel = totalXP % 1000;
+    return { current: xpInLevel, required: 1000, percentage: (xpInLevel / 1000) * 100 };
+  };
+  
+  // Additional stats (TODO: implement tracking)
+  const currentStreak = 0;
+  const longestStreak = 0;
+  const totalTimeSpent = 0;
+  const totalStars = lessonsCompleted * 3; // Estimate 3 stars per lesson
+  const averageQuizScore = quizzesCompleted > 0 
+    ? Object.values(progress.quizScores).reduce((sum, q) => sum + (q.percentage || 0), 0) / quizzesCompleted 
+    : 0;
+  
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
   };
+
+  const nextRankProgress = getNextRankProgress();
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: TrendingUp },

@@ -1,8 +1,18 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calculator } from 'lucide-react';
+import { useProgress } from '../contexts/ProgressContext';
 
 export default function MathematicsEngineeringPage() {
   const navigate = useNavigate();
+  const { isLessonCompleted } = useProgress();
+  
+  // If user has completed lesson 1, redirect to map
+  useEffect(() => {
+    if (isLessonCompleted('mathematics', 1)) {
+      navigate('/learn/mathematics/engineering/map', { replace: true });
+    }
+  }, [isLessonCompleted, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-8">
