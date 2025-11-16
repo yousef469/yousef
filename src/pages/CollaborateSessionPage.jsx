@@ -244,17 +244,18 @@ export default function CollaborateSessionPage() {
             {showMeetingInfo && (
               <div className="flex items-center gap-4 px-4 py-2 bg-gray-700/50 rounded-lg">
                 <div>
-                  <p className="text-xs text-gray-400">Meeting ID</p>
-                  <p className="font-mono font-bold">{sessionId}</p>
+                  <p className="text-xs text-gray-400">Session ID (Share this to invite)</p>
+                  <p className="font-mono font-bold text-blue-400">{sessionId}</p>
                 </div>
                 <div className="h-8 w-px bg-gray-600"></div>
                 <div>
-                  <p className="text-xs text-gray-400">Passcode</p>
-                  <p className="font-mono font-bold">{sessionPasscode}</p>
+                  <p className="text-xs text-gray-400">Passcode (Optional - if you want security)</p>
+                  <p className="font-mono font-bold text-green-400">{sessionPasscode}</p>
                 </div>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/collaborate/session/${sessionId}`);
+                    const inviteText = `Join my Engineerium meeting!\n\nSession ID: ${sessionId}\nPasscode: ${sessionPasscode}\n\nOr click: ${window.location.origin}/collaborate/session/${sessionId}`;
+                    navigator.clipboard.writeText(inviteText);
                     setLinkCopied(true);
                     setTimeout(() => setLinkCopied(false), 2000);
                   }}

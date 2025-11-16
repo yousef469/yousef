@@ -235,25 +235,26 @@ export default function CollaboratePage() {
             
             <div className="space-y-6 mb-8">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Session Code</label>
+                <label className="block text-sm text-gray-400 mb-2">Session ID</label>
+                <p className="text-xs text-gray-500 mb-2">The Session ID shown when the meeting was created</p>
                 <input
                   type="text"
                   value={sessionCode}
-                  onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-                  placeholder="Enter 6-digit code"
-                  maxLength={6}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-xl px-6 py-4 text-2xl text-center tracking-wider font-bold uppercase focus:border-purple-500 focus:outline-none"
+                  onChange={(e) => setSessionCode(e.target.value)}
+                  placeholder="e.g., abc123def456"
+                  className="w-full bg-gray-900 border border-gray-600 rounded-xl px-6 py-4 text-lg text-center tracking-wider font-mono focus:border-purple-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Password</label>
+                <label className="block text-sm text-gray-400 mb-2">Passcode (Optional)</label>
+                <p className="text-xs text-gray-500 mb-2">Only required if the host set a passcode</p>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
+                    placeholder="Enter passcode if required"
                     className="w-full bg-gray-900 border border-gray-600 rounded-xl px-6 py-4 text-lg focus:border-purple-500 focus:outline-none pr-12"
                   />
                   <button
@@ -289,11 +290,15 @@ export default function CollaboratePage() {
 
             <button
               onClick={() => joinWithCode(sessionCode, password)}
-              disabled={!sessionCode || !password}
+              disabled={!sessionCode}
               className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-all"
             >
               Join Session
             </button>
+            
+            <p className="text-xs text-gray-500 text-center mt-4">
+              💡 Tip: The Session ID is the long code shown in the meeting info bar when someone creates a meeting
+            </p>
           </div>
         </div>
       </div>
