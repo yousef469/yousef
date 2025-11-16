@@ -115,7 +115,24 @@ const DashboardPage = () => {
                 <p className="text-gray-300">{stats.rank} Rank</p>
               </div>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-all">
+            <button 
+              onClick={() => {
+                const shareText = `🚀 I'm Level ${stats.level} on Engineerium! ${stats.lessonsCompleted}/${stats.totalLessons} lessons completed with ${stats.totalPoints} XP earned! Join me in learning engineering! 🎓`;
+                const shareUrl = window.location.origin;
+                
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'My Engineerium Progress',
+                    text: shareText,
+                    url: shareUrl
+                  }).catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
+                  alert('Progress copied to clipboard! Share it anywhere you like! 🎉');
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-all"
+            >
               <Share2 className="w-4 h-4" />
               Share Progress
             </button>
