@@ -8,7 +8,8 @@ import {
   Trophy,
   User,
   LogOut,
-  Settings
+  Settings,
+  Calculator
 } from 'lucide-react';
 
 export default function SidebarMenu() {
@@ -19,6 +20,7 @@ export default function SidebarMenu() {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: User, label: 'Profile', path: '/profile' },
+    { icon: Calculator, label: 'Toolbox', path: '/toolbox' },
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   ];
 

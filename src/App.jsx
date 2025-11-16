@@ -1113,6 +1113,8 @@ const CollaboratePage = lazy(() => import('./pages/CollaboratePage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CommunityProjectsPage = lazy(() => import('./pages/CommunityProjectsPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
+const CommunityPage = lazy(() => import('./pages/CommunityPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const PhysicsPage = lazy(() => import('./pages/PhysicsPage'));
 const MathematicsPage = lazy(() => import('./pages/MathematicsPage'));
 const MathematicsEngineeringPage = lazy(() => import('./pages/MathematicsEngineeringPage'));
@@ -1130,11 +1132,6 @@ const LeaderboardPage = () => (
   </div>
 );
 
-const CommunityPage = () => (
-  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-8">
-    <CommunityQA />
-  </div>
-);
 import ProtectedRoute from './components/ProtectedRoute';
 import FloatingAIHelper from './components/FloatingAIHelper';
 import ScrollToTop from './components/ScrollToTop';
@@ -1186,6 +1183,8 @@ export default function App() {
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/community-projects" element={<ProtectedRoute><CommunityProjectsPage /></ProtectedRoute>} />
           <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />

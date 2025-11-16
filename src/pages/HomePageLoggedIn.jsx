@@ -45,8 +45,7 @@ const HomePageLoggedIn = () => {
               
               <nav className="hidden md:flex items-center gap-6">
                 <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">About</button>
-                <button onClick={() => navigate('/toolbox')} className="text-white hover:text-primary transition-colors font-medium">Toolbox</button>
-                <button onClick={() => navigate('/community-projects')} className="text-white hover:text-primary transition-colors font-medium">Community</button>
+                <button onClick={() => navigate('/community')} className="text-white hover:text-primary transition-colors font-medium">Community</button>
                 <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">Pricing</button>
               </nav>
             </div>
