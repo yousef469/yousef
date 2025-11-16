@@ -41,28 +41,39 @@ class WebRTCService {
     
     return new Promise((resolve, reject) => {
       this.socket = io(serverUrl, {
-        transports: ['websocket', 'polling'],
+        transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
         reconnection: true,
         reconnectionDelay: 1000,
-        reconnectionAttempts: 5
+        reconnectionAttempts: 5,
+        timeout: 20000,
+        forceNew: true
       });
+      
+      let resolved = false;
       
       this.socket.on('connect', () => {
         console.log('✅ Connected to signaling server');
-        resolve();
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('❌ Connection error:', error.message);
-        reject(error);
+        console.error('❌ Connection error:', error.message, error);
+        if (!resolved) {
+          resolved = true;
+          reject(error);
+        }
       });
       
-      // Timeout after 10 seconds
+      // Timeout after 30 seconds (Render free tier can take time to wake up)
       setTimeout(() => {
-        if (!this.socket.connected) {
-          reject(new Error('Connection timeout'));
+        if (!resolved && this.socket && !this.socket.connected) {
+          resolved = true;
+          reject(new Error('Connection timeout - server may be sleeping. Please try again.'));
         }
-      }, 10000);
+      }, 30000);
     }).then(() => {
       // Set up event handlers after connection is established
       this.setupEventHandlers();

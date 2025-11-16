@@ -142,7 +142,13 @@ export default function CollaborateSessionPage() {
         setIsConnecting(false);
       } catch (error) {
         console.error('❌ Failed to initialize session:', error);
-        alert('Failed to connect to session. Please try again.');
+        setIsConnecting(false);
+        
+        const errorMessage = error.message.includes('timeout') 
+          ? 'Connection timeout. The server may be waking up (free tier). Please wait 30 seconds and try again.'
+          : 'Failed to connect to session. Please check your internet connection and try again.';
+        
+        alert(errorMessage);
         navigate('/collaborate');
       }
     };
