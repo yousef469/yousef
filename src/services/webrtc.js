@@ -38,20 +38,38 @@ class WebRTCService {
     }
     
     console.log('🔌 Connecting to signaling server:', serverUrl);
-    this.socket = io(serverUrl, {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5
-    });
     
-    this.socket.on('connect', () => {
-      console.log('✅ Connected to signaling server');
-    });
+    return new Promise((resolve, reject) => {
+      this.socket = io(serverUrl, {
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 5
+      });
+      
+      this.socket.on('connect', () => {
+        console.log('✅ Connected to signaling server');
+        resolve();
+      });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('❌ Connection error:', error.message);
+      this.socket.on('connect_error', (error) => {
+        console.error('❌ Connection error:', error.message);
+        reject(error);
+      });
+      
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        if (!this.socket.connected) {
+          reject(new Error('Connection timeout'));
+        }
+      }, 10000);
+    }).then(() => {
+      // Set up event handlers after connection is established
+      this.setupEventHandlers();
     });
+  }
+  
+  setupEventHandlers() {
 
     this.socket.on('user-joined', ({ socketId, userId, userName }) => {
       console.log('👤 User joined:', userName);
@@ -133,13 +151,22 @@ class WebRTCService {
 
   // Create a silent audio stream (for when user doesn't want mic)
   createSilentAudioStream() {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const destination = audioContext.createMediaStreamDestination();
-    const oscillator = audioContext.createOscillator();
-    oscillator.frequency.value = 0; // Silent
-    oscillator.connect(destination);
-    oscillator.start();
-    return destination.stream;
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const destination = audioContext.createMediaStreamDestination();
+      const oscillator = audioContext.createOscillator();
+      oscillator.frequency.value = 0; // Silent
+      oscillator.connect(destination);
+      oscillator.start();
+      
+      const stream = destination.stream;
+      console.log('🔇 Silent stream created with tracks:', stream.getTracks().length);
+      return stream;
+    } catch (error) {
+      console.error('Failed to create silent audio stream:', error);
+      // Return null so we can handle it
+      return null;
+    }
   }
 
   // Get user media (camera/microphone)
@@ -169,14 +196,15 @@ class WebRTCService {
   getDummyStream() {
     if (!this.localStream) {
       console.log('🔇 Creating silent audio stream for peer connections');
-      try {
-        this.localStream = this.createSilentAudioStream();
-        console.log('✅ Dummy stream created:', this.localStream);
-      } catch (error) {
-        console.error('❌ Failed to create dummy stream:', error);
-        // Last resort: create empty MediaStream
+      
+      const silentStream = this.createSilentAudioStream();
+      
+      if (silentStream && silentStream.getTracks().length > 0) {
+        this.localStream = silentStream;
+        console.log('✅ Dummy stream created with', silentStream.getTracks().length, 'tracks');
+      } else {
+        console.warn('⚠️ Silent stream failed, creating empty MediaStream');
         this.localStream = new MediaStream();
-        console.log('⚠️ Created empty MediaStream as last resort');
       }
     }
     return this.localStream;
@@ -192,9 +220,26 @@ class WebRTCService {
       return null;
     }
     
-    // CRITICAL: Don't create peer without a stream
+    // CRITICAL: Don't create peer without a valid stream
     if (!this.localStream) {
       console.error('❌ Cannot create peer without local stream!');
+      console.log('🔄 Attempting to create dummy stream...');
+      this.getDummyStream();
+      
+      if (!this.localStream) {
+        console.error('❌ Still no stream after getDummyStream!');
+        return null;
+      }
+    }
+    
+    // Validate stream is actually a MediaStream with the required methods
+    if (!(this.localStream instanceof MediaStream)) {
+      console.error('❌ localStream is not a MediaStream!', typeof this.localStream);
+      return null;
+    }
+    
+    if (typeof this.localStream.getTracks !== 'function') {
+      console.error('❌ localStream does not have getTracks method!');
       return null;
     }
     
