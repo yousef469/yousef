@@ -64,6 +64,7 @@
     "hero": {
       "title": "Explore Engineering in 3D",
       "subtitle": "Choose a category to view detailed 3D models with interactive controls",
+      "welcome": "Welcome to your first steps in your engineering career",
       "new": "NEW: Voice AI • Model Comparison • Leaderboards • PWA Support",
       "getStarted": "Get Started Free",
       "readyToExplore": "Ready to explore?",

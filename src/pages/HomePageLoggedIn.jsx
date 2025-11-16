@@ -10,6 +10,7 @@ import MixpanelTest from '../components/MixpanelTest';
 import SidebarMenu from '../components/SidebarMenu';
 import ContinueLearning from '../components/ContinueLearning';
 import CourseOverview from '../components/CourseOverview';
+import Logo from '../components/Logo';
 
 const HomePageLoggedIn = () => {
   const navigate = useNavigate();
@@ -40,13 +41,7 @@ const HomePageLoggedIn = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-primary" />
-                <div>
-                  <h1 className="text-3xl font-bold">{t('app.title')}</h1>
-                  <p className="text-text-secondary text-sm mt-1">{t('app.subtitle')}</p>
-                </div>
-              </div>
+              <Logo size="md" showText={true} />
               
               <nav className="hidden md:flex items-center gap-6">
                 <button onClick={() => navigate('/ai-generator')} className="text-white hover:text-primary transition-colors font-medium">AI 3D</button>
@@ -119,6 +114,12 @@ const HomePageLoggedIn = () => {
         <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent hero-title-glow">
           {t('home.hero.title')}
         </h2>
+        
+        {/* Welcome Message */}
+        <p className="text-2xl font-semibold text-white/90 mb-3 animate-fade-in">
+          {t('home.hero.welcome')}
+        </p>
+        
         <p className="text-xl text-text max-w-2xl mx-auto mb-6">
           {t('home.hero.subtitle')}
         </p>

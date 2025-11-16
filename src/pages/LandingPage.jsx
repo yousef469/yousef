@@ -7,6 +7,7 @@ import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
 import MixpanelTest from '../components/MixpanelTest';
 import SidebarMenu from '../components/SidebarMenu';
+import Logo from '../components/Logo';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -30,13 +31,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-primary" />
-                <div>
-                  <h1 className="text-3xl font-bold">{t('app.title')}</h1>
-                  <p className="text-text-secondary text-sm mt-1">{t('app.subtitle')}</p>
-                </div>
-              </div>
+              <Logo size="md" showText={true} />
               
               <nav className="hidden md:flex items-center gap-6">
                 <button onClick={() => navigate('/ai-generator')} className="text-white hover:text-primary transition-colors font-medium">AI 3D</button>

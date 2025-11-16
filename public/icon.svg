@@ -1,18 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient Definitions -->
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
     </linearGradient>
   </defs>
-  <rect width="192" height="192" rx="24" fill="url(#grad)"/>
-  <g transform="translate(96,96)">
-    <!-- Rocket shape -->
-    <path d="M0,-60 L-15,-30 L-10,-10 L-20,0 L-10,20 L0,40 L10,20 L20,0 L10,-10 L15,-30 Z" 
-          fill="white" opacity="0.9"/>
-    <!-- Flame -->
-    <path d="M-8,40 L0,60 L8,40 Z" fill="#ff6b35" opacity="0.8"/>
-    <!-- Window -->
-    <circle cx="0" cy="-35" r="8" fill="#22d3ee" opacity="0.7"/>
-  </g>
+  
+  <!-- Hexagon Shape -->
+  <path 
+    d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" 
+    fill="url(#hexGradient)"
+    stroke="url(#innerGlow)"
+    stroke-width="2"
+  />
+  
+  <!-- Inner Gear/Engineering Symbol -->
+  <circle cx="50" cy="50" r="20" fill="#1f2937" />
+  <circle cx="50" cy="50" r="15" fill="none" stroke="url(#innerGlow)" stroke-width="2" />
+  
+  <!-- Gear Teeth -->
+  <path d="M50 30 L52 35 L48 35 Z" fill="url(#innerGlow)" />
+  <path d="M50 70 L52 65 L48 65 Z" fill="url(#innerGlow)" />
+  <path d="M30 50 L35 52 L35 48 Z" fill="url(#innerGlow)" />
+  <path d="M70 50 L65 52 L65 48 Z" fill="url(#innerGlow)" />
+  
+  <!-- Center Bolt -->
+  <circle cx="50" cy="50" r="5" fill="url(#innerGlow)" />
+  
+  <!-- Sparkle Effect -->
+  <circle cx="75" cy="25" r="3" fill="#fbbf24" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite" />
+  </circle>
 </svg>
