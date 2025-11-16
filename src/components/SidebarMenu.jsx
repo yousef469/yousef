@@ -5,9 +5,7 @@ import {
   Menu, 
   X, 
   LayoutDashboard, 
-  Trophy, 
-  MessageCircle, 
-  Bookmark,
+  Trophy,
   User,
   LogOut,
   Settings
@@ -20,9 +18,8 @@ export default function SidebarMenu() {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: User, label: 'Profile', path: '/profile' },
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
-    { icon: MessageCircle, label: 'Community Help', path: '/community' },
-    { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
   ];
 
   const handleNavigation = (path) => {

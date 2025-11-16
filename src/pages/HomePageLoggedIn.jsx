@@ -268,58 +268,6 @@ const HomePageLoggedIn = () => {
               </div>
             </div>
           </button>
-
-          {/* Community Projects */}
-          <button
-            onClick={() => navigate('/community-projects')}
-            className="group relative bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 hover:from-indigo-600 hover:via-purple-700 hover:to-pink-600 rounded-2xl p-8 border-2 border-indigo-400/50 hover:border-indigo-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-indigo-500/30"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-            
-            <div className="relative z-10">
-              <div className="flex justify-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                  <Share2 className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">🌟 Community Projects</h3>
-              <p className="text-white/90 text-center mb-4">
-                Share your projects, get feedback, and explore what others are building
-              </p>
-
-              <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Explore Community</span>
-                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Engineering Toolbox */}
-          <button
-            onClick={() => navigate('/toolbox')}
-            className="group relative bg-gradient-to-br from-slate-500 via-gray-600 to-zinc-500 hover:from-slate-600 hover:via-gray-700 hover:to-zinc-600 rounded-2xl p-8 border-2 border-slate-400/50 hover:border-slate-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-slate-500/30"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-            
-            <div className="relative z-10">
-              <div className="flex justify-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                  <Calculator className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">🔧 Engineering Toolbox</h3>
-              <p className="text-white/90 text-center mb-4">
-                Essential calculators and tools for engineering calculations
-              </p>
-
-              <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Open Toolbox</span>
-                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </button>
         </div>
       </div>
       </div>
