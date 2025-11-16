@@ -100,16 +100,10 @@ export default function CollaborateSessionPage() {
           })));
         };
 
-        // Join the session
-        await webrtcService.joinSession(
-          sessionId, 
-          user?.id, 
-          user?.email?.split('@')[0] || 'User'
-        );
-
-        // Apply initial camera/mic settings from setup page
+        // Get media BEFORE joining session (so we have stream for peer connections)
         if (initialVideoEnabled || initialAudioEnabled) {
           try {
+            console.log('🎥 Getting user media before joining...');
             const stream = await webrtcService.getUserMedia({ 
               video: initialVideoEnabled, 
               audio: initialAudioEnabled 
@@ -117,10 +111,18 @@ export default function CollaborateSessionPage() {
             if (localVideoRef.current && initialVideoEnabled) {
               localVideoRef.current.srcObject = stream;
             }
+            console.log('✅ Got user media');
           } catch (error) {
-            console.error('Error applying initial media settings:', error);
+            console.error('Error getting media:', error);
           }
         }
+
+        // Join the session (now we have stream for peer connections)
+        await webrtcService.joinSession(
+          sessionId, 
+          user?.id, 
+          user?.email?.split('@')[0] || 'User'
+        );
 
         console.log('✅ WebRTC session initialized');
         setIsConnecting(false);

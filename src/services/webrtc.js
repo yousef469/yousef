@@ -126,6 +126,8 @@ class WebRTCService {
 
   // Create a peer connection
   createPeer(socketId, initiator) {
+    console.log('🔗 Creating peer connection:', { socketId, initiator, hasStream: !!this.localStream });
+    
     // Free STUN servers + Metered TURN (you can add your own)
     const iceServers = [
       { urls: 'stun:stun.l.google.com:19302' },
@@ -144,14 +146,20 @@ class WebRTCService {
       }
     ];
 
-    const peer = new Peer({
+    const peerConfig = {
       initiator,
       trickle: false,
-      stream: this.localStream,
       config: {
         iceServers
       }
-    });
+    };
+
+    // Only add stream if we have one
+    if (this.localStream) {
+      peerConfig.stream = this.localStream;
+    }
+
+    const peer = new Peer(peerConfig);
 
     peer.on('signal', (signal) => {
       this.socket.emit('signal', {
@@ -178,6 +186,18 @@ class WebRTCService {
 
     this.peers.set(socketId, peer);
     return peer;
+  }
+
+  // Add stream to all existing peers
+  addStreamToPeers(stream) {
+    console.log('📤 Adding stream to', this.peers.size, 'peers');
+    this.peers.forEach((peer) => {
+      try {
+        peer.addStream(stream);
+      } catch (error) {
+        console.error('Error adding stream to peer:', error);
+      }
+    });
   }
 
   // Toggle microphone
