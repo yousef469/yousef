@@ -56,15 +56,12 @@ class WebRTCService {
     this.socket.on('user-joined', ({ socketId, userId, userName }) => {
       console.log('👤 User joined:', userName);
       
-      // Only create peer if we have a stream
-      if (this.localStream) {
-        this.createPeer(socketId, true); // We initiate the call
-      } else {
-        console.warn('⚠️ No local stream yet, peer will be created when stream is available');
-        // Store pending peer to create later
-        if (!this.pendingPeers) this.pendingPeers = [];
-        this.pendingPeers.push({ socketId, initiator: true });
+      // Ensure we have a stream (create dummy if needed)
+      if (!this.localStream) {
+        this.getDummyStream();
       }
+      
+      this.createPeer(socketId, true); // We initiate the call
       
       if (this.onUserJoined) {
         this.onUserJoined({ socketId, userId, userName });
@@ -74,19 +71,14 @@ class WebRTCService {
     this.socket.on('existing-users', (users) => {
       console.log('👥 Existing users:', users.length);
       
-      // Only create peers if we have a stream
-      if (this.localStream) {
-        users.forEach(socketId => {
-          this.createPeer(socketId, false); // They initiate the call
-        });
-      } else if (users.length > 0) {
-        console.warn('⚠️ No local stream yet, peers will be created when stream is available');
-        // Store pending peers to create later
-        if (!this.pendingPeers) this.pendingPeers = [];
-        users.forEach(socketId => {
-          this.pendingPeers.push({ socketId, initiator: false });
-        });
+      // Ensure we have a stream (create dummy if needed)
+      if (!this.localStream) {
+        this.getDummyStream();
       }
+      
+      users.forEach(socketId => {
+        this.createPeer(socketId, false); // They initiate the call
+      });
     });
 
     this.socket.on('signal', ({ signal, from }) => {
@@ -129,30 +121,57 @@ class WebRTCService {
     this.userName = userName;
     this.isHost = true; // Will be updated by server if needed
 
+    // Always ensure we have a stream (even if silent) for peer connections
+    if (!this.localStream) {
+      this.getDummyStream();
+    }
+
     if (this.socket) {
       this.socket.emit('join-session', { sessionId, userId, userName });
     }
   }
 
+  // Create a silent audio stream (for when user doesn't want mic)
+  createSilentAudioStream() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const destination = audioContext.createMediaStreamDestination();
+    const oscillator = audioContext.createOscillator();
+    oscillator.frequency.value = 0; // Silent
+    oscillator.connect(destination);
+    oscillator.start();
+    return destination.stream;
+  }
+
   // Get user media (camera/microphone)
   async getUserMedia(constraints = { video: true, audio: true }) {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      // Replace dummy stream with real media
+      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
       
-      // Create any pending peer connections now that we have a stream
-      if (this.pendingPeers && this.pendingPeers.length > 0) {
-        console.log('🔗 Creating', this.pendingPeers.length, 'pending peer connections');
-        this.pendingPeers.forEach(({ socketId, initiator }) => {
-          this.createPeer(socketId, initiator);
-        });
-        this.pendingPeers = [];
+      // If we had a dummy stream, replace it
+      if (this.localStream) {
+        this.localStream.getTracks().forEach(track => track.stop());
       }
+      
+      this.localStream = newStream;
+      
+      // Update all existing peer connections with the new stream
+      this.addStreamToPeers(newStream);
       
       return this.localStream;
     } catch (error) {
       console.error('Error accessing media devices:', error);
       throw error;
     }
+  }
+  
+  // Get a dummy stream (silent audio) for peer connections when user has no media
+  getDummyStream() {
+    if (!this.localStream) {
+      console.log('🔇 Creating silent audio stream for peer connections');
+      this.localStream = this.createSilentAudioStream();
+    }
+    return this.localStream;
   }
 
   // Create a peer connection
