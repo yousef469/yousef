@@ -102,6 +102,7 @@ export default function CollaborateSessionPage() {
 
         // ALWAYS get media BEFORE joining session (required for peer connections)
         // Microphone is always required for WebRTC to work properly
+        let streamReady = false;
         try {
           console.log('🎥 Getting user media before joining...');
           const stream = await webrtcService.getUserMedia({ 
@@ -111,13 +112,24 @@ export default function CollaborateSessionPage() {
           if (localVideoRef.current && initialVideoEnabled) {
             localVideoRef.current.srcObject = stream;
           }
-          console.log('✅ Got user media');
+          console.log('✅ Got user media, stream ready');
+          streamReady = true;
         } catch (error) {
           console.error('❌ Error getting media:', error);
           // If media fails, create dummy stream so peers can still connect
           console.log('🔇 Creating dummy stream as fallback');
-          webrtcService.getDummyStream();
+          const dummyStream = webrtcService.getDummyStream();
+          console.log('Dummy stream created:', dummyStream);
+          streamReady = !!dummyStream;
         }
+
+        // Only join if we have a stream ready
+        if (!streamReady) {
+          throw new Error('Failed to initialize media stream');
+        }
+
+        // Small delay to ensure stream is fully ready
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         // Join the session (now we have stream for peer connections)
         await webrtcService.joinSession(

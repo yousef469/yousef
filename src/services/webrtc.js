@@ -169,7 +169,15 @@ class WebRTCService {
   getDummyStream() {
     if (!this.localStream) {
       console.log('🔇 Creating silent audio stream for peer connections');
-      this.localStream = this.createSilentAudioStream();
+      try {
+        this.localStream = this.createSilentAudioStream();
+        console.log('✅ Dummy stream created:', this.localStream);
+      } catch (error) {
+        console.error('❌ Failed to create dummy stream:', error);
+        // Last resort: create empty MediaStream
+        this.localStream = new MediaStream();
+        console.log('⚠️ Created empty MediaStream as last resort');
+      }
     }
     return this.localStream;
   }
@@ -216,14 +224,27 @@ class WebRTCService {
       }
     };
 
-    // Always add stream (we have dummy stream if no real media)
-    peerConfig.stream = this.localStream;
+    // Validate stream before adding to peer config
+    if (this.localStream && this.localStream instanceof MediaStream) {
+      peerConfig.stream = this.localStream;
+      console.log('✅ Adding stream to peer config:', {
+        hasAudio: this.localStream.getAudioTracks().length > 0,
+        hasVideo: this.localStream.getVideoTracks().length > 0
+      });
+    } else {
+      console.warn('⚠️ No valid stream available, peer will be created without stream');
+    }
 
     let peer;
     try {
       peer = new Peer(peerConfig);
     } catch (error) {
       console.error('❌ Failed to create peer:', error);
+      console.log('Stream info:', {
+        exists: !!this.localStream,
+        type: this.localStream?.constructor?.name,
+        tracks: this.localStream?.getTracks?.()?.length
+      });
       console.log('💡 Tip: Make sure microphone is enabled in setup page');
       // Show user-friendly message
       if (typeof window !== 'undefined' && this.onConnectionError) {
