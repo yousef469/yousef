@@ -111,25 +111,18 @@ const HomePageLoggedIn = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-16">
       <div className="text-center mb-16">
-        <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent hero-title-glow">
+        <h2 className="text-5xl font-bold mb-4 text-white">
           {t('home.hero.title')}
         </h2>
         
         {/* Welcome Message */}
-        <p className="text-2xl font-semibold text-white/90 mb-3 animate-fade-in">
+        <p className="text-2xl font-semibold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6">
           {t('home.hero.welcome')}
         </p>
         
-        <p className="text-xl text-text max-w-2xl mx-auto mb-6">
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
           {t('home.hero.subtitle')}
         </p>
-        
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/20 border-2 border-secondary rounded-full">
-          <Sparkles className="w-4 h-4 text-secondary" />
-          <span className="text-sm font-semibold text-secondary">
-            {t('home.hero.new')}
-          </span>
-        </div>
       </div>
 
       {/* Continue Learning - Only show if user has progress */}
