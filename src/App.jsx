@@ -1111,6 +1111,8 @@ const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
 const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
 const CollaboratePage = lazy(() => import('./pages/CollaboratePage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const CommunityProjectsPage = lazy(() => import('./pages/CommunityProjectsPage'));
+const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
 const PhysicsPage = lazy(() => import('./pages/PhysicsPage'));
 const MathematicsPage = lazy(() => import('./pages/MathematicsPage'));
 const MathematicsEngineeringPage = lazy(() => import('./pages/MathematicsEngineeringPage'));
@@ -1182,6 +1184,8 @@ export default function App() {
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/collaborate" element={<ProtectedRoute><CollaboratePage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+          <Route path="/community-projects" element={<ProtectedRoute><CommunityProjectsPage /></ProtectedRoute>} />
+          <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
