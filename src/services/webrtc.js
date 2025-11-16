@@ -24,7 +24,7 @@ class WebRTCService {
     // Auto-detect production vs development
     if (!serverUrl) {
       serverUrl = import.meta.env.PROD 
-        ? import.meta.env.VITE_SIGNALING_SERVER || 'https://engineerium-signaling.up.railway.app'
+        ? import.meta.env.VITE_SIGNALING_SERVER || 'https://name-ai-3d-backend.onrender.com'
         : 'http://localhost:3001';
     }
     

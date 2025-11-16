@@ -7,6 +7,8 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+const sessions = new Map(); // sessionId -> Set of socket IDs
+
 // Health check endpoints for deployment platforms
 app.get('/', (req, res) => {
   res.json({ 
@@ -31,8 +33,6 @@ const io = new Server(server, {
     credentials: true
   }
 });
-
-const sessions = new Map(); // sessionId -> Set of socket IDs
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
