@@ -28,6 +28,8 @@
     "react-katex": "^3.1.0",
     "react-pdf": "^10.2.0",
     "react-router-dom": "^7.9.4",
+    "simple-peer": "^9.11.1",
+    "socket.io-client": "^4.8.1",
     "three": "^0.180.0"
   },
   "devDependencies": {

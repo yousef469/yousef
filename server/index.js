@@ -1,0 +1,83 @@
+// Simple WebRTC Signaling Server
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+const sessions = new Map(); // sessionId -> Set of socket IDs
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Join a session
+  socket.on('join-session', ({ sessionId, userId, userName }) => {
+    socket.join(sessionId);
+    
+    if (!sessions.has(sessionId)) {
+      sessions.set(sessionId, new Set());
+    }
+    sessions.get(sessionId).add(socket.id);
+
+    // Notify others in the session
+    socket.to(sessionId).emit('user-joined', {
+      socketId: socket.id,
+      userId,
+      userName
+    });
+
+    // Send list of existing users to the new user
+    const existingUsers = Array.from(sessions.get(sessionId)).filter(id => id !== socket.id);
+    socket.emit('existing-users', existingUsers);
+
+    console.log(`User ${userName} joined session ${sessionId}`);
+  });
+
+  // WebRTC signaling
+  socket.on('signal', ({ to, signal, from }) => {
+    io.to(to).emit('signal', { signal, from });
+  });
+
+  // Host transfer
+  socket.on('transfer-host', ({ sessionId, newHostId }) => {
+    io.to(sessionId).emit('host-changed', { newHostId });
+  });
+
+  // File sharing
+  socket.on('share-file', ({ sessionId, fileData }) => {
+    socket.to(sessionId).emit('file-shared', fileData);
+  });
+
+  // Disconnect
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+    
+    // Remove from all sessions
+    sessions.forEach((users, sessionId) => {
+      if (users.has(socket.id)) {
+        users.delete(socket.id);
+        socket.to(sessionId).emit('user-left', socket.id);
+        
+        // Clean up empty sessions
+        if (users.size === 0) {
+          sessions.delete(sessionId);
+        }
+      }
+    });
+  });
+});
+
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`🚀 Signaling server running on port ${PORT}`);
+});
