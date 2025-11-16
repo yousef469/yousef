@@ -7,12 +7,17 @@ export default function PhysicsEngineeringPage() {
   const navigate = useNavigate();
   const { isLessonCompleted } = useProgress();
   
-  // If user has completed lesson 1, redirect to map
+  // If user has completed lesson 1, redirect to map immediately
   useEffect(() => {
     if (isLessonCompleted('physics', 1)) {
       navigate('/learn/physics/engineering/map', { replace: true });
     }
   }, [isLessonCompleted, navigate]);
+
+  // Don't render anything if redirecting
+  if (isLessonCompleted('physics', 1)) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-8">

@@ -7,12 +7,17 @@ export default function MathematicsEngineeringPage() {
   const navigate = useNavigate();
   const { isLessonCompleted } = useProgress();
   
-  // If user has completed lesson 1, redirect to map
+  // If user has completed lesson 1, redirect to map immediately
   useEffect(() => {
     if (isLessonCompleted('mathematics', 1)) {
       navigate('/learn/mathematics/engineering/map', { replace: true });
     }
   }, [isLessonCompleted, navigate]);
+
+  // Don't render anything if redirecting
+  if (isLessonCompleted('mathematics', 1)) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-8">
