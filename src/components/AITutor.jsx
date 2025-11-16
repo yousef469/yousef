@@ -77,8 +77,8 @@ const AITutor = () => {
         <div className="fixed bottom-24 right-6 z-50 w-96 h-[600px] bg-gray-900 rounded-lg shadow-2xl flex flex-col border border-gray-700">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-t-lg">
-            <h3 className="text-white font-bold text-lg">🤖 AI Engineering Tutor</h3>
-            <p className="text-blue-100 text-sm">Ask me about rockets, planes & cars</p>
+            <h3 className="text-white font-bold text-lg">🤖 EnGo - AI Tutor</h3>
+            <p className="text-blue-100 text-sm">Your engineering companion</p>
           </div>
 
           {/* Messages */}

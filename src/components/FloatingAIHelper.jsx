@@ -66,7 +66,7 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 animate-pulse"
-        title="AI Helper"
+        title="EnGo - AI Companion"
       >
         <Bot className="w-8 h-8 text-white" />
       </button>
@@ -86,8 +86,8 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-white font-bold">AI Helper</h3>
-            <p className="text-xs text-gray-400">Ask me anything!</p>
+            <h3 className="text-white font-bold">EnGo</h3>
+            <p className="text-xs text-gray-400">Your AI Companion</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -113,8 +113,8 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
             {messages.length === 0 && (
               <div className="text-center text-gray-500 mt-20">
                 <Bot className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                <p className="text-lg font-semibold mb-2">Hi! I'm your AI Helper 👋</p>
-                <p className="text-sm">Ask me about rockets, planes, cars, or any engineering topic!</p>
+                <p className="text-lg font-semibold mb-2">Hi! I'm EnGo 👋</p>
+                <p className="text-sm">Your AI engineering companion! Ask me anything!</p>
               </div>
             )}
             

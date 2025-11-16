@@ -41,11 +41,11 @@ export default function LearnSectionsPage() {
             <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 py-6">
                     <button
-                        onClick={() => navigate('/learn')}
+                        onClick={() => navigate('/')}
                         className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        Back to Learn
+                        Back to Home
                     </button>
                     <h1 className="text-4xl font-bold mb-2">Journey</h1>
                     <p className="text-gray-400">Choose a lesson map to start your interactive learning journey</p>

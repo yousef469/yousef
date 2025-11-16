@@ -8,7 +8,7 @@ export default function LiveChatBot() {
     {
       id: 1,
       role: 'assistant',
-      content: "Hi! I'm your AI engineering tutor. Ask me anything about rockets, planes, cars, or engineering concepts! 🚀✈️🚗",
+      content: "Hi! I'm EnGo, your AI engineering companion! Ask me anything about rockets, planes, cars, or engineering concepts! 🚀✈️🚗",
       timestamp: new Date()
     }
   ]);
@@ -141,8 +141,8 @@ export default function LiveChatBot() {
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">AI Engineering Tutor</h3>
-            <p className="text-xs text-gray-400">Powered by Gemini AI</p>
+            <h3 className="text-lg font-bold text-white">EnGo - AI Tutor</h3>
+            <p className="text-xs text-gray-400">Your Engineering Companion</p>
           </div>
         </div>
         
