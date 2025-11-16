@@ -1,4 +1,4 @@
-// Simple WebRTC Signaling Server
+// WebRTC Signaling Server for Engineerium
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -7,11 +7,28 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+// Health check endpoints for deployment platforms
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    service: 'Engineerium WebRTC Signaling Server',
+    timestamp: new Date().toISOString(),
+    activeSessions: sessions.size
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', uptime: process.uptime() });
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['https://engineeruim.vercel.app', 'https://www.engineeruim.com', 'https://engineerium.vercel.app']
+      : "*",
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 

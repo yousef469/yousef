@@ -1,15 +1,12 @@
 services:
   - type: web
-    name: yousef-ai-backend
-    env: python
+    name: engineerium-signaling
+    env: node
     region: oregon
     plan: free
-    branch: main
-    rootDir: ai-backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app_hf.py
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    healthCheckPath: /health
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: HUGGINGFACE_API_TOKEN
-        sync: false
+      - key: NODE_ENV
+        value: production
