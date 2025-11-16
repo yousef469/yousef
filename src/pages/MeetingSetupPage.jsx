@@ -1,13 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Video, VideoOff, Mic, MicOff, Settings, ArrowLeft, Copy, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 
 export default function MeetingSetupPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const videoRef = useRef(null);
+  
+  // Check if joining an existing session
+  const isJoining = location.state?.isJoining || false;
+  const joinSessionId = location.state?.sessionId || '';
+  const joinPasscode = location.state?.passcode || '';
   
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true); // Always required
@@ -107,10 +113,15 @@ export default function MeetingSetupPage() {
       stream.getTracks().forEach(track => track.stop());
     }
 
-    // Navigate to session with chosen ID
-    const meetingId = usePMI ? personalMeetingId : generateRandomId();
+    // Navigate to session with chosen ID or join existing session
+    const meetingId = isJoining ? joinSessionId : (usePMI ? personalMeetingId : generateRandomId());
     navigate(`/collaborate/session/${meetingId}`, {
-      state: { videoEnabled, audioEnabled }
+      state: { 
+        videoEnabled, 
+        audioEnabled,
+        isJoining,
+        passcode: joinPasscode
+      }
     });
   };
 
@@ -146,8 +157,15 @@ export default function MeetingSetupPage() {
           Back
         </button>
 
-        <h1 className="text-4xl font-bold mb-2 text-center">Setup Your Meeting</h1>
-        <p className="text-gray-400 text-center mb-8">Configure your camera and microphone before joining</p>
+        <h1 className="text-4xl font-bold mb-2 text-center">
+          {isJoining ? 'Join Meeting' : 'Setup Your Meeting'}
+        </h1>
+        <p className="text-gray-400 text-center mb-8">
+          {isJoining 
+            ? `Configure your settings before joining session ${joinSessionId}`
+            : 'Configure your camera and microphone before starting'
+          }
+        </p>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Video Preview */}
@@ -287,16 +305,19 @@ export default function MeetingSetupPage() {
               </div>
             </div>
 
-            {/* Start Button */}
+            {/* Start/Join Button */}
             <button
               onClick={startMeeting}
               className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl"
             >
-              Start Meeting
+              {isJoining ? 'Join Meeting' : 'Start Meeting'}
             </button>
 
             <p className="text-center text-sm text-gray-400">
-              You can invite others after starting the meeting
+              {isJoining 
+                ? 'Your microphone will be enabled when you join'
+                : 'You can invite others after starting the meeting'
+              }
             </p>
           </div>
         </div>

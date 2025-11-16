@@ -56,8 +56,14 @@ export default function CollaboratePage() {
   };
 
   const joinWithCode = (code, pass) => {
-    // Navigate directly to the real WebRTC session page
-    navigate(`/collaborate/session/${code}`);
+    // Navigate to setup page first, then to session
+    navigate('/collaborate/setup', { 
+      state: { 
+        sessionId: code, 
+        passcode: pass,
+        isJoining: true 
+      } 
+    });
   };
 
   const copySessionInfo = () => {

@@ -100,21 +100,23 @@ export default function CollaborateSessionPage() {
           })));
         };
 
-        // Get media BEFORE joining session (so we have stream for peer connections)
-        if (initialVideoEnabled || initialAudioEnabled) {
-          try {
-            console.log('🎥 Getting user media before joining...');
-            const stream = await webrtcService.getUserMedia({ 
-              video: initialVideoEnabled, 
-              audio: initialAudioEnabled 
-            });
-            if (localVideoRef.current && initialVideoEnabled) {
-              localVideoRef.current.srcObject = stream;
-            }
-            console.log('✅ Got user media');
-          } catch (error) {
-            console.error('Error getting media:', error);
+        // ALWAYS get media BEFORE joining session (required for peer connections)
+        // Microphone is always required for WebRTC to work properly
+        try {
+          console.log('🎥 Getting user media before joining...');
+          const stream = await webrtcService.getUserMedia({ 
+            video: initialVideoEnabled, 
+            audio: true // Always get audio for peer connections
+          });
+          if (localVideoRef.current && initialVideoEnabled) {
+            localVideoRef.current.srcObject = stream;
           }
+          console.log('✅ Got user media');
+        } catch (error) {
+          console.error('❌ Error getting media:', error);
+          // If media fails, create dummy stream so peers can still connect
+          console.log('🔇 Creating dummy stream as fallback');
+          webrtcService.getDummyStream();
         }
 
         // Join the session (now we have stream for peer connections)
