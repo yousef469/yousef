@@ -53,41 +53,40 @@ class WebRTCService {
       console.error('❌ Connection error:', error.message);
     });
 
-    this.socket.on('user-joined', async ({ socketId, userId, userName }) => {
+    this.socket.on('user-joined', ({ socketId, userId, userName }) => {
       console.log('👤 User joined:', userName);
       
-      // If we don't have a stream yet, get one (audio only to avoid permission issues)
-      if (!this.localStream) {
-        try {
-          console.log('🎤 Getting audio stream for peer connection...');
-          await this.getUserMedia({ video: false, audio: true });
-        } catch (error) {
-          console.warn('Could not get media, creating peer without stream:', error);
-        }
+      // Only create peer if we have a stream
+      if (this.localStream) {
+        this.createPeer(socketId, true); // We initiate the call
+      } else {
+        console.warn('⚠️ No local stream yet, peer will be created when stream is available');
+        // Store pending peer to create later
+        if (!this.pendingPeers) this.pendingPeers = [];
+        this.pendingPeers.push({ socketId, initiator: true });
       }
       
-      this.createPeer(socketId, true); // We initiate the call
       if (this.onUserJoined) {
         this.onUserJoined({ socketId, userId, userName });
       }
     });
 
-    this.socket.on('existing-users', async (users) => {
+    this.socket.on('existing-users', (users) => {
       console.log('👥 Existing users:', users.length);
       
-      // If we don't have a stream yet and there are users, get one
-      if (!this.localStream && users.length > 0) {
-        try {
-          console.log('🎤 Getting audio stream for peer connections...');
-          await this.getUserMedia({ video: false, audio: true });
-        } catch (error) {
-          console.warn('Could not get media, creating peers without stream:', error);
-        }
+      // Only create peers if we have a stream
+      if (this.localStream) {
+        users.forEach(socketId => {
+          this.createPeer(socketId, false); // They initiate the call
+        });
+      } else if (users.length > 0) {
+        console.warn('⚠️ No local stream yet, peers will be created when stream is available');
+        // Store pending peers to create later
+        if (!this.pendingPeers) this.pendingPeers = [];
+        users.forEach(socketId => {
+          this.pendingPeers.push({ socketId, initiator: false });
+        });
       }
-      
-      users.forEach(socketId => {
-        this.createPeer(socketId, false); // They initiate the call
-      });
     });
 
     this.socket.on('signal', ({ signal, from }) => {
@@ -139,6 +138,16 @@ class WebRTCService {
   async getUserMedia(constraints = { video: true, audio: true }) {
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      // Create any pending peer connections now that we have a stream
+      if (this.pendingPeers && this.pendingPeers.length > 0) {
+        console.log('🔗 Creating', this.pendingPeers.length, 'pending peer connections');
+        this.pendingPeers.forEach(({ socketId, initiator }) => {
+          this.createPeer(socketId, initiator);
+        });
+        this.pendingPeers = [];
+      }
+      
       return this.localStream;
     } catch (error) {
       console.error('Error accessing media devices:', error);
