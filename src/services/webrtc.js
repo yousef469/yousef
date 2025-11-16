@@ -53,16 +53,38 @@ class WebRTCService {
       console.error('❌ Connection error:', error.message);
     });
 
-    this.socket.on('user-joined', ({ socketId, userId, userName }) => {
+    this.socket.on('user-joined', async ({ socketId, userId, userName }) => {
       console.log('👤 User joined:', userName);
+      
+      // If we don't have a stream yet, get one (audio only to avoid permission issues)
+      if (!this.localStream) {
+        try {
+          console.log('🎤 Getting audio stream for peer connection...');
+          await this.getUserMedia({ video: false, audio: true });
+        } catch (error) {
+          console.warn('Could not get media, creating peer without stream:', error);
+        }
+      }
+      
       this.createPeer(socketId, true); // We initiate the call
       if (this.onUserJoined) {
         this.onUserJoined({ socketId, userId, userName });
       }
     });
 
-    this.socket.on('existing-users', (users) => {
+    this.socket.on('existing-users', async (users) => {
       console.log('👥 Existing users:', users.length);
+      
+      // If we don't have a stream yet and there are users, get one
+      if (!this.localStream && users.length > 0) {
+        try {
+          console.log('🎤 Getting audio stream for peer connections...');
+          await this.getUserMedia({ video: false, audio: true });
+        } catch (error) {
+          console.warn('Could not get media, creating peers without stream:', error);
+        }
+      }
+      
       users.forEach(socketId => {
         this.createPeer(socketId, false); // They initiate the call
       });
