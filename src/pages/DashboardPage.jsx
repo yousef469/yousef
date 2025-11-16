@@ -10,11 +10,14 @@ import DailyChallenge from '../components/DailyChallenge';
 import AIStudyBuddy from '../components/AIStudyBuddy';
 import SocialShare from '../components/SocialShare';
 import CertificateGenerator from '../components/CertificateGenerator';
+import ShareAchievement from '../components/ShareAchievement';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { progress, userProfile } = useProgress();
+  const [shareAchievement, setShareAchievement] = useState(null);
+  const [showCertificate, setShowCertificate] = useState(null);
   
   // Calculate real stats from user progress
   const totalLessons = 88; // Total across all subjects
@@ -321,7 +324,7 @@ const DashboardPage = () => {
                 {achievements.map((achievement) => (
                   <div 
                     key={achievement.id}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-4 rounded-lg border-2 transition-all relative group ${
                       achievement.unlocked 
                         ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' 
                         : 'bg-gray-700/30 border-gray-600 opacity-50'
@@ -330,6 +333,20 @@ const DashboardPage = () => {
                     <div className="text-3xl mb-2">{achievement.icon}</div>
                     <p className="font-semibold text-sm mb-1">{achievement.name}</p>
                     <p className="text-xs text-gray-400">{achievement.desc}</p>
+                    
+                    {achievement.unlocked && (
+                      <button
+                        onClick={() => setShareAchievement({ 
+                          title: achievement.name, 
+                          description: achievement.desc,
+                          icon: achievement.icon 
+                        })}
+                        className="absolute top-2 right-2 p-2 bg-cyan-500/20 hover:bg-cyan-500/40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Share Achievement"
+                      >
+                        <Share2 className="w-4 h-4 text-cyan-400" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -337,6 +354,23 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Share Achievement Modal */}
+      {shareAchievement && (
+        <ShareAchievement 
+          achievement={shareAchievement} 
+          onClose={() => setShareAchievement(null)} 
+        />
+      )}
+
+      {/* Certificate Generator Modal */}
+      {showCertificate && (
+        <CertificateGenerator 
+          subject={showCertificate.subject}
+          totalLessons={showCertificate.totalLessons}
+          onClose={() => setShowCertificate(null)} 
+        />
+      )}
     </div>
   );
 };

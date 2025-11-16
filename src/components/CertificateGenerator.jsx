@@ -1,182 +1,184 @@
-import React, { useRef } from 'react';
-import { Award, Download, Share2 } from 'lucide-react';
+import { useState } from 'react';
+import { Download, Share2, X, Award } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import Logo from './Logo';
 
-const CertificateGenerator = ({ courseName, completionDate, score }) => {
+export default function CertificateGenerator({ subject, totalLessons, onClose }) {
   const { user } = useAuth();
-  const canvasRef = useRef(null);
+  const [generating, setGenerating] = useState(false);
+
+  const subjectNames = {
+    physics: 'Physics Engineering',
+    mathematics: 'Mathematics Engineering',
+    electronics: 'Electronics & Robotics',
+    rockets: 'Rocket Engineering',
+    cars: 'Automotive Engineering',
+    planes: 'Aircraft Engineering'
+  };
 
   const generateCertificate = () => {
+    setGenerating(true);
+    
     const canvas = document.createElement('canvas');
     canvas.width = 1920;
     canvas.height = 1080;
     const ctx = canvas.getContext('2d');
 
-    // Background
-    const gradient = ctx.createLinearGradient(0, 0, 1920, 1080);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(0.5, '#16213e');
-    gradient.addColorStop(1, '#0f3460');
+    // Background - elegant gradient
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#0f172a');
+    gradient.addColorStop(0.5, '#1e3a8a');
+    gradient.addColorStop(1, '#581c87');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 1920, 1080);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Border
-    ctx.strokeStyle = '#06b6d4';
+    ctx.strokeStyle = '#fbbf24';
     ctx.lineWidth = 20;
-    ctx.strokeRect(60, 60, 1800, 960);
+    ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
 
     // Inner border
-    ctx.strokeStyle = '#3b82f6';
+    ctx.strokeStyle = '#06b6d4';
     ctx.lineWidth = 5;
-    ctx.strokeRect(80, 80, 1760, 920);
+    ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
 
-    // Title
-    ctx.fillStyle = '#ffffff';
+    // Certificate title
     ctx.font = 'bold 80px Arial';
+    ctx.fillStyle = '#fbbf24';
     ctx.textAlign = 'center';
-    ctx.fillText('CERTIFICATE OF COMPLETION', 960, 200);
+    ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 200);
 
     // Subtitle
     ctx.font = '40px Arial';
-    ctx.fillStyle = '#9ca3af';
-    ctx.fillText('This certifies that', 960, 300);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText('This certifies that', canvas.width / 2, 300);
 
-    // Student Name
-    ctx.font = 'bold 70px Arial';
-    ctx.fillStyle = '#06b6d4';
-    const studentName = user?.email?.split('@')[0] || 'Student';
-    ctx.fillText(studentName.toUpperCase(), 960, 420);
-
-    // Line under name
-    ctx.strokeStyle = '#06b6d4';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(560, 450);
-    ctx.lineTo(1360, 450);
-    ctx.stroke();
-
-    // Course completion text
-    ctx.font = '40px Arial';
+    // Student name
+    ctx.font = 'bold 72px Arial';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('has successfully completed', 960, 540);
+    const studentName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student';
+    ctx.fillText(studentName, canvas.width / 2, 420);
 
-    // Course Name
-    ctx.font = 'bold 60px Arial';
-    ctx.fillStyle = '#3b82f6';
-    ctx.fillText(courseName || 'Aerospace Engineering Course', 960, 640);
+    // Achievement text
+    ctx.font = '40px Arial';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText('has successfully completed', canvas.width / 2, 520);
 
-    // Score
-    if (score) {
-      ctx.font = '35px Arial';
-      ctx.fillStyle = '#10b981';
-      ctx.fillText(`Final Score: ${score}%`, 960, 720);
-    }
+    // Subject name
+    ctx.font = 'bold 64px Arial';
+    ctx.fillStyle = '#06b6d4';
+    ctx.fillText(subjectNames[subject] || subject, canvas.width / 2, 640);
+
+    // Lesson count
+    ctx.font = '36px Arial';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`${totalLessons} Lessons Completed`, canvas.width / 2, 720);
 
     // Date
-    ctx.font = '30px Arial';
-    ctx.fillStyle = '#9ca3af';
-    const date = completionDate || new Date().toLocaleDateString('en-US', { 
+    const date = new Date().toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
     });
-    ctx.fillText(`Completed on ${date}`, 960, 800);
+    ctx.font = '32px Arial';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(`Issued on ${date}`, canvas.width / 2, 850);
 
-    // Logo/Badge
-    ctx.beginPath();
-    ctx.arc(960, 900, 60, 0, Math.PI * 2);
+    // Engineerium branding
+    ctx.font = 'bold 48px Arial';
     ctx.fillStyle = '#06b6d4';
-    ctx.fill();
-    ctx.font = 'bold 50px Arial';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText('🚀', 960, 920);
+    ctx.fillText('Engineerium', canvas.width / 2, 950);
 
-    // Footer
-    ctx.font = '25px Arial';
-    ctx.fillStyle = '#6b7280';
-    ctx.fillText('Engineerium - Interactive Engineering Education', 960, 980);
+    ctx.font = '28px Arial';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('Interactive Engineering Education Platform', canvas.width / 2, 1000);
 
     // Download
-    const link = document.createElement('a');
-    link.download = `Engineerium-Certificate-${courseName.replace(/\s+/g, '-')}.png`;
-    link.href = canvas.toDataURL('image/png', 1.0);
-    link.click();
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Engineerium_${subject}_Certificate_${studentName.replace(/\s+/g, '_')}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setGenerating(false);
+    });
   };
 
-  const generatePDF = () => {
-    // For a real PDF, you'd use jsPDF library
-    // This is a simplified version that downloads as image
-    generateCertificate();
+  const handleShare = () => {
+    const shareText = `🎓 I just completed ${subjectNames[subject]} on Engineerium! ${totalLessons} lessons mastered! 🚀`;
+    const shareUrl = window.location.origin;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'Engineerium Certificate',
+        text: shareText,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
+      alert('Link copied to clipboard!');
+    }
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-2xl p-8">
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-          <Award className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h3 className="text-2xl font-bold">Congratulations! 🎉</h3>
-          <p className="text-gray-300">You've completed {courseName}</p>
-        </div>
-      </div>
-
-      {/* Certificate Preview */}
-      <div className="bg-gray-900 rounded-xl p-8 mb-6 border-4 border-cyan-500/30">
-        <div className="text-center">
-          <p className="text-sm text-gray-400 mb-2">CERTIFICATE OF COMPLETION</p>
-          <p className="text-gray-500 text-xs mb-4">This certifies that</p>
-          <p className="text-2xl font-bold text-cyan-400 mb-4">
-            {user?.email?.split('@')[0]?.toUpperCase() || 'STUDENT'}
-          </p>
-          <p className="text-gray-400 text-sm mb-2">has successfully completed</p>
-          <p className="text-xl font-bold text-blue-400 mb-4">{courseName}</p>
-          {score && (
-            <p className="text-green-400 text-sm mb-4">Final Score: {score}%</p>
-          )}
-          <p className="text-gray-500 text-xs mb-4">
-            {completionDate || new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
-          <div className="text-4xl mb-2">🚀</div>
-          <p className="text-gray-600 text-xs">Engineerium - Interactive Engineering Education</p>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-3">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 max-w-2xl w-full border border-cyan-500/30 relative">
         <button
-          onClick={generatePDF}
-          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
         >
-          <Download className="w-5 h-5" />
-          Download Certificate
+          <X className="w-6 h-6" />
         </button>
-        <button
-          onClick={() => {
-            // Share functionality
-            if (navigator.share) {
-              navigator.share({
-                title: 'My Engineerium Certificate',
-                text: `I just completed ${courseName} on Engineerium!`,
-                url: window.location.href
-              });
-            }
-          }}
-          className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-        >
-          <Share2 className="w-5 h-5" />
-        </button>
-      </div>
 
-      <p className="text-center text-gray-400 text-sm mt-4">
-        Share your achievement on LinkedIn to showcase your skills! 🎓
-      </p>
+        <div className="text-center mb-8">
+          <Award className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold mb-2">Congratulations!</h2>
+          <p className="text-gray-300 text-lg">
+            You've completed all lessons in {subjectNames[subject]}
+          </p>
+        </div>
+
+        {/* Certificate Preview */}
+        <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl p-8 border border-cyan-500/30 mb-6">
+          <div className="text-center">
+            <div className="mb-4">
+              <Logo size="md" showText={true} />
+            </div>
+            <div className="text-2xl font-bold text-yellow-400 mb-2">CERTIFICATE OF COMPLETION</div>
+            <div className="text-gray-300 mb-2">This certifies that</div>
+            <div className="text-3xl font-bold text-white mb-2">
+              {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student'}
+            </div>
+            <div className="text-gray-300 mb-2">has successfully completed</div>
+            <div className="text-2xl font-bold text-cyan-400 mb-2">{subjectNames[subject]}</div>
+            <div className="text-gray-400 text-sm">{totalLessons} Lessons Completed</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={generateCertificate}
+            disabled={generating}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-colors disabled:opacity-50"
+          >
+            <Download className="w-5 h-5" />
+            {generating ? 'Generating...' : 'Download Certificate'}
+          </button>
+
+          <button
+            onClick={handleShare}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-lg font-semibold transition-colors"
+          >
+            <Share2 className="w-5 h-5" />
+            Share Achievement
+          </button>
+        </div>
+
+        <p className="text-center text-sm text-gray-400 mt-4">
+          Your certificate will be downloaded as a high-quality image
+        </p>
+      </div>
     </div>
   );
-};
-
-export default CertificateGenerator;
+}
