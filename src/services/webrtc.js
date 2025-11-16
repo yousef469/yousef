@@ -159,6 +159,12 @@ class WebRTCService {
   createPeer(socketId, initiator) {
     console.log('🔗 Creating peer connection:', { socketId, initiator, hasStream: !!this.localStream });
     
+    // CRITICAL: Don't create peer without a stream
+    if (!this.localStream) {
+      console.error('❌ Cannot create peer without local stream!');
+      return null;
+    }
+    
     // Free STUN servers + Metered TURN (you can add your own)
     const iceServers = [
       { urls: 'stun:stun.l.google.com:19302' },
