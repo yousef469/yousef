@@ -178,6 +178,12 @@ class WebRTCService {
   createPeer(socketId, initiator) {
     console.log('🔗 Creating peer connection:', { socketId, initiator, hasStream: !!this.localStream });
     
+    // Check if Peer is available
+    if (typeof Peer === 'undefined') {
+      console.error('❌ Peer library not loaded!');
+      return null;
+    }
+    
     // CRITICAL: Don't create peer without a stream
     if (!this.localStream) {
       console.error('❌ Cannot create peer without local stream!');
@@ -210,12 +216,16 @@ class WebRTCService {
       }
     };
 
-    // Only add stream if we have one
-    if (this.localStream) {
-      peerConfig.stream = this.localStream;
-    }
+    // Always add stream (we have dummy stream if no real media)
+    peerConfig.stream = this.localStream;
 
-    const peer = new Peer(peerConfig);
+    let peer;
+    try {
+      peer = new Peer(peerConfig);
+    } catch (error) {
+      console.error('❌ Failed to create peer:', error);
+      return null;
+    }
 
     peer.on('signal', (signal) => {
       this.socket.emit('signal', {
