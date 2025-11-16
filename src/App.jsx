@@ -1158,7 +1158,7 @@ export default function App() {
           <Route path="/" element={<HomeRouter />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
-          <Route path="/learn" element={<ProtectedRoute><LearnMechanicsPage /></ProtectedRoute>} />
+          <Route path="/learn" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
           <Route path="/learn/sections" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
           <Route path="/learn/information" element={<ProtectedRoute><LearnInformationPage /></ProtectedRoute>} />
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
