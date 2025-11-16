@@ -44,9 +44,8 @@ export default function CollaboratePage() {
   };
 
   const createSession = () => {
-    const code = generateSessionCode();
-    // Navigate directly to the real WebRTC session page
-    navigate(`/collaborate/session/${code}`);
+    // Navigate to meeting setup page (like Zoom)
+    navigate('/collaborate/setup');
   };
 
   const startSession = () => {

@@ -1110,6 +1110,7 @@ const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
 const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
 const CollaboratePage = lazy(() => import('./pages/CollaboratePage'));
+const MeetingSetupPage = lazy(() => import('./pages/MeetingSetupPage'));
 const CollaborateSessionPage = lazy(() => import('./pages/CollaborateSessionPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CommunityProjectsPage = lazy(() => import('./pages/CommunityProjectsPage'));
@@ -1181,6 +1182,7 @@ export default function App() {
           <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/collaborate" element={<ProtectedRoute><CollaboratePage /></ProtectedRoute>} />
+          <Route path="/collaborate/setup" element={<ProtectedRoute><MeetingSetupPage /></ProtectedRoute>} />
           <Route path="/collaborate/session/:sessionId" element={<ProtectedRoute><CollaborateSessionPage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/community-projects" element={<ProtectedRoute><CommunityProjectsPage /></ProtectedRoute>} />

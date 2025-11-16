@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
-import { ArrowLeft, Camera, Edit2, Save, X } from 'lucide-react';
+import { supabase } from '../services/supabase';
+import { ArrowLeft, Camera, Edit2, Save, X, Copy, Check } from 'lucide-react';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -150,6 +151,124 @@ export default function ProfilePage() {
             </p>
           </div>
         </div>
+
+        {/* Personal Meeting ID Section */}
+        <PersonalMeetingIDSection userId={user?.id} />
+      </div>
+    </div>
+  );
+}
+
+// Personal Meeting ID Component
+function PersonalMeetingIDSection({ userId }) {
+  const [pmi, setPmi] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const loadPMI = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('personal_meeting_id')
+          .eq('id', userId)
+          .single();
+
+        if (error) throw error;
+        
+        if (data?.personal_meeting_id) {
+          setPmi(data.personal_meeting_id);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading PMI:', error);
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      loadPMI();
+    }
+  }, [userId]);
+
+  const copyPMI = () => {
+    navigator.clipboard.writeText(pmi);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const copyMeetingLink = () => {
+    const link = `${window.location.origin}/collaborate/session/${pmi}`;
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (loading) {
+    return (
+      <div className="mt-6 bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-xl p-6">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-12 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-xl p-6">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="text-xl font-bold mb-1">Personal Meeting ID</h3>
+          <p className="text-sm text-gray-400">Your permanent meeting room - like Zoom PMI</p>
+        </div>
+        <div className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-xs font-semibold text-blue-400">
+          PERMANENT
+        </div>
+      </div>
+
+      <div className="bg-gray-900/50 rounded-lg p-4 mb-4">
+        <p className="text-sm text-gray-400 mb-2">Your PMI</p>
+        <div className="flex items-center justify-between">
+          <p className="text-3xl font-bold tracking-wider font-mono">{pmi || 'Loading...'}</p>
+          <button
+            onClick={copyPMI}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all flex items-center gap-2"
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4" />
+                Copy ID
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <button
+          onClick={copyMeetingLink}
+          className="px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg transition-all text-sm font-semibold"
+        >
+          Copy Meeting Link
+        </button>
+        <button
+          onClick={() => window.location.href = `/collaborate/session/${pmi}`}
+          className="px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-lg transition-all text-sm font-semibold"
+        >
+          Start Personal Room
+        </button>
+      </div>
+
+      <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <p className="text-xs text-blue-300">
+          💡 <strong>Tip:</strong> Share your PMI with students or colleagues for easy access to your personal meeting room anytime!
+        </p>
       </div>
     </div>
   );
