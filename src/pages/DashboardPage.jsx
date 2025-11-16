@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useProgress } from '../contexts/ProgressContext';
 import { 
   Trophy, Target, Flame, BookMarked, Award, TrendingUp, 
   Calendar, Clock, Zap, Star, Crown, ChevronRight, Share2
@@ -13,34 +14,67 @@ import CertificateGenerator from '../components/CertificateGenerator';
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    level: 12,
-    xp: 3450,
-    xpToNextLevel: 4000,
-    totalPoints: 8750,
-    lessonsCompleted: 18,
-    totalLessons: 75,
-    streak: 7,
-    achievements: 12,
-    rank: 'Gold',
-    studyTime: 24.5 // hours
-  });
+  const { progress, userProfile } = useProgress();
+  
+  // Calculate real stats from user progress
+  const totalLessons = 88; // Total across all subjects
+  const completedLessons = Object.keys(progress.completedLessons).length;
+  const totalXP = userProfile.total_xp || 0;
+  const level = userProfile.level || 1;
+  const xpToNextLevel = level * 1000; // 1000 XP per level
+  const xpInCurrentLevel = totalXP % 1000;
+  const achievementsCount = progress.achievements?.length || 0;
+  
+  // Calculate rank based on level
+  const getRank = (lvl) => {
+    if (lvl >= 20) return 'Diamond';
+    if (lvl >= 15) return 'Platinum';
+    if (lvl >= 10) return 'Gold';
+    if (lvl >= 5) return 'Silver';
+    return 'Bronze';
+  };
+  
+  const stats = {
+    level,
+    xp: xpInCurrentLevel,
+    xpToNextLevel: 1000,
+    totalPoints: totalXP,
+    lessonsCompleted: completedLessons,
+    totalLessons,
+    streak: 0, // TODO: Implement streak tracking
+    achievements: achievementsCount,
+    rank: getRank(level),
+    studyTime: 0 // TODO: Implement time tracking
+  };
 
-  const [recentActivity, setRecentActivity] = useState([
-    { type: 'lesson', title: 'Orbital Mechanics', points: 100, time: '2 hours ago' },
-    { type: 'quiz', title: 'Rocket Propulsion Quiz', points: 50, time: '5 hours ago' },
-    { type: 'achievement', title: 'Week Warrior', points: 200, time: '1 day ago' },
-    { type: 'challenge', title: 'Daily Challenge', points: 75, time: '1 day ago' }
-  ]);
+  // Get recent activity from completed lessons
+  const recentActivity = Object.entries(progress.completedLessons)
+    .slice(-4)
+    .reverse()
+    .map(([key, data]) => ({
+      type: 'lesson',
+      title: `${data.subject} Lesson ${data.lessonId}`,
+      points: data.xpEarned || 100,
+      time: new Date(data.completedAt).toLocaleString()
+    }));
 
-  const [achievements] = useState([
-    { id: 1, name: 'First Steps', desc: 'Complete your first lesson', icon: '🎯', unlocked: true },
-    { id: 2, name: 'Week Warrior', desc: '7-day streak', icon: '🔥', unlocked: true },
-    { id: 3, name: 'Quiz Master', desc: 'Score 100% on 5 quizzes', icon: '🧠', unlocked: true },
-    { id: 4, name: 'Social Butterfly', desc: 'Help 10 community members', icon: '🦋', unlocked: false },
-    { id: 5, name: 'Rocket Scientist', desc: 'Complete all rocket lessons', icon: '🚀', unlocked: false },
-    { id: 6, name: 'Century Club', desc: 'Earn 10,000 points', icon: '💯', unlocked: false }
-  ]);
+  // Real achievements from progress
+  const allAchievements = [
+    { id: 'first_lesson', name: 'First Steps', desc: 'Complete your first lesson', icon: '🎯' },
+    { id: 'ten_lessons', name: 'Getting Started', desc: 'Complete 10 lessons', icon: '🔟' },
+    { id: 'quarter_century', name: 'Quarter Century', desc: 'Complete 25 lessons', icon: '🎯' },
+    { id: 'half_century', name: 'Half Century', desc: 'Complete 50 lessons', icon: '🏆' },
+    { id: 'quiz_master', name: 'Quiz Master', desc: 'Get perfect scores on 10 quizzes', icon: '🧠' },
+    { id: 'rocket_master', name: 'Rocket Scientist', desc: 'Complete all rocket lessons', icon: '🚀' },
+    { id: 'car_master', name: 'Automotive Master', desc: 'Complete all car lessons', icon: '🚗' },
+    { id: 'plane_master', name: 'Aviation Master', desc: 'Complete all plane lessons', icon: '✈️' },
+    { id: 'electronics_master', name: 'Electronics Master', desc: 'Complete all electronics lessons', icon: '⚡' }
+  ];
+  
+  const achievements = allAchievements.map(ach => ({
+    ...ach,
+    unlocked: progress.achievements?.includes(ach.id) || false
+  }));
 
   const xpPercentage = (stats.xp / stats.xpToNextLevel) * 100;
   const lessonPercentage = (stats.lessonsCompleted / stats.totalLessons) * 100;
@@ -178,44 +212,54 @@ const DashboardPage = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                      <span className="text-2xl">🚀</span>
+                {/* Physics */}
+                {(() => {
+                  const physicsCompleted = Object.keys(progress.completedLessons).filter(k => k.startsWith('physics-')).length;
+                  const physicsTotal = 33;
+                  const physicsPercent = Math.round((physicsCompleted / physicsTotal) * 100);
+                  return physicsCompleted > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                          <span className="text-2xl">⚛️</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">Physics</p>
+                          <p className="text-sm text-gray-400">{physicsCompleted}/{physicsTotal} lessons</p>
+                        </div>
+                      </div>
+                      <span className="text-blue-400 font-bold">{physicsPercent}%</span>
                     </div>
-                    <div>
-                      <p className="font-semibold">Rocket Mechanics</p>
-                      <p className="text-sm text-gray-400">12/25 lessons</p>
+                  );
+                })()}
+                
+                {/* Mathematics */}
+                {(() => {
+                  const mathCompleted = Object.keys(progress.completedLessons).filter(k => k.startsWith('mathematics-')).length;
+                  const mathTotal = 37;
+                  const mathPercent = Math.round((mathCompleted / mathTotal) * 100);
+                  return mathCompleted > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                          <span className="text-2xl">🔢</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">Mathematics</p>
+                          <p className="text-sm text-gray-400">{mathCompleted}/{mathTotal} lessons</p>
+                        </div>
+                      </div>
+                      <span className="text-green-400 font-bold">{mathPercent}%</span>
                     </div>
+                  );
+                })()}
+                
+                {/* Show message if no lessons completed */}
+                {completedLessons === 0 && (
+                  <div className="text-center py-8 text-gray-400">
+                    <p>Start your first lesson to see progress here!</p>
                   </div>
-                  <span className="text-orange-400 font-bold">48%</span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                      <span className="text-2xl">✈️</span>
-                    </div>
-                    <div>
-                      <p className="font-semibold">Plane Mechanics</p>
-                      <p className="text-sm text-gray-400">4/25 lessons</p>
-                    </div>
-                  </div>
-                  <span className="text-blue-400 font-bold">16%</span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                      <span className="text-2xl">🚗</span>
-                    </div>
-                    <div>
-                      <p className="font-semibold">Car Mechanics</p>
-                      <p className="text-sm text-gray-400">2/25 lessons</p>
-                    </div>
-                  </div>
-                  <span className="text-purple-400 font-bold">8%</span>
-                </div>
+                )}
               </div>
             </div>
 
