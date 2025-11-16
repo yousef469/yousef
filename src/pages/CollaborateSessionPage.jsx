@@ -5,93 +5,152 @@ import {
   Crown, PhoneOff, Copy, Check, FileVideo, Box
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import webrtcService from '../services/webrtc';
 
 export default function CollaborateSessionPage() {
   const navigate = useNavigate();
   const { sessionId } = useParams();
   const { user } = useAuth();
-  const videoRef = useRef(null);
-  const [stream, setStream] = useState(null);
+  const localVideoRef = useRef(null);
+  const remoteVideosRef = useRef(new Map());
   
   // Session state
-  const [isHost, setIsHost] = useState(true); // First person is host
+  const [isHost, setIsHost] = useState(true);
   const [isMicOn, setIsMicOn] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(true);
   
-  // Participants (mock data - would come from real-time DB)
+  // Participants - start with just the current user
   const [participants, setParticipants] = useState([
-    { id: user?.id, name: user?.email?.split('@')[0] || 'You', isHost: true, isMuted: false, isCameraOff: false },
-    { id: '2', name: 'Alex Chen', isHost: false, isMuted: false, isCameraOff: false },
-    { id: '3', name: 'Sarah Kim', isHost: false, isMuted: true, isCameraOff: false }
+    { 
+      id: user?.id, 
+      socketId: 'local',
+      name: user?.email?.split('@')[0] || 'You', 
+      isHost: true, 
+      isMuted: !isMicOn, 
+      isCameraOff: !isCameraOn 
+    }
   ]);
 
-  // Initialize media on mount
+  // Initialize WebRTC on mount
   useEffect(() => {
-    return () => {
-      // Cleanup: stop all tracks when component unmounts
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+    const initializeSession = async () => {
+      try {
+        console.log('🚀 Initializing WebRTC session...');
+        
+        // Connect to signaling server
+        await webrtcService.connect();
+        
+        // Set up event handlers
+        webrtcService.onUserJoined = ({ socketId, userId, userName }) => {
+          console.log('👤 User joined:', userName);
+          setParticipants(prev => [...prev, {
+            id: userId,
+            socketId,
+            name: userName,
+            isHost: false,
+            isMuted: false,
+            isCameraOff: false
+          }]);
+        };
+
+        webrtcService.onUserLeft = (socketId) => {
+          console.log('👋 User left:', socketId);
+          setParticipants(prev => prev.filter(p => p.socketId !== socketId));
+          const videoElement = remoteVideosRef.current.get(socketId);
+          if (videoElement && videoElement.parentNode) {
+            videoElement.parentNode.removeChild(videoElement);
+          }
+          remoteVideosRef.current.delete(socketId);
+        };
+
+        webrtcService.onStreamReceived = (socketId, stream) => {
+          console.log('📹 Received stream from:', socketId);
+          let videoElement = remoteVideosRef.current.get(socketId);
+          if (!videoElement) {
+            videoElement = document.createElement('video');
+            videoElement.autoplay = true;
+            videoElement.playsInline = true;
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'cover';
+            remoteVideosRef.current.set(socketId, videoElement);
+          }
+          videoElement.srcObject = stream;
+        };
+
+        webrtcService.onHostChanged = (newHostId) => {
+          setIsHost(webrtcService.socket.id === newHostId);
+          setParticipants(prev => prev.map(p => ({
+            ...p,
+            isHost: p.socketId === newHostId
+          })));
+        };
+
+        // Join the session
+        await webrtcService.joinSession(
+          sessionId, 
+          user?.id, 
+          user?.email?.split('@')[0] || 'User'
+        );
+
+        console.log('✅ WebRTC session initialized');
+        setIsConnecting(false);
+      } catch (error) {
+        console.error('❌ Failed to initialize session:', error);
+        alert('Failed to connect to session. Please try again.');
+        navigate('/collaborate');
       }
     };
-  }, [stream]);
+
+    initializeSession();
+
+    // Cleanup on unmount
+    return () => {
+      console.log('🧹 Cleaning up WebRTC session');
+      webrtcService.leaveSession();
+    };
+  }, [sessionId, user, navigate]);
 
   const toggleMic = async () => {
     if (!isMicOn) {
       try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        setStream(prev => {
-          if (prev) {
-            audioStream.getAudioTracks().forEach(track => prev.addTrack(track));
-            return prev;
-          }
-          return audioStream;
-        });
-        setIsMicOn(true);
+        if (!webrtcService.localStream) {
+          await webrtcService.getUserMedia({ audio: true, video: isCameraOn });
+        }
+        const enabled = webrtcService.toggleMicrophone();
+        setIsMicOn(enabled);
       } catch (err) {
         alert('Microphone access denied');
       }
     } else {
-      if (stream) {
-        stream.getAudioTracks().forEach(track => {
-          track.stop();
-          stream.removeTrack(track);
-        });
-      }
-      setIsMicOn(false);
+      const enabled = webrtcService.toggleMicrophone();
+      setIsMicOn(enabled);
     }
   };
 
   const toggleCamera = async () => {
     if (!isCameraOn) {
       try {
-        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = videoStream;
-        }
-        setStream(prev => {
-          if (prev) {
-            videoStream.getVideoTracks().forEach(track => prev.addTrack(track));
-            return prev;
+        if (!webrtcService.localStream) {
+          const stream = await webrtcService.getUserMedia({ audio: isMicOn, video: true });
+          if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
           }
-          return videoStream;
-        });
-        setIsCameraOn(true);
+        }
+        const enabled = webrtcService.toggleCamera();
+        setIsCameraOn(enabled);
       } catch (err) {
         alert('Camera access denied');
       }
     } else {
-      if (stream) {
-        stream.getVideoTracks().forEach(track => {
-          track.stop();
-          stream.removeTrack(track);
-        });
+      const enabled = webrtcService.toggleCamera();
+      setIsCameraOn(enabled);
+      if (!enabled && localVideoRef.current) {
+        localVideoRef.current.srcObject = null;
       }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-      setIsCameraOn(false);
     }
   };
 
@@ -102,15 +161,9 @@ export default function CollaborateSessionPage() {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  const makeHost = (participantId) => {
-    if (isHost) {
-      setParticipants(prev => prev.map(p => ({
-        ...p,
-        isHost: p.id === participantId
-      })));
-      if (participantId !== user?.id) {
-        setIsHost(false);
-      }
+  const makeHost = (participant) => {
+    if (isHost && participant.socketId !== 'local') {
+      webrtcService.transferHost(participant.socketId);
     }
   };
 
@@ -129,11 +182,22 @@ export default function CollaborateSessionPage() {
   };
 
   const leaveSession = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
+    webrtcService.leaveSession();
     navigate('/collaborate');
   };
+
+  // Show loading while connecting
+  if (isConnecting) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold mb-2">Connecting to session...</h2>
+          <p className="text-gray-400">Please wait while we set up your video call</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -145,7 +209,7 @@ export default function CollaborateSessionPage() {
           <div className="relative bg-gray-800 rounded-lg overflow-hidden">
             {isCameraOn ? (
               <video
-                ref={videoRef}
+                ref={localVideoRef}
                 autoPlay
                 muted
                 playsInline
@@ -171,34 +235,49 @@ export default function CollaborateSessionPage() {
           </div>
 
           {/* Other Participants */}
-          {participants.slice(1).map((participant) => (
-            <div key={participant.id} className="relative bg-gray-800 rounded-lg overflow-hidden group">
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">
-                    {participant.name[0]}
+          {participants.slice(1).map((participant) => {
+            const videoElement = remoteVideosRef.current.get(participant.socketId);
+            
+            return (
+              <div key={participant.socketId} className="relative bg-gray-800 rounded-lg overflow-hidden group">
+                {videoElement ? (
+                  <div 
+                    className="w-full h-full"
+                    ref={(container) => {
+                      if (container && videoElement && !container.contains(videoElement)) {
+                        container.appendChild(videoElement);
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">
+                        {participant.name[0]}
+                      </div>
+                      <p className="font-semibold">{participant.name}</p>
+                    </div>
                   </div>
-                  <p className="font-semibold">{participant.name}</p>
+                )}
+                
+                <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                  <span className="px-2 py-1 bg-black/70 rounded text-sm">{participant.name}</span>
+                  {participant.isHost && <Crown className="w-4 h-4 text-yellow-400" />}
+                  {participant.isMuted && <MicOff className="w-4 h-4 text-red-400" />}
                 </div>
-              </div>
-              
-              <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                <span className="px-2 py-1 bg-black/70 rounded text-sm">{participant.name}</span>
-                {participant.isHost && <Crown className="w-4 h-4 text-yellow-400" />}
-                {participant.isMuted && <MicOff className="w-4 h-4 text-red-400" />}
-              </div>
 
-              {/* Make Host Button (only visible to host) */}
-              {isHost && !participant.isHost && (
-                <button
-                  onClick={() => makeHost(participant.id)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 px-2 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-xs font-semibold transition-all"
-                >
-                  Make Host
-                </button>
-              )}
-            </div>
-          ))}
+                {/* Make Host Button (only visible to host) */}
+                {isHost && !participant.isHost && (
+                  <button
+                    onClick={() => makeHost(participant)}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 px-2 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-xs font-semibold transition-all"
+                  >
+                    Make Host
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Control Bar */}
