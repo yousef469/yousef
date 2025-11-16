@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ['simple-peer'],
+    include: ['simple-peer', 'socket.io-client'],
     esbuildOptions: {
       target: 'esnext'
     }
@@ -15,16 +15,26 @@ export default defineConfig({
     open: true
   },
   build: {
-    chunkSizeWarningLimit: 1600, // Increase to handle large bundle
+    chunkSizeWarningLimit: 1600,
+    commonjsOptions: {
+      include: [/simple-peer/, /node_modules/],
+      transformMixedEsModules: true
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           'three': ['three'],
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['lucide-react'],
-          'services': ['@supabase/supabase-js', '@google/generative-ai']
+          'services': ['@supabase/supabase-js', '@google/generative-ai'],
+          'webrtc': ['simple-peer', 'socket.io-client']
         }
       }
+    }
+  },
+  resolve: {
+    alias: {
+      'simple-peer': 'simple-peer/simplepeer.min.js'
     }
   }
 })
