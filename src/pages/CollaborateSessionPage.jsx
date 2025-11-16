@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   Mic, MicOff, Video, VideoOff, Share2, Upload, Users, 
   Crown, PhoneOff, Copy, Check, FileVideo, Box
@@ -10,16 +10,22 @@ import webrtcService from '../services/webrtc';
 export default function CollaborateSessionPage() {
   const navigate = useNavigate();
   const { sessionId } = useParams();
+  const { state } = useLocation();
   const { user } = useAuth();
   const localVideoRef = useRef(null);
   const remoteVideosRef = useRef(new Map());
   
+  // Get initial settings from setup page
+  const initialVideoEnabled = state?.videoEnabled ?? false;
+  const initialAudioEnabled = state?.audioEnabled ?? false;
+  
   // Session state
   const [isHost, setIsHost] = useState(true);
-  const [isMicOn, setIsMicOn] = useState(false);
-  const [isCameraOn, setIsCameraOn] = useState(false);
+  const [isMicOn, setIsMicOn] = useState(initialAudioEnabled);
+  const [isCameraOn, setIsCameraOn] = useState(initialVideoEnabled);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [showMeetingInfo, setShowMeetingInfo] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
   
   // Participants - start with just the current user
@@ -95,6 +101,21 @@ export default function CollaborateSessionPage() {
           user?.id, 
           user?.email?.split('@')[0] || 'User'
         );
+
+        // Apply initial camera/mic settings from setup page
+        if (initialVideoEnabled || initialAudioEnabled) {
+          try {
+            const stream = await webrtcService.getUserMedia({ 
+              video: initialVideoEnabled, 
+              audio: initialAudioEnabled 
+            });
+            if (localVideoRef.current && initialVideoEnabled) {
+              localVideoRef.current.srcObject = stream;
+            }
+          } catch (error) {
+            console.error('Error applying initial media settings:', error);
+          }
+        }
 
         console.log('✅ WebRTC session initialized');
         setIsConnecting(false);
@@ -201,8 +222,53 @@ export default function CollaborateSessionPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      {/* Top Meeting Info Bar */}
+      <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowMeetingInfo(!showMeetingInfo)}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all"
+            >
+              <Users className="w-4 h-4" />
+              <span className="text-sm font-semibold">Meeting Info</span>
+            </button>
+            
+            {showMeetingInfo && (
+              <div className="flex items-center gap-4 px-4 py-2 bg-gray-700/50 rounded-lg">
+                <div>
+                  <p className="text-xs text-gray-400">Meeting ID</p>
+                  <p className="font-mono font-bold">{sessionId}</p>
+                </div>
+                <div className="h-8 w-px bg-gray-600"></div>
+                <div>
+                  <p className="text-xs text-gray-400">Passcode</p>
+                  <p className="font-mono font-bold">No password</p>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/collaborate/session/${sessionId}`);
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 2000);
+                  }}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm font-semibold transition-all flex items-center gap-2"
+                >
+                  {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {linkCopied ? 'Copied!' : 'Copy Invite'}
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Users className="w-4 h-4" />
+            <span>{participants.length} participant{participants.length !== 1 ? 's' : ''}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Main Video Grid */}
-      <div className="h-screen flex flex-col">
+      <div className="h-[calc(100vh-60px)] flex flex-col">
         {/* Video Grid */}
         <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-2 p-4">
           {/* Your Video */}
