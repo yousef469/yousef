@@ -45,9 +45,8 @@ export default function CollaboratePage() {
 
   const createSession = () => {
     const code = generateSessionCode();
-    const pass = generatePassword();
-    setSessionCode(code);
-    setPassword(pass);
+    // Navigate to the new session page
+    navigate(`/collaborate/session/${code}`);
     setIsHost(true);
     setStep('create');
   };
