@@ -23,8 +23,17 @@ class WebRTCService {
   async connect(serverUrl) {
     // Auto-detect production vs development
     if (!serverUrl) {
-      serverUrl = import.meta.env.PROD 
-        ? import.meta.env.VITE_SIGNALING_SERVER || 'https://name-ai-3d-backend.onrender.com'
+      const isProd = import.meta.env.PROD;
+      const envServer = import.meta.env.VITE_SIGNALING_SERVER;
+      
+      console.log('🔍 Environment check:', {
+        isProd,
+        envServer,
+        mode: import.meta.env.MODE
+      });
+      
+      serverUrl = isProd 
+        ? (envServer || 'https://name-ai-3d-backend.onrender.com')
         : 'http://localhost:3001';
     }
     

@@ -19,6 +19,11 @@ export default function CollaborateSessionPage() {
   const initialVideoEnabled = state?.videoEnabled ?? false;
   const initialAudioEnabled = state?.audioEnabled ?? false;
   
+  // Generate a random 6-digit passcode for this session
+  const [sessionPasscode] = useState(() => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  });
+  
   // Session state
   const [isHost, setIsHost] = useState(true);
   const [isMicOn, setIsMicOn] = useState(initialAudioEnabled);
@@ -243,7 +248,7 @@ export default function CollaborateSessionPage() {
                 <div className="h-8 w-px bg-gray-600"></div>
                 <div>
                   <p className="text-xs text-gray-400">Passcode</p>
-                  <p className="font-mono font-bold">No password</p>
+                  <p className="font-mono font-bold">{sessionPasscode}</p>
                 </div>
                 <button
                   onClick={() => {
