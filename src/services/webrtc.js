@@ -224,6 +224,11 @@ class WebRTCService {
       peer = new Peer(peerConfig);
     } catch (error) {
       console.error('❌ Failed to create peer:', error);
+      console.log('💡 Tip: Make sure microphone is enabled in setup page');
+      // Show user-friendly message
+      if (typeof window !== 'undefined' && this.onConnectionError) {
+        this.onConnectionError('Connection failed. Please refresh and ensure microphone is enabled.');
+      }
       return null;
     }
 
