@@ -10,7 +10,7 @@ export default function MeetingSetupPage() {
   const videoRef = useRef(null);
   
   const [videoEnabled, setVideoEnabled] = useState(true);
-  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(true); // Always required
   const [usePMI, setUsePMI] = useState(false);
   const [personalMeetingId, setPersonalMeetingId] = useState('');
   const [stream, setStream] = useState(null);
@@ -186,14 +186,14 @@ export default function MeetingSetupPage() {
                 {videoEnabled ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
               </button>
               <button
-                onClick={() => setAudioEnabled(!audioEnabled)}
-                className={`p-4 rounded-full transition-all ${
-                  audioEnabled 
-                    ? 'bg-gray-700 hover:bg-gray-600' 
-                    : 'bg-red-600 hover:bg-red-700'
-                }`}
+                disabled
+                className="p-4 rounded-full bg-green-600 cursor-not-allowed opacity-90 relative"
+                title="Microphone required for video calls"
               >
-                {audioEnabled ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+                <Mic className="w-6 h-6" />
+                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
+                  Required
+                </span>
               </button>
               <button className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 transition-all">
                 <Settings className="w-6 h-6" />
@@ -203,6 +203,19 @@ export default function MeetingSetupPage() {
 
           {/* Meeting Options */}
           <div className="space-y-6">
+            {/* Microphone Required Notice */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Mic className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-blue-300 mb-1">Microphone Required</p>
+                  <p className="text-sm text-blue-200/80">
+                    A microphone is required to join video calls. This ensures clear communication and follows industry standards (like Zoom and Google Meet).
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Personal Meeting ID */}
             <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Meeting ID</h3>
