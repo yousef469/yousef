@@ -34,7 +34,7 @@ const LandingPage = () => {
               <Logo size="md" showText={true} />
               
               <nav className="hidden md:flex items-center gap-6">
-                <button onClick={() => navigate('/ai-generator')} className="text-white hover:text-primary transition-colors font-medium">AI 3D</button>
+                <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">About</button>
                 <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">Pricing</button>
               </nav>
             </div>

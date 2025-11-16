@@ -1104,6 +1104,7 @@ import ModelUpload from './components/ModelUpload';
 import GamificationSystem from './components/GamificationSystem';
 const AI3DGeneratorPage = lazy(() => import('./pages/AI3DGeneratorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProgressionPage = lazy(() => import('./pages/ProgressionPage'));
 const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
@@ -1217,6 +1218,7 @@ export default function App() {
           <Route path="/community" element={<ProtectedRoute><CommunityQA /></ProtectedRoute>} />
           <Route path="/ai-generator" element={<AI3DGeneratorPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/about" element={<AboutPage />} />
           </Routes>
         </React.Suspense>
       </Router>
