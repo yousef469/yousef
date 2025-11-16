@@ -1110,6 +1110,7 @@ const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
 const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
 const CollaboratePage = lazy(() => import('./pages/CollaboratePage'));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const PhysicsPage = lazy(() => import('./pages/PhysicsPage'));
 const MathematicsPage = lazy(() => import('./pages/MathematicsPage'));
 const MathematicsEngineeringPage = lazy(() => import('./pages/MathematicsEngineeringPage'));
@@ -1180,6 +1181,7 @@ export default function App() {
           <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/collaborate" element={<ProtectedRoute><CollaboratePage /></ProtectedRoute>} />
+          <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
