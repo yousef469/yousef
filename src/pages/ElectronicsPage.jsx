@@ -7,15 +7,17 @@ export default function ElectronicsPage() {
     const navigate = useNavigate();
     const { isLessonCompleted } = useProgress();
     
-    // If user has completed lesson 1, redirect to map immediately
+    // Check immediately - if lesson 1 is completed, redirect
+    const hasCompletedLesson1 = isLessonCompleted('electronics', 0);
+    
     useEffect(() => {
-        if (isLessonCompleted('electronics', 0)) {
+        if (hasCompletedLesson1) {
             navigate('/games/map/electronics', { replace: true });
         }
-    }, [isLessonCompleted, navigate]);
+    }, [hasCompletedLesson1, navigate]);
 
     // Don't render anything if redirecting
-    if (isLessonCompleted('electronics', 0)) {
+    if (hasCompletedLesson1) {
         return null;
     }
 
