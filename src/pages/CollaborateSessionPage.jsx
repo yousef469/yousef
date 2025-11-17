@@ -876,95 +876,88 @@ export default function CollaborateSessionPage() {
 
         {/* Right: Video Sidebar */}
         <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col overflow-y-auto p-2 space-y-2">
-          {/* Your Video - Host at Top */}
-          <div className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video">
-            {isCameraOn ? (
-              <video
-                ref={localVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-900">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
-                    {user?.email?.[0]?.toUpperCase() || 'Y'}
-                  </div>
-                  <p className="font-semibold text-sm">{user?.email?.split('@')[0] || 'You'}</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Overlay Info */}
-            <div className="absolute bottom-1 left-1 flex items-center gap-1">
-              <span className="px-2 py-0.5 bg-black/70 rounded text-xs">{user?.email?.split('@')[0] || 'You'}</span>
-              {isHost && <Crown className="w-3 h-3 text-yellow-400" />}
-              {!isMicOn && <MicOff className="w-3 h-3 text-red-400" />}
-            </div>
-          </div>
-
-          {/* Other Participants */}
-          {participants.slice(1).map((participant) => {
-            const videoElement = remoteVideosRef.current.get(participant.socketId);
-            // Use the hasStream flag we set when stream is received
-            const hasVideo = participant.hasStream && videoElement;
-            
-            console.log('🎬 Rendering participant:', {
-              socketId: participant.socketId,
-              name: participant.name,
-              hasStream: participant.hasStream,
-              hasVideoElement: !!videoElement,
-              hasVideo,
-              videoSrcObject: videoElement?.srcObject ? 'yes' : 'no'
-            });
-            
-            return (
-              <div key={participant.socketId} className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video group">
-                {hasVideo ? (
-                  <div 
-                    className="w-full h-full bg-black"
-                    ref={(container) => {
-                      if (container && videoElement && !container.contains(videoElement)) {
-                        // Clear container first
-                        while (container.firstChild) {
-                          container.removeChild(container.firstChild);
-                        }
-                        container.appendChild(videoElement);
-                      }
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
-                        {participant.name[0]}
+          {/* Sort participants: Host first, then others */}
+          {participants
+            .sort((a, b) => {
+              // Host always first
+              if (a.isHost && !b.isHost) return -1;
+              if (!a.isHost && b.isHost) return 1;
+              // Then by socketId to keep consistent order
+              return a.socketId.localeCompare(b.socketId);
+            })
+            .map((participant) => {
+              const isLocalUser = participant.socketId === 'local';
+              const videoElement = remoteVideosRef.current.get(participant.socketId);
+              const hasVideo = isLocalUser ? isCameraOn : (participant.hasStream && videoElement);
+              
+              return (
+                <div key={participant.socketId} className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video group">
+                  {isLocalUser ? (
+                    // Local user video
+                    isCameraOn ? (
+                      <video
+                        ref={localVideoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-900">
+                        <div className="text-center">
+                          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
+                            {user?.email?.[0]?.toUpperCase() || 'Y'}
+                          </div>
+                          <p className="font-semibold text-sm">{participant.name}</p>
+                        </div>
                       </div>
-                      <p className="font-semibold text-sm">{participant.name}</p>
-                      <p className="text-xs text-gray-400 mt-1">Connecting...</p>
-                    </div>
+                    )
+                  ) : (
+                    // Remote participant video
+                    hasVideo ? (
+                      <div 
+                        className="w-full h-full bg-black"
+                        ref={(container) => {
+                          if (container && videoElement && !container.contains(videoElement)) {
+                            while (container.firstChild) {
+                              container.removeChild(container.firstChild);
+                            }
+                            container.appendChild(videoElement);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
+                        <div className="text-center">
+                          <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
+                            {participant.name[0]}
+                          </div>
+                          <p className="font-semibold text-sm">{participant.name}</p>
+                          <p className="text-xs text-gray-400 mt-1">Connecting...</p>
+                        </div>
+                      </div>
+                    )
+                  )}
+                  
+                  {/* Overlay Info */}
+                  <div className="absolute bottom-1 left-1 flex items-center gap-1">
+                    <span className="px-2 py-0.5 bg-black/70 rounded text-xs">{participant.name}</span>
+                    {participant.isHost && <Crown className="w-3 h-3 text-yellow-400" />}
+                    {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
                   </div>
-                )}
-                
-                <div className="absolute bottom-1 left-1 flex items-center gap-1">
-                  <span className="px-2 py-0.5 bg-black/70 rounded text-xs">{participant.name}</span>
-                  {participant.isHost && <Crown className="w-3 h-3 text-yellow-400" />}
-                  {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
-                </div>
 
-                {/* Make Host Button (only visible to host) */}
-                {isHost && !participant.isHost && (
-                  <button
-                    onClick={() => makeHost(participant)}
-                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 px-2 py-0.5 bg-yellow-600 hover:bg-yellow-700 rounded text-xs font-semibold transition-all"
-                  >
-                    Make Host
-                  </button>
-                )}
-              </div>
-            );
-          })}
+                  {/* Make Host Button (only visible to current host for non-hosts) */}
+                  {isHost && !participant.isHost && !isLocalUser && (
+                    <button
+                      onClick={() => makeHost(participant)}
+                      className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 px-2 py-0.5 bg-yellow-600 hover:bg-yellow-700 rounded text-xs font-semibold transition-all"
+                    >
+                      Make Host
+                    </button>
+                  )}
+                </div>
+              );
+            })}
         </div>
       </div>
 
