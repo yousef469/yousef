@@ -67,15 +67,22 @@ export default function CollaborateSessionPage() {
         
         // Set up event handlers
         webrtcService.onUserJoined = ({ socketId, userId, userName }) => {
-          console.log('👤 User joined:', userName);
-          setParticipants(prev => [...prev, {
-            id: userId,
-            socketId,
-            name: userName,
-            isHost: false,
-            isMuted: false,
-            isCameraOff: false
-          }]);
+          console.log('👤 User joined:', userName, socketId);
+          setParticipants(prev => {
+            // Prevent duplicates
+            if (prev.some(p => p.socketId === socketId)) {
+              console.log('⚠️ Participant already exists:', socketId);
+              return prev;
+            }
+            return [...prev, {
+              id: userId,
+              socketId,
+              name: userName,
+              isHost: false,
+              isMuted: false,
+              isCameraOff: false
+            }];
+          });
         };
 
         webrtcService.onUserLeft = (socketId) => {

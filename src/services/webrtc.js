@@ -276,6 +276,7 @@ class WebRTCService {
     const peerConfig = {
       initiator,
       trickle: false,
+      channelName: 'data', // Enable data channel explicitly
       config: {
         iceServers
       }
@@ -284,9 +285,11 @@ class WebRTCService {
     // Validate stream before adding to peer config
     if (this.localStream && this.localStream instanceof MediaStream) {
       peerConfig.stream = this.localStream;
-      console.log('✅ Adding stream to peer config:', {
+      console.log('✅ Adding stream to peer config for', socketId, ':', {
         hasAudio: this.localStream.getAudioTracks().length > 0,
-        hasVideo: this.localStream.getVideoTracks().length > 0
+        hasVideo: this.localStream.getVideoTracks().length > 0,
+        audioEnabled: this.localStream.getAudioTracks()[0]?.enabled,
+        videoEnabled: this.localStream.getVideoTracks()[0]?.enabled
       });
     } else {
       console.warn('⚠️ No valid stream available, peer will be created without stream');
@@ -323,7 +326,11 @@ class WebRTCService {
     });
 
     peer.on('stream', (stream) => {
-      console.log('📹 Received stream from:', socketId);
+      console.log('📹 Received stream from:', socketId, {
+        hasAudio: stream.getAudioTracks().length > 0,
+        hasVideo: stream.getVideoTracks().length > 0,
+        tracks: stream.getTracks().length
+      });
       if (this.onStreamReceived) {
         this.onStreamReceived(socketId, stream);
       }
