@@ -610,14 +610,17 @@ export default function CollaborateSessionPage() {
             console.log(`📤 Sending file in ${totalChunks} chunks:`, file.name);
             setUploadProgress({ fileName: file.name, progress: 0 });
             
-            // Send chunks in batches for much faster transfer
-            const BATCH_SIZE = 10; // Send 10 chunks at once
-            const BATCH_DELAY = 10; // Only 10ms delay between batches
+            // Ultra-fast batch sending with minimal delays
+            const BATCH_SIZE = 50; // Send 50 chunks at once (increased from 10)
+            const BATCH_DELAY = 1; // Only 1ms delay between batches (reduced from 10ms)
+            
+            // Use requestAnimationFrame for smoother progress updates
+            let lastProgressUpdate = 0;
             
             for (let batchStart = 0; batchStart < totalChunks; batchStart += BATCH_SIZE) {
               const batchEnd = Math.min(batchStart + BATCH_SIZE, totalChunks);
               
-              // Send batch of chunks without delay
+              // Send entire batch instantly
               for (let i = batchStart; i < batchEnd; i++) {
                 const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
                 
@@ -632,11 +635,14 @@ export default function CollaborateSessionPage() {
                 });
               }
               
-              // Update progress after batch
+              // Update progress only every 5% to reduce UI lag
               const progress = Math.round((batchEnd / totalChunks) * 100);
-              setUploadProgress({ fileName: file.name, progress });
+              if (progress - lastProgressUpdate >= 5 || batchEnd === totalChunks) {
+                setUploadProgress({ fileName: file.name, progress });
+                lastProgressUpdate = progress;
+              }
               
-              // Small delay only between batches
+              // Minimal delay only between batches
               if (batchEnd < totalChunks) {
                 await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
               }
