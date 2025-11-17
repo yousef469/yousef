@@ -44,11 +44,12 @@ export default function CollaborateSessionPage() {
   const [connectionStatus, setConnectionStatus] = useState('Initializing...'); // Status message
   const [showParticipants, setShowParticipants] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
-  const [uploadedContent, setUploadedContent] = useState(null); // Don't persist - files too large for localStorage
+  const [uploadedContent, setUploadedContent] = useState(null);
   const [localStreamReady, setLocalStreamReady] = useState(false); // Track when stream is ready
   const [uploadProgress, setUploadProgress] = useState(null); // {fileName: string, progress: number}
   const [receivingFiles, setReceivingFiles] = useState(new Map()); // Map of fileId -> {chunks, totalChunks, type, name}
   const sharedVideoRef = useRef(null); // Ref for synced video playback
+  const dbRef = useRef(null); // IndexedDB reference
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -68,8 +69,80 @@ export default function CollaborateSessionPage() {
     name: user?.email?.split('@')[0] || 'User'
   });
 
-  // Note: Removed localStorage persistence for content - files are too large (26MB+ exceeds 5-10MB quota)
-  // Content will be re-broadcast to new joiners by the host automatically
+  // Initialize IndexedDB for large file storage (supports 50MB+)
+  useEffect(() => {
+    const initDB = async () => {
+      try {
+        const request = indexedDB.open('CollaborateDB', 1);
+        
+        request.onerror = () => console.error('IndexedDB error');
+        
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('sessions')) {
+            db.createObjectStore('sessions', { keyPath: 'sessionId' });
+          }
+        };
+        
+        request.onsuccess = async (event) => {
+          dbRef.current = event.target.result;
+          
+          // Restore content from IndexedDB
+          const transaction = dbRef.current.transaction(['sessions'], 'readonly');
+          const store = transaction.objectStore('sessions');
+          const getRequest = store.get(sessionId);
+          
+          getRequest.onsuccess = () => {
+            if (getRequest.result && getRequest.result.content) {
+              setUploadedContent(getRequest.result.content);
+              console.log('✅ Restored content from IndexedDB');
+            }
+          };
+        };
+      } catch (error) {
+        console.error('Failed to initialize IndexedDB:', error);
+      }
+    };
+    
+    initDB();
+    
+    // Cleanup on unmount
+    return () => {
+      if (dbRef.current) {
+        // Clear session data
+        try {
+          const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
+          const store = transaction.objectStore('sessions');
+          store.delete(sessionId);
+        } catch (error) {
+          console.error('Failed to cleanup IndexedDB:', error);
+        }
+      }
+    };
+  }, [sessionId]);
+
+  // Persist uploaded content to IndexedDB
+  useEffect(() => {
+    if (dbRef.current && uploadedContent) {
+      try {
+        const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
+        const store = transaction.objectStore('sessions');
+        store.put({ sessionId, content: uploadedContent });
+        console.log('💾 Saved content to IndexedDB');
+      } catch (error) {
+        console.error('Failed to save to IndexedDB:', error);
+      }
+    } else if (dbRef.current && !uploadedContent) {
+      // Clear content when null
+      try {
+        const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
+        const store = transaction.objectStore('sessions');
+        store.delete(sessionId);
+      } catch (error) {
+        console.error('Failed to delete from IndexedDB:', error);
+      }
+    }
+  }, [uploadedContent, sessionId]);
 
   // Initialize WebRTC on mount
   useEffect(() => {
