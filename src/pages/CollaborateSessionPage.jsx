@@ -164,6 +164,52 @@ export default function CollaborateSessionPage() {
     };
   }, [sessionId, user, navigate]);
 
+  // Initialize canvas
+  useEffect(() => {
+    if (showWhiteboard && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 3;
+    }
+  }, [showWhiteboard]);
+
+  // Drawing functions
+  const startDrawing = (e) => {
+    if (!canvasRef.current) return;
+    drawingRef.current.isDrawing = true;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  };
+
+  const draw = (e) => {
+    if (!drawingRef.current.isDrawing || !canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = drawingRef.current.tool === 'eraser' ? '#ffffff' : drawingRef.current.color;
+    ctx.lineWidth = drawingRef.current.tool === 'eraser' ? 20 : 3;
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    drawingRef.current.isDrawing = false;
+  };
+
+  const clearCanvas = () => {
+    if (!canvasRef.current) return;
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  };
+
   const toggleMic = async () => {
     if (!isMicOn) {
       try {
