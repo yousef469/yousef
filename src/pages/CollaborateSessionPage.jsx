@@ -610,28 +610,35 @@ export default function CollaborateSessionPage() {
             console.log(`📤 Sending file in ${totalChunks} chunks:`, file.name);
             setUploadProgress({ fileName: file.name, progress: 0 });
             
-            // Send chunks with small delays to avoid overwhelming the connection
-            for (let i = 0; i < totalChunks; i++) {
-              const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+            // Send chunks in batches for much faster transfer
+            const BATCH_SIZE = 10; // Send 10 chunks at once
+            const BATCH_DELAY = 10; // Only 10ms delay between batches
+            
+            for (let batchStart = 0; batchStart < totalChunks; batchStart += BATCH_SIZE) {
+              const batchEnd = Math.min(batchStart + BATCH_SIZE, totalChunks);
               
-              webrtcService.broadcastData({
-                type: 'file-chunk',
-                fileId,
-                chunkIndex: i,
-                totalChunks,
-                data: chunk,
-                fileType: type,
-                fileName: file.name
-              });
+              // Send batch of chunks without delay
+              for (let i = batchStart; i < batchEnd; i++) {
+                const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                
+                webrtcService.broadcastData({
+                  type: 'file-chunk',
+                  fileId,
+                  chunkIndex: i,
+                  totalChunks,
+                  data: chunk,
+                  fileType: type,
+                  fileName: file.name
+                });
+              }
               
-              // Update progress
-              const progress = Math.round(((i + 1) / totalChunks) * 100);
+              // Update progress after batch
+              const progress = Math.round((batchEnd / totalChunks) * 100);
               setUploadProgress({ fileName: file.name, progress });
               
-              // Small delay between chunks to prevent overwhelming
-              // Use shorter delay for better performance with large files
-              if (i < totalChunks - 1) {
-                await new Promise(resolve => setTimeout(resolve, 30));
+              // Small delay only between batches
+              if (batchEnd < totalChunks) {
+                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
               }
             }
             
