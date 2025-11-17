@@ -127,7 +127,16 @@ class WebRTCService {
         this.getDummyStream();
       }
       
-      users.forEach(socketId => {
+      users.forEach(user => {
+        const socketId = typeof user === 'string' ? user : user.socketId;
+        const userId = typeof user === 'object' ? user.userId : null;
+        const userName = typeof user === 'object' ? user.userName : 'User';
+        
+        // Notify about existing user (same as user-joined)
+        if (this.onUserJoined) {
+          this.onUserJoined({ socketId, userId, userName });
+        }
+        
         this.createPeer(socketId, false); // They initiate the call
       });
     });
