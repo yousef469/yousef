@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   Mic, MicOff, Video, VideoOff, Share2, Upload, Users, 
@@ -947,17 +947,15 @@ export default function CollaborateSessionPage() {
                         <p className="text-sm text-gray-400">Loading 3D Model...</p>
                       </div>
                     </div>
-                    {/* Memoized viewer - only recreates when URL changes */}
-                    {useMemo(() => (
-                      <ThreeJSViewer 
-                        key={uploadedContent.url} 
-                        modelInfo={{ 
-                          path: uploadedContent.url,
-                          name: uploadedContent.name,
-                          type: '3d-model'
-                        }} 
-                      />
-                    ), [uploadedContent.url])}
+                    {/* 3D Viewer with key to prevent unnecessary remounts */}
+                    <ThreeJSViewer 
+                      key={uploadedContent.url} 
+                      modelInfo={{ 
+                        path: uploadedContent.url,
+                        name: uploadedContent.name,
+                        type: '3d-model'
+                      }} 
+                    />
                   </div>
                 )}
               </div>
