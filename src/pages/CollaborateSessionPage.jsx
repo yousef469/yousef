@@ -106,19 +106,8 @@ export default function CollaborateSessionPage() {
     
     initDB();
     
-    // Cleanup on unmount
-    return () => {
-      if (dbRef.current) {
-        // Clear session data
-        try {
-          const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
-          const store = transaction.objectStore('sessions');
-          store.delete(sessionId);
-        } catch (error) {
-          console.error('Failed to cleanup IndexedDB:', error);
-        }
-      }
-    };
+    // Note: Don't cleanup on unmount - we want content to persist across page switches
+    // Content will be cleaned up when user explicitly closes it or leaves the session
   }, [sessionId]);
 
   // Persist uploaded content to IndexedDB
@@ -127,21 +116,20 @@ export default function CollaborateSessionPage() {
       try {
         const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
         const store = transaction.objectStore('sessions');
-        store.put({ sessionId, content: uploadedContent });
-        console.log('💾 Saved content to IndexedDB');
+        const putRequest = store.put({ sessionId, content: uploadedContent });
+        
+        putRequest.onsuccess = () => {
+          console.log('💾 Saved content to IndexedDB:', uploadedContent.name, uploadedContent.type);
+        };
+        
+        putRequest.onerror = (error) => {
+          console.error('❌ Failed to save to IndexedDB:', error);
+        };
       } catch (error) {
-        console.error('Failed to save to IndexedDB:', error);
-      }
-    } else if (dbRef.current && !uploadedContent) {
-      // Clear content when null
-      try {
-        const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
-        const store = transaction.objectStore('sessions');
-        store.delete(sessionId);
-      } catch (error) {
-        console.error('Failed to delete from IndexedDB:', error);
+        console.error('❌ Failed to save to IndexedDB:', error);
       }
     }
+    // Don't delete on null - let closeContent handle explicit deletion
   }, [uploadedContent, sessionId]);
 
   // Initialize WebRTC on mount
@@ -682,6 +670,19 @@ export default function CollaborateSessionPage() {
 
   const closeContent = () => {
     setUploadedContent(null);
+    
+    // Clean up IndexedDB when content is explicitly closed
+    if (dbRef.current) {
+      try {
+        const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
+        const store = transaction.objectStore('sessions');
+        store.delete(sessionId);
+        console.log('🗑️ Cleaned up IndexedDB');
+      } catch (error) {
+        console.error('Failed to cleanup IndexedDB:', error);
+      }
+    }
+    
     if (isHost) {
       setTimeout(() => {
         webrtcService.broadcastData({ type: 'content-closed' });
