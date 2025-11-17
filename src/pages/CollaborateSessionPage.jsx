@@ -216,8 +216,6 @@ export default function CollaborateSessionPage() {
             audioEnabled: audioTrack?.enabled
           });
           
-          // Signal that stream is ready (will be set to video element in useEffect)
-          setLocalStreamReady(true);
           streamReady = true;
         } catch (error) {
           console.error('❌ Error getting media:', error);
@@ -248,6 +246,13 @@ export default function CollaborateSessionPage() {
         console.log('✅ WebRTC session initialized');
         setConnectionStatus('Connected!');
         setIsConnecting(false);
+        
+        // Set stream ready AFTER component renders (after isConnecting = false)
+        // This ensures the video element exists before we try to set the stream
+        setTimeout(() => {
+          setLocalStreamReady(true);
+          console.log('📹 Local stream ready flag set');
+        }, 100);
       } catch (error) {
         console.error('❌ Failed to initialize session:', error);
         setIsConnecting(false);
