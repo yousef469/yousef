@@ -705,7 +705,8 @@ export default function CollaborateSessionPage() {
           {/* Other Participants */}
           {participants.slice(1).map((participant) => {
             const videoElement = remoteVideosRef.current.get(participant.socketId);
-            const hasVideo = videoElement && videoElement.srcObject;
+            // Use the hasStream flag we set when stream is received
+            const hasVideo = participant.hasStream && videoElement;
             
             return (
               <div key={participant.socketId} className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video group">
