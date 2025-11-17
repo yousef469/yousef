@@ -300,21 +300,28 @@ export default function CollaborateSessionPage() {
     setShowWhiteboard(true);
     setUploadedContent(null);
     if (isHost) {
-      webrtcService.broadcastData({ type: 'whiteboard-opened' });
+      // Small delay to ensure peers are ready
+      setTimeout(() => {
+        webrtcService.broadcastData({ type: 'whiteboard-opened' });
+      }, 100);
     }
   };
 
   const closeWhiteboard = () => {
     setShowWhiteboard(false);
     if (isHost) {
-      webrtcService.broadcastData({ type: 'whiteboard-closed' });
+      setTimeout(() => {
+        webrtcService.broadcastData({ type: 'whiteboard-closed' });
+      }, 100);
     }
   };
 
   const closeContent = () => {
     setUploadedContent(null);
     if (isHost) {
-      webrtcService.broadcastData({ type: 'content-closed' });
+      setTimeout(() => {
+        webrtcService.broadcastData({ type: 'content-closed' });
+      }, 100);
     }
   };
 

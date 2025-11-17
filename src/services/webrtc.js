@@ -318,6 +318,10 @@ class WebRTCService {
       });
     });
 
+    peer.on('connect', () => {
+      console.log('🔗 Peer connected:', socketId);
+    });
+
     peer.on('stream', (stream) => {
       console.log('📹 Received stream from:', socketId);
       if (this.onStreamReceived) {
