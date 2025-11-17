@@ -20,8 +20,10 @@ class WebRTCService {
     this.onDataReceived = null; // New callback for data channel messages
   }
 
-  // Initialize connection to signaling server
-  async connect(serverUrl) {
+  // Initialize connection to signaling server with retry logic
+  async connect(serverUrl, retryCount = 0) {
+    const MAX_RETRIES = 3;
+    
     // Auto-detect production vs development
     if (!serverUrl) {
       const isProd = import.meta.env.PROD;
@@ -38,47 +40,66 @@ class WebRTCService {
         : 'http://localhost:3001';
     }
     
-    console.log('🔌 Connecting to signaling server:', serverUrl);
+    console.log(`🔌 Connecting to signaling server (attempt ${retryCount + 1}/${MAX_RETRIES + 1}):`, serverUrl);
     
-    return new Promise((resolve, reject) => {
-      this.socket = io(serverUrl, {
-        transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 5,
-        timeout: 20000,
-        forceNew: true
-      });
-      
-      let resolved = false;
-      
-      this.socket.on('connect', () => {
-        console.log('✅ Connected to signaling server');
-        if (!resolved) {
-          resolved = true;
-          resolve();
-        }
-      });
+    try {
+      await new Promise((resolve, reject) => {
+        this.socket = io(serverUrl, {
+          transports: ['websocket', 'polling'], // Try websocket first for better performance
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionAttempts: 10,
+          timeout: 45000, // Increased timeout for free tier wake-up
+          forceNew: true,
+          upgrade: true,
+          rememberUpgrade: true
+        });
+        
+        let resolved = false;
+        
+        this.socket.on('connect', () => {
+          console.log('✅ Connected to signaling server');
+          if (!resolved) {
+            resolved = true;
+            resolve();
+          }
+        });
 
-      this.socket.on('connect_error', (error) => {
-        console.error('❌ Connection error:', error.message, error);
-        if (!resolved) {
-          resolved = true;
-          reject(error);
-        }
+        this.socket.on('connect_error', (error) => {
+          console.error('❌ Connection error:', error.message);
+          if (!resolved) {
+            resolved = true;
+            reject(error);
+          }
+        });
+        
+        // Timeout after 45 seconds (Render free tier needs time to wake up)
+        setTimeout(() => {
+          if (!resolved && this.socket && !this.socket.connected) {
+            resolved = true;
+            reject(new Error('timeout'));
+          }
+        }, 45000);
       });
       
-      // Timeout after 30 seconds (Render free tier can take time to wake up)
-      setTimeout(() => {
-        if (!resolved && this.socket && !this.socket.connected) {
-          resolved = true;
-          reject(new Error('Connection timeout - server may be sleeping. Please try again.'));
-        }
-      }, 30000);
-    }).then(() => {
       // Set up event handlers after connection is established
       this.setupEventHandlers();
-    });
+      
+    } catch (error) {
+      // Retry logic for timeout or connection errors
+      if (retryCount < MAX_RETRIES && (error.message === 'timeout' || error.message.includes('xhr poll error'))) {
+        console.log(`🔄 Retrying connection... (${retryCount + 1}/${MAX_RETRIES})`);
+        // Disconnect previous socket
+        if (this.socket) {
+          this.socket.disconnect();
+          this.socket = null;
+        }
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return this.connect(serverUrl, retryCount + 1);
+      }
+      throw error;
+    }
   }
   
   setupEventHandlers() {

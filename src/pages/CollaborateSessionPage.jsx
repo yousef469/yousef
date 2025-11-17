@@ -40,6 +40,7 @@ export default function CollaborateSessionPage() {
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const [showMeetingInfo, setShowMeetingInfo] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState('Initializing...'); // Status message
   const [showParticipants, setShowParticipants] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [uploadedContent, setUploadedContent] = useState(null); // {type: 'image'|'video'|'3d', url: string, name: string}
@@ -70,6 +71,7 @@ export default function CollaborateSessionPage() {
         console.log('🚀 Initializing WebRTC session...');
         
         // Connect to signaling server
+        setConnectionStatus('Connecting to server...');
         await webrtcService.connect();
         
         // Set up event handlers
@@ -188,6 +190,7 @@ export default function CollaborateSessionPage() {
         // Microphone is always required for WebRTC to work properly
         let streamReady = false;
         try {
+          setConnectionStatus('Requesting camera and microphone access...');
           console.log('🎥 Getting user media before joining...', { video: initialVideoEnabled, audio: true });
           const stream = await webrtcService.getUserMedia({ 
             video: initialVideoEnabled, 
@@ -235,6 +238,7 @@ export default function CollaborateSessionPage() {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // Join the session (now we have stream for peer connections)
+        setConnectionStatus('Joining session...');
         await webrtcService.joinSession(
           sessionId, 
           userInfoRef.current.id, 
@@ -242,15 +246,23 @@ export default function CollaborateSessionPage() {
         );
 
         console.log('✅ WebRTC session initialized');
+        setConnectionStatus('Connected!');
         setIsConnecting(false);
       } catch (error) {
         console.error('❌ Failed to initialize session:', error);
         setIsConnecting(false);
         
-        const errorMessage = error.message.includes('timeout') 
-          ? 'Connection timeout. The server may be waking up (free tier). Please wait 30 seconds and try again.'
-          : 'Failed to connect to session. Please check your internet connection and try again.';
+        let errorMessage = 'Failed to connect to session. Please try again.';
         
+        if (error.message.includes('timeout')) {
+          errorMessage = 'Connection timeout. The server is waking up (this can take 30-60 seconds on first use). Please refresh and try again.';
+        } else if (error.message.includes('Permission denied') || error.message.includes('NotAllowedError')) {
+          errorMessage = 'Camera/microphone access denied. Please allow access and try again.';
+        } else if (error.message.includes('NotFoundError')) {
+          errorMessage = 'No camera or microphone found. Please connect a device and try again.';
+        }
+        
+        setConnectionStatus('Connection failed');
         alert(errorMessage);
         navigate('/collaborate');
       }
@@ -482,10 +494,20 @@ export default function CollaborateSessionPage() {
   if (isConnecting) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <h2 className="text-2xl font-bold mb-2">Connecting to session...</h2>
-          <p className="text-gray-400">Please wait while we set up your video call</p>
+        <div className="text-center max-w-md px-4">
+          <div className="relative mb-8">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-t-4 border-blue-500 mx-auto"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Video className="w-12 h-12 text-blue-400" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold mb-3">Setting up your meeting</h2>
+          <p className="text-xl text-blue-400 mb-4">{connectionStatus}</p>
+          <p className="text-gray-400 text-sm">
+            {connectionStatus.includes('server') && '⏳ First connection may take 30-60 seconds as the server wakes up'}
+            {connectionStatus.includes('camera') && '📹 Please allow camera and microphone access in your browser'}
+            {connectionStatus.includes('Joining') && '🚀 Almost there...'}
+          </p>
         </div>
       </div>
     );
