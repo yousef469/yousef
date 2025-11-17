@@ -56,6 +56,12 @@ export default function CollaborateSessionPage() {
     }
   ]);
 
+  // Store user info in ref to avoid re-renders
+  const userInfoRef = useRef({
+    id: user?.id,
+    name: user?.email?.split('@')[0] || 'User'
+  });
+
   // Initialize WebRTC on mount
   useEffect(() => {
     const initializeSession = async () => {
@@ -149,6 +155,24 @@ export default function CollaborateSessionPage() {
             setShowWhiteboard(false);
           }
           
+          if (message.type === 'whiteboard-draw' && canvasRef.current) {
+            // Receive and draw on canvas
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            const x = message.x * canvas.width;
+            const y = message.y * canvas.height;
+            
+            ctx.strokeStyle = message.tool === 'eraser' ? '#ffffff' : message.color;
+            ctx.lineWidth = message.tool === 'eraser' ? 20 : 3;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+          }
+          
+          if (message.type === 'whiteboard-clear' && canvasRef.current) {
+            const ctx = canvasRef.current.getContext('2d');
+            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          }
+          
           if (message.type === 'content-uploaded') {
             setUploadedContent(message.content);
             setShowWhiteboard(false);
@@ -163,15 +187,28 @@ export default function CollaborateSessionPage() {
         // Microphone is always required for WebRTC to work properly
         let streamReady = false;
         try {
-          console.log('🎥 Getting user media before joining...');
+          console.log('🎥 Getting user media before joining...', { video: initialVideoEnabled, audio: true });
           const stream = await webrtcService.getUserMedia({ 
             video: initialVideoEnabled, 
             audio: true // Always get audio for peer connections
           });
-          if (localVideoRef.current && initialVideoEnabled) {
+          
+          // Set local video immediately
+          if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
+            console.log('📹 Local video ref set with stream');
           }
-          console.log('✅ Got user media, stream ready');
+          
+          // Update camera state based on actual stream
+          const videoTrack = stream.getVideoTracks()[0];
+          if (videoTrack) {
+            setIsCameraOn(videoTrack.enabled);
+          }
+          
+          console.log('✅ Got user media, stream ready', {
+            hasVideo: stream.getVideoTracks().length > 0,
+            hasAudio: stream.getAudioTracks().length > 0
+          });
           streamReady = true;
         } catch (error) {
           console.error('❌ Error getting media:', error);
@@ -180,6 +217,7 @@ export default function CollaborateSessionPage() {
           const dummyStream = webrtcService.getDummyStream();
           console.log('Dummy stream created:', dummyStream);
           streamReady = !!dummyStream;
+          setIsCameraOn(false);
         }
 
         // Only join if we have a stream ready
@@ -193,8 +231,8 @@ export default function CollaborateSessionPage() {
         // Join the session (now we have stream for peer connections)
         await webrtcService.joinSession(
           sessionId, 
-          user?.id, 
-          user?.email?.split('@')[0] || 'User'
+          userInfoRef.current.id, 
+          userInfoRef.current.name
         );
 
         console.log('✅ WebRTC session initialized');
@@ -219,7 +257,7 @@ export default function CollaborateSessionPage() {
       console.log('🧹 Cleaning up WebRTC session');
       webrtcService.leaveSession();
     };
-  }, [sessionId, user?.id, initialVideoEnabled, initialAudioEnabled]);
+  }, [sessionId]); // Only re-initialize if sessionId changes
 
   // Initialize canvas
   useEffect(() => {
@@ -251,10 +289,24 @@ export default function CollaborateSessionPage() {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const ctx = canvas.getContext('2d');
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
     ctx.strokeStyle = drawingRef.current.tool === 'eraser' ? '#ffffff' : drawingRef.current.color;
     ctx.lineWidth = drawingRef.current.tool === 'eraser' ? 20 : 3;
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.lineTo(x, y);
     ctx.stroke();
+    
+    // Broadcast drawing to other participants
+    if (isHost) {
+      webrtcService.broadcastData({
+        type: 'whiteboard-draw',
+        x: x / canvas.width, // Normalize coordinates
+        y: y / canvas.height,
+        color: drawingRef.current.color,
+        tool: drawingRef.current.tool
+      });
+    }
   };
 
   const stopDrawing = () => {
@@ -265,6 +317,11 @@ export default function CollaborateSessionPage() {
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    
+    // Broadcast clear to other participants
+    if (isHost) {
+      webrtcService.broadcastData({ type: 'whiteboard-clear' });
+    }
   };
 
   const toggleMic = async () => {
