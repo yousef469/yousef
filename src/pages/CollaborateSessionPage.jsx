@@ -260,10 +260,15 @@ export default function CollaborateSessionPage() {
         };
 
         webrtcService.onHostChanged = (newHostId) => {
-          setIsHost(webrtcService.socket.id === newHostId);
+          const amINewHost = webrtcService.socket.id === newHostId;
+          const isLocalNewHost = newHostId === 'local';
+          
+          console.log('👑 Host changed to:', newHostId, 'Am I host?', amINewHost || isLocalNewHost);
+          
+          setIsHost(amINewHost || isLocalNewHost);
           setParticipants(prev => prev.map(p => ({
             ...p,
-            isHost: p.socketId === newHostId
+            isHost: p.socketId === newHostId || (newHostId === 'local' && p.socketId === 'local')
           })));
         };
 
