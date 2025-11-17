@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   Mic, MicOff, Video, VideoOff, Share2, Upload, Users, 
@@ -939,14 +939,25 @@ export default function CollaborateSessionPage() {
                   />
                 )}
                 {uploadedContent.type === '3d' && (
-                  <div className="w-full h-full">
-                    <ThreeJSViewer 
-                      modelInfo={{ 
-                        path: uploadedContent.url,
-                        name: uploadedContent.name,
-                        type: '3d-model'
-                      }} 
-                    />
+                  <div className="w-full h-full relative">
+                    {/* Loading overlay */}
+                    <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10 pointer-events-none">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                        <p className="text-sm text-gray-400">Loading 3D Model...</p>
+                      </div>
+                    </div>
+                    {/* Memoized viewer - only recreates when URL changes */}
+                    {useMemo(() => (
+                      <ThreeJSViewer 
+                        key={uploadedContent.url} 
+                        modelInfo={{ 
+                          path: uploadedContent.url,
+                          name: uploadedContent.name,
+                          type: '3d-model'
+                        }} 
+                      />
+                    ), [uploadedContent.url])}
                   </div>
                 )}
               </div>
