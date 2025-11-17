@@ -14,6 +14,8 @@ export default function CollaborateSessionPage() {
   const { user } = useAuth();
   const localVideoRef = useRef(null);
   const remoteVideosRef = useRef(new Map());
+  const canvasRef = useRef(null);
+  const drawingRef = useRef({ isDrawing: false, color: '#3b82f6', tool: 'pen' });
   
   // Get initial settings from setup page
   const initialVideoEnabled = state?.videoEnabled ?? false;
