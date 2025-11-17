@@ -8,6 +8,7 @@ const app = express();
 app.use(cors());
 
 const sessions = new Map(); // sessionId -> Set of socket IDs
+const userInfo = new Map(); // socketId -> {userId, userName}
 
 // Health check endpoints for deployment platforms
 app.get('/', (req, res) => {
@@ -46,6 +47,9 @@ io.on('connection', (socket) => {
   socket.on('join-session', ({ sessionId, userId, userName }) => {
     socket.join(sessionId);
     
+    // Store user info
+    userInfo.set(socket.id, { userId, userName });
+    
     if (!sessions.has(sessionId)) {
       sessions.set(sessionId, new Set());
     }
@@ -58,8 +62,13 @@ io.on('connection', (socket) => {
       userName
     });
 
-    // Send list of existing users to the new user
-    const existingUsers = Array.from(sessions.get(sessionId)).filter(id => id !== socket.id);
+    // Send list of existing users with their info to the new user
+    const existingUsers = Array.from(sessions.get(sessionId))
+      .filter(id => id !== socket.id)
+      .map(id => ({
+        socketId: id,
+        ...userInfo.get(id)
+      }));
     socket.emit('existing-users', existingUsers);
 
     console.log(`User ${userName} joined session ${sessionId}`);
@@ -83,6 +92,9 @@ io.on('connection', (socket) => {
   // Disconnect
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+    
+    // Remove user info
+    userInfo.delete(socket.id);
     
     // Remove from all sessions
     sessions.forEach((users, sessionId) => {

@@ -161,8 +161,8 @@ export default function CollaborateSessionPage() {
             setShowWhiteboard(false);
           }
           
-          if (message.type === 'whiteboard-draw' && canvasRef.current) {
-            // Receive and draw on canvas
+          if (message.type === 'whiteboard-start' && canvasRef.current) {
+            // Start new drawing path
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
             const x = message.x * canvas.width;
@@ -170,6 +170,17 @@ export default function CollaborateSessionPage() {
             
             ctx.strokeStyle = message.tool === 'eraser' ? '#ffffff' : message.color;
             ctx.lineWidth = message.tool === 'eraser' ? 20 : 3;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+          }
+          
+          if (message.type === 'whiteboard-draw' && canvasRef.current) {
+            // Continue drawing
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            const x = message.x * canvas.width;
+            const y = message.y * canvas.height;
+            
             ctx.lineTo(x, y);
             ctx.stroke();
           }
@@ -341,8 +352,22 @@ export default function CollaborateSessionPage() {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const ctx = canvas.getContext('2d');
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
     ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.moveTo(x, y);
+    
+    // Broadcast drawing start to other participants
+    if (isHost) {
+      webrtcService.broadcastData({
+        type: 'whiteboard-start',
+        x: x / canvas.width,
+        y: y / canvas.height,
+        color: drawingRef.current.color,
+        tool: drawingRef.current.tool
+      });
+    }
   };
 
   const draw = (e) => {
@@ -475,9 +500,10 @@ export default function CollaborateSessionPage() {
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
-        // Check file size (limit to 10MB for data channel transfer)
-        if (file.size > 10 * 1024 * 1024) {
-          alert('File too large! Please upload files smaller than 10MB.');
+        // Check file size (limit to 1MB for data channel transfer)
+        const maxSize = 1 * 1024 * 1024; // 1MB
+        if (file.size > maxSize) {
+          alert(`File too large! Please upload files smaller than 1MB.\nYour file: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
           return;
         }
         
@@ -647,43 +673,49 @@ export default function CollaborateSessionPage() {
                 )}
               </div>
               
-              {/* Drawing Tools */}
-              <div className="flex items-center gap-2 mb-4 p-3 bg-gray-800 rounded-lg">
-                <button
-                  onClick={() => drawingRef.current.tool = 'pen'}
-                  className="p-2 bg-blue-600 hover:bg-blue-700 rounded"
-                >
-                  Pen
-                </button>
-                <button
-                  onClick={() => drawingRef.current.tool = 'eraser'}
-                  className="p-2 bg-gray-700 hover:bg-gray-600 rounded"
-                >
-                  Eraser
-                </button>
-                <input
-                  type="color"
-                  defaultValue="#3b82f6"
-                  onChange={(e) => drawingRef.current.color = e.target.value}
-                  className="w-10 h-10 rounded"
-                />
-                <button
-                  onClick={clearCanvas}
-                  className="p-2 bg-red-600 hover:bg-red-700 rounded ml-auto"
-                >
-                  Clear
-                </button>
-              </div>
+              {/* Drawing Tools - Host Only */}
+              {isHost ? (
+                <div className="flex items-center gap-2 mb-4 p-3 bg-gray-800 rounded-lg">
+                  <button
+                    onClick={() => drawingRef.current.tool = 'pen'}
+                    className="p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                  >
+                    Pen
+                  </button>
+                  <button
+                    onClick={() => drawingRef.current.tool = 'eraser'}
+                    className="p-2 bg-gray-700 hover:bg-gray-600 rounded"
+                  >
+                    Eraser
+                  </button>
+                  <input
+                    type="color"
+                    defaultValue="#3b82f6"
+                    onChange={(e) => drawingRef.current.color = e.target.value}
+                    className="w-10 h-10 rounded"
+                  />
+                  <button
+                    onClick={clearCanvas}
+                    className="p-2 bg-red-600 hover:bg-red-700 rounded ml-auto"
+                  >
+                    Clear
+                  </button>
+                </div>
+              ) : (
+                <div className="mb-4 p-3 bg-gray-800 rounded-lg text-center text-gray-400">
+                  <p className="text-sm">👁️ View Only - Host is controlling the whiteboard</p>
+                </div>
+              )}
               
-              {/* Canvas with event handlers */}
+              {/* Canvas with event handlers - only host can draw */}
               <div className="flex-1 bg-white rounded-lg overflow-hidden">
                 <canvas
                   ref={canvasRef}
-                  onMouseDown={startDrawing}
-                  onMouseMove={draw}
-                  onMouseUp={stopDrawing}
-                  onMouseLeave={stopDrawing}
-                  className="w-full h-full cursor-crosshair"
+                  onMouseDown={isHost ? startDrawing : undefined}
+                  onMouseMove={isHost ? draw : undefined}
+                  onMouseUp={isHost ? stopDrawing : undefined}
+                  onMouseLeave={isHost ? stopDrawing : undefined}
+                  className={`w-full h-full ${isHost ? 'cursor-crosshair' : 'cursor-not-allowed'}`}
                 />
               </div>
             </div>
