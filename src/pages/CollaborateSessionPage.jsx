@@ -500,10 +500,10 @@ export default function CollaborateSessionPage() {
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
-        // Check file size (limit to 1MB for data channel transfer)
-        const maxSize = 1 * 1024 * 1024; // 1MB
+        // Check file size (limit to 100KB for data channel transfer without chunking)
+        const maxSize = 100 * 1024; // 100KB - safe for data channels
         if (file.size > maxSize) {
-          alert(`File too large! Please upload files smaller than 1MB.\nYour file: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+          alert(`File too large! Please upload files smaller than 100KB.\nYour file: ${(file.size / 1024).toFixed(2)}KB\n\nTip: Compress images before uploading.`);
           return;
         }
         
