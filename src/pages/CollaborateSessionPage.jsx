@@ -18,8 +18,8 @@ export default function CollaborateSessionPage() {
   const drawingRef = useRef({ isDrawing: false, color: '#3b82f6', tool: 'pen' });
   
   // Get initial settings from setup page
-  const initialVideoEnabled = state?.videoEnabled ?? false;
-  const initialAudioEnabled = state?.audioEnabled ?? false;
+  const initialVideoEnabled = state?.videoEnabled ?? true;
+  const initialAudioEnabled = state?.audioEnabled ?? true;
   
   // Generate consistent passcode from sessionId (same for all participants)
   const [sessionPasscode] = useState(() => {
@@ -97,17 +97,35 @@ export default function CollaborateSessionPage() {
 
         webrtcService.onStreamReceived = (socketId, stream) => {
           console.log('📹 Received stream from:', socketId);
+          
+          // Force re-render to show the new video
+          setParticipants(prev => {
+            // Update the participant to trigger re-render
+            return prev.map(p => 
+              p.socketId === socketId 
+                ? { ...p, hasStream: true }
+                : p
+            );
+          });
+          
           let videoElement = remoteVideosRef.current.get(socketId);
           if (!videoElement) {
             videoElement = document.createElement('video');
             videoElement.autoplay = true;
             videoElement.playsInline = true;
+            videoElement.muted = false; // Don't mute remote videos
             videoElement.style.width = '100%';
             videoElement.style.height = '100%';
             videoElement.style.objectFit = 'cover';
             remoteVideosRef.current.set(socketId, videoElement);
           }
+          
           videoElement.srcObject = stream;
+          
+          // Force play (some browsers need this)
+          videoElement.play().catch(err => {
+            console.log('Auto-play prevented, user interaction needed:', err);
+          });
         };
 
         webrtcService.onHostChanged = (newHostId) => {
@@ -567,14 +585,19 @@ export default function CollaborateSessionPage() {
           {/* Other Participants */}
           {participants.slice(1).map((participant) => {
             const videoElement = remoteVideosRef.current.get(participant.socketId);
+            const hasVideo = videoElement && videoElement.srcObject;
             
             return (
               <div key={participant.socketId} className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video group">
-                {videoElement ? (
+                {hasVideo ? (
                   <div 
-                    className="w-full h-full"
+                    className="w-full h-full bg-black"
                     ref={(container) => {
                       if (container && videoElement && !container.contains(videoElement)) {
+                        // Clear container first
+                        while (container.firstChild) {
+                          container.removeChild(container.firstChild);
+                        }
                         container.appendChild(videoElement);
                       }
                     }}
@@ -586,6 +609,7 @@ export default function CollaborateSessionPage() {
                         {participant.name[0]}
                       </div>
                       <p className="font-semibold text-sm">{participant.name}</p>
+                      <p className="text-xs text-gray-400 mt-1">Connecting...</p>
                     </div>
                   </div>
                 )}
@@ -657,35 +681,38 @@ export default function CollaborateSessionPage() {
                 {linkCopied ? <Check className="w-6 h-6" /> : <Share2 className="w-6 h-6" />}
               </button>
 
-              {/* Upload Menu */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowUploadMenu(!showUploadMenu)}
-                  className="p-4 bg-purple-600 hover:bg-purple-700 rounded-full transition-all"
-                  title="Upload content"
-                >
-                  <Upload className="w-6 h-6" />
-                </button>
+              {/* Upload Menu - Disabled (requires file server) */}
+              {false && (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUploadMenu(!showUploadMenu)}
+                    className="p-4 bg-purple-600 hover:bg-purple-700 rounded-full transition-all"
+                    title="Upload content (Coming soon)"
+                    disabled
+                  >
+                    <Upload className="w-6 h-6" />
+                  </button>
 
-                {showUploadMenu && (
-                  <div className="absolute bottom-full mb-2 right-0 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-2 min-w-[200px]">
-                    <button
-                      onClick={() => handleFileUpload('video')}
-                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 rounded transition-colors text-left"
-                    >
-                      <FileVideo className="w-5 h-5 text-red-400" />
-                      <span>Upload Video</span>
-                    </button>
-                    <button
-                      onClick={() => handleFileUpload('3d')}
-                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 rounded transition-colors text-left"
-                    >
-                      <Box className="w-5 h-5 text-cyan-400" />
-                      <span>Upload 3D Model</span>
-                    </button>
-                  </div>
-                )}
-              </div>
+                  {showUploadMenu && (
+                    <div className="absolute bottom-full mb-2 right-0 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-2 min-w-[200px]">
+                      <button
+                        onClick={() => handleFileUpload('video')}
+                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 rounded transition-colors text-left"
+                      >
+                        <FileVideo className="w-5 h-5 text-red-400" />
+                        <span>Upload Video</span>
+                      </button>
+                      <button
+                        onClick={() => handleFileUpload('3d')}
+                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 rounded transition-colors text-left"
+                      >
+                        <Box className="w-5 h-5 text-cyan-400" />
+                        <span>Upload 3D Model</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Whiteboard Toggle - Host Only */}
               {isHost && (
