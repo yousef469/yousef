@@ -179,9 +179,38 @@ export default function CollaborateSessionPage() {
             }];
           });
           
-          // If host has content displayed, broadcast it to new joiner
-          // Note: Content is kept in memory, not localStorage (too large)
-          // Host will need to re-upload if they refresh the page
+          // If host has content displayed, broadcast it to new joiner after a delay
+          if (isHost && uploadedContent && uploadedContent.data) {
+            setTimeout(async () => {
+              console.log('📤 Re-broadcasting content to new joiner');
+              const CHUNK_SIZE = 16 * 1024;
+              const BATCH_SIZE = 50;
+              const totalChunks = Math.ceil(uploadedContent.data.length / CHUNK_SIZE);
+              const fileId = `${Date.now()}-${Math.random()}`;
+              
+              for (let batchStart = 0; batchStart < totalChunks; batchStart += BATCH_SIZE) {
+                const batchEnd = Math.min(batchStart + BATCH_SIZE, totalChunks);
+                
+                for (let i = batchStart; i < batchEnd; i++) {
+                  const chunk = uploadedContent.data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                  webrtcService.broadcastData({
+                    type: 'file-chunk',
+                    fileId,
+                    chunkIndex: i,
+                    totalChunks,
+                    data: chunk,
+                    fileType: uploadedContent.type,
+                    fileName: uploadedContent.name
+                  });
+                }
+                
+                if (batchEnd < totalChunks) {
+                  await new Promise(resolve => setTimeout(resolve, 1));
+                }
+              }
+              console.log('✅ Content re-broadcast complete');
+            }, 2000); // 2 second delay to ensure peer connection is ready
+          }
         };
 
         webrtcService.onUserLeft = (socketId) => {
