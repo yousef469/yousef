@@ -43,6 +43,7 @@ export default function CollaborateSessionPage() {
   const [showParticipants, setShowParticipants] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [uploadedContent, setUploadedContent] = useState(null); // {type: 'image'|'video'|'3d', url: string, name: string}
+  const [localStreamReady, setLocalStreamReady] = useState(false); // Track when stream is ready
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -193,18 +194,6 @@ export default function CollaborateSessionPage() {
             audio: true // Always get audio for peer connections
           });
           
-          // Set local video immediately
-          if (localVideoRef.current) {
-            localVideoRef.current.srcObject = stream;
-            // Force play
-            localVideoRef.current.play().catch(err => {
-              console.log('📹 Local video autoplay prevented:', err);
-            });
-            console.log('📹 Local video ref set with stream');
-          } else {
-            console.warn('⚠️ localVideoRef.current is null');
-          }
-          
           // Update camera state based on actual stream
           const videoTrack = stream.getVideoTracks()[0];
           const audioTrack = stream.getAudioTracks()[0];
@@ -223,6 +212,9 @@ export default function CollaborateSessionPage() {
             videoEnabled: videoTrack?.enabled,
             audioEnabled: audioTrack?.enabled
           });
+          
+          // Signal that stream is ready (will be set to video element in useEffect)
+          setLocalStreamReady(true);
           streamReady = true;
         } catch (error) {
           console.error('❌ Error getting media:', error);
@@ -273,12 +265,26 @@ export default function CollaborateSessionPage() {
     };
   }, [sessionId]); // Only re-initialize if sessionId changes
 
+  // Set local video stream when ready
+  useEffect(() => {
+    if (localStreamReady && localVideoRef.current && webrtcService.localStream) {
+      console.log('📹 Setting local video stream to ref');
+      localVideoRef.current.srcObject = webrtcService.localStream;
+      localVideoRef.current.play().catch(err => {
+        console.log('📹 Local video autoplay prevented:', err);
+      });
+      console.log('✅ Local video element updated with stream');
+    }
+  }, [localStreamReady]);
+
   // Update local video when camera state changes
   useEffect(() => {
     if (localVideoRef.current && webrtcService.localStream) {
       const videoTrack = webrtcService.localStream.getVideoTracks()[0];
       if (videoTrack && isCameraOn) {
-        localVideoRef.current.srcObject = webrtcService.localStream;
+        if (!localVideoRef.current.srcObject) {
+          localVideoRef.current.srcObject = webrtcService.localStream;
+        }
         localVideoRef.current.play().catch(err => {
           console.log('Local video autoplay prevented:', err);
         });
