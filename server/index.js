@@ -27,7 +27,12 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://engineeruim.vercel.app', 'https://www.engineeruim.com', 'https://engineerium.vercel.app']
+      ? [
+          'https://engineeruim.vercel.app', 
+          'https://www.engineeruim.com', 
+          'https://engineerium.vercel.app',
+          'https://yousef-one.vercel.app'
+        ]
       : "*",
     methods: ["GET", "POST"],
     credentials: true
