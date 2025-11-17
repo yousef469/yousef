@@ -17,6 +17,7 @@ class WebRTCService {
     this.onStreamReceived = null;
     this.onHostChanged = null;
     this.onFileShared = null;
+    this.onDataReceived = null; // New callback for data channel messages
   }
 
   // Initialize connection to signaling server
@@ -324,6 +325,18 @@ class WebRTCService {
       }
     });
 
+    peer.on('data', (data) => {
+      try {
+        const message = JSON.parse(data.toString());
+        console.log('📨 Received data from', socketId, ':', message.type);
+        if (this.onDataReceived) {
+          this.onDataReceived(message);
+        }
+      } catch (error) {
+        console.error('Error parsing data:', error);
+      }
+    });
+
     peer.on('error', (error) => {
       console.error('❌ Peer error:', error);
     });
@@ -334,6 +347,19 @@ class WebRTCService {
 
     this.peers.set(socketId, peer);
     return peer;
+  }
+
+  // Broadcast data to all peers
+  broadcastData(data) {
+    const message = JSON.stringify(data);
+    this.peers.forEach((peer, socketId) => {
+      try {
+        peer.send(message);
+        console.log('📤 Sent data to', socketId);
+      } catch (error) {
+        console.error('Error sending data to', socketId, error);
+      }
+    });
   }
 
   // Add stream to all existing peers

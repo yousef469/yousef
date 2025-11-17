@@ -111,6 +111,29 @@ export default function CollaborateSessionPage() {
           })));
         };
 
+        // Handle data channel messages (screen sharing sync)
+        webrtcService.onDataReceived = (message) => {
+          console.log('📨 Received:', message.type);
+          
+          if (message.type === 'whiteboard-opened') {
+            setShowWhiteboard(true);
+            setUploadedContent(null);
+          }
+          
+          if (message.type === 'whiteboard-closed') {
+            setShowWhiteboard(false);
+          }
+          
+          if (message.type === 'content-uploaded') {
+            setUploadedContent(message.content);
+            setShowWhiteboard(false);
+          }
+          
+          if (message.type === 'content-closed') {
+            setUploadedContent(null);
+          }
+        };
+
         // ALWAYS get media BEFORE joining session (required for peer connections)
         // Microphone is always required for WebRTC to work properly
         let streamReady = false;
@@ -272,6 +295,29 @@ export default function CollaborateSessionPage() {
     }
   };
 
+  // Broadcast helpers
+  const openWhiteboard = () => {
+    setShowWhiteboard(true);
+    setUploadedContent(null);
+    if (isHost) {
+      webrtcService.broadcastData({ type: 'whiteboard-opened' });
+    }
+  };
+
+  const closeWhiteboard = () => {
+    setShowWhiteboard(false);
+    if (isHost) {
+      webrtcService.broadcastData({ type: 'whiteboard-closed' });
+    }
+  };
+
+  const closeContent = () => {
+    setUploadedContent(null);
+    if (isHost) {
+      webrtcService.broadcastData({ type: 'content-closed' });
+    }
+  };
+
   const handleFileUpload = (type) => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -281,13 +327,22 @@ export default function CollaborateSessionPage() {
       if (file) {
         // Create a URL for the uploaded file
         const fileUrl = URL.createObjectURL(file);
-        setUploadedContent({
+        const content = {
           type,
           url: fileUrl,
           name: file.name
-        });
-        setShowWhiteboard(false); // Close whiteboard when showing content
+        };
+        setUploadedContent(content);
+        setShowWhiteboard(false);
         setShowUploadMenu(false);
+        
+        // Broadcast to other participants (host only)
+        if (isHost) {
+          webrtcService.broadcastData({
+            type: 'content-uploaded',
+            content
+          });
+        }
       }
     };
     input.click();
@@ -368,7 +423,7 @@ export default function CollaborateSessionPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">{uploadedContent.name}</h2>
                 <button
-                  onClick={() => setUploadedContent(null)}
+                  onClick={closeContent}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
                 >
                   Close
@@ -405,7 +460,7 @@ export default function CollaborateSessionPage() {
                 <h2 className="text-xl font-bold">Whiteboard</h2>
                 {isHost && (
                   <button
-                    onClick={() => setShowWhiteboard(false)}
+                    onClick={closeWhiteboard}
                     className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
                   >
                     Close
@@ -621,7 +676,7 @@ export default function CollaborateSessionPage() {
               {/* Whiteboard Toggle - Host Only */}
               {isHost && (
                 <button
-                  onClick={() => setShowWhiteboard(!showWhiteboard)}
+                  onClick={() => showWhiteboard ? closeWhiteboard() : openWhiteboard()}
                   className={`p-4 rounded-full transition-all ${
                     showWhiteboard 
                       ? 'bg-green-600 hover:bg-green-700' 
