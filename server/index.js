@@ -26,14 +26,14 @@ app.get('/health', (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? [
-          'https://engineeruim.vercel.app', 
-          'https://www.engineeruim.com', 
-          'https://engineerium.vercel.app',
-          'https://yousef-one.vercel.app'
-        ]
-      : "*",
+    origin: [
+      'https://engineeruim.vercel.app', 
+      'https://www.engineeruim.com', 
+      'https://engineerium.vercel.app',
+      'https://yousef-one.vercel.app',
+      'http://localhost:3000',
+      /\.vercel\.app$/ // Allow all Vercel preview deployments
+    ],
     methods: ["GET", "POST"],
     credentials: true
   }
