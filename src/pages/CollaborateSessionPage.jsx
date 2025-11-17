@@ -43,16 +43,8 @@ export default function CollaborateSessionPage() {
   const [isConnecting, setIsConnecting] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState('Initializing...'); // Status message
   const [showParticipants, setShowParticipants] = useState(false);
-  const [showWhiteboard, setShowWhiteboard] = useState(() => {
-    // Restore whiteboard state from localStorage
-    const saved = localStorage.getItem(`session-${sessionId}-whiteboard`);
-    return saved === 'true';
-  });
-  const [uploadedContent, setUploadedContent] = useState(() => {
-    // Restore uploaded content from localStorage
-    const saved = localStorage.getItem(`session-${sessionId}-content`);
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
+  const [uploadedContent, setUploadedContent] = useState(null); // Don't persist - files too large for localStorage
   const [localStreamReady, setLocalStreamReady] = useState(false); // Track when stream is ready
   const [uploadProgress, setUploadProgress] = useState(null); // {fileName: string, progress: number}
   const [receivingFiles, setReceivingFiles] = useState(new Map()); // Map of fileId -> {chunks, totalChunks, type, name}
@@ -64,7 +56,7 @@ export default function CollaborateSessionPage() {
       id: user?.id, 
       socketId: 'local',
       name: user?.email?.split('@')[0] || 'You', 
-      isHost: true, 
+      isHost: !state?.isJoining, // Only creator is host, not joiners
       isMuted: !isMicOn, 
       isCameraOff: !isCameraOn 
     }
@@ -76,28 +68,8 @@ export default function CollaborateSessionPage() {
     name: user?.email?.split('@')[0] || 'User'
   });
 
-  // Persist uploaded content to localStorage
-  useEffect(() => {
-    if (uploadedContent) {
-      localStorage.setItem(`session-${sessionId}-content`, JSON.stringify(uploadedContent));
-    } else {
-      localStorage.removeItem(`session-${sessionId}-content`);
-    }
-  }, [uploadedContent, sessionId]);
-
-  // Persist whiteboard state to localStorage
-  useEffect(() => {
-    localStorage.setItem(`session-${sessionId}-whiteboard`, showWhiteboard.toString());
-  }, [showWhiteboard, sessionId]);
-
-  // Cleanup localStorage when leaving session
-  useEffect(() => {
-    return () => {
-      // Clean up session data when component unmounts
-      localStorage.removeItem(`session-${sessionId}-content`);
-      localStorage.removeItem(`session-${sessionId}-whiteboard`);
-    };
-  }, [sessionId]);
+  // Note: Removed localStorage persistence for content - files are too large (26MB+ exceeds 5-10MB quota)
+  // Content will be re-broadcast to new joiners by the host automatically
 
   // Initialize WebRTC on mount
   useEffect(() => {
@@ -129,38 +101,8 @@ export default function CollaborateSessionPage() {
           });
           
           // If host has content displayed, broadcast it to new joiner
-          if (isHost) {
-            setTimeout(() => {
-              const savedContent = localStorage.getItem(`session-${sessionId}-content`);
-              const savedWhiteboard = localStorage.getItem(`session-${sessionId}-whiteboard`);
-              
-              if (savedWhiteboard === 'true') {
-                webrtcService.broadcastData({ type: 'whiteboard-opened' });
-              } else if (savedContent) {
-                const content = JSON.parse(savedContent);
-                // Re-broadcast content to new joiner
-                if (content.data) {
-                  // If we have the full data, send it
-                  const CHUNK_SIZE = 16 * 1024;
-                  const totalChunks = Math.ceil(content.data.length / CHUNK_SIZE);
-                  const fileId = `${Date.now()}-${Math.random()}`;
-                  
-                  for (let i = 0; i < totalChunks; i++) {
-                    const chunk = content.data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-                    webrtcService.broadcastData({
-                      type: 'file-chunk',
-                      fileId,
-                      chunkIndex: i,
-                      totalChunks,
-                      data: chunk,
-                      fileType: content.type,
-                      fileName: content.name
-                    });
-                  }
-                }
-              }
-            }, 1000); // Small delay to ensure peer connection is ready
-          }
+          // Note: Content is kept in memory, not localStorage (too large)
+          // Host will need to re-upload if they refresh the page
         };
 
         webrtcService.onUserLeft = (socketId) => {
