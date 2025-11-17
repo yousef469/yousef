@@ -201,7 +201,7 @@ export default function CollaborateSessionPage() {
       console.log('🧹 Cleaning up WebRTC session');
       webrtcService.leaveSession();
     };
-  }, [sessionId, user, navigate]);
+  }, [sessionId, user?.id, initialVideoEnabled, initialAudioEnabled]);
 
   // Initialize canvas
   useEffect(() => {
