@@ -180,7 +180,12 @@ export default function CollaborateSessionPage() {
           }
           
           if (message.type === 'content-uploaded') {
-            setUploadedContent(message.content);
+            // Received content from host - use the base64 data as URL
+            setUploadedContent({
+              type: message.content.type,
+              url: message.content.data, // Base64 data URL
+              name: message.content.name
+            });
             setShowWhiteboard(false);
           }
           
@@ -467,27 +472,46 @@ export default function CollaborateSessionPage() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = type === 'video' ? 'video/*' : type === '3d' ? '.obj,.fbx,.gltf,.glb,.stl' : 'image/*';
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
-        // Create a URL for the uploaded file
-        const fileUrl = URL.createObjectURL(file);
-        const content = {
-          type,
-          url: fileUrl,
-          name: file.name
-        };
-        setUploadedContent(content);
-        setShowWhiteboard(false);
-        setShowUploadMenu(false);
-        
-        // Broadcast to other participants (host only)
-        if (isHost) {
-          webrtcService.broadcastData({
-            type: 'content-uploaded',
-            content
-          });
+        // Check file size (limit to 10MB for data channel transfer)
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File too large! Please upload files smaller than 10MB.');
+          return;
         }
+        
+        // Create a URL for local display
+        const fileUrl = URL.createObjectURL(file);
+        
+        // Convert file to base64 for sharing
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Data = reader.result;
+          const content = {
+            type,
+            url: fileUrl, // Local URL for this user
+            name: file.name,
+            data: base64Data // Base64 for sharing
+          };
+          
+          setUploadedContent(content);
+          setShowWhiteboard(false);
+          setShowUploadMenu(false);
+          
+          // Broadcast to other participants (host only)
+          if (isHost) {
+            webrtcService.broadcastData({
+              type: 'content-uploaded',
+              content: {
+                type,
+                name: file.name,
+                data: base64Data
+              }
+            });
+          }
+        };
+        reader.readAsDataURL(file);
       }
     };
     input.click();
@@ -814,20 +838,26 @@ export default function CollaborateSessionPage() {
                 {linkCopied ? <Check className="w-6 h-6" /> : <Share2 className="w-6 h-6" />}
               </button>
 
-              {/* Upload Menu - Disabled (requires file server) */}
-              {false && (
+              {/* Upload Menu - Host Only */}
+              {isHost && (
                 <div className="relative">
                   <button
                     onClick={() => setShowUploadMenu(!showUploadMenu)}
                     className="p-4 bg-purple-600 hover:bg-purple-700 rounded-full transition-all"
-                    title="Upload content (Coming soon)"
-                    disabled
+                    title="Upload content"
                   >
                     <Upload className="w-6 h-6" />
                   </button>
 
                   {showUploadMenu && (
                     <div className="absolute bottom-full mb-2 right-0 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-2 min-w-[200px]">
+                      <button
+                        onClick={() => handleFileUpload('image')}
+                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 rounded transition-colors text-left"
+                      >
+                        <Upload className="w-5 h-5 text-blue-400" />
+                        <span>Upload Image</span>
+                      </button>
                       <button
                         onClick={() => handleFileUpload('video')}
                         className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-700 rounded transition-colors text-left"
