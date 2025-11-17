@@ -109,12 +109,15 @@ export default function CollaborateSessionPage() {
           
           // Force re-render to show the new video
           setParticipants(prev => {
+            console.log('📋 Current participants before update:', prev.map(p => ({ socketId: p.socketId, name: p.name, hasStream: p.hasStream })));
             // Update the participant to trigger re-render
-            return prev.map(p => 
+            const updated = prev.map(p => 
               p.socketId === socketId 
                 ? { ...p, hasStream: true }
                 : p
             );
+            console.log('📋 Updated participants:', updated.map(p => ({ socketId: p.socketId, name: p.name, hasStream: p.hasStream })));
+            return updated;
           });
           
           let videoElement = remoteVideosRef.current.get(socketId);
@@ -707,6 +710,15 @@ export default function CollaborateSessionPage() {
             const videoElement = remoteVideosRef.current.get(participant.socketId);
             // Use the hasStream flag we set when stream is received
             const hasVideo = participant.hasStream && videoElement;
+            
+            console.log('🎬 Rendering participant:', {
+              socketId: participant.socketId,
+              name: participant.name,
+              hasStream: participant.hasStream,
+              hasVideoElement: !!videoElement,
+              hasVideo,
+              videoSrcObject: videoElement?.srcObject ? 'yes' : 'no'
+            });
             
             return (
               <div key={participant.socketId} className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video group">
