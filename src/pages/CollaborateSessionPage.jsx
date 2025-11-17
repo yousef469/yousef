@@ -21,9 +21,15 @@ export default function CollaborateSessionPage() {
   const initialVideoEnabled = state?.videoEnabled ?? false;
   const initialAudioEnabled = state?.audioEnabled ?? false;
   
-  // Generate a random 6-digit passcode for this session
+  // Generate consistent passcode from sessionId (same for all participants)
   const [sessionPasscode] = useState(() => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    // Create deterministic passcode from sessionId
+    let hash = 0;
+    for (let i = 0; i < sessionId.length; i++) {
+      hash = ((hash << 5) - hash) + sessionId.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash % 1000000).toString().padStart(6, '0');
   });
   
   // Session state - Only the creator is host initially
@@ -476,14 +482,14 @@ export default function CollaborateSessionPage() {
                   <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
                     {user?.email?.[0]?.toUpperCase() || 'Y'}
                   </div>
-                  <p className="font-semibold text-sm">You</p>
+                  <p className="font-semibold text-sm">{user?.email?.split('@')[0] || 'You'}</p>
                 </div>
               </div>
             )}
             
             {/* Overlay Info */}
             <div className="absolute bottom-1 left-1 flex items-center gap-1">
-              <span className="px-2 py-0.5 bg-black/70 rounded text-xs">You</span>
+              <span className="px-2 py-0.5 bg-black/70 rounded text-xs">{user?.email?.split('@')[0] || 'You'}</span>
               {isHost && <Crown className="w-3 h-3 text-yellow-400" />}
               {!isMicOn && <MicOff className="w-3 h-3 text-red-400" />}
             </div>
