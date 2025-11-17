@@ -36,6 +36,7 @@ export default function CollaborateSessionPage() {
   const [isConnecting, setIsConnecting] = useState(true);
   const [showParticipants, setShowParticipants] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
+  const [uploadedContent, setUploadedContent] = useState(null); // {type: 'image'|'video'|'3d', url: string, name: string}
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -268,11 +269,18 @@ export default function CollaborateSessionPage() {
   const handleFileUpload = (type) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = type === 'video' ? 'video/*' : type === '3d' ? '.obj,.fbx,.gltf,.glb' : '*';
+    input.accept = type === 'video' ? 'video/*' : type === '3d' ? '.obj,.fbx,.gltf,.glb,.stl' : 'image/*';
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (file) {
-        alert(`${type} file "${file.name}" uploaded! (In production, this would be shared with all participants)`);
+        // Create a URL for the uploaded file
+        const fileUrl = URL.createObjectURL(file);
+        setUploadedContent({
+          type,
+          url: fileUrl,
+          name: file.name
+        });
+        setShowWhiteboard(false); // Close whiteboard when showing content
         setShowUploadMenu(false);
       }
     };
@@ -349,7 +357,43 @@ export default function CollaborateSessionPage() {
       <div className="h-[calc(100vh-120px)] flex">
         {/* Left: Main Content Area */}
         <div className="flex-1 flex items-center justify-center bg-gray-900">
-          {showWhiteboard ? (
+          {uploadedContent ? (
+            <div className="w-full h-full p-4 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">{uploadedContent.name}</h2>
+                <button
+                  onClick={() => setUploadedContent(null)}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
+                >
+                  Close
+                </button>
+              </div>
+              
+              <div className="flex-1 flex items-center justify-center bg-black rounded-lg overflow-hidden">
+                {uploadedContent.type === 'image' && (
+                  <img 
+                    src={uploadedContent.url} 
+                    alt={uploadedContent.name}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                )}
+                {uploadedContent.type === 'video' && (
+                  <video 
+                    src={uploadedContent.url}
+                    controls
+                    className="max-w-full max-h-full"
+                  />
+                )}
+                {uploadedContent.type === '3d' && (
+                  <div className="text-center text-gray-400">
+                    <Box className="w-24 h-24 mx-auto mb-4" />
+                    <p className="text-lg">3D Model: {uploadedContent.name}</p>
+                    <p className="text-sm mt-2">3D viewer coming soon</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : showWhiteboard ? (
             <div className="w-full h-full p-4 flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">Whiteboard</h2>
