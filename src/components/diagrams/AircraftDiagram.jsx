@@ -89,7 +89,7 @@ export default function AircraftDiagram({ type = "forces" }) {
           <p className="text-sm text-gray-700 dark:text-gray-300">
             <strong>Steady Flight:</strong> Lift = Weight, Thrust = Drag
             <br/>
-            <strong>Climbing:</strong> Lift > Weight or Thrust > Drag
+            <strong>Climbing:</strong> Lift &gt; Weight or Thrust &gt; Drag
           </p>
         </div>
       </div>

@@ -45,6 +45,8 @@ export default function CollaborateSessionPage() {
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [uploadedContent, setUploadedContent] = useState(null); // {type: 'image'|'video'|'3d', url: string, name: string}
   const [localStreamReady, setLocalStreamReady] = useState(false); // Track when stream is ready
+  const [uploadProgress, setUploadProgress] = useState(null); // {fileName: string, progress: number}
+  const [receivingFiles, setReceivingFiles] = useState(new Map()); // Map of fileId -> {chunks, totalChunks, type, name}
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -190,8 +192,43 @@ export default function CollaborateSessionPage() {
             ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           }
           
+          // File chunk receiving
+          if (message.type === 'file-chunk') {
+            setReceivingFiles(prev => {
+              const newMap = new Map(prev);
+              const fileData = newMap.get(message.fileId) || {
+                chunks: [],
+                totalChunks: message.totalChunks,
+                type: message.fileType,
+                name: message.fileName
+              };
+              
+              fileData.chunks[message.chunkIndex] = message.data;
+              newMap.set(message.fileId, fileData);
+              
+              // Check if all chunks received
+              const receivedChunks = fileData.chunks.filter(c => c).length;
+              console.log(`📦 Received chunk ${receivedChunks}/${message.totalChunks} for ${message.fileName}`);
+              
+              if (receivedChunks === message.totalChunks) {
+                // Reassemble file
+                const completeData = fileData.chunks.join('');
+                setUploadedContent({
+                  type: fileData.type,
+                  url: completeData,
+                  name: fileData.name
+                });
+                setShowWhiteboard(false);
+                newMap.delete(message.fileId);
+                console.log('✅ File reassembled:', fileData.name);
+              }
+              
+              return newMap;
+            });
+          }
+          
           if (message.type === 'content-uploaded') {
-            // Received content from host - use the base64 data as URL
+            // Legacy: Received content from host - use the base64 data as URL
             setUploadedContent({
               type: message.content.type,
               url: message.content.data, // Base64 data URL
@@ -500,10 +537,10 @@ export default function CollaborateSessionPage() {
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
-        // Check file size (limit to 100KB for data channel transfer without chunking)
-        const maxSize = 100 * 1024; // 100KB - safe for data channels
+        // Check file size (limit to 10MB for reasonable transfer)
+        const maxSize = 10 * 1024 * 1024; // 10MB
         if (file.size > maxSize) {
-          alert(`File too large! Please upload files smaller than 100KB.\nYour file: ${(file.size / 1024).toFixed(2)}KB\n\nTip: Compress images before uploading.`);
+          alert(`File too large! Please upload files smaller than 10MB.\nYour file: ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
           return;
         }
         
@@ -512,7 +549,7 @@ export default function CollaborateSessionPage() {
         
         // Convert file to base64 for sharing
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = async () => {
           const base64Data = reader.result;
           const content = {
             type,
@@ -525,16 +562,41 @@ export default function CollaborateSessionPage() {
           setShowWhiteboard(false);
           setShowUploadMenu(false);
           
-          // Broadcast to other participants (host only)
+          // Broadcast to other participants (host only) with chunking
           if (isHost) {
-            webrtcService.broadcastData({
-              type: 'content-uploaded',
-              content: {
-                type,
-                name: file.name,
-                data: base64Data
+            const CHUNK_SIZE = 16 * 1024; // 16KB chunks (safe for all browsers)
+            const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
+            const fileId = `${Date.now()}-${Math.random()}`;
+            
+            console.log(`📤 Sending file in ${totalChunks} chunks:`, file.name);
+            setUploadProgress({ fileName: file.name, progress: 0 });
+            
+            // Send chunks with small delays to avoid overwhelming the connection
+            for (let i = 0; i < totalChunks; i++) {
+              const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+              
+              webrtcService.broadcastData({
+                type: 'file-chunk',
+                fileId,
+                chunkIndex: i,
+                totalChunks,
+                data: chunk,
+                fileType: type,
+                fileName: file.name
+              });
+              
+              // Update progress
+              const progress = Math.round(((i + 1) / totalChunks) * 100);
+              setUploadProgress({ fileName: file.name, progress });
+              
+              // Small delay between chunks to prevent overwhelming
+              if (i < totalChunks - 1) {
+                await new Promise(resolve => setTimeout(resolve, 50));
               }
-            });
+            }
+            
+            console.log('✅ All chunks sent');
+            setTimeout(() => setUploadProgress(null), 2000);
           }
         };
         reader.readAsDataURL(file);
@@ -1009,6 +1071,23 @@ export default function CollaborateSessionPage() {
         <div className="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-2 animate-fade-in z-50">
           <Check className="w-5 h-5" />
           <span>Invite link copied!</span>
+        </div>
+      )}
+
+      {/* Upload Progress */}
+      {uploadProgress && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 text-white px-6 py-4 rounded-lg shadow-xl z-50 min-w-[300px]">
+          <div className="flex items-center gap-3 mb-2">
+            <Upload className="w-5 h-5 text-blue-400 animate-pulse" />
+            <span className="font-semibold">Uploading {uploadProgress.fileName}</span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+            <div 
+              className="bg-blue-500 h-full transition-all duration-300"
+              style={{ width: `${uploadProgress.progress}%` }}
+            />
+          </div>
+          <p className="text-sm text-gray-400 mt-1 text-right">{uploadProgress.progress}%</p>
         </div>
       )}
     </div>
