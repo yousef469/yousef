@@ -163,11 +163,17 @@ export default function CollaborateSessionPage() {
               console.log('⚠️ Participant already exists:', socketId);
               return prev;
             }
+            
+            // If this is a joiner and there are no other remote participants yet,
+            // this must be the host (first person in the session)
+            const isFirstRemoteUser = prev.length === 1 && prev[0].socketId === 'local';
+            const isHostUser = isFirstRemoteUser && !isHost; // Joiner sees first remote as host
+            
             return [...prev, {
               id: userId,
               socketId,
               name: userName,
-              isHost: false,
+              isHost: isHostUser,
               isMuted: false,
               isCameraOff: false
             }];
