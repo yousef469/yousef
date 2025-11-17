@@ -297,12 +297,30 @@ export default function CollaborateSessionPage() {
         </div>
       </div>
 
-      {/* Main Video Grid */}
-      <div className="h-[calc(100vh-60px)] flex flex-col">
-        {/* Video Grid */}
-        <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-2 p-4">
-          {/* Your Video */}
-          <div className="relative bg-gray-800 rounded-lg overflow-hidden">
+      {/* Main Layout: Content + Video Sidebar */}
+      <div className="h-[calc(100vh-120px)] flex">
+        {/* Left: Main Content Area */}
+        <div className="flex-1 flex items-center justify-center bg-gray-900">
+          {showWhiteboard ? (
+            <div className="w-full h-full p-4 flex flex-col">
+              <h2 className="text-xl font-bold mb-4">Whiteboard</h2>
+              <div className="flex-1 bg-white rounded-lg"></div>
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              <svg className="w-24 h-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <p className="text-lg">Video Call Active</p>
+              <p className="text-sm mt-2">{isHost ? 'Click Whiteboard to start' : 'Waiting for host'}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Video Sidebar */}
+        <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col overflow-y-auto p-2 space-y-2">
+          {/* Your Video - Host at Top */}
+          <div className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video">
             {isCameraOn ? (
               <video
                 ref={localVideoRef}
@@ -314,19 +332,19 @@ export default function CollaborateSessionPage() {
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-900">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
                     {user?.email?.[0]?.toUpperCase() || 'Y'}
                   </div>
-                  <p className="font-semibold">You</p>
+                  <p className="font-semibold text-sm">You</p>
                 </div>
               </div>
             )}
             
             {/* Overlay Info */}
-            <div className="absolute bottom-2 left-2 flex items-center gap-2">
-              <span className="px-2 py-1 bg-black/70 rounded text-sm">You</span>
-              {isHost && <Crown className="w-4 h-4 text-yellow-400" />}
-              {!isMicOn && <MicOff className="w-4 h-4 text-red-400" />}
+            <div className="absolute bottom-1 left-1 flex items-center gap-1">
+              <span className="px-2 py-0.5 bg-black/70 rounded text-xs">You</span>
+              {isHost && <Crown className="w-3 h-3 text-yellow-400" />}
+              {!isMicOn && <MicOff className="w-3 h-3 text-red-400" />}
             </div>
           </div>
 
@@ -335,7 +353,7 @@ export default function CollaborateSessionPage() {
             const videoElement = remoteVideosRef.current.get(participant.socketId);
             
             return (
-              <div key={participant.socketId} className="relative bg-gray-800 rounded-lg overflow-hidden group">
+              <div key={participant.socketId} className="relative bg-gray-700 rounded-lg overflow-hidden aspect-video group">
                 {videoElement ? (
                   <div 
                     className="w-full h-full"
@@ -348,25 +366,25 @@ export default function CollaborateSessionPage() {
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
                     <div className="text-center">
-                      <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">
+                      <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-1 text-xl">
                         {participant.name[0]}
                       </div>
-                      <p className="font-semibold">{participant.name}</p>
+                      <p className="font-semibold text-sm">{participant.name}</p>
                     </div>
                   </div>
                 )}
                 
-                <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                  <span className="px-2 py-1 bg-black/70 rounded text-sm">{participant.name}</span>
-                  {participant.isHost && <Crown className="w-4 h-4 text-yellow-400" />}
-                  {participant.isMuted && <MicOff className="w-4 h-4 text-red-400" />}
+                <div className="absolute bottom-1 left-1 flex items-center gap-1">
+                  <span className="px-2 py-0.5 bg-black/70 rounded text-xs">{participant.name}</span>
+                  {participant.isHost && <Crown className="w-3 h-3 text-yellow-400" />}
+                  {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
                 </div>
 
                 {/* Make Host Button (only visible to host) */}
                 {isHost && !participant.isHost && (
                   <button
                     onClick={() => makeHost(participant)}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 px-2 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-xs font-semibold transition-all"
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 px-2 py-0.5 bg-yellow-600 hover:bg-yellow-700 rounded text-xs font-semibold transition-all"
                   >
                     Make Host
                   </button>
@@ -375,18 +393,19 @@ export default function CollaborateSessionPage() {
             );
           })}
         </div>
+      </div>
 
-        {/* Control Bar */}
-        <div className="bg-gray-800 border-t border-gray-700 p-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* Left: Session Info */}
-            <div>
-              <h3 className="font-bold">Engineering Session</h3>
-              <p className="text-sm text-gray-400">{participants.length} participants</p>
-            </div>
+      {/* Control Bar */}
+      <div className="h-[60px] bg-gray-800 border-t border-gray-700">
+        <div className="h-full max-w-7xl mx-auto flex items-center justify-between px-6">
+          {/* Left: Session Info */}
+          <div>
+            <h3 className="font-bold">Engineering Session</h3>
+            <p className="text-sm text-gray-400">{participants.length} participants</p>
+          </div>
 
-            {/* Center: Controls */}
-            <div className="flex items-center gap-3">
+          {/* Center: Controls */}
+          <div className="flex items-center gap-3">
               {/* Mic Toggle */}
               <button
                 onClick={toggleMic}
