@@ -94,8 +94,35 @@ export default function CollaborateSessionPage() {
           
           getRequest.onsuccess = () => {
             if (getRequest.result && getRequest.result.content) {
-              setUploadedContent(getRequest.result.content);
-              console.log('✅ Restored content from IndexedDB');
+              const savedContent = getRequest.result.content;
+              
+              // For 3D models, recreate Blob URL from base64 data
+              if (savedContent.type === '3d' && savedContent.data) {
+                try {
+                  const base64 = savedContent.data.split(',')[1];
+                  const mimeType = savedContent.data.match(/data:([^;]+);/)?.[1] || 'model/gltf-binary';
+                  const byteCharacters = atob(base64);
+                  const byteNumbers = new Array(byteCharacters.length);
+                  for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                  }
+                  const byteArray = new Uint8Array(byteNumbers);
+                  const blob = new Blob([byteArray], { type: mimeType });
+                  const newBlobUrl = URL.createObjectURL(blob);
+                  
+                  setUploadedContent({
+                    ...savedContent,
+                    url: newBlobUrl // Use new Blob URL
+                  });
+                  console.log('✅ Restored 3D model from IndexedDB with new Blob URL');
+                } catch (error) {
+                  console.error('❌ Failed to recreate Blob URL:', error);
+                  setUploadedContent(savedContent);
+                }
+              } else {
+                setUploadedContent(savedContent);
+                console.log('✅ Restored content from IndexedDB');
+              }
             }
           };
         };
