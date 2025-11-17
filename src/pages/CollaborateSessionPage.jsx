@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import webrtcService from '../services/webrtc';
+import ThreeJSViewer from '../components/ThreeJSViewer';
 
 export default function CollaborateSessionPage() {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export default function CollaborateSessionPage() {
   const [localStreamReady, setLocalStreamReady] = useState(false); // Track when stream is ready
   const [uploadProgress, setUploadProgress] = useState(null); // {fileName: string, progress: number}
   const [receivingFiles, setReceivingFiles] = useState(new Map()); // Map of fileId -> {chunks, totalChunks, type, name}
+  const sharedVideoRef = useRef(null); // Ref for synced video playback
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -239,6 +241,21 @@ export default function CollaborateSessionPage() {
           
           if (message.type === 'content-closed') {
             setUploadedContent(null);
+          }
+          
+          // Video sync events
+          if (message.type === 'video-play' && sharedVideoRef.current) {
+            sharedVideoRef.current.currentTime = message.time;
+            sharedVideoRef.current.play();
+          }
+          
+          if (message.type === 'video-pause' && sharedVideoRef.current) {
+            sharedVideoRef.current.currentTime = message.time;
+            sharedVideoRef.current.pause();
+          }
+          
+          if (message.type === 'video-seek' && sharedVideoRef.current) {
+            sharedVideoRef.current.currentTime = message.time;
           }
         };
 
@@ -707,16 +724,39 @@ export default function CollaborateSessionPage() {
                 )}
                 {uploadedContent.type === 'video' && (
                   <video 
+                    ref={sharedVideoRef}
                     src={uploadedContent.url}
-                    controls
+                    controls={isHost}
                     className="max-w-full max-h-full"
+                    onPlay={(e) => {
+                      if (isHost) {
+                        webrtcService.broadcastData({
+                          type: 'video-play',
+                          time: e.target.currentTime
+                        });
+                      }
+                    }}
+                    onPause={(e) => {
+                      if (isHost) {
+                        webrtcService.broadcastData({
+                          type: 'video-pause',
+                          time: e.target.currentTime
+                        });
+                      }
+                    }}
+                    onSeeked={(e) => {
+                      if (isHost) {
+                        webrtcService.broadcastData({
+                          type: 'video-seek',
+                          time: e.target.currentTime
+                        });
+                      }
+                    }}
                   />
                 )}
                 {uploadedContent.type === '3d' && (
-                  <div className="text-center text-gray-400">
-                    <Box className="w-24 h-24 mx-auto mb-4" />
-                    <p className="text-lg">3D Model: {uploadedContent.name}</p>
-                    <p className="text-sm mt-2">3D viewer coming soon</p>
+                  <div className="w-full h-full">
+                    <ThreeJSViewer modelUrl={uploadedContent.url} />
                   </div>
                 )}
               </div>
