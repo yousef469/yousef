@@ -215,9 +215,31 @@ export default function CollaborateSessionPage() {
               if (receivedChunks === message.totalChunks) {
                 // Reassemble file
                 const completeData = fileData.chunks.join('');
+                
+                // For 3D models, convert base64 to Blob URL for GLTFLoader
+                let fileUrl = completeData;
+                if (fileData.type === '3d') {
+                  try {
+                    // Extract base64 data (remove data:...;base64, prefix)
+                    const base64 = completeData.split(',')[1];
+                    const mimeType = completeData.match(/data:([^;]+);/)?.[1] || 'model/gltf-binary';
+                    const byteCharacters = atob(base64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                      byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: mimeType });
+                    fileUrl = URL.createObjectURL(blob);
+                    console.log('✅ Converted 3D model to Blob URL');
+                  } catch (error) {
+                    console.error('❌ Error converting 3D model:', error);
+                  }
+                }
+                
                 setUploadedContent({
                   type: fileData.type,
-                  url: completeData,
+                  url: fileUrl,
                   name: fileData.name
                 });
                 setShowWhiteboard(false);
@@ -757,7 +779,13 @@ export default function CollaborateSessionPage() {
                 )}
                 {uploadedContent.type === '3d' && (
                   <div className="w-full h-full">
-                    <ThreeJSViewer modelUrl={uploadedContent.url} />
+                    <ThreeJSViewer 
+                      modelInfo={{ 
+                        path: uploadedContent.url,
+                        name: uploadedContent.name,
+                        type: '3d-model'
+                      }} 
+                    />
                   </div>
                 )}
               </div>
