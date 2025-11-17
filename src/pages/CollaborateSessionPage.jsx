@@ -196,18 +196,32 @@ export default function CollaborateSessionPage() {
           // Set local video immediately
           if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
+            // Force play
+            localVideoRef.current.play().catch(err => {
+              console.log('📹 Local video autoplay prevented:', err);
+            });
             console.log('📹 Local video ref set with stream');
+          } else {
+            console.warn('⚠️ localVideoRef.current is null');
           }
           
           // Update camera state based on actual stream
           const videoTrack = stream.getVideoTracks()[0];
+          const audioTrack = stream.getAudioTracks()[0];
           if (videoTrack) {
             setIsCameraOn(videoTrack.enabled);
+            console.log('📹 Video track enabled:', videoTrack.enabled);
+          }
+          if (audioTrack) {
+            setIsMicOn(audioTrack.enabled);
+            console.log('🎤 Audio track enabled:', audioTrack.enabled);
           }
           
           console.log('✅ Got user media, stream ready', {
             hasVideo: stream.getVideoTracks().length > 0,
-            hasAudio: stream.getAudioTracks().length > 0
+            hasAudio: stream.getAudioTracks().length > 0,
+            videoEnabled: videoTrack?.enabled,
+            audioEnabled: audioTrack?.enabled
           });
           streamReady = true;
         } catch (error) {
@@ -258,6 +272,22 @@ export default function CollaborateSessionPage() {
       webrtcService.leaveSession();
     };
   }, [sessionId]); // Only re-initialize if sessionId changes
+
+  // Update local video when camera state changes
+  useEffect(() => {
+    if (localVideoRef.current && webrtcService.localStream) {
+      const videoTrack = webrtcService.localStream.getVideoTracks()[0];
+      if (videoTrack && isCameraOn) {
+        localVideoRef.current.srcObject = webrtcService.localStream;
+        localVideoRef.current.play().catch(err => {
+          console.log('Local video autoplay prevented:', err);
+        });
+        console.log('📹 Local video updated, camera on');
+      } else if (!isCameraOn) {
+        console.log('📹 Camera is off');
+      }
+    }
+  }, [isCameraOn]);
 
   // Initialize canvas
   useEffect(() => {
