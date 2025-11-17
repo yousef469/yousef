@@ -351,11 +351,21 @@ class WebRTCService {
 
   // Broadcast data to all peers
   broadcastData(data) {
+    if (this.peers.size === 0) {
+      console.log('📭 No peers to broadcast to');
+      return;
+    }
+    
     const message = JSON.stringify(data);
     this.peers.forEach((peer, socketId) => {
       try {
-        peer.send(message);
-        console.log('📤 Sent data to', socketId);
+        // Check if peer is connected and has send method
+        if (peer && peer.connected && typeof peer.send === 'function') {
+          peer.send(message);
+          console.log('📤 Sent data to', socketId);
+        } else {
+          console.log('⏳ Peer not ready:', socketId);
+        }
       } catch (error) {
         console.error('Error sending data to', socketId, error);
       }
