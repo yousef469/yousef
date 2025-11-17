@@ -521,7 +521,6 @@ export default function CollaborateSessionPage() {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Participants Sidebar */}
       {showParticipants && (
