@@ -554,10 +554,10 @@ export default function CollaborateSessionPage() {
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
-        // Check file size (limit to 10MB for reasonable transfer)
-        const maxSize = 10 * 1024 * 1024; // 10MB
+        // Check file size (limit to 50MB for reasonable transfer)
+        const maxSize = 50 * 1024 * 1024; // 50MB
         if (file.size > maxSize) {
-          alert(`File too large! Please upload files smaller than 10MB.\nYour file: ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
+          alert(`File too large! Please upload files smaller than 50MB.\nYour file: ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
           return;
         }
         
@@ -607,8 +607,9 @@ export default function CollaborateSessionPage() {
               setUploadProgress({ fileName: file.name, progress });
               
               // Small delay between chunks to prevent overwhelming
+              // Use shorter delay for better performance with large files
               if (i < totalChunks - 1) {
-                await new Promise(resolve => setTimeout(resolve, 50));
+                await new Promise(resolve => setTimeout(resolve, 30));
               }
             }
             
