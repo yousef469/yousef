@@ -310,7 +310,7 @@ export default function CollaborateSessionPage() {
 
         // Handle data channel messages (screen sharing sync)
         webrtcService.onDataReceived = (message) => {
-          console.log('📨 Received:', message.type);
+          // Removed frequent logging to reduce lag
           
           if (message.type === 'whiteboard-opened') {
             setShowWhiteboard(true);
@@ -519,13 +519,13 @@ export default function CollaborateSessionPage() {
           
           // 3D Camera sync - throttled to reduce lag
           if (message.type === '3d-camera-update') {
-            // Use requestAnimationFrame to batch updates
+            // Use requestAnimationFrame to batch updates (no logging to reduce lag)
             requestAnimationFrame(() => {
               setSyncedCameraState(message.cameraState);
             });
           }
           
-          // 3D Annotations
+          // 3D Annotations (no logging to reduce lag)
           if (message.type === '3d-annotation-draw') {
             setAnnotations(prev => [...prev, message.drawing]);
           }
@@ -909,7 +909,7 @@ export default function CollaborateSessionPage() {
             const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
             const BATCH_SIZE = 50; // Increased batch size for faster sending
             
-            console.log(`📦 Sending ${totalChunks} chunks in batches of ${BATCH_SIZE}`);
+            // Removed log to reduce lag during upload
             
             const sendChunks = async () => {
               // Send all chunks in larger batches with minimal delays
@@ -943,8 +943,7 @@ export default function CollaborateSessionPage() {
                 }
               }
               
-              const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-              console.log(`✅ File upload complete in ${elapsed}s`);
+              // Removed completion log to reduce lag
               setTimeout(() => setUploadProgress(null), 1500);
             };
             

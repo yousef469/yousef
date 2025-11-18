@@ -390,12 +390,15 @@ class WebRTCService {
     peer.on('data', (data) => {
       try {
         const message = JSON.parse(data.toString());
-        console.log('📨 Received data from', socketId, ':', message.type);
+        // Removed frequent logging to reduce lag
         if (this.onDataReceived) {
           this.onDataReceived(message);
         }
       } catch (error) {
-        console.error('Error parsing data:', error);
+        // Only log errors, not every message
+        if (error.message && !error.message.includes('JSON')) {
+          console.error('Error parsing data:', error);
+        }
       }
     });
 
@@ -414,8 +417,7 @@ class WebRTCService {
   // Broadcast data to all peers
   broadcastData(data) {
     if (this.peers.size === 0) {
-      console.log('📭 No peers to broadcast to');
-      return;
+      return; // Removed log to reduce lag
     }
     
     const message = JSON.stringify(data);
@@ -424,12 +426,14 @@ class WebRTCService {
         // Check if peer is connected and has send method
         if (peer && peer.connected && typeof peer.send === 'function') {
           peer.send(message);
-          console.log('📤 Sent data to', socketId);
-        } else {
-          console.log('⏳ Peer not ready:', socketId);
+          // Removed frequent logging to reduce lag
         }
+        // Removed "peer not ready" log to reduce lag
       } catch (error) {
-        console.error('Error sending data to', socketId, error);
+        // Only log actual errors
+        if (error.message) {
+          console.error('Error sending data to', socketId, error);
+        }
       }
     });
   }

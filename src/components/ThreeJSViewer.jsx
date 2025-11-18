@@ -20,11 +20,7 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
       return;
     }
 
-    console.log('ThreeJSViewer: Initializing...', {
-      width: containerRef.current.clientWidth,
-      height: containerRef.current.clientHeight,
-      modelInfo
-    });
+    // Removed initialization log to reduce lag
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -96,6 +92,42 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
       // Ensure zoom is enabled via mouse wheel
       controls.enableZoom = true;
       controls.zoomSpeed = 1.2; // Make zoom more responsive
+      
+      // Prevent context menu on right click (but allow rotation)
+      renderer.domElement.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+      
+      // Prevent page scroll when zooming with mouse wheel
+      renderer.domElement.addEventListener('wheel', (e) => {
+        if (controls.enableZoom) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, { passive: false });
+      
+      // Prevent page scroll when right-click dragging (rotating)
+      let isRightClickDragging = false;
+      renderer.domElement.addEventListener('mousedown', (e) => {
+        if (e.button === 2) { // Right click
+          isRightClickDragging = true;
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+      
+      renderer.domElement.addEventListener('mousemove', (e) => {
+        if (isRightClickDragging) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+      
+      renderer.domElement.addEventListener('mouseup', (e) => {
+        if (e.button === 2) {
+          isRightClickDragging = false;
+        }
+      });
     } else {
       // Joiner mode: disable all controls
       controls.enabled = false;

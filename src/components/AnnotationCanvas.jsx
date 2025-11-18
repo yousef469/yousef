@@ -130,6 +130,12 @@ const AnnotationCanvas = ({
 
   const handleMouseDown = (e) => {
     if (!isHost) return;
+    // Only handle left click (button 0) - ignore right click (button 2) and middle click (button 1)
+    if (e.button !== 0) return;
+    
+    e.preventDefault(); // Prevent context menu and page scroll
+    e.stopPropagation(); // Stop event from reaching 3D viewer
+    
     setIsDrawing(true);
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -141,6 +147,9 @@ const AnnotationCanvas = ({
 
   const handleMouseMove = (e) => {
     if (!isDrawing || !isHost) return;
+    e.preventDefault(); // Prevent page scroll
+    e.stopPropagation(); // Stop event from reaching 3D viewer
+    
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
@@ -173,8 +182,12 @@ const AnnotationCanvas = ({
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
     if (!isDrawing || !isHost) return;
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setIsDrawing(false);
 
     const canvas = canvasRef.current;
@@ -273,15 +286,24 @@ const AnnotationCanvas = ({
 
   return (
     <div className="absolute inset-0 pointer-events-none z-40">
-      {/* Canvas for drawing - only capture events when drawing tool is selected */}
+      {/* Canvas for drawing - only capture LEFT click events when drawing tool is selected */}
       <canvas
         ref={canvasRef}
         className={`absolute inset-0 ${shouldCaptureEvents ? 'pointer-events-auto' : 'pointer-events-none'}`}
         style={{ cursor: shouldCaptureEvents ? 'crosshair' : 'default' }}
-        onMouseDown={shouldCaptureEvents ? handleMouseDown : undefined}
+        onMouseDown={(e) => {
+          // Only handle left click (button 0) - right click (button 2) passes through to 3D viewer
+          if (shouldCaptureEvents && e.button === 0) {
+            handleMouseDown(e);
+          }
+        }}
         onMouseMove={shouldCaptureEvents ? handleMouseMove : undefined}
         onMouseUp={shouldCaptureEvents ? handleMouseUp : undefined}
         onMouseLeave={shouldCaptureEvents ? handleMouseUp : undefined}
+        onContextMenu={(e) => {
+          // Always allow right-click context menu to pass through (for 3D viewer rotation)
+          e.stopPropagation();
+        }}
       />
 
       {/* Drawing Tools - Host Only */}
