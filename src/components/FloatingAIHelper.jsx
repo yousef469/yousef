@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Bot, X, Send, Minimize2, Maximize2 } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default function FloatingAIHelper() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,7 +8,43 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+  const callGeminiAPI = async (prompt) => {
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!text) {
+      throw new Error('No text in response');
+    }
+    
+    return text;
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -20,27 +55,18 @@ export default function FloatingAIHelper() {
     setIsLoading(true);
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-      
       const systemPrompt = `You are an AI engineering tutor for Engineerium, an interactive engineering education platform. 
 Help users understand aerospace, automotive, and general engineering concepts. 
 Be concise, clear, and educational. Use emojis occasionally to make learning fun.
 Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineering fundamentals.`;
 
-      const chat = model.startChat({
-        history: messages.map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.content }]
-        })),
-        generationConfig: {
-          maxOutputTokens: 500,
-          temperature: 0.7,
-        },
-      });
+      const conversationHistory = messages
+        .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+        .join('\n\n');
 
-      const result = await chat.sendMessage(systemPrompt + '\n\nUser: ' + userMessage);
-      const response = await result.response;
-      const text = response.text();
+      const fullPrompt = `${systemPrompt}\n\n${conversationHistory ? conversationHistory + '\n\n' : ''}User: ${userMessage}\n\nAssistant:`;
+
+      const text = await callGeminiAPI(fullPrompt);
 
       setMessages(prev => [...prev, { role: 'assistant', content: text }]);
     } catch (error) {
@@ -63,7 +89,7 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -164,7 +190,7 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
                 placeholder="Ask me anything..."
                 className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:border-blue-500 focus:outline-none text-sm"
                 disabled={isLoading}
