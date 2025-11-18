@@ -268,6 +268,7 @@ const AnnotationCanvas = ({
   };
 
   // Determine if we should capture pointer events (only when drawing tool is active for host)
+  // Left click always available for drawing when tool is selected
   const shouldCaptureEvents = isHost && (tool === 'pen' || tool === 'circle' || tool === 'arrow' || tool === 'eraser');
 
   return (

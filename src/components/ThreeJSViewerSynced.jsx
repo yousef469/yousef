@@ -42,6 +42,9 @@ const ThreeJSViewerSynced = ({
       const now = Date.now();
       if (now - lastBroadcastTime.current < BROADCAST_THROTTLE) return;
 
+      // Calculate distance for zoom (OrbitControls uses distance, not camera.zoom for perspective)
+      const distance = camera.position.distanceTo(controls.target);
+      
       const state = {
         position: {
           x: camera.position.x,
@@ -53,7 +56,8 @@ const ThreeJSViewerSynced = ({
           y: controls.target.y,
           z: controls.target.z
         },
-        zoom: camera.zoom
+        distance: distance, // Use distance for zoom tracking
+        zoom: camera.zoom // Keep for compatibility
       };
 
       // Only broadcast if significantly changed (reduce network traffic)
@@ -123,8 +127,23 @@ const ThreeJSViewerSynced = ({
         0.2
       );
 
-      camera.zoom = THREE.MathUtils.lerp(camera.zoom, syncedCameraState.zoom, 0.2);
-      camera.updateProjectionMatrix();
+      // Sync zoom by adjusting camera distance to target
+      if (syncedCameraState.distance !== undefined) {
+        const currentDistance = camera.position.distanceTo(controls.target);
+        const targetDistance = syncedCameraState.distance;
+        const direction = new THREE.Vector3()
+          .subVectors(camera.position, controls.target)
+          .normalize();
+        
+        // Interpolate distance
+        const newDistance = THREE.MathUtils.lerp(currentDistance, targetDistance, 0.2);
+        camera.position.copy(controls.target).add(direction.multiplyScalar(newDistance));
+        camera.updateProjectionMatrix();
+      } else if (syncedCameraState.zoom !== undefined) {
+        // Fallback to zoom if distance not available
+        camera.zoom = THREE.MathUtils.lerp(camera.zoom, syncedCameraState.zoom, 0.2);
+        camera.updateProjectionMatrix();
+      }
       controls.update();
     };
 

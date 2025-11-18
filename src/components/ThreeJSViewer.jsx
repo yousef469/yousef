@@ -71,20 +71,31 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
     controls.dampingFactor = 0.08;
     controls.screenSpacePanning = false;
     
-    controls.minDistance = 3;
-    controls.maxDistance = 25;
+    controls.minDistance = 1; // Allow closer zoom
+    controls.maxDistance = 50; // Allow further zoom
     controls.enablePan = false;
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     
     // Configure controls based on enableControls
     if (enableControls) {
-      // Host mode: enable all controls, disable auto-rotate
+      // Host mode: right-click rotates, left-click is free for drawing
       controls.enabled = true;
       controls.enableRotate = true;
+      controls.enableZoom = true; // Mouse wheel zoom
+      controls.enablePan = false;
+      controls.autoRotate = false;
+      
+      // Set right mouse button for rotation (left click will be for drawing)
+      controls.mouseButtons = {
+        LEFT: null, // Disable left click rotation (for drawing)
+        MIDDLE: THREE.MOUSE.DOLLY, // Middle mouse for zoom
+        RIGHT: THREE.MOUSE.ROTATE // Right click for rotation
+      };
+      
+      // Ensure zoom is enabled via mouse wheel
       controls.enableZoom = true;
-      controls.enablePan = false; // Keep pan disabled for cleaner view
-      controls.autoRotate = false; // Disable auto-rotate so host can control
+      controls.zoomSpeed = 1.2; // Make zoom more responsive
     } else {
       // Joiner mode: disable all controls
       controls.enabled = false;
