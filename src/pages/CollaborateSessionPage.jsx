@@ -74,19 +74,25 @@ export default function CollaborateSessionPage() {
   useEffect(() => {
     const initDB = async () => {
       try {
+        console.log('🗄️ Initializing IndexedDB for session:', sessionId);
         const request = indexedDB.open('CollaborateDB', 1);
         
-        request.onerror = () => console.error('IndexedDB error');
+        request.onerror = () => {
+          console.error('❌ IndexedDB error');
+          setIsLoadingContent(false);
+        };
         
         request.onupgradeneeded = (event) => {
           const db = event.target.result;
           if (!db.objectStoreNames.contains('sessions')) {
             db.createObjectStore('sessions', { keyPath: 'sessionId' });
+            console.log('✅ Created IndexedDB object store');
           }
         };
         
         request.onsuccess = async (event) => {
           dbRef.current = event.target.result;
+          console.log('✅ IndexedDB connected');
           
           // Restore content from IndexedDB
           const transaction = dbRef.current.transaction(['sessions'], 'readonly');
