@@ -20,7 +20,7 @@ export default function FloatingAIHelper() {
     setIsLoading(true);
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
       
       const systemPrompt = `You are an AI engineering tutor for Engineerium, an interactive engineering education platform. 
 Help users understand aerospace, automotive, and general engineering concepts. 

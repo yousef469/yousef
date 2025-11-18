@@ -112,7 +112,7 @@ export default function GeminiLiveChat() {
         // Send setup message
         ws.send(JSON.stringify({
           setup: {
-            model: 'models/gemini-1.5-flash',
+            model: 'models/gemini-pro',
             generation_config: {
               response_modalities: ['AUDIO'],
               speech_config: {
