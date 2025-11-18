@@ -8,7 +8,7 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_KEY = 'AIzaSyCjAyzCPEhBBCe-YZPlidfytbwqv6uVj5Q'; // Use same key as gemini.js
+  const API_KEY = 'AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q'; // Use same key as gemini.js
 
   const callGeminiAPI = async (prompt) => {
     // Use the correct model name format for v1beta API

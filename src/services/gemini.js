@@ -1,5 +1,5 @@
 // Direct API implementation using v1 API - Hardcoded key to bypass Vercel env issues
-const API_KEY = 'AIzaSyCjAyzCPEhBBCe-YZPlidfytbwqv6uVj5Q';
+const API_KEY = 'AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q';
 
 console.log('🔑 API Key Status [FRESH BUILD]:', {
   exists: !!API_KEY,
@@ -10,7 +10,7 @@ console.log('🔑 API Key Status [FRESH BUILD]:', {
 
 // Direct API call using v1beta endpoint with Gemini 1.5 Flash (better rate limits)
 const callGeminiAPI = async (prompt) => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
   
   try {
     console.log('🚀 Calling Gemini API directly...');
