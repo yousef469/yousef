@@ -380,14 +380,29 @@ export default function CollaborateSessionPage() {
                   }
                 }
                 
-                setUploadedContent({
+                const contentToSave = {
                   type: fileData.type,
                   url: fileUrl,
-                  name: fileData.name
-                });
+                  name: fileData.name,
+                  data: completeData // Save base64 data for persistence
+                };
+                
+                setUploadedContent(contentToSave);
                 setShowWhiteboard(false);
                 newMap.delete(message.fileId);
                 console.log('✅ File reassembled:', fileData.name);
+                
+                // Save to IndexedDB for joiner persistence
+                if (dbRef.current) {
+                  try {
+                    const transaction = dbRef.current.transaction(['sessions'], 'readwrite');
+                    const store = transaction.objectStore('sessions');
+                    store.put({ sessionId, content: contentToSave });
+                    console.log('💾 Joiner saved received content to IndexedDB');
+                  } catch (error) {
+                    console.error('❌ Failed to save received content:', error);
+                  }
+                }
               }
               
               return newMap;
