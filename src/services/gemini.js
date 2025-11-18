@@ -1,5 +1,5 @@
 // Direct API implementation using v1 API - Hardcoded key to bypass Vercel env issues
-const API_KEY = 'AIzaSyAyc8h7rPTKJ9UM5GF4div6iLgZ_dQ5CNw';
+const API_KEY = 'AIzaSyCjAyzCPEhBBCe-YZPlidfytbwqv6uVj5Q';
 
 console.log('🔑 API Key Status [FRESH BUILD]:', {
   exists: !!API_KEY,

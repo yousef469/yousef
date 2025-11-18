@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
-const API_KEY = 'AIzaSyAyc8h7rPTKJ9UM5GF4div6iLgZ_dQ5CNw';
+const API_KEY = 'AIzaSyCjAyzCPEhBBCe-YZPlidfytbwqv6uVj5Q';
 
 export default function GeminiLiveChat() {
   const [isConnected, setIsConnected] = useState(false);
