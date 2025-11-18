@@ -53,6 +53,7 @@ export default function CollaborateSessionPage() {
   const sharedVideoRef = useRef(null); // Ref for synced video playback
   const dbRef = useRef(null); // IndexedDB reference
   const [syncedCameraState, setSyncedCameraState] = useState(null); // Camera state from host (for joiners)
+  const [annotations, setAnnotations] = useState([]); // Annotation drawings
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -449,6 +450,15 @@ export default function CollaborateSessionPage() {
           // 3D Camera sync
           if (message.type === '3d-camera-update') {
             setSyncedCameraState(message.cameraState);
+          }
+          
+          // 3D Annotations
+          if (message.type === '3d-annotation-draw') {
+            setAnnotations(prev => [...prev, message.drawing]);
+          }
+          
+          if (message.type === '3d-annotation-clear') {
+            setAnnotations([]);
           }
         };
 

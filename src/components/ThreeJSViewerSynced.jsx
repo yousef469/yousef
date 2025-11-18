@@ -1,16 +1,20 @@
 import React, { useRef, useEffect, useState } from 'react';
 import ThreeJSViewer from './ThreeJSViewer';
+import AnnotationCanvas from './AnnotationCanvas';
 
 /**
- * Enhanced ThreeJSViewer with camera synchronization for presentation mode
- * Host controls camera, joiners follow automatically
+ * Enhanced ThreeJSViewer with camera synchronization and annotations for presentation mode
+ * Host controls camera and can draw annotations, joiners follow automatically
  */
 const ThreeJSViewerSynced = ({ 
   modelInfo, 
   isHost = false,
   onCameraChange = null, // Callback when host moves camera
   syncedCameraState = null, // Camera state from host (for joiners)
-  enableControls = true // Disable for joiners
+  enableControls = true, // Disable for joiners
+  onAnnotationDraw = null, // Callback when host draws
+  receivedAnnotations = [], // Annotations from host
+  onAnnotationClear = null // Callback when host clears
 }) => {
   const viewerRef = useRef(null);
   const [cameraState, setCameraState] = useState(null);
@@ -98,14 +102,22 @@ const ThreeJSViewerSynced = ({
 
   return (
     <div ref={viewerRef} className="relative w-full h-full">
+      {/* 3D Viewer */}
       <ThreeJSViewer 
         modelInfo={modelInfo}
-        // We'll need to modify ThreeJSViewer to accept enableControls prop
+      />
+      
+      {/* Annotation Canvas Overlay */}
+      <AnnotationCanvas
+        isHost={isHost}
+        onDraw={onAnnotationDraw}
+        receivedDrawings={receivedAnnotations}
+        onClear={onAnnotationClear}
       />
       
       {/* View-only indicator for joiners */}
       {!isHost && (
-        <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg flex items-center gap-2">
+        <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg flex items-center gap-2 z-50">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -116,7 +128,7 @@ const ThreeJSViewerSynced = ({
 
       {/* Presentation mode indicator for host */}
       {isHost && (
-        <div className="absolute top-4 left-4 bg-blue-600/90 text-white px-3 py-2 rounded-lg flex items-center gap-2">
+        <div className="absolute top-4 left-4 bg-blue-600/90 text-white px-3 py-2 rounded-lg flex items-center gap-2 z-50">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
