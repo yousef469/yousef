@@ -45,6 +45,7 @@ export default function CollaborateSessionPage() {
   const [showParticipants, setShowParticipants] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [uploadedContent, setUploadedContent] = useState(null);
+  const [isLoadingContent, setIsLoadingContent] = useState(true); // Track IndexedDB loading
   const [localStreamReady, setLocalStreamReady] = useState(false); // Track when stream is ready
   const [uploadProgress, setUploadProgress] = useState(null); // {fileName: string, progress: number}
   const [receivingFiles, setReceivingFiles] = useState(new Map()); // Map of fileId -> {chunks, totalChunks, type, name}
@@ -124,6 +125,13 @@ export default function CollaborateSessionPage() {
                 console.log('✅ Restored content from IndexedDB');
               }
             }
+            // Mark loading as complete
+            setIsLoadingContent(false);
+          };
+          
+          getRequest.onerror = () => {
+            console.error('❌ Failed to load from IndexedDB');
+            setIsLoadingContent(false);
           };
         };
       } catch (error) {
@@ -886,7 +894,12 @@ export default function CollaborateSessionPage() {
       <div className="h-[calc(100vh-120px)] flex">
         {/* Left: Main Content Area */}
         <div className="flex-1 flex items-center justify-center bg-gray-900">
-          {uploadedContent ? (
+          {isLoadingContent ? (
+            <div className="text-center text-gray-500">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-lg">Restoring session...</p>
+            </div>
+          ) : uploadedContent ? (
             <div className="w-full h-full p-4 flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">{uploadedContent.name}</h2>
