@@ -346,7 +346,7 @@ export default function CollaborateSessionPage() {
             ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           }
           
-          // File chunk receiving
+          // File chunk receiving - streaming support
           if (message.type === 'file-chunk') {
             setReceivingFiles(prev => {
               const newMap = new Map(prev);
@@ -354,17 +354,78 @@ export default function CollaborateSessionPage() {
                 chunks: [],
                 totalChunks: message.totalChunks,
                 type: message.fileType,
-                name: message.fileName
+                name: message.fileName,
+                receivedCount: 0
               };
               
-              fileData.chunks[message.chunkIndex] = message.data;
+              // Handle streaming chunks
+              if (message.isStreaming && message.chunkIndex >= 0) {
+                // Append chunk as it arrives (streaming mode)
+                if (!fileData.chunks[message.chunkIndex]) {
+                  fileData.chunks[message.chunkIndex] = message.data;
+                  fileData.receivedCount++;
+                  
+                  // Update total chunks if we get a better estimate
+                  if (message.totalChunks > fileData.totalChunks) {
+                    fileData.totalChunks = message.totalChunks;
+                  }
+                  
+                  // Show progress for joiners
+                  const progress = Math.min(95, Math.round((fileData.receivedCount / fileData.totalChunks) * 100));
+                  setUploadProgress({ fileName: message.fileName, progress });
+                  
+                  // Try to display partial content as it streams (for images)
+                  if (fileData.type === 'image' && fileData.receivedCount >= 3) {
+                    // For images, we can show a partial preview
+                    const partialData = fileData.chunks.slice(0, message.chunkIndex + 1).join('');
+                    try {
+                      const base64 = partialData.split(',')[1] || partialData;
+                      const mimeType = message.fileType === 'image' ? 'image/jpeg' : 'image/png';
+                      const byteCharacters = atob(base64);
+                      const byteNumbers = new Array(byteCharacters.length);
+                      for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                      }
+                      const byteArray = new Uint8Array(byteNumbers);
+                      const blob = new Blob([byteArray], { type: mimeType });
+                      const fileUrl = URL.createObjectURL(blob);
+                      
+                      // Only update if we don't have content yet or it's significantly more complete
+                      if (!uploadedContent || fileData.receivedCount > fileData.totalChunks * 0.5) {
+                        setUploadedContent({
+                          type: fileData.type,
+                          url: fileUrl,
+                          name: fileData.name,
+                          data: null // Will be set when complete
+                        });
+                        setShowWhiteboard(false);
+                      }
+                    } catch (e) {
+                      // Ignore partial decode errors
+                    }
+                  }
+                }
+              } else if (message.isComplete && message.chunkIndex === -1) {
+                // Final complete data received
+                const completeData = message.data;
+                fileData.chunks = [completeData]; // Replace with complete data
+                fileData.receivedCount = 1;
+                fileData.totalChunks = 1;
+              } else {
+                // Legacy mode: store by index
+                if (!fileData.chunks[message.chunkIndex]) {
+                  fileData.chunks[message.chunkIndex] = message.data;
+                  fileData.receivedCount++;
+                }
+              }
+              
               newMap.set(message.fileId, fileData);
               
               // Check if all chunks received
               const receivedChunks = fileData.chunks.filter(c => c).length;
-              console.log(`📦 Received chunk ${receivedChunks}/${message.totalChunks} for ${message.fileName}`);
+              const isComplete = message.isComplete || (receivedChunks === fileData.totalChunks && fileData.totalChunks > 0);
               
-              if (receivedChunks === message.totalChunks) {
+              if (isComplete) {
                 // Reassemble file
                 const completeData = fileData.chunks.join('');
                 
@@ -372,8 +433,8 @@ export default function CollaborateSessionPage() {
                 let fileUrl = completeData;
                 if (fileData.type === '3d') {
                   try {
-                    // Extract base64 data (remove data:...;base64, prefix)
-                    const base64 = completeData.split(',')[1];
+                    // Extract base64 data (remove data:...;base64, prefix if present)
+                    const base64 = completeData.includes(',') ? completeData.split(',')[1] : completeData;
                     const mimeType = completeData.match(/data:([^;]+);/)?.[1] || 'model/gltf-binary';
                     const byteCharacters = atob(base64);
                     const byteNumbers = new Array(byteCharacters.length);
@@ -387,6 +448,9 @@ export default function CollaborateSessionPage() {
                   } catch (error) {
                     console.error('❌ Error converting 3D model:', error);
                   }
+                } else if (fileData.type === 'image' || fileData.type === 'video') {
+                  // For images/videos, use data URL directly
+                  fileUrl = completeData.includes('data:') ? completeData : `data:${fileData.type === 'image' ? 'image/jpeg' : 'video/mp4'};base64,${completeData}`;
                 }
                 
                 const contentToSave = {
@@ -412,6 +476,8 @@ export default function CollaborateSessionPage() {
                     console.error('❌ Failed to save received content:', error);
                   }
                 }
+                
+                setUploadProgress(null);
               }
               
               return newMap;
@@ -777,76 +843,101 @@ export default function CollaborateSessionPage() {
           return;
         }
         
-        // Create a URL for local display
+        // Create a URL for local display immediately
         const fileUrl = URL.createObjectURL(file);
         
-        // Convert file to base64 for sharing
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const base64Data = reader.result;
-          const content = {
-            type,
-            url: fileUrl, // Local URL for this user
-            name: file.name,
-            data: base64Data // Base64 for sharing
+        // Set content immediately for host (so they see it right away)
+        const content = {
+          type,
+          url: fileUrl, // Local URL for this user
+          name: file.name,
+          data: null // Will be set after reading
+        };
+        
+        setUploadedContent(content);
+        setShowWhiteboard(false);
+        setShowUploadMenu(false);
+        
+        // Stream file to base64 and broadcast chunks as they're read (host only)
+        if (isHost) {
+          const CHUNK_SIZE = 16 * 1024; // 16KB chunks (safe for all browsers)
+          const fileId = `${Date.now()}-${Math.random()}`;
+          
+          console.log(`📤 Streaming file upload:`, file.name);
+          setUploadProgress({ fileName: file.name, progress: 0 });
+          
+          // Read file and convert to base64, then stream chunks
+          const reader = new FileReader();
+          reader.onprogress = (e) => {
+            // Update progress as file is being read
+            if (e.lengthComputable) {
+              const progress = Math.round((e.loaded / e.total) * 20); // First 20% is reading
+              setUploadProgress({ fileName: file.name, progress });
+            }
           };
           
-          setUploadedContent(content);
-          setShowWhiteboard(false);
-          setShowUploadMenu(false);
-          
-          // Broadcast to other participants (host only) with chunking
-          if (isHost) {
-            const CHUNK_SIZE = 16 * 1024; // 16KB chunks (safe for all browsers)
+          reader.onload = () => {
+            const base64Data = reader.result;
+            
+            // Update content with full data
+            setUploadedContent({
+              ...content,
+              data: base64Data
+            });
+            
+            // Split base64 into chunks and send immediately
             const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
-            const fileId = `${Date.now()}-${Math.random()}`;
+            const BATCH_SIZE = 10; // Send 10 chunks at a time
             
-            console.log(`📤 Sending file in ${totalChunks} chunks:`, file.name);
-            setUploadProgress({ fileName: file.name, progress: 0 });
-            
-            // Ultra-fast batch sending with minimal delays
-            const BATCH_SIZE = 50; // Send 50 chunks at once (increased from 10)
-            const BATCH_DELAY = 1; // Only 1ms delay between batches (reduced from 10ms)
-            
-            // Use requestAnimationFrame for smoother progress updates
-            let lastProgressUpdate = 0;
-            
-            for (let batchStart = 0; batchStart < totalChunks; batchStart += BATCH_SIZE) {
-              const batchEnd = Math.min(batchStart + BATCH_SIZE, totalChunks);
-              
-              // Send entire batch instantly
-              for (let i = batchStart; i < batchEnd; i++) {
-                const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+            const sendChunks = async () => {
+              for (let batchStart = 0; batchStart < totalChunks; batchStart += BATCH_SIZE) {
+                const batchEnd = Math.min(batchStart + BATCH_SIZE, totalChunks);
                 
-                webrtcService.broadcastData({
-                  type: 'file-chunk',
-                  fileId,
-                  chunkIndex: i,
-                  totalChunks,
-                  data: chunk,
-                  fileType: type,
-                  fileName: file.name
-                });
-              }
-              
-              // Update progress only every 5% to reduce UI lag
-              const progress = Math.round((batchEnd / totalChunks) * 100);
-              if (progress - lastProgressUpdate >= 5 || batchEnd === totalChunks) {
+                // Send entire batch
+                for (let i = batchStart; i < batchEnd; i++) {
+                  const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                  
+                  webrtcService.broadcastData({
+                    type: 'file-chunk',
+                    fileId,
+                    chunkIndex: i,
+                    totalChunks,
+                    data: chunk,
+                    fileType: type,
+                    fileName: file.name,
+                    isStreaming: true
+                  });
+                }
+                
+                // Update progress (20% reading + 80% sending)
+                const progress = 20 + Math.round((batchEnd / totalChunks) * 80);
                 setUploadProgress({ fileName: file.name, progress });
-                lastProgressUpdate = progress;
+                
+                // Small delay between batches to prevent overwhelming
+                if (batchEnd < totalChunks) {
+                  await new Promise(resolve => setTimeout(resolve, 10));
+                }
               }
               
-              // Minimal delay only between batches
-              if (batchEnd < totalChunks) {
-                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
-              }
-            }
+              console.log('✅ File streaming complete');
+              setTimeout(() => setUploadProgress(null), 2000);
+            };
             
-            console.log('✅ All chunks sent');
-            setTimeout(() => setUploadProgress(null), 2000);
-          }
-        };
-        reader.readAsDataURL(file);
+            sendChunks();
+          };
+          
+          reader.readAsDataURL(file);
+        } else {
+          // For non-hosts, just read the file normally
+          const reader = new FileReader();
+          reader.onload = () => {
+            setUploadedContent({
+              ...content,
+              data: reader.result
+            });
+          };
+          reader.readAsDataURL(file);
+        }
       }
     };
     input.click();
@@ -939,23 +1030,86 @@ export default function CollaborateSessionPage() {
             </div>
           ) : uploadedContent ? (
             <div className="w-full h-full p-4 flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">{uploadedContent.name}</h2>
+              <div className="flex items-center justify-between mb-4 bg-gray-800/50 backdrop-blur-sm rounded-lg px-4 py-3">
+                <div className="flex items-center gap-3">
+                  {uploadedContent.type === '3d' && <Box className="w-5 h-5 text-cyan-400" />}
+                  {uploadedContent.type === 'image' && <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+                  {uploadedContent.type === 'video' && <FileVideo className="w-5 h-5 text-red-400" />}
+                  <div>
+                    <h2 className="text-xl font-bold">{uploadedContent.name}</h2>
+                    <p className="text-xs text-gray-400">
+                      {uploadedContent.type === '3d' ? '3D Model' : uploadedContent.type === 'image' ? 'Image' : 'Video'}
+                      {isHost && ' • You are presenting'}
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={closeContent}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-all font-semibold"
                 >
                   Close
                 </button>
               </div>
               
-              <div className="flex-1 flex items-center justify-center bg-black rounded-lg overflow-hidden">
+              <div className="flex-1 flex items-center justify-center bg-black rounded-lg overflow-hidden relative group">
                 {uploadedContent.type === 'image' && (
-                  <img 
-                    src={uploadedContent.url} 
-                    alt={uploadedContent.name}
-                    className="max-w-full max-h-full object-contain"
-                  />
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <img 
+                      src={uploadedContent.url} 
+                      alt={uploadedContent.name}
+                      className="max-w-full max-h-full object-contain transition-transform duration-300"
+                      id="uploaded-image"
+                    />
+                    {/* Zoom Controls */}
+                    {isHost && (
+                      <div className="absolute bottom-4 right-4 bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <button
+                          onClick={() => {
+                            const img = document.getElementById('uploaded-image');
+                            if (img) {
+                              const currentScale = img.style.transform.match(/scale\(([\d.]+)\)/)?.[1] || 1;
+                              img.style.transform = `scale(${Math.min(parseFloat(currentScale) + 0.25, 3)})`;
+                            }
+                          }}
+                          className="p-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
+                          title="Zoom In"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => {
+                            const img = document.getElementById('uploaded-image');
+                            if (img) {
+                              const currentScale = img.style.transform.match(/scale\(([\d.]+)\)/)?.[1] || 1;
+                              img.style.transform = `scale(${Math.max(parseFloat(currentScale) - 0.25, 0.5)})`;
+                            }
+                          }}
+                          className="p-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+                          title="Zoom Out"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => {
+                            const img = document.getElementById('uploaded-image');
+                            if (img) {
+                              img.style.transform = 'scale(1)';
+                            }
+                          }}
+                          className="p-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+                          title="Reset Zoom"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
                 {uploadedContent.type === 'video' && (
                   <video 
@@ -991,16 +1145,9 @@ export default function CollaborateSessionPage() {
                 )}
                 {uploadedContent.type === '3d' && (
                   <div className="w-full h-full relative">
-                    {/* Loading overlay */}
-                    <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10 pointer-events-none">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                        <p className="text-sm text-gray-400">Loading 3D Model...</p>
-                      </div>
-                    </div>
-                    {/* 3D Viewer with camera sync for presentation mode */}
+                    {/* 3D Viewer with camera sync for presentation mode - stable key prevents reload */}
                     <ThreeJSViewerSynced
-                      key={uploadedContent.url}
+                      key={`3d-${uploadedContent.name}-${sessionId}`}
                       modelInfo={{
                         path: uploadedContent.url,
                         name: uploadedContent.name,
@@ -1015,6 +1162,24 @@ export default function CollaborateSessionPage() {
                           webrtcService.broadcastData({
                             type: '3d-camera-update',
                             cameraState
+                          });
+                        }
+                      }}
+                      onAnnotationDraw={(drawing) => {
+                        // Host broadcasts annotations
+                        if (isHost) {
+                          webrtcService.broadcastData({
+                            type: '3d-annotation-draw',
+                            drawing
+                          });
+                        }
+                      }}
+                      receivedAnnotations={annotations}
+                      onAnnotationClear={() => {
+                        // Host broadcasts clear
+                        if (isHost) {
+                          webrtcService.broadcastData({
+                            type: '3d-annotation-clear'
                           });
                         }
                       }}
@@ -1369,20 +1534,32 @@ export default function CollaborateSessionPage() {
         </div>
       )}
 
-      {/* Upload Progress */}
+      {/* Upload Progress - Enhanced */}
       {uploadProgress && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 text-white px-6 py-4 rounded-lg shadow-xl z-50 min-w-[300px]">
-          <div className="flex items-center gap-3 mb-2">
-            <Upload className="w-5 h-5 text-blue-400 animate-pulse" />
-            <span className="font-semibold">Uploading {uploadProgress.fileName}</span>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 text-white px-6 py-4 rounded-lg shadow-xl z-50 min-w-[400px] backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="relative">
+              <Upload className="w-6 h-6 text-blue-400 animate-pulse" />
+              <div className="absolute inset-0 border-2 border-blue-400 rounded-full animate-ping opacity-75"></div>
+            </div>
+            <div className="flex-1">
+              <span className="font-semibold text-lg block">{uploadProgress.fileName}</span>
+              <span className="text-xs text-gray-400">Streaming to participants...</span>
+            </div>
+            <span className="text-2xl font-bold text-blue-400">{uploadProgress.progress}%</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
             <div 
-              className="bg-blue-500 h-full transition-all duration-300"
+              className="bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 h-full transition-all duration-200 ease-out relative overflow-hidden"
               style={{ width: `${uploadProgress.progress}%` }}
-            />
+            >
+              <div className="absolute inset-0 bg-white/20 animate-shimmer"></div>
+            </div>
           </div>
-          <p className="text-sm text-gray-400 mt-1 text-right">{uploadProgress.progress}%</p>
+          <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
+            <span>Host: Uploading...</span>
+            <span>Joiners: Receiving...</span>
+          </div>
         </div>
       )}
     </div>

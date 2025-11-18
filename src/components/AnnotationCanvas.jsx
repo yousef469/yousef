@@ -45,10 +45,18 @@ const AnnotationCanvas = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     receivedDrawings.forEach(drawing => {
-      ctx.strokeStyle = drawing.color;
-      ctx.lineWidth = drawing.tool === 'eraser' ? 20 : 3;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
+
+      if (drawing.tool === 'eraser') {
+        // Use destination-out for proper erasing
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 20;
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = drawing.color;
+        ctx.lineWidth = 3;
+      }
 
       if (drawing.tool === 'pen' || drawing.tool === 'eraser') {
         ctx.beginPath();
@@ -137,8 +145,17 @@ const AnnotationCanvas = ({
 
     // Draw locally
     const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = tool === 'eraser' ? '#000000' : color;
-    ctx.lineWidth = tool === 'eraser' ? 20 : 3;
+    
+    if (tool === 'eraser') {
+      // Use destination-out composite operation for proper erasing
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 20;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+    }
+    
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 

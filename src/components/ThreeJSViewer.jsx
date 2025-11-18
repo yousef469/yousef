@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, expansionRatio: 10, ambientPressure: 101325 } }) => {
+const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, expansionRatio: 10, ambientPressure: 101325 }, enableControls = true }) => {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -78,6 +78,14 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
     controls.enablePan = false;
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
+    
+    // Disable controls if enableControls is false (for joiners)
+    if (!enableControls) {
+      controls.enabled = false;
+      controls.enableRotate = false;
+      controls.enableZoom = false;
+      controls.enablePan = false;
+    }
     
     controlsRef.current = controls;
 
@@ -848,7 +856,7 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
         containerRef.current.removeChild(rendererRef.current.domElement);
       }
     };
-  }, [modelInfo]);
+  }, [modelInfo, enableControls]);
 
   // Update nozzle params ref when they change
   useEffect(() => {

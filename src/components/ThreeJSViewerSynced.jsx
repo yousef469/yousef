@@ -105,6 +105,7 @@ const ThreeJSViewerSynced = ({
       {/* 3D Viewer */}
       <ThreeJSViewer 
         modelInfo={modelInfo}
+        enableControls={enableControls}
       />
       
       {/* Annotation Canvas Overlay */}
