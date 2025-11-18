@@ -13,7 +13,7 @@ const AnnotationCanvas = ({
 }) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [tool, setTool] = useState('pen');
+  const [tool, setTool] = useState('view'); // Start in view mode to allow 3D interaction
   const [color, setColor] = useState('#FF0000');
   const [startPos, setStartPos] = useState(null);
   const drawingPathRef = useRef([]);
@@ -286,32 +286,59 @@ const AnnotationCanvas = ({
     if (onClear) onClear();
   };
 
-  // Determine if we should capture pointer events (only when drawing tool is active for host)
-  // Left click always available for drawing when tool is selected
-  const shouldCaptureEvents = isHost && (tool === 'pen' || tool === 'circle' || tool === 'arrow' || tool === 'eraser');
+  // Determine if we should show drawing cursor
+  // In 'view' mode, all events pass through to 3D viewer
+  const isDrawingToolActive = isHost && tool !== 'view' && (tool === 'pen' || tool === 'circle' || tool === 'arrow' || tool === 'eraser');
 
   return (
     <div className="absolute inset-0 pointer-events-none z-40">
-      {/* Canvas for drawing - only capture LEFT click events when drawing tool is selected */}
+      {/* Canvas for drawing - displays the drawings */}
       <canvas
         ref={canvasRef}
-        className={`absolute inset-0 ${shouldCaptureEvents ? 'pointer-events-auto' : 'pointer-events-none'}`}
-        style={{ cursor: shouldCaptureEvents ? 'crosshair' : 'default' }}
+        className="absolute inset-0"
+        style={{
+          // Only capture left-click events, let everything else pass through
+          pointerEvents: isDrawingToolActive ? 'auto' : 'none',
+          cursor: isDrawingToolActive ? 'crosshair' : 'default',
+          // This allows right-click and scroll to pass through
+          touchAction: 'none'
+        }}
         onMouseDown={(e) => {
-          // Only handle left click (button 0) - right click (button 2) passes through to 3D viewer
-          if (shouldCaptureEvents && e.button === 0) {
+          // Only handle left click (button 0) for drawing
+          if (isDrawingToolActive && e.button === 0) {
+            // Prevent default and stop propagation ONLY for left-click
+            e.preventDefault();
+            e.stopPropagation();
             handleMouseDown(e);
           }
+          // Right-click (button 2) and middle-click (button 1) are NOT prevented
+          // They pass through to the 3D viewer
         }}
-        onMouseMove={shouldCaptureEvents ? handleMouseMove : undefined}
-        onMouseUp={shouldCaptureEvents ? handleMouseUp : undefined}
-        onMouseLeave={shouldCaptureEvents ? handleMouseUp : undefined}
-        onContextMenu={(e) => {
-          // Prevent context menu when drawing tool is active
-          if (shouldCaptureEvents) {
+        onMouseMove={(e) => {
+          if (isDrawing) {
             e.preventDefault();
+            e.stopPropagation();
+            handleMouseMove(e);
           }
-          // Otherwise let it pass through to 3D viewer
+        }}
+        onMouseUp={(e) => {
+          if (isDrawing) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleMouseUp(e);
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (isDrawing) {
+            handleMouseUp(e);
+          }
+        }}
+        // Don't prevent context menu or wheel events
+        onContextMenu={(e) => {
+          // Let right-click pass through for 3D rotation
+        }}
+        onWheel={(e) => {
+          // Let scroll pass through for 3D zoom
         }}
       />
 
@@ -319,6 +346,23 @@ const AnnotationCanvas = ({
       {isHost && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-800/95 backdrop-blur-sm rounded-lg shadow-xl p-3 pointer-events-auto z-50">
           <div className="flex items-center gap-2">
+            {/* View/Rotate Mode - Default mode for 3D interaction */}
+            <button
+              onClick={() => setTool('view')}
+              className={`p-2 rounded transition-all ${
+                tool === 'view' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+              title="View Mode - Rotate & Zoom 3D Model"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+
+            {/* Divider */}
+            <div className="w-px h-8 bg-gray-600 mx-1"></div>
+
             {/* Tool Selection */}
             <button
               onClick={() => setTool('pen')}
