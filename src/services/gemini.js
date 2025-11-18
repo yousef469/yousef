@@ -8,9 +8,9 @@ console.log('🔑 API Key Status [FRESH BUILD]:', {
   firstChars: API_KEY?.substring(0, 10) + '...'
 });
 
-// Direct API call using v1 endpoint with Gemini 2.5 Flash
+// Direct API call using v1 endpoint with Gemini 1.5 Flash (better rate limits)
 const callGeminiAPI = async (prompt) => {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
   
   try {
     console.log('🚀 Calling Gemini API directly...');
@@ -84,10 +84,19 @@ Your API key doesn't have access to the Gemini models. Please:
 Current error: ${error.message}`;
     }
     
-    if (error.message?.includes('429')) {
-      return `**Rate Limit**
+    if (error.message?.includes('429') || error.message?.includes('quota')) {
+      return `**Rate Limit Exceeded**
 
-Too many requests. Please wait a minute and try again.`;
+The AI service has reached its usage limit. This happens when:
+- Too many requests in a short time
+- Daily/monthly quota exceeded
+
+**Solutions:**
+1. Wait 1-2 minutes and try again
+2. Use the AI chat less frequently
+3. For production: Upgrade to a paid Gemini API plan at https://ai.google.dev/pricing
+
+The free tier allows 15 requests per minute. Please try again shortly.`;
     }
     
     return `**Temporary Error**
