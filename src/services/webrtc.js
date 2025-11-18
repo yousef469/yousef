@@ -21,8 +21,9 @@ class WebRTCService {
   }
 
   // Initialize connection to signaling server with retry logic
-  async connect(serverUrl, retryCount = 0) {
-    const MAX_RETRIES = 3;
+  async connect(serverUrl, retryCount = 0, onProgress = null) {
+    const MAX_RETRIES = 2; // Reduced retries for faster feedback
+    const CONNECTION_TIMEOUT = 20000; // Reduced to 20 seconds
     
     // Auto-detect production vs development
     if (!serverUrl) {
@@ -42,44 +43,63 @@ class WebRTCService {
     
     console.log(`🔌 Connecting to signaling server (attempt ${retryCount + 1}/${MAX_RETRIES + 1}):`, serverUrl);
     
+    if (onProgress) onProgress(`Connecting to server... (${retryCount + 1}/${MAX_RETRIES + 1})`);
+    
     try {
       await new Promise((resolve, reject) => {
         this.socket = io(serverUrl, {
-          transports: ['websocket', 'polling'], // Try websocket first for better performance
-          reconnection: true,
-          reconnectionDelay: 1000,
-          reconnectionAttempts: 10,
-          timeout: 45000, // Increased timeout for free tier wake-up
+          transports: ['polling', 'websocket'], // Try polling first (more reliable for sleeping servers)
+          reconnection: false, // Disable auto-reconnect, we handle it manually
+          timeout: CONNECTION_TIMEOUT,
           forceNew: true,
-          upgrade: true,
-          rememberUpgrade: true
+          upgrade: true
         });
         
         let resolved = false;
+        let progressInterval;
+        
+        // Show progress updates
+        if (onProgress) {
+          let elapsed = 0;
+          progressInterval = setInterval(() => {
+            elapsed += 2;
+            if (elapsed < 10) {
+              onProgress(`Connecting to server... (${elapsed}s)`);
+            } else if (elapsed < 20) {
+              onProgress(`Server is waking up... (${elapsed}s)`);
+            } else {
+              onProgress(`Still connecting... (${elapsed}s)`);
+            }
+          }, 2000);
+        }
         
         this.socket.on('connect', () => {
           console.log('✅ Connected to signaling server');
+          if (progressInterval) clearInterval(progressInterval);
           if (!resolved) {
             resolved = true;
+            if (onProgress) onProgress('Connected!');
             resolve();
           }
         });
 
         this.socket.on('connect_error', (error) => {
           console.error('❌ Connection error:', error.message);
+          if (progressInterval) clearInterval(progressInterval);
           if (!resolved) {
             resolved = true;
             reject(error);
           }
         });
         
-        // Timeout after 45 seconds (Render free tier needs time to wake up)
+        // Timeout after CONNECTION_TIMEOUT
         setTimeout(() => {
+          if (progressInterval) clearInterval(progressInterval);
           if (!resolved && this.socket && !this.socket.connected) {
             resolved = true;
             reject(new Error('timeout'));
           }
-        }, 45000);
+        }, CONNECTION_TIMEOUT);
       });
       
       // Set up event handlers after connection is established
@@ -87,16 +107,17 @@ class WebRTCService {
       
     } catch (error) {
       // Retry logic for timeout or connection errors
-      if (retryCount < MAX_RETRIES && (error.message === 'timeout' || error.message.includes('xhr poll error'))) {
+      if (retryCount < MAX_RETRIES && (error.message === 'timeout' || error.message.includes('xhr poll error') || error.message.includes('Network'))) {
         console.log(`🔄 Retrying connection... (${retryCount + 1}/${MAX_RETRIES})`);
+        if (onProgress) onProgress(`Retrying connection... (${retryCount + 1}/${MAX_RETRIES})`);
         // Disconnect previous socket
         if (this.socket) {
           this.socket.disconnect();
           this.socket = null;
         }
         // Wait a bit before retrying
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        return this.connect(serverUrl, retryCount + 1);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return this.connect(serverUrl, retryCount + 1, onProgress);
       }
       throw error;
     }

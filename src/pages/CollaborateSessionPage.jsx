@@ -182,9 +182,11 @@ export default function CollaborateSessionPage() {
       try {
         console.log('🚀 Initializing WebRTC session...');
         
-        // Connect to signaling server
+        // Connect to signaling server with progress updates
         setConnectionStatus('Connecting to server...');
-        await webrtcService.connect();
+        await webrtcService.connect(undefined, 0, (status) => {
+          setConnectionStatus(status);
+        });
         
         // Set up event handlers
         webrtcService.onUserJoined = ({ socketId, userId, userName }) => {
@@ -602,7 +604,7 @@ export default function CollaborateSessionPage() {
         let errorMessage = 'Failed to connect to session. Please try again.';
         
         if (error.message.includes('timeout')) {
-          errorMessage = 'Connection timeout. The server is waking up (this can take 30-60 seconds on first use). Please refresh and try again.';
+          errorMessage = 'Connection timeout. The server may be sleeping. Please click "Retry" or refresh the page.';
         } else if (error.message.includes('Permission denied') || error.message.includes('NotAllowedError')) {
           errorMessage = 'Camera/microphone access denied. Please allow access and try again.';
         } else if (error.message.includes('NotFoundError')) {
@@ -610,8 +612,20 @@ export default function CollaborateSessionPage() {
         }
         
         setConnectionStatus('Connection failed');
-        alert(errorMessage);
-        navigate('/collaborate');
+        
+        // Show retry option instead of immediately navigating away
+        const shouldRetry = window.confirm(
+          `${errorMessage}\n\nWould you like to retry the connection?`
+        );
+        
+        if (shouldRetry) {
+          // Retry connection
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        } else {
+          navigate('/collaborate');
+        }
       }
     };
 
@@ -961,11 +975,20 @@ export default function CollaborateSessionPage() {
           </div>
           <h2 className="text-3xl font-bold mb-3">Setting up your meeting</h2>
           <p className="text-xl text-blue-400 mb-4">{connectionStatus}</p>
-          <p className="text-gray-400 text-sm">
-            {connectionStatus.includes('server') && '⏳ First connection may take 30-60 seconds as the server wakes up'}
+          <p className="text-gray-400 text-sm mb-6">
+            {connectionStatus.includes('server') && '⏳ Server may be waking up (free tier takes ~15-30s)'}
             {connectionStatus.includes('camera') && '📹 Please allow camera and microphone access in your browser'}
             {connectionStatus.includes('Joining') && '🚀 Almost there...'}
+            {connectionStatus.includes('Retrying') && '🔄 Attempting to reconnect...'}
           </p>
+          {connectionStatus.includes('server') && (
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-all"
+            >
+              Retry Connection
+            </button>
+          )}
         </div>
       </div>
     );
