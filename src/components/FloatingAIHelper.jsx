@@ -20,7 +20,7 @@ export default function FloatingAIHelper() {
     setIsLoading(true);
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       
       const systemPrompt = `You are an AI engineering tutor for Engineerium, an interactive engineering education platform. 
 Help users understand aerospace, automotive, and general engineering concepts. 
@@ -45,9 +45,18 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
       setMessages(prev => [...prev, { role: 'assistant', content: text }]);
     } catch (error) {
       console.error('AI Error:', error);
+      
+      let errorMessage = '❌ Sorry, I encountered an error. Please try again.';
+      
+      if (error.message?.includes('429') || error.message?.includes('quota')) {
+        errorMessage = '⏱️ Rate limit reached! Please wait a minute and try again. The free tier allows 15 requests per minute.';
+      } else if (error.message?.includes('404')) {
+        errorMessage = '🔑 API configuration issue. Please check your API key.';
+      }
+      
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: '❌ Sorry, I encountered an error. Please try again.' 
+        content: errorMessage
       }]);
     } finally {
       setIsLoading(false);
