@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -8,6 +8,7 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
+  const [isLoadingModel, setIsLoadingModel] = useState(false);
   const controlsRef = useRef(null);
   const modelRef = useRef(null);
   const animationFrameRef = useRef(null);
@@ -549,10 +550,12 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
     
     if (modelInfo && modelInfo.path) {
       console.log('Starting to load model from:', modelInfo.path);
+      setIsLoadingModel(true);
       loader.load(
         modelInfo.path,
         (gltf) => {
           console.log('Model loaded successfully!', gltf);
+          setIsLoadingModel(false);
           // Clear previous model
           if (modelRef.current) {
             scene.remove(modelRef.current);
@@ -639,6 +642,7 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
         (error) => {
           console.error('Error loading model:', modelInfo.path, error);
           console.error('Model info:', modelInfo);
+          setIsLoadingModel(false);
         }
       );
     }
@@ -925,8 +929,15 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
   return (
     <div ref={containerRef} className="w-full h-full bg-gradient-to-br from-gray-900 to-black relative z-10">
       {!modelInfo && (
-        <div className="absolute inset-0 flex items-center justify-center text-white">
+        <div className="absolute inset-0 flex items-center justify-center text-white z-50">
           <p>Loading 3D Viewer...</p>
+        </div>
+      )}
+      {isLoadingModel && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/80 text-white z-50">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+          <p className="text-lg font-semibold">Loading 3D Model...</p>
+          <p className="text-sm text-gray-400 mt-2">This may take a few seconds</p>
         </div>
       )}
     </div>

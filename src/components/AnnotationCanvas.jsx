@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Pen, Circle, ArrowRight, Type, Eraser, Trash2 } from 'lucide-react';
+import { useRef, useEffect, useState } from 'react';
+import { Pen, Circle, ArrowRight, Eraser, Trash2 } from 'lucide-react';
 
 /**
  * Annotation Canvas Overlay for 3D Presentation Mode
@@ -22,12 +22,16 @@ const AnnotationCanvas = ({
   // Initialize canvas
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('❌ AnnotationCanvas: Canvas ref not ready');
+      return;
+    }
 
     const resizeCanvas = () => {
       const rect = canvas.parentElement.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
+      console.log('✅ AnnotationCanvas: Canvas resized', { width: canvas.width, height: canvas.height });
     };
 
     resizeCanvas();
@@ -129,6 +133,7 @@ const AnnotationCanvas = ({
   };
 
   const handleMouseDown = (e) => {
+    console.log('🖱️ Mouse down:', { isHost, tool, button: e.button });
     if (!isHost) return;
     // Only handle left click (button 0) - ignore right click (button 2) and middle click (button 1)
     if (e.button !== 0) return;
@@ -141,6 +146,7 @@ const AnnotationCanvas = ({
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
+    console.log('✏️ Starting drawing at:', { x, y, tool, color });
     setStartPos({ x, y });
     drawingPathRef.current = [{ x, y }];
   };
