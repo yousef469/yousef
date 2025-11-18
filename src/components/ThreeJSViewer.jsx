@@ -93,41 +93,33 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
       controls.enableZoom = true;
       controls.zoomSpeed = 1.2; // Make zoom more responsive
       
-      // Prevent context menu on right click (but allow rotation)
-      renderer.domElement.addEventListener('contextmenu', (e) => {
+      // Prevent context menu on right click (but allow OrbitControls to handle rotation)
+      const contextMenuHandler = (e) => {
         e.preventDefault();
-      });
+        e.stopPropagation();
+      };
+      renderer.domElement.addEventListener('contextmenu', contextMenuHandler);
       
       // Prevent page scroll when zooming with mouse wheel
-      renderer.domElement.addEventListener('wheel', (e) => {
+      const wheelHandler = (e) => {
         if (controls.enableZoom) {
           e.preventDefault();
           e.stopPropagation();
         }
-      }, { passive: false });
+      };
+      renderer.domElement.addEventListener('wheel', wheelHandler, { passive: false });
       
-      // Prevent page scroll when right-click dragging (rotating)
-      let isRightClickDragging = false;
-      renderer.domElement.addEventListener('mousedown', (e) => {
-        if (e.button === 2) { // Right click
-          isRightClickDragging = true;
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
+      // Store cleanup function
+      const cleanup = () => {
+        renderer.domElement.removeEventListener('contextmenu', contextMenuHandler);
+        renderer.domElement.removeEventListener('wheel', wheelHandler);
+      };
       
-      renderer.domElement.addEventListener('mousemove', (e) => {
-        if (isRightClickDragging) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-      
-      renderer.domElement.addEventListener('mouseup', (e) => {
-        if (e.button === 2) {
-          isRightClickDragging = false;
-        }
-      });
+      // Store cleanup in ref for later
+      if (!window.__threeViewerCleanups) {
+        window.__threeViewerCleanups = new Map();
+      }
+      window.__threeViewerCleanups.set(renderer.domElement, cleanup);
     } else {
       // Joiner mode: disable all controls
       controls.enabled = false;
@@ -892,6 +884,15 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
       window.removeEventListener('resize', handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+      }
+      
+      // Clean up event listeners
+      if (window.__threeViewerCleanups && renderer.domElement) {
+        const cleanup = window.__threeViewerCleanups.get(renderer.domElement);
+        if (cleanup) {
+          cleanup();
+          window.__threeViewerCleanups.delete(renderer.domElement);
+        }
       }
       
       // Clean up particle systems

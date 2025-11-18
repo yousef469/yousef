@@ -301,8 +301,11 @@ const AnnotationCanvas = ({
         onMouseUp={shouldCaptureEvents ? handleMouseUp : undefined}
         onMouseLeave={shouldCaptureEvents ? handleMouseUp : undefined}
         onContextMenu={(e) => {
-          // Always allow right-click context menu to pass through (for 3D viewer rotation)
-          e.stopPropagation();
+          // Prevent context menu when drawing tool is active
+          if (shouldCaptureEvents) {
+            e.preventDefault();
+          }
+          // Otherwise let it pass through to 3D viewer
         }}
       />
 

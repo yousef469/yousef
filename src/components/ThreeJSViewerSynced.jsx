@@ -162,7 +162,17 @@ const ThreeJSViewerSynced = ({
   }, [syncedCameraState, isHost]);
 
   return (
-    <div ref={viewerRef} className="relative w-full h-full">
+    <div 
+      ref={viewerRef} 
+      className="relative w-full h-full"
+      onContextMenu={(e) => {
+        // Prevent context menu on the container so 3D viewer can handle right-click
+        if (enableControls) {
+          e.preventDefault();
+        }
+      }}
+      style={{ userSelect: 'none' }} // Prevent text selection when dragging
+    >
       {/* 3D Viewer */}
       <ThreeJSViewer 
         modelInfo={modelInfo}
