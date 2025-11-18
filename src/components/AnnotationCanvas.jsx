@@ -236,6 +236,16 @@ const AnnotationCanvas = ({
       }
     }
 
+    // Store drawing locally for host to see it
+    if (drawingPathRef.current.length > 0) {
+      const drawing = {
+        tool,
+        color,
+        points: drawingPathRef.current
+      };
+      setLocalDrawings(prev => [...prev, drawing]);
+    }
+
     // Broadcast drawing
     if (onDraw && drawingPathRef.current.length > 0) {
       onDraw({
