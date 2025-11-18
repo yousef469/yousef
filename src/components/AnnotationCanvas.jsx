@@ -176,7 +176,7 @@ const AnnotationCanvas = ({
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute inset-0 pointer-events-none z-40">
       {/* Canvas for drawing */}
       <canvas
         ref={canvasRef}
@@ -190,7 +190,7 @@ const AnnotationCanvas = ({
 
       {/* Drawing Tools - Host Only */}
       {isHost && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-800/95 backdrop-blur-sm rounded-lg shadow-xl p-3 pointer-events-auto">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-800/95 backdrop-blur-sm rounded-lg shadow-xl p-3 pointer-events-auto z-50">
           <div className="flex items-center gap-2">
             {/* Tool Selection */}
             <button
