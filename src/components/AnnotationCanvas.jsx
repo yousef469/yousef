@@ -267,17 +267,20 @@ const AnnotationCanvas = ({
     if (onClear) onClear();
   };
 
+  // Determine if we should capture pointer events (only when drawing tool is active for host)
+  const shouldCaptureEvents = isHost && (tool === 'pen' || tool === 'circle' || tool === 'arrow' || tool === 'eraser');
+
   return (
     <div className="absolute inset-0 pointer-events-none z-40">
-      {/* Canvas for drawing */}
+      {/* Canvas for drawing - only capture events when drawing tool is selected */}
       <canvas
         ref={canvasRef}
-        className={`absolute inset-0 ${isHost ? 'pointer-events-auto' : 'pointer-events-none'}`}
-        style={{ cursor: isHost ? 'crosshair' : 'default' }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        className={`absolute inset-0 ${shouldCaptureEvents ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        style={{ cursor: shouldCaptureEvents ? 'crosshair' : 'default' }}
+        onMouseDown={shouldCaptureEvents ? handleMouseDown : undefined}
+        onMouseMove={shouldCaptureEvents ? handleMouseMove : undefined}
+        onMouseUp={shouldCaptureEvents ? handleMouseUp : undefined}
+        onMouseLeave={shouldCaptureEvents ? handleMouseUp : undefined}
       />
 
       {/* Drawing Tools - Host Only */}

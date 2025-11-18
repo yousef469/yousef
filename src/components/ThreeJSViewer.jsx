@@ -73,18 +73,25 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
     
     controls.minDistance = 3;
     controls.maxDistance = 25;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 2.0;
     controls.enablePan = false;
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     
-    // Disable controls if enableControls is false (for joiners)
-    if (!enableControls) {
+    // Configure controls based on enableControls
+    if (enableControls) {
+      // Host mode: enable all controls, disable auto-rotate
+      controls.enabled = true;
+      controls.enableRotate = true;
+      controls.enableZoom = true;
+      controls.enablePan = false; // Keep pan disabled for cleaner view
+      controls.autoRotate = false; // Disable auto-rotate so host can control
+    } else {
+      // Joiner mode: disable all controls
       controls.enabled = false;
       controls.enableRotate = false;
       controls.enableZoom = false;
       controls.enablePan = false;
+      controls.autoRotate = false;
     }
     
     controlsRef.current = controls;
