@@ -856,7 +856,7 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
         containerRef.current.removeChild(rendererRef.current.domElement);
       }
     };
-  }, [modelInfo, enableControls]);
+  }, [modelInfo?.path, modelInfo?.name, enableControls]); // Only re-run if path or name changes
 
   // Update nozzle params ref when they change
   useEffect(() => {

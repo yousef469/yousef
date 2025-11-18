@@ -872,45 +872,50 @@ export default function CollaborateSessionPage() {
         setShowWhiteboard(false);
         setShowUploadMenu(false);
         
-        // Stream file to base64 and broadcast chunks as they're read (host only)
+        // Fast upload: read file and send chunks quickly (host only)
         if (isHost) {
-          const CHUNK_SIZE = 16 * 1024; // 16KB chunks (safe for all browsers)
+          const CHUNK_SIZE = 32 * 1024; // Increased to 32KB chunks (faster, still safe)
           const fileId = `${Date.now()}-${Math.random()}`;
           
-          console.log(`📤 Streaming file upload:`, file.name);
+          console.log(`📤 Fast file upload:`, file.name, `(${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
           setUploadProgress({ fileName: file.name, progress: 0 });
           
-          // Read file and convert to base64, then stream chunks
+          // Read file and convert to base64
           const reader = new FileReader();
           reader.onprogress = (e) => {
             // Update progress as file is being read
             if (e.lengthComputable) {
-              const progress = Math.round((e.loaded / e.total) * 20); // First 20% is reading
+              const progress = Math.round((e.loaded / e.total) * 15); // First 15% is reading
               setUploadProgress({ fileName: file.name, progress });
             }
           };
           
           reader.onload = () => {
             const base64Data = reader.result;
+            const startTime = Date.now();
             
-            // Update content with full data
+            // Update content with full data immediately
             setUploadedContent({
               ...content,
               data: base64Data
             });
             
-            // Split base64 into chunks and send immediately
+            // Split base64 into chunks and send as fast as possible
             const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
-            const BATCH_SIZE = 10; // Send 10 chunks at a time
+            const BATCH_SIZE = 50; // Increased batch size for faster sending
+            
+            console.log(`📦 Sending ${totalChunks} chunks in batches of ${BATCH_SIZE}`);
             
             const sendChunks = async () => {
+              // Send all chunks in larger batches with minimal delays
               for (let batchStart = 0; batchStart < totalChunks; batchStart += BATCH_SIZE) {
                 const batchEnd = Math.min(batchStart + BATCH_SIZE, totalChunks);
                 
-                // Send entire batch
+                // Send entire batch synchronously (no await in loop)
                 for (let i = batchStart; i < batchEnd; i++) {
                   const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
                   
+                  // Send immediately without waiting
                   webrtcService.broadcastData({
                     type: 'file-chunk',
                     fileId,
@@ -923,18 +928,19 @@ export default function CollaborateSessionPage() {
                   });
                 }
                 
-                // Update progress (20% reading + 80% sending)
-                const progress = 20 + Math.round((batchEnd / totalChunks) * 80);
+                // Update progress (15% reading + 85% sending)
+                const progress = 15 + Math.round((batchEnd / totalChunks) * 85);
                 setUploadProgress({ fileName: file.name, progress });
                 
-                // Small delay between batches to prevent overwhelming
+                // Minimal delay only between batches (1ms instead of 10ms)
                 if (batchEnd < totalChunks) {
-                  await new Promise(resolve => setTimeout(resolve, 10));
+                  await new Promise(resolve => setTimeout(resolve, 1));
                 }
               }
               
-              console.log('✅ File streaming complete');
-              setTimeout(() => setUploadProgress(null), 2000);
+              const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+              console.log(`✅ File upload complete in ${elapsed}s`);
+              setTimeout(() => setUploadProgress(null), 1500);
             };
             
             sendChunks();
@@ -1170,7 +1176,7 @@ export default function CollaborateSessionPage() {
                   <div className="w-full h-full relative">
                     {/* 3D Viewer with camera sync for presentation mode - stable key prevents reload */}
                     <ThreeJSViewerSynced
-                      key={`3d-${uploadedContent.name}-${sessionId}`}
+                      key={`3d-${uploadedContent.name}-${sessionId}-${uploadedContent.url}`}
                       modelInfo={{
                         path: uploadedContent.url,
                         name: uploadedContent.name,
