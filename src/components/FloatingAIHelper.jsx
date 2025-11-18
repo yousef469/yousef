@@ -11,39 +11,55 @@ export default function FloatingAIHelper() {
   const API_KEY = 'AIzaSyCjAyzCPEhBBCe-YZPlidfytbwqv6uVj5Q'; // Use same key as gemini.js
 
   const callGeminiAPI = async (prompt) => {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    // Try multiple model endpoints in order of preference
+    const models = [
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-flash',
+      'gemini-pro',
+      'gemini-1.0-pro'
+    ];
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
+    let lastError = null;
+    
+    for (const model of models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500,
+            }
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          
+          if (text) {
+            return text;
+          }
         }
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
-    }
-
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!text) {
-      throw new Error('No text in response');
+        
+        lastError = await response.json();
+      } catch (error) {
+        lastError = error;
+      }
     }
     
-    return text;
+    // If all models failed, throw error
+    throw new Error(`All models failed. Last error: ${JSON.stringify(lastError)}`);
   };
 
   const sendMessage = async () => {
@@ -75,9 +91,9 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
       let errorMessage = '❌ Sorry, I encountered an error. Please try again.';
       
       if (error.message?.includes('429') || error.message?.includes('quota')) {
-        errorMessage = '⏱️ Rate limit reached! Please wait a minute and try again. The free tier allows 15 requests per minute.';
-      } else if (error.message?.includes('404')) {
-        errorMessage = '🔑 API configuration issue. Please check your API key.';
+        errorMessage = '⏱️ **Rate Limit Reached**\n\nPlease wait a minute and try again. The free tier allows 15 requests per minute.';
+      } else if (error.message?.includes('404') || error.message?.includes('All models failed')) {
+        errorMessage = '🔧 **AI Service Temporarily Unavailable**\n\nThe AI chat is currently being configured. In the meantime:\n\n• Browse lessons in Rockets, Cars, Planes, or Electronics\n• Try the interactive 3D models\n• Complete quizzes to test your knowledge\n\nWe\'re working to restore AI chat soon!';
       }
       
       setMessages(prev => [...prev, { 
