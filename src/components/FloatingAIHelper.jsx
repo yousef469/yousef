@@ -11,55 +11,40 @@ export default function FloatingAIHelper() {
   const API_KEY = 'AIzaSyCjAyzCPEhBBCe-YZPlidfytbwqv6uVj5Q'; // Use same key as gemini.js
 
   const callGeminiAPI = async (prompt) => {
-    // Try multiple model endpoints in order of preference
-    const models = [
-      'gemini-1.5-flash-latest',
-      'gemini-1.5-flash',
-      'gemini-pro',
-      'gemini-1.0-pro'
-    ];
+    // Use the correct model name format for v1beta API
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
     
-    let lastError = null;
-    
-    for (const model of models) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
-        
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 500,
-            }
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          
-          if (text) {
-            return text;
-          }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
         }
-        
-        lastError = await response.json();
-      } catch (error) {
-        lastError = error;
-      }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!text) {
+      throw new Error('No text in response');
     }
     
-    // If all models failed, throw error
-    throw new Error(`All models failed. Last error: ${JSON.stringify(lastError)}`);
+    return text;
   };
 
   const sendMessage = async () => {
