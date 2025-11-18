@@ -17,6 +17,7 @@ const AnnotationCanvas = ({
   const [color, setColor] = useState('#FF0000');
   const [startPos, setStartPos] = useState(null);
   const drawingPathRef = useRef([]);
+  const [localDrawings, setLocalDrawings] = useState([]); // Store host's own drawings
 
   // Initialize canvas
   useEffect(() => {
@@ -34,17 +35,21 @@ const AnnotationCanvas = ({
     return () => window.removeEventListener('resize', resizeCanvas);
   }, []);
 
-  // Draw received annotations (joiners)
+  // Draw all annotations (both local for host and received for joiners)
   useEffect(() => {
-    if (isHost || !receivedDrawings.length) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    receivedDrawings.forEach(drawing => {
+    // For host: draw local drawings + received (if any)
+    // For joiners: draw only received drawings
+    const drawingsToDraw = isHost 
+      ? [...localDrawings, ...receivedDrawings]
+      : receivedDrawings;
+
+    drawingsToDraw.forEach(drawing => {
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
@@ -76,7 +81,7 @@ const AnnotationCanvas = ({
         drawCircle(ctx, drawing.points, canvas.width, canvas.height, drawing.color);
       }
     });
-  }, [receivedDrawings, isHost]);
+  }, [receivedDrawings, isHost, localDrawings]);
 
   const drawArrow = (ctx, points, width, height, color) => {
     if (points.length < 2) return;
@@ -172,6 +177,65 @@ const AnnotationCanvas = ({
     if (!isDrawing || !isHost) return;
     setIsDrawing(false);
 
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+
+    // Draw shape locally first (for host to see it immediately)
+    if (drawingPathRef.current.length > 0) {
+      ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
+      ctx.strokeStyle = tool === 'eraser' ? 'transparent' : color;
+      ctx.lineWidth = tool === 'eraser' ? 20 : 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      if (tool === 'circle' && drawingPathRef.current.length >= 2) {
+        const start = { 
+          x: drawingPathRef.current[0].x * rect.width, 
+          y: drawingPathRef.current[0].y * rect.height 
+        };
+        const end = { 
+          x: drawingPathRef.current[drawingPathRef.current.length - 1].x * rect.width, 
+          y: drawingPathRef.current[drawingPathRef.current.length - 1].y * rect.height 
+        };
+        const radius = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+        ctx.beginPath();
+        ctx.arc(start.x, start.y, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+      } else if (tool === 'arrow' && drawingPathRef.current.length >= 2) {
+        const start = { 
+          x: drawingPathRef.current[0].x * rect.width, 
+          y: drawingPathRef.current[0].y * rect.height 
+        };
+        const end = { 
+          x: drawingPathRef.current[drawingPathRef.current.length - 1].x * rect.width, 
+          y: drawingPathRef.current[drawingPathRef.current.length - 1].y * rect.height 
+        };
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+        const angle = Math.atan2(end.y - start.y, end.x - start.x);
+        const headLength = 20;
+        ctx.beginPath();
+        ctx.moveTo(end.x, end.y);
+        ctx.lineTo(
+          end.x - headLength * Math.cos(angle - Math.PI / 6),
+          end.y - headLength * Math.sin(angle - Math.PI / 6)
+        );
+        ctx.lineTo(
+          end.x - headLength * Math.cos(angle + Math.PI / 6),
+          end.y - headLength * Math.sin(angle + Math.PI / 6)
+        );
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
     // Broadcast drawing
     if (onDraw && drawingPathRef.current.length > 0) {
       onDraw({
@@ -189,6 +253,7 @@ const AnnotationCanvas = ({
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setLocalDrawings([]); // Clear local drawings too
     if (onClear) onClear();
   };
 

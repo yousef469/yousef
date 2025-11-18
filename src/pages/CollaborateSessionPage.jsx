@@ -260,28 +260,18 @@ export default function CollaborateSessionPage() {
         webrtcService.onStreamReceived = (socketId, stream) => {
           console.log('📹 Received stream from:', socketId);
           
-          // Force re-render to show the new video
-          setParticipants(prev => {
-            console.log('📋 Current participants before update:', prev.map(p => ({ socketId: p.socketId, name: p.name, hasStream: p.hasStream })));
-            // Update the participant to trigger re-render
-            const updated = prev.map(p => 
-              p.socketId === socketId 
-                ? { ...p, hasStream: true }
-                : p
-            );
-            console.log('📋 Updated participants:', updated.map(p => ({ socketId: p.socketId, name: p.name, hasStream: p.hasStream })));
-            return updated;
-          });
-          
           let videoElement = remoteVideosRef.current.get(socketId);
           if (!videoElement) {
             videoElement = document.createElement('video');
             videoElement.autoplay = true;
             videoElement.playsInline = true;
-            videoElement.muted = false; // Don't mute remote videos
+            videoElement.muted = false;
             videoElement.style.width = '100%';
             videoElement.style.height = '100%';
             videoElement.style.objectFit = 'cover';
+            // Performance optimizations
+            videoElement.setAttribute('playsinline', 'true');
+            videoElement.setAttribute('webkit-playsinline', 'true');
             remoteVideosRef.current.set(socketId, videoElement);
           }
           
@@ -290,6 +280,18 @@ export default function CollaborateSessionPage() {
           // Force play (some browsers need this)
           videoElement.play().catch(err => {
             console.log('Auto-play prevented, user interaction needed:', err);
+          });
+          
+          // Update participants state (throttled to reduce re-renders)
+          setParticipants(prev => {
+            if (prev.some(p => p.socketId === socketId && p.hasStream)) {
+              return prev; // Already updated, skip re-render
+            }
+            return prev.map(p => 
+              p.socketId === socketId 
+                ? { ...p, hasStream: true }
+                : p
+            );
           });
         };
 
@@ -515,9 +517,12 @@ export default function CollaborateSessionPage() {
             sharedVideoRef.current.currentTime = message.time;
           }
           
-          // 3D Camera sync
+          // 3D Camera sync - throttled to reduce lag
           if (message.type === '3d-camera-update') {
-            setSyncedCameraState(message.cameraState);
+            // Use requestAnimationFrame to batch updates
+            requestAnimationFrame(() => {
+              setSyncedCameraState(message.cameraState);
+            });
           }
           
           // 3D Annotations

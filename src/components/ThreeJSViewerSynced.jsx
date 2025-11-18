@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import * as THREE from 'three';
 import ThreeJSViewer from './ThreeJSViewer';
 import AnnotationCanvas from './AnnotationCanvas';
 
@@ -17,72 +18,100 @@ const ThreeJSViewerSynced = ({
   onAnnotationClear = null // Callback when host clears
 }) => {
   const viewerRef = useRef(null);
-  const [cameraState, setCameraState] = useState(null);
+  const cameraRef = useRef(null);
+  const controlsRef = useRef(null);
   const lastBroadcastTime = useRef(0);
-  const BROADCAST_THROTTLE = 50; // ms (20 updates/second)
+  const lastCameraState = useRef(null);
+  const BROADCAST_THROTTLE = 100; // ms (10 updates/second - reduced for performance)
 
-  // Monitor camera changes (host only)
+  // Handle camera ready callback from ThreeJSViewer
+  const handleCameraReady = ({ camera, controls }) => {
+    cameraRef.current = camera;
+    controlsRef.current = controls;
+  };
+
+  // Monitor camera changes (host only) - throttled for performance
   useEffect(() => {
     if (!isHost || !enableControls || !onCameraChange) return;
 
-    const interval = setInterval(() => {
-      // Get camera state from ThreeJS viewer
-      const viewer = viewerRef.current;
-      if (!viewer) return;
+    const checkCamera = () => {
+      const camera = cameraRef.current;
+      const controls = controlsRef.current;
+      if (!camera || !controls) return;
 
-      // Access Three.js internals (we'll need to expose these)
-      const camera = viewer.querySelector('canvas')?.__camera;
-      const controls = viewer.querySelector('canvas')?.__controls;
-      
-      if (camera && controls) {
-        const now = Date.now();
-        if (now - lastBroadcastTime.current < BROADCAST_THROTTLE) return;
+      const now = Date.now();
+      if (now - lastBroadcastTime.current < BROADCAST_THROTTLE) return;
 
-        const state = {
-          position: {
-            x: camera.position.x,
-            y: camera.position.y,
-            z: camera.position.z
-          },
-          target: {
-            x: controls.target.x,
-            y: controls.target.y,
-            z: controls.target.z
-          },
-          zoom: camera.zoom
-        };
+      const state = {
+        position: {
+          x: camera.position.x,
+          y: camera.position.y,
+          z: camera.position.z
+        },
+        target: {
+          x: controls.target.x,
+          y: controls.target.y,
+          z: controls.target.z
+        },
+        zoom: camera.zoom
+      };
 
-        // Only broadcast if changed
-        if (JSON.stringify(state) !== JSON.stringify(cameraState)) {
-          setCameraState(state);
-          onCameraChange(state);
-          lastBroadcastTime.current = now;
-        }
+      // Only broadcast if significantly changed (reduce network traffic)
+      const stateStr = JSON.stringify(state);
+      if (stateStr !== lastCameraState.current) {
+        lastCameraState.current = stateStr;
+        onCameraChange(state);
+        lastBroadcastTime.current = now;
       }
-    }, BROADCAST_THROTTLE);
+    };
 
-    return () => clearInterval(interval);
-  }, [isHost, enableControls, onCameraChange, cameraState]);
+    // Wait for camera to be ready
+    const waitForCamera = setInterval(() => {
+      if (cameraRef.current && controlsRef.current) {
+        clearInterval(waitForCamera);
+        
+        // Listen to controls change event
+        const controls = controlsRef.current;
+        controls.addEventListener('change', checkCamera);
 
-  // Apply synced camera state (joiners only)
+        // Also check periodically (fallback)
+        const interval = setInterval(checkCamera, BROADCAST_THROTTLE);
+
+        // Store cleanup function
+        window.__cameraSyncCleanup = () => {
+          controls.removeEventListener('change', checkCamera);
+          clearInterval(interval);
+        };
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(waitForCamera);
+      if (window.__cameraSyncCleanup) {
+        window.__cameraSyncCleanup();
+        delete window.__cameraSyncCleanup;
+      }
+    };
+  }, [isHost, enableControls, onCameraChange]);
+
+  // Apply synced camera state (joiners only) - optimized with requestAnimationFrame
   useEffect(() => {
-    if (isHost || !syncedCameraState) return;
+    if (isHost || !syncedCameraState || !cameraRef.current || !controlsRef.current) return;
 
-    const viewer = viewerRef.current;
-    if (!viewer) return;
+    let animationFrameId;
+    const updateCamera = () => {
+      const camera = cameraRef.current;
+      const controls = controlsRef.current;
+      if (!camera || !controls) return;
 
-    const camera = viewer.querySelector('canvas')?.__camera;
-    const controls = viewer.querySelector('canvas')?.__controls;
-
-    if (camera && controls && syncedCameraState) {
-      // Smoothly interpolate to new position
+      // Smoothly interpolate to new position (reduced lerp for faster sync)
       camera.position.lerp(
         new THREE.Vector3(
           syncedCameraState.position.x,
           syncedCameraState.position.y,
           syncedCameraState.position.z
         ),
-        0.1 // Smooth interpolation
+        0.2 // Increased from 0.1 for faster sync
       );
 
       controls.target.lerp(
@@ -91,13 +120,26 @@ const ThreeJSViewerSynced = ({
           syncedCameraState.target.y,
           syncedCameraState.target.z
         ),
-        0.1
+        0.2
       );
 
-      camera.zoom = syncedCameraState.zoom;
+      camera.zoom = THREE.MathUtils.lerp(camera.zoom, syncedCameraState.zoom, 0.2);
       camera.updateProjectionMatrix();
       controls.update();
-    }
+    };
+
+    // Use requestAnimationFrame for smooth updates
+    const animate = () => {
+      updateCamera();
+      animationFrameId = requestAnimationFrame(animate);
+    };
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [syncedCameraState, isHost]);
 
   return (
@@ -106,6 +148,7 @@ const ThreeJSViewerSynced = ({
       <ThreeJSViewer 
         modelInfo={modelInfo}
         enableControls={enableControls}
+        onCameraReady={handleCameraReady}
       />
       
       {/* Annotation Canvas Overlay */}

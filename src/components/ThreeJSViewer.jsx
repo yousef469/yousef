@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, expansionRatio: 10, ambientPressure: 101325 }, enableControls = true }) => {
+const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, expansionRatio: 10, ambientPressure: 101325 }, enableControls = true, onCameraReady = null }) => {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -88,6 +88,11 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
     }
     
     controlsRef.current = controls;
+    
+    // Expose camera and controls to parent component
+    if (onCameraReady) {
+      onCameraReady({ camera, controls });
+    }
 
     // Lighting - Balanced for good visibility
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
