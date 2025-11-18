@@ -11,8 +11,8 @@ export default function FloatingAIHelper() {
   const API_KEY = 'AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q'; // Use same key as gemini.js
 
   const callGeminiAPI = async (prompt) => {
-    // Use v1 API with correct model name
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    // Use v1 API with gemini-2.5-flash (from available models list)
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
     
     const response = await fetch(url, {
       method: 'POST',
