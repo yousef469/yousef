@@ -93,6 +93,9 @@ const ThreeJSViewer = ({ modelType, modelInfo, nozzleParams = { throttle: 1.0, e
       controls.enableZoom = true;
       controls.zoomSpeed = 1.2; // Make zoom more responsive
       
+      // Force update controls to apply mouse button settings
+      controls.update();
+      
       // Prevent context menu on right click (but allow OrbitControls to handle rotation)
       const contextMenuHandler = (e) => {
         e.preventDefault();
