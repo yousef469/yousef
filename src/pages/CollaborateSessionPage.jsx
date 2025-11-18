@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import webrtcService from '../services/webrtc';
 import ThreeJSViewer from '../components/ThreeJSViewer';
+import ThreeJSViewerSynced from '../components/ThreeJSViewerSynced';
 
 export default function CollaborateSessionPage() {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ export default function CollaborateSessionPage() {
   const [receivingFiles, setReceivingFiles] = useState(new Map()); // Map of fileId -> {chunks, totalChunks, type, name}
   const sharedVideoRef = useRef(null); // Ref for synced video playback
   const dbRef = useRef(null); // IndexedDB reference
+  const [syncedCameraState, setSyncedCameraState] = useState(null); // Camera state from host (for joiners)
   
   // Participants - start with just the current user
   const [participants, setParticipants] = useState([
@@ -442,6 +444,11 @@ export default function CollaborateSessionPage() {
           
           if (message.type === 'video-seek' && sharedVideoRef.current) {
             sharedVideoRef.current.currentTime = message.time;
+          }
+          
+          // 3D Camera sync
+          if (message.type === '3d-camera-update') {
+            setSyncedCameraState(message.cameraState);
           }
         };
 
@@ -981,14 +988,26 @@ export default function CollaborateSessionPage() {
                         <p className="text-sm text-gray-400">Loading 3D Model...</p>
                       </div>
                     </div>
-                    {/* 3D Viewer with key to prevent unnecessary remounts */}
-                    <ThreeJSViewer 
-                      key={uploadedContent.url} 
-                      modelInfo={{ 
+                    {/* 3D Viewer with camera sync for presentation mode */}
+                    <ThreeJSViewerSynced
+                      key={uploadedContent.url}
+                      modelInfo={{
                         path: uploadedContent.url,
                         name: uploadedContent.name,
                         type: '3d-model'
-                      }} 
+                      }}
+                      isHost={isHost}
+                      enableControls={isHost} // Only host can control
+                      syncedCameraState={syncedCameraState} // Joiners follow this
+                      onCameraChange={(cameraState) => {
+                        // Host broadcasts camera changes
+                        if (isHost) {
+                          webrtcService.broadcastData({
+                            type: '3d-camera-update',
+                            cameraState
+                          });
+                        }
+                      }}
                     />
                   </div>
                 )}
