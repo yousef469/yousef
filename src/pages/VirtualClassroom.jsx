@@ -7,7 +7,23 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import classroomService from '../services/classroom';
+import { generateToken, getLiveKitUrl, isLiveKitConfigured } from '../services/livekit';
 import ThreeJSViewerSynced from '../components/ThreeJSViewerSynced';
+
+// Lazy load LiveKit components (only if configured)
+let LiveKitRoom, VideoConference, RoomAudioRenderer;
+if (isLiveKitConfigured()) {
+  try {
+    const livekit = await import('@livekit/components-react');
+    LiveKitRoom = livekit.LiveKitRoom;
+    VideoConference = livekit.VideoConference;
+    RoomAudioRenderer = livekit.RoomAudioRenderer;
+    // Import styles
+    await import('@livekit/components-styles');
+  } catch (error) {
+    console.warn('LiveKit not installed. Video/audio disabled.');
+  }
+}
 
 export default function VirtualClassroom() {
   const { roomId } = useParams();
@@ -27,9 +43,11 @@ export default function VirtualClassroom() {
   const [followTeacher, setFollowTeacher] = useState(true);
   const [pointerPosition, setPointerPosition] = useState(null);
 
-  // Media controls (placeholder for LiveKit)
+  // Media controls
   const [isMicOn, setIsMicOn] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(false);
+  const [liveKitToken, setLiveKitToken] = useState(null);
+  const [liveKitEnabled] = useState(isLiveKitConfigured());
 
   // Initialize classroom
   useEffect(() => {
@@ -100,6 +118,28 @@ export default function VirtualClassroom() {
       classroomService.leaveRoom();
     };
   }, [roomId, user, followTeacher]);
+
+  // Initialize LiveKit (if configured)
+  useEffect(() => {
+    const initLiveKit = async () => {
+      if (!liveKitEnabled || !isConnected) return;
+
+      try {
+        const token = await generateToken(
+          roomId,
+          user.email?.split('@')[0] || `User-${user.id.slice(0, 6)}`,
+          isTeacher
+        );
+        if (token) {
+          setLiveKitToken(token);
+        }
+      } catch (error) {
+        console.error('Failed to initialize LiveKit:', error);
+      }
+    };
+
+    initLiveKit();
+  }, [isConnected, roomId, user, isTeacher, liveKitEnabled]);
 
   // Handle camera movement (teacher only)
   const handleCameraChange = () => {
@@ -326,33 +366,57 @@ export default function VirtualClassroom() {
             </div>
           </div>
 
-          {/* Video Controls (Placeholder for LiveKit) */}
+          {/* Video/Audio Section */}
           <div className="border-t border-primary/20 p-4">
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => setIsMicOn(!isMicOn)}
-                className={`p-4 rounded-full transition-colors ${
-                  isMicOn 
-                    ? 'bg-primary/20 text-primary' 
-                    : 'bg-danger/20 text-danger'
-                }`}
+            {liveKitEnabled && liveKitToken && LiveKitRoom ? (
+              <LiveKitRoom
+                token={liveKitToken}
+                serverUrl={getLiveKitUrl()}
+                connect={true}
+                audio={isMicOn}
+                video={isCameraOn}
+                className="h-full"
+                options={{
+                  adaptiveStream: true,
+                  dynacast: true,
+                }}
               >
-                {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
-              </button>
-              <button
-                onClick={() => setIsCameraOn(!isCameraOn)}
-                className={`p-4 rounded-full transition-colors ${
-                  isCameraOn 
-                    ? 'bg-primary/20 text-primary' 
-                    : 'bg-danger/20 text-danger'
-                }`}
-              >
-                {isCameraOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
-              </button>
-            </div>
-            <p className="text-xs text-text-muted text-center mt-3">
-              Video/Audio coming soon with LiveKit
-            </p>
+                <VideoConference />
+                <RoomAudioRenderer />
+              </LiveKitRoom>
+            ) : (
+              <>
+                <div className="flex items-center justify-center gap-4 mb-3">
+                  <button
+                    onClick={() => setIsMicOn(!isMicOn)}
+                    disabled={!liveKitEnabled}
+                    className={`p-4 rounded-full transition-colors ${
+                      isMicOn 
+                        ? 'bg-primary/20 text-primary' 
+                        : 'bg-danger/20 text-danger'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+                  </button>
+                  <button
+                    onClick={() => setIsCameraOn(!isCameraOn)}
+                    disabled={!liveKitEnabled}
+                    className={`p-4 rounded-full transition-colors ${
+                      isCameraOn 
+                        ? 'bg-primary/20 text-primary' 
+                        : 'bg-danger/20 text-danger'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isCameraOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
+                  </button>
+                </div>
+                <p className="text-xs text-text-muted text-center">
+                  {liveKitEnabled 
+                    ? 'Connecting to video...' 
+                    : 'Video/Audio: Add LiveKit credentials to enable'}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
