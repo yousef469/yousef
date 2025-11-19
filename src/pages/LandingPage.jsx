@@ -170,9 +170,31 @@ const LandingPage = () => {
         </section>
       </div>
 
-      <footer className="border-t border-primary/20 mt-20 py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-text-muted">
-          <p>{t('home.footer.copyright')}</p>
+      <footer className="border-t border-primary/20 mt-20 py-10 bg-gray-900/80">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="flex justify-center items-center gap-6 mb-6">
+            <a 
+              href="mailto:youseflovemessi@gmail.com" 
+              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+            >
+              Help
+            </a>
+            <span className="text-gray-500 text-2xl">|</span>
+            <a 
+              href="/privacy" 
+              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+            >
+              Privacy
+            </a>
+            <span className="text-gray-500 text-2xl">|</span>
+            <a 
+              href="/terms" 
+              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+            >
+              Terms
+            </a>
+          </div>
+          <p className="text-gray-400">{t('home.footer.copyright')}</p>
           <p className="text-xs mt-2 text-gray-600">{t('home.footer.version')}</p>
         </div>
       </footer>
