@@ -115,6 +115,13 @@ export default function ExplodeViewPage() {
     loader.load(
       url,
       (gltf) => {
+        if (!gltf || !gltf.scene) {
+          alert('Invalid model file. Please try another GLB/GLTF file.');
+          setIsLoading(false);
+          URL.revokeObjectURL(url);
+          return;
+        }
+
         // Clear previous model
         if (sceneRef.current) {
           const oldParts = sceneRef.current.children.filter(
@@ -127,41 +134,60 @@ export default function ExplodeViewPage() {
         const newParts = [];
         const positions = new Map();
 
-        gltf.scene.traverse((child) => {
-          if (child.isMesh) {
-            child.userData.isPart = true;
-            child.userData.originalMaterial = child.material.clone();
-            
-            // Save original position
-            positions.set(child, {
-              x: child.position.x,
-              y: child.position.y,
-              z: child.position.z
-            });
+        try {
+          gltf.scene.traverse((child) => {
+            if (child.isMesh) {
+              child.userData.isPart = true;
+              
+              // Clone material safely
+              if (child.material) {
+                child.userData.originalMaterial = child.material.clone();
+              } else {
+                child.userData.originalMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
+              }
+              
+              // Save original position
+              positions.set(child, {
+                x: child.position.x,
+                y: child.position.y,
+                z: child.position.z
+              });
 
-            newParts.push(child);
-            sceneRef.current.add(child);
+              newParts.push(child);
+              sceneRef.current.add(child);
+            }
+          });
+
+          if (newParts.length === 0) {
+            alert('No parts found in model. Make sure your model has separate meshes.');
+            setIsLoading(false);
+            URL.revokeObjectURL(url);
+            return;
           }
-        });
 
-        setParts(newParts);
-        setOriginalPositions(positions);
-        setModelLoaded(true);
-        setIsLoading(false);
+          setParts(newParts);
+          setOriginalPositions(positions);
+          setModelLoaded(true);
+          setIsLoading(false);
 
-        // Center camera on model
-        const box = new THREE.Box3().setFromObject(gltf.scene);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = cameraRef.current.fov * (Math.PI / 180);
-        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-        cameraZ *= 2;
+          // Center camera on model
+          const box = new THREE.Box3().setFromObject(gltf.scene);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const fov = cameraRef.current.fov * (Math.PI / 180);
+          let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+          cameraZ *= 2;
 
-        cameraRef.current.position.set(center.x + cameraZ, center.y + cameraZ / 2, center.z + cameraZ);
-        cameraRef.current.lookAt(center);
-        controlsRef.current.target.copy(center);
-        controlsRef.current.update();
+          cameraRef.current.position.set(center.x + cameraZ, center.y + cameraZ / 2, center.z + cameraZ);
+          cameraRef.current.lookAt(center);
+          controlsRef.current.target.copy(center);
+          controlsRef.current.update();
+        } catch (error) {
+          console.error('Error processing model:', error);
+          alert('Error processing model. Please try another file.');
+          setIsLoading(false);
+        }
 
         URL.revokeObjectURL(url);
       },
