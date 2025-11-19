@@ -375,28 +375,56 @@ Be specific and technical. If the part name is generic, make reasonable engineer
     }
   };
 
-  // Reset all
+  // Reset all with animation
   const handleReset = () => {
-    parts.forEach((part) => {
+    parts.forEach((part, index) => {
       const original = originalPositions.get(part);
+      const delay = index * 0.05;
+      
+      // Kill any ongoing animations
+      gsap.killTweensOf(part.position);
+      gsap.killTweensOf(part.scale);
+      gsap.killTweensOf(part.material);
+      
+      // Restore position
       gsap.to(part.position, {
         x: original.x,
         y: original.y,
         z: original.z,
         duration: 1,
-        ease: 'power2.inOut'
+        delay: delay,
+        ease: 'back.out(1.2)'
       });
 
-      // Reset material
+      // Restore scale with bounce
+      gsap.to(part.scale, {
+        x: 1,
+        y: 1,
+        z: 1,
+        duration: 1,
+        delay: delay,
+        ease: 'elastic.out(1, 0.5)'
+      });
+
+      // Restore material
       part.material = part.userData.originalMaterial.clone();
       part.material.transparent = false;
-      part.material.opacity = 1;
+      
+      // Fade in
+      part.material.opacity = 0;
+      gsap.to(part.material, {
+        opacity: 1,
+        duration: 0.8,
+        delay: delay,
+        ease: 'power2.out'
+      });
     });
+    
     setIsExploded(false);
     setSelectedPart(null);
   };
 
-  // Handle click on part with AI explanation
+  // Handle click on part with AI explanation and hide other parts
   const handleClick = async (event) => {
     if (!containerRef.current || parts.length === 0) return;
 
@@ -410,42 +438,91 @@ Be specific and technical. If the part name is generic, make reasonable engineer
     if (intersects.length > 0) {
       const clickedPart = intersects[0].object;
       
-      // Reset all parts
-      parts.forEach(part => {
-        part.material = part.userData.originalMaterial.clone();
-        part.material.transparent = true;
-        part.material.opacity = 0.3;
+      // Hide all other parts with animation
+      parts.forEach((part, index) => {
+        if (part !== clickedPart) {
+          // Fade out and scale down
+          gsap.to(part.material, {
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.out'
+          });
+          gsap.to(part.scale, {
+            x: 0.01,
+            y: 0.01,
+            z: 0.01,
+            duration: 0.6,
+            delay: index * 0.02,
+            ease: 'back.in(1.7)'
+          });
+          part.material.transparent = true;
+        }
       });
 
-      // Highlight selected part
+      // Highlight selected part with glow
       clickedPart.material = clickedPart.userData.originalMaterial.clone();
       clickedPart.material.emissive = new THREE.Color(0x00ffff);
-      clickedPart.material.emissiveIntensity = 0.8;
+      clickedPart.material.emissiveIntensity = 1.2;
       clickedPart.material.transparent = false;
       clickedPart.material.opacity = 1;
+      
+      // Pulse animation for selected part
+      gsap.to(clickedPart.material, {
+        emissiveIntensity: 0.6,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
 
       setSelectedPart(clickedPart);
+      
+      // Auto-focus on selected part
+      handleFocusSelected(clickedPart);
       
       // Generate AI explanation
       await generatePartExplanation(clickedPart.userData.partName);
     }
   };
 
-  // Select part from list with AI explanation
+  // Select part from list with AI explanation and hide other parts
   const handleSelectPart = async (part) => {
-    // Reset all parts
-    parts.forEach(p => {
-      p.material = p.userData.originalMaterial.clone();
-      p.material.transparent = true;
-      p.material.opacity = 0.3;
+    // Hide all other parts with animation
+    parts.forEach((p, index) => {
+      if (p !== part) {
+        // Fade out and scale down
+        gsap.to(p.material, {
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.out'
+        });
+        gsap.to(p.scale, {
+          x: 0.01,
+          y: 0.01,
+          z: 0.01,
+          duration: 0.6,
+          delay: index * 0.02,
+          ease: 'back.in(1.7)'
+        });
+        p.material.transparent = true;
+      }
     });
 
-    // Highlight selected part
+    // Highlight selected part with glow
     part.material = part.userData.originalMaterial.clone();
     part.material.emissive = new THREE.Color(0x00ffff);
-    part.material.emissiveIntensity = 0.8;
+    part.material.emissiveIntensity = 1.2;
     part.material.transparent = false;
     part.material.opacity = 1;
+    
+    // Pulse animation for selected part
+    gsap.to(part.material, {
+      emissiveIntensity: 0.6,
+      duration: 1,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    });
 
     setSelectedPart(part);
 
