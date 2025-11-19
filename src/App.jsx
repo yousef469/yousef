@@ -1101,6 +1101,8 @@ const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
 // Virtual Classroom (Modern State Sync - replaces old Collaborate)
 const ClassroomSetup = lazy(() => import('./pages/ClassroomSetup'));
 const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
+// Explode View Mode
+const ExplodeViewPage = lazy(() => import('./pages/ExplodeViewPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CommunityProjectsPage = lazy(() => import('./pages/CommunityProjectsPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
@@ -1173,6 +1175,8 @@ export default function App() {
           {/* Virtual Classroom Routes */}
           <Route path="/classroom" element={<ProtectedRoute><ClassroomSetup /></ProtectedRoute>} />
           <Route path="/classroom/:roomId" element={<ProtectedRoute><VirtualClassroom /></ProtectedRoute>} />
+          {/* Explode View Mode */}
+          <Route path="/explode-view" element={<ProtectedRoute><ExplodeViewPage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/community-projects" element={<ProtectedRoute><CommunityProjectsPage /></ProtectedRoute>} />
           <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />

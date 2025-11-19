@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, LogIn, UserPlus, Globe, User, ChevronDown, Upload, Briefcase, Share2, Calculator } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, LogIn, UserPlus, Globe, User, ChevronDown, Upload, Briefcase, Share2, Calculator, Maximize2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
@@ -238,6 +238,32 @@ const HomePageLoggedIn = () => {
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
                 <span>Explore Projects</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* Explode View Mode */}
+          <button
+            onClick={() => navigate('/explode-view')}
+            className="group relative bg-gradient-to-br from-orange-500 via-amber-600 to-yellow-500 hover:from-orange-600 hover:via-amber-700 hover:to-yellow-600 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                  <Maximize2 className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🔧 Explode View Mode</h3>
+              <p className="text-white/90 text-center mb-4">
+                Explore 3D models with interactive exploded views. Click parts to highlight and focus.
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Try Explode View</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
