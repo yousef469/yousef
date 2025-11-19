@@ -266,6 +266,14 @@ export default function AllInOnePage() {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline text-sm">Exit</span>
+            </button>
+
+            <button
               onClick={() => setShowLessons(!showLessons)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
