@@ -171,8 +171,12 @@ class ClassroomService {
     }
 
     const fileExt = file.name.split('.').pop();
-    const fileName = `${this.roomId}-${Date.now()}.${fileExt}`;
+    // Sanitize filename to avoid issues with special characters
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const fileName = `${this.roomId}-${Date.now()}-${sanitizedName}`;
     const filePath = `classroom-models/${fileName}`;
+
+    console.log('Uploading model to Supabase:', filePath);
 
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
@@ -183,13 +187,21 @@ class ClassroomService {
       });
 
     if (error) {
-      throw error;
+      console.error('Supabase upload error:', error);
+      throw new Error(`Upload failed: ${error.message}`);
     }
 
     // Get public URL
     const { data: urlData } = supabase.storage
       .from('models')
       .getPublicUrl(filePath);
+
+    if (!urlData || !urlData.publicUrl) {
+      console.error('Failed to get public URL');
+      throw new Error('Failed to generate public URL for model');
+    }
+
+    console.log('Model uploaded successfully:', urlData.publicUrl);
 
     return {
       url: urlData.publicUrl,

@@ -21,7 +21,7 @@ const ModelUpload = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFiles(e.dataTransfer.files);
     }
@@ -59,9 +59,9 @@ const ModelUpload = () => {
           uploadDate: new Date().toLocaleDateString(),
           thumbnail: URL.createObjectURL(file)
         };
-        
+
         setUploadedFiles(prev => [...prev, newFile]);
-        
+
         if (index === validFiles.length - 1) {
           setUploading(false);
         }
@@ -87,11 +87,10 @@ const ModelUpload = () => {
 
         {/* Upload Area */}
         <div
-          className={`border-2 border-dashed rounded-2xl p-12 mb-8 transition-all ${
-            dragActive 
-              ? 'border-cyan-500 bg-cyan-500/10' 
+          className={`border-2 border-dashed rounded-2xl p-12 mb-8 transition-all ${dragActive
+              ? 'border-cyan-500 bg-cyan-500/10'
               : 'border-gray-600 bg-gray-800/50'
-          }`}
+            }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
@@ -105,7 +104,7 @@ const ModelUpload = () => {
             onChange={handleChange}
             className="hidden"
           />
-          
+
           <div className="text-center">
             {uploading ? (
               <>
@@ -153,10 +152,10 @@ const ModelUpload = () => {
         {uploadedFiles.length > 0 && (
           <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
             <h3 className="text-xl font-bold mb-4">Your Uploads ({uploadedFiles.length})</h3>
-            
+
             <div className="space-y-3">
               {uploadedFiles.map((file) => (
-                <div 
+                <div
                   key={file.id}
                   className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-all"
                 >
@@ -167,7 +166,7 @@ const ModelUpload = () => {
                       <File className="w-8 h-8 text-gray-400" />
                     )}
                   </div>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-semibold">{file.name}</h4>
@@ -195,7 +194,7 @@ const ModelUpload = () => {
                     <button className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg text-sm font-semibold transition-colors">
                       View
                     </button>
-                    <button 
+                    <button
                       onClick={() => removeFile(file.id)}
                       className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-sm font-semibold transition-colors"
                     >

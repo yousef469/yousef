@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Upload, Users, Crown, PhoneOff, Copy, Check, Box, Loader2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,20 +8,20 @@ import classroomService from '../services/classroom';
 import { isDailyConfigured } from '../services/daily';
 import ThreeJSViewerSynced from '../components/ThreeJSViewerSynced';
 import DailyVideoChat from '../components/DailyVideoChat';
+import ModelUploadModal from '../components/ModelUploadModal';
 
 export default function VirtualClassroom() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const controlsRef = useRef();
-  const fileInputRef = useRef();
 
   // Session state
   const [isTeacher, setIsTeacher] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [currentModel, setCurrentModel] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
   const [followTeacher, setFollowTeacher] = useState(true);
@@ -39,7 +39,7 @@ export default function VirtualClassroom() {
       await classroomService.joinRoom(roomId, isTeacherRole, {
         userId: user.id,
         userName: user.email?.split('@')[0] || 'Student',
-        
+
         onConnected: () => {
           setIsConnected(true);
           console.log('Connected to classroom');
@@ -49,7 +49,7 @@ export default function VirtualClassroom() {
           if (followTeacher && controlsRef.current) {
             // Update camera to match teacher's view
             const { position, target, zoom } = cameraData;
-            
+
             if (controlsRef.current.object) {
               controlsRef.current.object.position.set(
                 position.x,
@@ -113,20 +113,17 @@ export default function VirtualClassroom() {
   };
 
   // Handle model upload (teacher only)
-  const handleModelUpload = async (event) => {
-    const file = event.target.files[0];
+  const handleModelUpload = async (file) => {
     if (!file) return;
 
-    setIsUploading(true);
     try {
       const modelData = await classroomService.uploadModel(file);
       await classroomService.broadcastModelChange(modelData.url, modelData.name);
       setCurrentModel(modelData);
+      setShowUploadModal(false);
     } catch (error) {
       console.error('Failed to upload model:', error);
-      alert('Failed to upload model. Please try again.');
-    } finally {
-      setIsUploading(false);
+      throw error; // Re-throw so ModelUploadModal can show error
     }
   };
 
@@ -216,7 +213,11 @@ export default function VirtualClassroom() {
         <div className="flex-1 relative">
           {currentModel ? (
             <ThreeJSViewerSynced
-              modelUrl={currentModel.url}
+              modelInfo={{
+                path: currentModel.url,
+                name: currentModel.name,
+                type: 'custom'
+              }}
               controlsRef={controlsRef}
               onCameraChange={handleCameraChange}
               enableControls={isTeacher || !followTeacher}
@@ -228,7 +229,7 @@ export default function VirtualClassroom() {
                 <p className="text-xl text-white mb-2">No model loaded</p>
                 {isTeacher ? (
                   <button
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => setShowUploadModal(true)}
                     className="glow-primary bg-primary hover:bg-primary-light text-black font-semibold px-6 py-3 rounded-lg transition-all"
                   >
                     <Upload className="w-5 h-5 inline mr-2" />
@@ -258,21 +259,11 @@ export default function VirtualClassroom() {
             <div className="absolute bottom-6 left-6 glass rounded-lg p-4">
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50"
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors"
                 >
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Uploading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-5 h-5" />
-                      <span>Change Model</span>
-                    </>
-                  )}
+                  <Upload className="w-5 h-5" />
+                  <span>Change Model</span>
                 </button>
               </div>
             </div>
@@ -299,7 +290,7 @@ export default function VirtualClassroom() {
           {/* Video Chat Section */}
           {videoEnabled && (
             <div className="h-64 border-b border-primary/20">
-              <DailyVideoChat 
+              <DailyVideoChat
                 roomId={roomId}
                 userName={user.email?.split('@')[0] || 'Student'}
               />
@@ -335,14 +326,13 @@ export default function VirtualClassroom() {
         </div>
       </div>
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".glb,.gltf"
-        onChange={handleModelUpload}
-        className="hidden"
-      />
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <ModelUploadModal
+          onUpload={handleModelUpload}
+          onClose={() => setShowUploadModal(false)}
+        />
+      )}
     </div>
   );
 }
