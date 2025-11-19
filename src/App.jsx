@@ -1090,7 +1090,6 @@ import BookmarksNotes from './components/BookmarksNotes';
 import CollaborationMode from './components/CollaborationMode';
 import ModelUpload from './components/ModelUpload';
 import GamificationSystem from './components/GamificationSystem';
-const AI3DGeneratorPage = lazy(() => import('./pages/AI3DGeneratorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProgressionPage = lazy(() => import('./pages/ProgressionPage'));
@@ -1215,7 +1214,6 @@ export default function App() {
           <Route path="/progression" element={<ProtectedRoute><ProgressionPage /></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/community" element={<ProtectedRoute><CommunityQA /></ProtectedRoute>} />
-          <Route path="/ai-generator" element={<AI3DGeneratorPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
