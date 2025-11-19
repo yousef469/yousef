@@ -191,59 +191,57 @@ const HomePageLoggedIn = () => {
           </div>
 
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Career Projects */}
-            <button
-              onClick={() => navigate('/projects')}
-              className="group relative bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-500 hover:from-emerald-600 hover:via-teal-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-emerald-400/50 hover:border-emerald-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-emerald-500/30"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-              
-              <div className="relative z-10">
-                <div className="flex justify-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                    <Briefcase className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">💼 Career Projects</h3>
-                <p className="text-white/90 text-center mb-4">
-                  Build real-world engineering projects for your portfolio
-                </p>
-
-                <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <span>Start Building</span>
-                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+          {/* Career Projects */}
+          <button
+            onClick={() => navigate('/projects')}
+            className="group relative bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-500 hover:from-emerald-600 hover:via-teal-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-emerald-400/50 hover:border-emerald-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-emerald-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                  <Briefcase className="w-8 h-8 text-white" />
                 </div>
               </div>
-            </button>
-
-            {/* Community Projects */}
-            <button
-              onClick={() => navigate('/community-projects')}
-              className="group relative bg-gradient-to-br from-pink-500 via-rose-600 to-red-500 hover:from-pink-600 hover:via-rose-700 hover:to-red-600 rounded-2xl p-8 border-2 border-pink-400/50 hover:border-pink-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-pink-500/30"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
               
-              <div className="relative z-10">
-                <div className="flex justify-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                    <UsersIcon className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">🌍 Community Projects</h3>
-                <p className="text-white/90 text-center mb-4">
-                  Explore and contribute to community engineering projects
-                </p>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">💼 Career Projects</h3>
+              <p className="text-white/90 text-center mb-4">
+                Build real-world engineering projects for your portfolio
+              </p>
 
-                <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <span>Explore Projects</span>
-                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Start Building</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* Community Projects */}
+          <button
+            onClick={() => navigate('/community-projects')}
+            className="group relative bg-gradient-to-br from-pink-500 via-rose-600 to-red-500 hover:from-pink-600 hover:via-rose-700 hover:to-red-600 rounded-2xl p-8 border-2 border-pink-400/50 hover:border-pink-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-pink-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                  <UsersIcon className="w-8 h-8 text-white" />
                 </div>
               </div>
-            </button>
-          </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🌍 Community Projects</h3>
+              <p className="text-white/90 text-center mb-4">
+                Explore and contribute to community engineering projects
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Explore Projects</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
         </div>
       </div>
       </div>
