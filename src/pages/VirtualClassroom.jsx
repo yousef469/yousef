@@ -1,32 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Mic, MicOff, Video, VideoOff, Upload, Users, 
-  Crown, PhoneOff, Copy, Check, Box, Pointer, X,
-  Download, Loader2
+  Upload, Users, Crown, PhoneOff, Copy, Check, Box, Loader2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import classroomService from '../services/classroom';
-import { createRoomUrl, isDailyConfigured, getDailyConfig } from '../services/daily';
+import { isDailyConfigured } from '../services/daily';
 import ThreeJSViewerSynced from '../components/ThreeJSViewerSynced';
-
-// Lazy load Daily.co components (only if configured)
-let DailyProvider, useDaily, DailyVideo, DailyAudio;
-let dailyAvailable = false;
-
-if (isDailyConfigured()) {
-  try {
-    import('@daily-co/daily-react').then(daily => {
-      DailyProvider = daily.DailyProvider;
-      useDaily = daily.useDaily;
-      DailyVideo = daily.DailyVideo;
-      DailyAudio = daily.DailyAudio;
-      dailyAvailable = true;
-    });
-  } catch (error) {
-    console.warn('Daily.co not installed. Video/audio disabled.');
-  }
-}
+import DailyVideoChat from '../components/DailyVideoChat';
 
 export default function VirtualClassroom() {
   const { roomId } = useParams();
@@ -45,11 +26,6 @@ export default function VirtualClassroom() {
   const [showParticipants, setShowParticipants] = useState(false);
   const [followTeacher, setFollowTeacher] = useState(true);
   const [pointerPosition, setPointerPosition] = useState(null);
-
-  // Media controls
-  const [isMicOn, setIsMicOn] = useState(false);
-  const [isCameraOn, setIsCameraOn] = useState(false);
-  const [dailyRoomUrl, setDailyRoomUrl] = useState(null);
   const [videoEnabled] = useState(isDailyConfigured());
 
   // Initialize classroom
@@ -121,14 +97,6 @@ export default function VirtualClassroom() {
       classroomService.leaveRoom();
     };
   }, [roomId, user, followTeacher]);
-
-  // Initialize Daily.co (if configured)
-  useEffect(() => {
-    if (videoEnabled && isConnected) {
-      const roomUrl = createRoomUrl(roomId);
-      setDailyRoomUrl(roomUrl);
-    }
-  }, [isConnected, roomId, videoEnabled]);
 
   // Handle camera movement (teacher only)
   const handleCameraChange = () => {
@@ -326,8 +294,18 @@ export default function VirtualClassroom() {
           )}
         </div>
 
-        {/* Sidebar - Participants & Video (Future: LiveKit) */}
-        <div className="w-80 glass border-l border-primary/20 flex flex-col">
+        {/* Sidebar - Video & Participants */}
+        <div className="w-96 glass border-l border-primary/20 flex flex-col">
+          {/* Video Chat Section */}
+          {videoEnabled && (
+            <div className="h-64 border-b border-primary/20">
+              <DailyVideoChat 
+                roomId={roomId}
+                userName={user.email?.split('@')[0] || 'Student'}
+              />
+            </div>
+          )}
+
           {/* Participants List */}
           <div className="flex-1 overflow-y-auto p-4">
             <h3 className="text-lg font-semibold text-white mb-4">
@@ -353,63 +331,6 @@ export default function VirtualClassroom() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Video/Audio Section */}
-          <div className="border-t border-primary/20 p-4">
-            {videoEnabled && dailyRoomUrl ? (
-              <div className="h-full">
-                <iframe
-                  src={dailyRoomUrl}
-                  allow="camera; microphone; fullscreen; display-capture"
-                  className="w-full h-96 rounded-lg border border-primary/20"
-                  title="Video Conference"
-                />
-                <p className="text-xs text-text-muted text-center mt-2">
-                  Powered by Daily.co
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-center gap-4 mb-3">
-                  <button
-                    onClick={() => setIsMicOn(!isMicOn)}
-                    disabled={!videoEnabled}
-                    className={`p-4 rounded-full transition-colors ${
-                      isMicOn 
-                        ? 'bg-primary/20 text-primary' 
-                        : 'bg-danger/20 text-danger'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
-                  </button>
-                  <button
-                    onClick={() => setIsCameraOn(!isCameraOn)}
-                    disabled={!videoEnabled}
-                    className={`p-4 rounded-full transition-colors ${
-                      isCameraOn 
-                        ? 'bg-primary/20 text-primary' 
-                        : 'bg-danger/20 text-danger'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    {isCameraOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
-                  </button>
-                </div>
-                <p className="text-xs text-text-muted text-center">
-                  {videoEnabled 
-                    ? 'Connecting to video...' 
-                    : 'Video/Audio: Add Daily.co domain to enable'}
-                </p>
-                <a
-                  href="https://www.daily.co/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center text-xs text-primary hover:text-primary-light mt-2"
-                >
-                  Get free Daily.co account →
-                </a>
-              </>
-            )}
           </div>
         </div>
       </div>
