@@ -59,19 +59,8 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
     // Scene setup
     const scene = new THREE.Scene();
     
-    // Enhanced background with gradient
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d');
-    const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 512);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(0.5, '#0f0f1e');
-    gradient.addColorStop(1, '#050510');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 512, 512);
-    scene.background = new THREE.CanvasTexture(canvas);
-    scene.fog = new THREE.Fog(0x0a0a0f, 20, 50);
+    // Transparent background
+    scene.background = null;
     
     sceneRef.current = scene;
 
@@ -730,9 +719,8 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         meshRef.current.rotation.x = rotationRef.current.x;
         meshRef.current.rotation.y = rotationRef.current.y;
         
-        if (!mouseRef.current.isDragging) {
-          rotationRef.current.y += 0.005;
-        }
+        // Always rotate (even when dragging)
+        rotationRef.current.y += 0.005;
       }
 
       renderer.render(scene, camera);
