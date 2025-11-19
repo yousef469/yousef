@@ -1087,7 +1087,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage'));
 const ComparePage = lazy(() => import('./pages/ComparePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 import BookmarksNotes from './components/BookmarksNotes';
-import CollaborationMode from './components/CollaborationMode';
+// Removed old CollaborationMode - replaced with Virtual Classroom
 import ModelUpload from './components/ModelUpload';
 import GamificationSystem from './components/GamificationSystem';
 const PricingPage = lazy(() => import('./pages/PricingPage'));
@@ -1098,10 +1098,7 @@ const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
 const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
-const CollaboratePage = lazy(() => import('./pages/CollaboratePage'));
-const MeetingSetupPage = lazy(() => import('./pages/MeetingSetupPage'));
-const CollaborateSessionPage = lazy(() => import('./pages/CollaborateSessionPage'));
-// New Virtual Classroom (Modern State Sync)
+// Virtual Classroom (Modern State Sync - replaces old Collaborate)
 const ClassroomSetup = lazy(() => import('./pages/ClassroomSetup'));
 const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
@@ -1173,10 +1170,7 @@ export default function App() {
           <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
           <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
-          <Route path="/collaborate" element={<ProtectedRoute><CollaboratePage /></ProtectedRoute>} />
-          <Route path="/collaborate/setup" element={<ProtectedRoute><MeetingSetupPage /></ProtectedRoute>} />
-          <Route path="/collaborate/session/:sessionId" element={<ProtectedRoute><CollaborateSessionPage /></ProtectedRoute>} />
-          {/* New Virtual Classroom Routes */}
+          {/* Virtual Classroom Routes */}
           <Route path="/classroom" element={<ProtectedRoute><ClassroomSetup /></ProtectedRoute>} />
           <Route path="/classroom/:roomId" element={<ProtectedRoute><VirtualClassroom /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
@@ -1213,9 +1207,6 @@ export default function App() {
           {/* New Features */}
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/bookmarks" element={<ProtectedRoute><BookmarksNotes /></ProtectedRoute>} />
-          {/* Removed duplicate /collaborate route to avoid conflicts */}
-          {/* Use existing components for leaderboard and community */}
-          <Route path="/collaborate/:sessionId" element={<ProtectedRoute><CollaborationMode /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
           <Route path="/progression" element={<ProtectedRoute><ProgressionPage /></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
