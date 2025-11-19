@@ -228,7 +228,7 @@ const HomePageLoggedIn = () => {
               <div className="relative z-10">
                 <div className="flex justify-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                    <Users className="w-8 h-8 text-white" />
+                    <UsersIcon className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 
