@@ -1106,6 +1106,8 @@ const AI3DGeneratorPage = lazy(() => import('./pages/AI3DGeneratorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProgressionPage = lazy(() => import('./pages/ProgressionPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
 const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
@@ -1228,6 +1230,8 @@ export default function App() {
           <Route path="/ai-generator" element={<AI3DGeneratorPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
           </Routes>
         </React.Suspense>
       </Router>

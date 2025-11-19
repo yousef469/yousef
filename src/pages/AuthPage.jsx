@@ -13,6 +13,7 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   const { signIn, signUp, signInWithGoogle, signInWithApple } = useAuth();
   const navigate = useNavigate();
@@ -29,6 +30,11 @@ export default function AuthPage() {
       } else {
         if (!fullName.trim()) {
           setError(t('auth.errors.nameRequired'));
+          setLoading(false);
+          return;
+        }
+        if (!agreedToTerms) {
+          setError('You must agree to the Terms of Service and Privacy Policy');
           setLoading(false);
           return;
         }
@@ -165,6 +171,28 @@ export default function AuthPage() {
                 />
               </div>
             </div>
+
+            {!isLogin && (
+              <div className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-gray-800"
+                />
+                <label htmlFor="terms" className="text-sm text-gray-300">
+                  I agree to the{' '}
+                  <a href="/terms" target="_blank" className="text-cyan-400 hover:text-cyan-300 underline">
+                    Terms of Service
+                  </a>
+                  {' '}and{' '}
+                  <a href="/privacy" target="_blank" className="text-cyan-400 hover:text-cyan-300 underline">
+                    Privacy Policy
+                  </a>
+                </label>
+              </div>
+            )}
 
             {error && (
               <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
