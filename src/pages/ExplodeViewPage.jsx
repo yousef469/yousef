@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, ArrowLeft, Loader2, Sparkles, DollarSign, Package } from 'lucide-react';
+import { Upload, ArrowLeft, Loader2, Sparkles, Crosshair, RotateCcw, Scan, Cpu } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
@@ -8,6 +8,31 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import { generateResponse } from '../services/gemini';
+
+// --- HUD Component for Iron Man Feel ---
+const HUDOverlay = ({ selectedPartName }) => (
+  <div className="absolute inset-0 pointer-events-none z-10">
+    {/* Corners */}
+    <div className="absolute top-4 left-4 w-16 h-16 border-l-2 border-t-2 border-cyan-400 rounded-tl-lg opacity-60" />
+    <div className="absolute top-4 right-4 w-16 h-16 border-r-2 border-t-2 border-cyan-400 rounded-tr-lg opacity-60" />
+    <div className="absolute bottom-4 left-4 w-16 h-16 border-l-2 border-b-2 border-cyan-400 rounded-bl-lg opacity-60" />
+    <div className="absolute bottom-4 right-4 w-16 h-16 border-r-2 border-b-2 border-cyan-400 rounded-br-lg opacity-60" />
+    
+    {/* Center Crosshair */}
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-20">
+      <div className="w-[300px] h-[300px] border border-cyan-500/30 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
+        <div className="w-[280px] h-[280px] border-t border-b border-cyan-500/50 rounded-full" />
+      </div>
+    </div>
+    
+    {/* Selected Part Label Floating */}
+    {selectedPartName && (
+      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-black/60 border border-cyan-500/50 px-6 py-2 rounded text-cyan-400 font-mono text-sm tracking-widest backdrop-blur-sm animate-pulse">
+        TARGET LOCKED: {selectedPartName.toUpperCase()}
+      </div>
+    )}
+  </div>
+);
 
 export default function ExplodeViewPage() {
   const navigate = useNavigate();
@@ -19,6 +44,7 @@ export default function ExplodeViewPage() {
   const raycasterRef = useRef(new THREE.Raycaster());
   const mouseRef = useRef(new THREE.Vector2());
   const fileInputRef = useRef(null);
+  const animationFrameRef = useRef(null);
 
   // State
   const [parts, setParts] = useState([]);
@@ -27,6 +53,7 @@ export default function ExplodeViewPage() {
   const [explodeOffsets, setExplodeOffsets] = useState(new Map());
   const [isExploded, setIsExploded] = useState(false);
   const [selectedPart, setSelectedPart] = useState(null);
+  const [hoveredPart, setHoveredPart] = useState(null);
   const [partExplanations, setPartExplanations] = useState(new Map());
   const [loadingExplanation, setLoadingExplanation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,26 +63,31 @@ export default function ExplodeViewPage() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Scene
+    // Scene Setup - Darker, Foggy "Tech" atmosphere
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0e27);
+    scene.background = new THREE.Color(0x050510); // Deep space blue/black
+    scene.fog = new THREE.FogExp2(0x050510, 0.02);
     sceneRef.current = scene;
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
-      50,
+      45, // Narrower FOV for more cinematic look
       containerRef.current.clientWidth / containerRef.current.clientHeight,
       0.1,
       1000
     );
-    camera.position.set(5, 3, 8);
+    camera.position.set(8, 5, 10);
     cameraRef.current = camera;
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // High contrast tone mapping
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -63,34 +95,53 @@ export default function ExplodeViewPage() {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
+    controls.minDistance = 2;
+    controls.maxDistance = 50;
     controlsRef.current = controls;
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Advanced Lighting (Iron Man Workshop Style)
+    const ambientLight = new THREE.AmbientLight(0x404040, 2); // Blueish ambient
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
+    // Key Light (Warm/White)
+    const spotLight = new THREE.SpotLight(0xffffff, 20);
+    spotLight.position.set(10, 20, 10);
+    spotLight.angle = Math.PI / 4;
+    spotLight.penumbra = 0.5;
+    spotLight.castShadow = true;
+    scene.add(spotLight);
 
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight2.position.set(-5, 5, -5);
-    scene.add(directionalLight2);
+    // Rim Light (Cyan) - Gives the holographic edge
+    const rimLight = new THREE.PointLight(0x00ffff, 5, 20);
+    rimLight.position.set(-5, 2, -5);
+    scene.add(rimLight);
 
-    // Grid helper
-    const gridHelper = new THREE.GridHelper(20, 20, 0x00d9ff, 0x1a1f3a);
+    // Bottom fill (Purple/Blue)
+    const fillLight = new THREE.PointLight(0x8800ff, 3, 20);
+    fillLight.position.set(0, -5, 0);
+    scene.add(fillLight);
+
+    // Holographic Grid Floor
+    const gridHelper = new THREE.GridHelper(30, 30, 0x00ffff, 0x111122);
+    gridHelper.position.y = -2;
+    gridHelper.material.opacity = 0.2;
+    gridHelper.material.transparent = true;
     scene.add(gridHelper);
 
     // Animation loop
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationFrameRef.current = requestAnimationFrame(animate);
       controls.update();
+      
+      // Rotate selected part slightly for inspection effect
+      if (selectedPart && selectedPart.userData.isInspecting) {
+        selectedPart.rotation.y += 0.005;
+      }
+
       renderer.render(scene, camera);
     };
     animate();
 
-    // Handle resize
     const handleResize = () => {
       if (!containerRef.current) return;
       camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
@@ -99,661 +150,461 @@ export default function ExplodeViewPage() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameRef.current);
       renderer.dispose();
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [selectedPart]);
 
-  // AI-powered part detection and explanation
-  const generatePartExplanation = async (partName) => {
-    if (partExplanations.has(partName)) {
-      return partExplanations.get(partName);
+  // --- Logic for Hover & Clicking ---
+
+  const handleMouseMove = (event) => {
+    if (!containerRef.current || !modelLoaded || parts.length === 0) return;
+
+    // Calculate mouse position
+    const rect = containerRef.current.getBoundingClientRect();
+    mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    // Raycasting
+    raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
+    
+    // Only intersect with PART meshes, not helpers/lines
+    const intersects = raycasterRef.current.intersectObjects(parts, false);
+
+    if (intersects.length > 0) {
+      const object = intersects[0].object;
+      if (object !== hoveredPart && object !== selectedPart) {
+        // Reset previous hover
+        if (hoveredPart && hoveredPart !== selectedPart) {
+          hoveredPart.material.emissive.setHex(0x000000);
+        }
+        
+        // Set new hover (Cyan Glow)
+        object.material.emissive = new THREE.Color(0x00ffff);
+        object.material.emissiveIntensity = 0.5;
+        setHoveredPart(object);
+        containerRef.current.style.cursor = 'crosshair';
+      }
+    } else {
+      if (hoveredPart) {
+        if (hoveredPart !== selectedPart) {
+          hoveredPart.material.emissive.setHex(0x000000);
+        }
+        setHoveredPart(null);
+        containerRef.current.style.cursor = 'default';
+      }
     }
+  };
+
+  const generatePartExplanation = async (partName) => {
+    if (partExplanations.has(partName)) return partExplanations.get(partName);
 
     setLoadingExplanation(true);
     try {
-      const prompt = `You are an engineering expert. Analyze this mechanical part: "${partName}"
-
-Provide a JSON response with:
-{
-  "purpose": "What this part does (1-2 sentences)",
-  "material": "Typical material used (e.g., Aluminum, Steel, Titanium)",
-  "cost": "Estimated cost range (e.g., $50-$200)",
-  "tip": "One critical engineering insight or design consideration"
-}
-
-Be specific and technical. If the part name is generic, make reasonable engineering assumptions.`;
-
+      const prompt = `Analyze mechanical part: "${partName}". Return JSON: {"purpose": "string", "material": "string", "cost": "string", "tip": "string"}`;
       const response = await generateResponse(prompt);
-      
-      // Parse AI response
-      let explanation;
-      try {
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          explanation = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('No JSON found');
-        }
-      } catch {
-        explanation = {
-          purpose: response.substring(0, 200) || "Component of the mechanical assembly",
-          material: "Varies by application",
-          cost: "Contact manufacturer",
-          tip: "Proper maintenance extends lifespan"
-        };
-      }
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      const explanation = jsonMatch ? JSON.parse(jsonMatch[0]) : {
+        purpose: "Analysis unavailable", material: "Unknown", cost: "N/A", tip: "Check manual"
+      };
 
       setPartExplanations(prev => new Map(prev).set(partName, explanation));
       setLoadingExplanation(false);
       return explanation;
     } catch (error) {
-      console.error('AI explanation error:', error);
       setLoadingExplanation(false);
-      return {
-        purpose: "Mechanical component",
-        material: "Various materials",
-        cost: "Varies",
-        tip: "Consult engineering specifications"
-      };
+      return { purpose: "Error analyzing", material: "N/A", cost: "N/A", tip: "N/A" };
     }
   };
 
-  // Handle model upload
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setIsLoading(true);
     const url = URL.createObjectURL(file);
-    
-    // Determine loader based on file extension
     const extension = file.name.split('.').pop().toLowerCase();
-    let loader;
     
-    if (extension === 'fbx') {
-      loader = new FBXLoader();
-    } else {
-      loader = new GLTFLoader();
-      
-      // Setup Draco compression for optimized loading
+    let loader = extension === 'fbx' ? new FBXLoader() : new GLTFLoader();
+    if (extension !== 'fbx') {
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
       loader.setDRACOLoader(dracoLoader);
     }
 
-    loader.load(
-      url,
-      (gltf) => {
-        const model = extension === 'fbx' ? gltf : gltf.scene;
-        
-        if (!model) {
-          alert('Invalid model file. Please try another file.');
-          setIsLoading(false);
-          URL.revokeObjectURL(url);
-          return;
-        }
-
-        // Clear previous model
-        if (sceneRef.current) {
-          const oldParts = sceneRef.current.children.filter(
-            child => child.userData.isPart
-          );
-          oldParts.forEach(part => sceneRef.current.remove(part));
-        }
-
-        // Add model to scene
-        sceneRef.current.add(model);
-
-        // Extract all meshes as separate parts
-        const newParts = [];
-        const positions = new Map();
-        const offsets = new Map();
-
-        try {
-          // Calculate model center for explode direction
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-          
-          // Traverse the model to find all meshes
-          const partsInfo = [];
-          let partIndex = 0;
-
-          model.traverse((child) => {
-            if (child.isMesh) {
-              child.userData.isPart = true;
-              
-              // Smart part name detection
-              let partName = child.name || `Part ${partIndex + 1}`;
-              
-              // Auto-detect common part names
-              const nameLower = partName.toLowerCase();
-              if (nameLower.includes('piston')) partName = 'Piston';
-              else if (nameLower.includes('cylinder')) partName = 'Cylinder';
-              else if (nameLower.includes('nozzle')) partName = 'Nozzle';
-              else if (nameLower.includes('exhaust')) partName = 'Exhaust';
-              else if (nameLower.includes('turbine')) partName = 'Turbine';
-              else if (nameLower.includes('valve')) partName = 'Valve';
-              else if (nameLower.includes('shaft')) partName = 'Shaft';
-              else if (nameLower.includes('gear')) partName = 'Gear';
-              else if (nameLower.includes('bearing')) partName = 'Bearing';
-              else if (nameLower.includes('housing')) partName = 'Housing';
-              
-              child.userData.partName = partName;
-              
-              // Clone material safely
-              if (child.material) {
-                child.userData.originalMaterial = child.material.clone();
-              } else {
-                child.userData.originalMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
-              }
-              
-              // Save original position
-              positions.set(child, {
-                x: child.position.x,
-                y: child.position.y,
-                z: child.position.z
-              });
-
-              // Calculate explode direction and offset
-              const partWorldPos = new THREE.Vector3();
-              child.getWorldPosition(partWorldPos);
-              const direction = new THREE.Vector3()
-                .subVectors(partWorldPos, center)
-                .normalize();
-              
-              // Vary distance for dramatic effect
-              const baseDistance = 5;
-              const randomOffset = (Math.random() - 0.5) * 2;
-              const distance = baseDistance + randomOffset;
-              
-              offsets.set(child, {
-                x: direction.x * distance,
-                y: direction.y * distance,
-                z: direction.z * distance
-              });
-
-              newParts.push(child);
-              partsInfo.push({
-                id: partIndex,
-                name: partName,
-                mesh: child
-              });
-              
-              partIndex++;
-            }
-          });
-
-          if (newParts.length === 0) {
-            alert('No parts found in model. Make sure your model has separate meshes.');
-            sceneRef.current.remove(model);
-            setIsLoading(false);
-            URL.revokeObjectURL(url);
-            return;
-          }
-
-          setParts(newParts);
-          setPartsList(partsInfo);
-          setOriginalPositions(positions);
-          setExplodeOffsets(offsets);
-          setModelLoaded(true);
-          setIsLoading(false);
-
-          // Center camera on model
-          const modelBox = new THREE.Box3().setFromObject(model);
-          const modelCenter = modelBox.getCenter(new THREE.Vector3());
-          const size = modelBox.getSize(new THREE.Vector3());
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const fov = cameraRef.current.fov * (Math.PI / 180);
-          let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-          cameraZ *= 2;
-
-          cameraRef.current.position.set(modelCenter.x + cameraZ, modelCenter.y + cameraZ / 2, modelCenter.z + cameraZ);
-          cameraRef.current.lookAt(modelCenter);
-          controlsRef.current.target.copy(modelCenter);
-          controlsRef.current.update();
-        } catch (error) {
-          console.error('Error processing model:', error);
-          alert('Error processing model. Please try another file.');
-          sceneRef.current.remove(model);
-          setIsLoading(false);
-        }
-
-        URL.revokeObjectURL(url);
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading model:', error);
-        alert('Failed to load model. Please try another file.');
-        setIsLoading(false);
+    loader.load(url, (gltf) => {
+      const model = extension === 'fbx' ? gltf : gltf.scene;
+      
+      // Clean scene
+      if (sceneRef.current) {
+        const partsToRemove = sceneRef.current.children.filter(c => c.userData.isPart || c.userData.isWireframe);
+        partsToRemove.forEach(p => sceneRef.current.remove(p));
       }
-    );
+
+      // Reset states
+      setParts([]);
+      setPartsList([]);
+      setSelectedPart(null);
+      setIsExploded(false);
+
+      // Process Mesh
+      const newParts = [];
+      const positions = new Map();
+      const offsets = new Map();
+      const partsData = [];
+      
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      
+      // Center the model first
+      model.position.sub(center);
+  
+      let idx = 0;
+      model.traverse((child) => {
+        if (child.isMesh) {
+          // Material Setup for Tech Look
+          child.castShadow = true;
+          child.receiveShadow = true;
+          // Save original material but upgrade to Physical for better metal look
+          const oldMat = child.material;
+          const newMat = new THREE.MeshPhysicalMaterial({
+            color: oldMat.color || 0x888888,
+            metalness: 0.8,
+            roughness: 0.2,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1,
+          });
+          
+          child.material = newMat;
+          child.userData.originalMaterial = newMat.clone();
+          child.userData.isPart = true;
+          child.userData.partName = child.name || `Component-${idx + 1}`;
+          
+          // Save Position
+          positions.set(child, child.position.clone());
+          child.userData.originalRotation = child.rotation.clone();
+
+          // Calculate Explode Vector (from center of scene 0,0,0 since we centered model)
+          const worldPos = new THREE.Vector3();
+          child.getWorldPosition(worldPos);
+          const direction = worldPos.normalize(); // Direction from center
+          const distance = 2 + Math.random() * 3; // Randomize distance for organic look
+          
+          offsets.set(child, direction.multiplyScalar(distance));
+
+          sceneRef.current.add(child); // Add directly to scene for easier control
+          newParts.push(child);
+          partsData.push({ id: idx++, name: child.userData.partName, mesh: child });
+        }
+      });
+
+      setParts(newParts);
+      setPartsList(partsData);
+      setOriginalPositions(positions);
+      setExplodeOffsets(offsets);
+      setModelLoaded(true);
+      setIsLoading(false);
+      URL.revokeObjectURL(url);
+    }, undefined, (e) => {
+      console.error(e);
+      setIsLoading(false);
+      alert("Failed to load model");
+    });
   };
 
-  // Iron-Man style explode animation
   const handleExplode = () => {
     if (parts.length === 0) return;
 
+    // If a part is currently inspected (selected), reset it first
+    if (selectedPart) {
+      handleResetSelection();
+    }
+
     if (isExploded) {
-      // Collapse back with staggered timing
-      parts.forEach((part, index) => {
-        const original = originalPositions.get(part);
-        const delay = index * 0.05;
-        
+      // Implode
+      parts.forEach((part, i) => {
+        const target = originalPositions.get(part);
         gsap.to(part.position, {
-          x: original.x,
-          y: original.y,
-          z: original.z,
-          duration: 1.2,
-          delay: delay,
-          ease: 'back.in(1.2)'
+          x: target.x, y: target.y, z: target.z,
+          duration: 1, ease: "power3.inOut", delay: i * 0.005
+        });
+        gsap.to(part.rotation, {
+          x: part.userData.originalRotation.x,
+          y: part.userData.originalRotation.y,
+          z: part.userData.originalRotation.z,
+          duration: 1
         });
       });
       setIsExploded(false);
     } else {
-      // Explode outward with dramatic staggered animation
-      parts.forEach((part, index) => {
-        const offset = explodeOffsets.get(part);
-        const original = originalPositions.get(part);
-        const delay = index * 0.08;
+      // Explode
+      parts.forEach((part, i) => {
+        const pos = originalPositions.get(part);
+        const off = explodeOffsets.get(part);
         
         gsap.to(part.position, {
-          x: original.x + offset.x,
-          y: original.y + offset.y,
-          z: original.z + offset.z,
-          duration: 1.5,
-          delay: delay,
-          ease: 'back.out(1.7)'
+          x: pos.x + off.x,
+          y: pos.y + off.y,
+          z: pos.z + off.z,
+          duration: 1.5, ease: "power4.out", delay: i * 0.01
+        });
+        // Add random rotation for floating debris effect
+        gsap.to(part.rotation, {
+          x: Math.random() * 0.5,
+          y: Math.random() * 0.5,
+          duration: 2
         });
       });
       setIsExploded(true);
     }
   };
 
-  // Reset all with animation
-  const handleReset = () => {
-    parts.forEach((part, index) => {
-      const original = originalPositions.get(part);
-      const delay = index * 0.05;
-      
-      // Kill any ongoing animations
-      gsap.killTweensOf(part.position);
-      gsap.killTweensOf(part.scale);
-      gsap.killTweensOf(part.material);
-      
-      // Restore position
-      gsap.to(part.position, {
-        x: original.x,
-        y: original.y,
-        z: original.z,
-        duration: 1,
-        delay: delay,
-        ease: 'back.out(1.2)'
-      });
+  const handleResetSelection = () => {
+    if (!selectedPart) return;
 
-      // Restore scale with bounce
-      gsap.to(part.scale, {
-        x: 1,
-        y: 1,
-        z: 1,
-        duration: 1,
-        delay: delay,
-        ease: 'elastic.out(1, 0.5)'
-      });
+    // Stop inspection rotation
+    selectedPart.userData.isInspecting = false;
 
-      // Restore material
+    // Restore all parts
+    parts.forEach(part => {
+      part.visible = true;
+      
+      // Reset Material
       part.material = part.userData.originalMaterial.clone();
       part.material.transparent = false;
+      part.material.opacity = 1;
       
-      // Fade in
-      part.material.opacity = 0;
-      gsap.to(part.material, {
-        opacity: 1,
-        duration: 0.8,
-        delay: delay,
-        ease: 'power2.out'
-      });
+      // If implied, restore position slightly if we moved it
+      gsap.to(part.scale, { x: 1, y: 1, z: 1, duration: 0.5 });
     });
-    
-    setIsExploded(false);
+
+    // Reset Camera (pull back)
+    gsap.to(cameraRef.current.position, {
+      x: 8, y: 5, z: 10, duration: 1, ease: "power2.inOut"
+    });
+    gsap.to(controlsRef.current.target, {
+      x: 0, y: 0, z: 0, duration: 1
+    });
+
     setSelectedPart(null);
   };
 
-  // Handle click on part with AI explanation and hide other parts
-  const handleClick = async (event) => {
-    if (!containerRef.current || parts.length === 0) return;
+  const handlePartSelect = async (part) => {
+    if (selectedPart === part) return;
+    
+    // If selecting a new part, reset others first visually
+    if (selectedPart) handleResetSelection();
 
-    const rect = containerRef.current.getBoundingClientRect();
-    mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    setSelectedPart(part);
+    part.userData.isInspecting = true; // Flag for animation loop
 
-    raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
-    const intersects = raycasterRef.current.intersectObjects(parts);
-
-    if (intersects.length > 0) {
-      const clickedPart = intersects[0].object;
-      
-      // Hide all other parts with animation
-      parts.forEach((part, index) => {
-        if (part !== clickedPart) {
-          // Fade out and scale down
-          gsap.to(part.material, {
-            opacity: 0,
-            duration: 0.6,
-            ease: 'power2.out'
-          });
-          gsap.to(part.scale, {
-            x: 0.01,
-            y: 0.01,
-            z: 0.01,
-            duration: 0.6,
-            delay: index * 0.02,
-            ease: 'back.in(1.7)'
-          });
-          part.material.transparent = true;
-        }
-      });
-
-      // Highlight selected part with glow
-      clickedPart.material = clickedPart.userData.originalMaterial.clone();
-      clickedPart.material.emissive = new THREE.Color(0x00ffff);
-      clickedPart.material.emissiveIntensity = 1.2;
-      clickedPart.material.transparent = false;
-      clickedPart.material.opacity = 1;
-      
-      // Pulse animation for selected part
-      gsap.to(clickedPart.material, {
-        emissiveIntensity: 0.6,
-        duration: 1,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
-
-      setSelectedPart(clickedPart);
-      
-      // Auto-focus on selected part
-      handleFocusSelected(clickedPart);
-      
-      // Generate AI explanation
-      await generatePartExplanation(clickedPart.userData.partName);
-    }
-  };
-
-  // Select part from list with AI explanation and hide other parts
-  const handleSelectPart = async (part) => {
-    // Hide all other parts with animation
-    parts.forEach((p, index) => {
+    // 1. Visual Isolation: Turn others into "Schematic Wireframes"
+    parts.forEach(p => {
       if (p !== part) {
-        // Fade out and scale down
-        gsap.to(p.material, {
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power2.out'
+        p.material = new THREE.MeshBasicMaterial({
+          color: 0x0044aa, // Dark blue wireframe
+          wireframe: true,
+          transparent: true,
+          opacity: 0.05
         });
-        gsap.to(p.scale, {
-          x: 0.01,
-          y: 0.01,
-          z: 0.01,
-          duration: 0.6,
-          delay: index * 0.02,
-          ease: 'back.in(1.7)'
-        });
-        p.material.transparent = true;
+      } else {
+        // Highlight selected
+        p.material = p.userData.originalMaterial.clone();
+        p.material.emissive = new THREE.Color(0x00ffff);
+        p.material.emissiveIntensity = 0.2;
       }
     });
 
-    // Highlight selected part with glow
-    part.material = part.userData.originalMaterial.clone();
-    part.material.emissive = new THREE.Color(0x00ffff);
-    part.material.emissiveIntensity = 1.2;
-    part.material.transparent = false;
-    part.material.opacity = 1;
+    // 2. Camera Focus (The "Iron Man" Zoom)
+    const box = new THREE.Box3().setFromObject(part);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
     
-    // Pulse animation for selected part
-    gsap.to(part.material, {
-      emissiveIntensity: 0.6,
-      duration: 1,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
+    // Move controls target to the part
+    gsap.to(controlsRef.current.target, {
+      x: center.x, y: center.y, z: center.z,
+      duration: 1, ease: "expo.out"
     });
 
-    setSelectedPart(part);
+    // Move camera close
+    const dist = maxDim * 2.5;
+    const direction = new THREE.Vector3().subVectors(cameraRef.current.position, center).normalize();
+    const newCamPos = center.clone().add(direction.multiplyScalar(dist));
 
-    // Auto-focus on selected part
-    handleFocusSelected(part);
-    
-    // Generate AI explanation
+    gsap.to(cameraRef.current.position, {
+      x: newCamPos.x, y: newCamPos.y, z: newCamPos.z,
+      duration: 1.2, ease: "expo.out"
+    });
+
+    // 3. AI Info
     await generatePartExplanation(part.userData.partName);
   };
 
-  // Focus on selected part
-  const handleFocusSelected = (part = selectedPart) => {
-    if (!part || !cameraRef.current || !controlsRef.current) return;
+  const handleClick = (event) => {
+    // Reuse the calculated mouse ref from hover
+    raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
+    const intersects = raycasterRef.current.intersectObjects(parts, false); // Non-recursive, only parts
 
-    const partBox = new THREE.Box3().setFromObject(part);
-    const partCenter = partBox.getCenter(new THREE.Vector3());
-    const size = partBox.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = cameraRef.current.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-    cameraZ *= 2.5;
-
-    gsap.to(cameraRef.current.position, {
-      x: partCenter.x + cameraZ,
-      y: partCenter.y + cameraZ / 2,
-      z: partCenter.z + cameraZ,
-      duration: 1.5,
-      ease: 'power2.inOut',
-      onUpdate: () => {
-        cameraRef.current.lookAt(partCenter);
-      }
-    });
-
-    gsap.to(controlsRef.current.target, {
-      x: partCenter.x,
-      y: partCenter.y,
-      z: partCenter.z,
-      duration: 1.5,
-      ease: 'power2.inOut'
-    });
+    if (intersects.length > 0) {
+      handlePartSelect(intersects[0].object);
+    } else {
+      // Click background to reset
+      handleResetSelection();
+    }
   };
 
   return (
-    <div className="h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="glass border-b border-primary/20 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
-            <h1 className="text-2xl font-bold text-white">🔧 Explode View Mode</h1>
-          </div>
+    <div className="h-screen bg-[#050510] text-cyan-50 font-mono overflow-hidden flex flex-col">
+      
+      {/* Header / Top Bar */}
+      <div className="z-20 px-6 py-4 border-b border-cyan-900/50 bg-[#050510]/80 backdrop-blur-md flex justify-between items-center shadow-[0_0_15px_rgba(0,255,255,0.1)]">
+        <div className="flex items-center gap-6">
+          <button onClick={() => navigate('/')} className="text-cyan-500 hover:text-cyan-300 transition-colors">
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-xl font-bold tracking-wider text-cyan-100 flex items-center gap-2">
+            <Cpu className="w-5 h-5 text-cyan-500" />
+            SCHEMATIC EXPLORER
+          </h1>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleExplode}
-              disabled={!modelLoaded}
-              className="flex items-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary border border-primary rounded-lg transition-all disabled:opacity-30"
-            >
-              <Sparkles className="w-5 h-5" />
-              <span>{isExploded ? 'Collapse' : 'Explode'}</span>
-            </button>
-            
-            <button
-              onClick={handleReset}
-              disabled={!modelLoaded}
-              className="px-4 py-2 bg-background-light hover:bg-background border border-primary/20 text-white rounded-lg transition-all disabled:opacity-30"
-            >
-              Reset
-            </button>
-            
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-light text-black font-semibold rounded-lg transition-all disabled:opacity-50"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Loading...</span>
-                </>
-              ) : (
-                <>
-                  <Upload className="w-5 h-5" />
-                  <span>Upload</span>
-                </>
-              )}
-            </button>
-          </div>
+        <div className="flex gap-4">
+          <button 
+            onClick={handleExplode}
+            disabled={!modelLoaded}
+            className={`flex items-center gap-2 px-6 py-2 rounded border ${
+              isExploded 
+                ? 'border-orange-500 text-orange-500 bg-orange-500/10 hover:bg-orange-500/20' 
+                : 'border-cyan-500 text-cyan-500 bg-cyan-500/10 hover:bg-cyan-500/20'
+            } transition-all uppercase tracking-wider font-bold text-sm disabled:opacity-30`}
+          >
+            {isExploded ? <RotateCcw className="w-4 h-4" /> : <Scan className="w-4 h-4" />}
+            {isExploded ? 'Implode' : 'Explode'}
+          </button>
+          
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-2 px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded transition-all"
+          >
+            {isLoading ? <Loader2 className="animate-spin w-4 h-4" /> : <Upload className="w-4 h-4" />}
+            UPLOAD MODEL
+          </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 3D Viewer */}
+      {/* Main Viewport */}
+      <div className="flex-1 relative flex overflow-hidden">
+        
+        {/* HUD Overlay */}
+        {modelLoaded && <HUDOverlay selectedPartName={selectedPart?.userData?.partName} />}
+
+        {/* 3D Canvas */}
         <div 
-          ref={containerRef} 
+          ref={containerRef}
+          className="flex-1 cursor-default outline-none active:cursor-grabbing"
+          onMouseMove={handleMouseMove}
           onClick={handleClick}
-          className="flex-1 cursor-pointer"
         />
 
-        {/* Info Sidebar */}
-        {modelLoaded && (
-          <div className="w-96 border-l border-primary/20 bg-background-dark overflow-y-auto flex flex-col">
-            {/* Parts List */}
-            <div className="p-6 border-b border-primary/20">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <Package className="w-5 h-5" />
-                <span>Parts</span>
-                <span className="text-xs font-mono text-text-muted">({partsList.length})</span>
-              </h3>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {partsList.map((partInfo) => (
-                  <button
-                    key={partInfo.id}
-                    onClick={() => handleSelectPart(partInfo.mesh)}
-                    className={`w-full text-left p-3 rounded-lg transition-all ${
-                      selectedPart === partInfo.mesh
-                        ? 'bg-primary/20 border border-primary text-primary'
-                        : 'bg-background-light hover:bg-background border border-primary/20 text-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm">{partInfo.name}</span>
-                      {selectedPart === partInfo.mesh && (
-                        <span className="text-xs">✓</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
+        {/* Right Info Panel (Glassmorphism) */}
+        <div className={`w-[400px] border-l border-cyan-900/50 bg-[#0a0a1a]/90 backdrop-blur-md transform transition-transform duration-300 absolute right-0 top-0 bottom-0 z-30 flex flex-col ${modelLoaded ? 'translate-x-0' : 'translate-x-full'}`}>
+          
+          {/* Parts List */}
+          <div className="p-4 border-b border-cyan-900/30 flex-shrink-0 max-h-[40%] overflow-y-auto custom-scrollbar">
+            <h3 className="text-cyan-400 text-xs font-bold tracking-widest mb-4 uppercase">System Components ({partsList.length})</h3>
+            <div className="space-y-1">
+              {partsList.map(p => (
+                <button
+                  key={p.id}
+                  onClick={(e) => { e.stopPropagation(); handlePartSelect(p.mesh); }}
+                  className={`w-full text-left px-3 py-2 text-sm border-l-2 transition-all ${
+                    selectedPart === p.mesh 
+                      ? 'border-cyan-400 bg-cyan-500/10 text-cyan-300' 
+                      : 'border-transparent text-gray-500 hover:text-cyan-400 hover:bg-cyan-900/20'
+                  }`}
+                >
+                  {p.name}
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* AI Explanation Panel */}
-            {selectedPart && (
-              <div className="p-6 flex-1">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  <span>{selectedPart.userData.partName}</span>
-                </h3>
+          {/* AI Analysis Panel */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            {selectedPart ? (
+              <>
+                <div className="flex items-center gap-2 mb-6 text-cyan-400 border-b border-cyan-900/50 pb-4">
+                  <Crosshair className="w-5 h-5 animate-spin-slow" />
+                  <span className="font-bold text-lg uppercase tracking-wider">{selectedPart.userData.partName}</span>
+                </div>
 
                 {loadingExplanation ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <div className="space-y-4 opacity-50 animate-pulse">
+                    <div className="h-4 bg-cyan-900/50 rounded w-3/4"></div>
+                    <div className="h-4 bg-cyan-900/50 rounded w-1/2"></div>
+                    <div className="h-24 bg-cyan-900/30 rounded w-full mt-4"></div>
                   </div>
-                ) : partExplanations.has(selectedPart.userData.partName) ? (
-                  <div className="space-y-4">
-                    {/* Purpose */}
-                    <div className="bg-background-light p-4 rounded-lg border border-primary/20">
-                      <h4 className="text-primary font-semibold mb-2 text-sm">Purpose</h4>
-                      <p className="text-text-secondary text-sm leading-relaxed">
+                ) : partExplanations.has(selectedPart.userData.partName) && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="bg-cyan-950/30 p-4 rounded border border-cyan-900/50 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-1 opacity-20">
+                        <Sparkles className="w-12 h-12" />
+                      </div>
+                      <h4 className="text-cyan-500 text-xs font-bold uppercase mb-2">Function</h4>
+                      <p className="text-gray-300 text-sm leading-relaxed">
                         {partExplanations.get(selectedPart.userData.partName).purpose}
                       </p>
                     </div>
 
-                    {/* Material */}
-                    <div className="bg-background-light p-4 rounded-lg border border-primary/20">
-                      <h4 className="text-primary font-semibold mb-2 text-sm flex items-center gap-2">
-                        <Package className="w-4 h-4" />
-                        Material
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-black/40 p-3 rounded border-t border-cyan-900">
+                        <span className="text-xs text-gray-500 uppercase block mb-1">Material</span>
+                        <span className="text-cyan-300 text-sm font-semibold">{partExplanations.get(selectedPart.userData.partName).material}</span>
+                      </div>
+                      <div className="bg-black/40 p-3 rounded border-t border-cyan-900">
+                        <span className="text-xs text-gray-500 uppercase block mb-1">Est. Cost</span>
+                        <span className="text-green-400 text-sm font-mono">{partExplanations.get(selectedPart.userData.partName).cost}</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-900/10 border border-orange-500/20 p-4 rounded-lg">
+                      <h4 className="text-orange-400 text-xs font-bold uppercase mb-2 flex items-center gap-2">
+                        Warning / Tip
                       </h4>
-                      <p className="text-white font-mono text-sm">
-                        {partExplanations.get(selectedPart.userData.partName).material}
+                      <p className="text-orange-200/80 text-sm italic">
+                        "{partExplanations.get(selectedPart.userData.partName).tip}"
                       </p>
                     </div>
-
-                    {/* Cost */}
-                    <div className="bg-background-light p-4 rounded-lg border border-primary/20">
-                      <h4 className="text-primary font-semibold mb-2 text-sm flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        Estimated Cost
-                      </h4>
-                      <p className="text-white font-mono text-sm">
-                        {partExplanations.get(selectedPart.userData.partName).cost}
-                      </p>
-                    </div>
-
-                    {/* Engineering Tip */}
-                    <div className="bg-primary/10 p-4 rounded-lg border border-primary/30">
-                      <h4 className="text-primary font-semibold mb-2 text-sm">💡 Engineering Insight</h4>
-                      <p className="text-text-secondary text-sm leading-relaxed">
-                        {partExplanations.get(selectedPart.userData.partName).tip}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => handleFocusSelected()}
-                      className="w-full py-2 bg-primary/20 hover:bg-primary/30 text-primary border border-primary rounded-lg transition-all text-sm font-semibold"
-                    >
-                      Focus on Part
-                    </button>
                   </div>
-                ) : (
-                  <p className="text-text-muted text-sm">Click a part to see details</p>
                 )}
+              </>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-gray-600 opacity-50">
+                <Scan className="w-16 h-16 mb-4 stroke-1" />
+                <p className="uppercase tracking-widest text-xs">Select component for analysis</p>
               </div>
             )}
           </div>
-        )}
+        </div>
 
         {/* Empty State */}
         {!modelLoaded && !isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center">
-              <Upload className="w-24 h-24 text-text-muted mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">No Model Loaded</h2>
-              <p className="text-text-muted mb-6">Upload a GLB/GLTF file to get started</p>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="pointer-events-auto glow-primary bg-primary hover:bg-primary-light text-black font-semibold px-8 py-4 rounded-lg transition-all"
-              >
-                Upload 3D Model
-              </button>
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
+            <div className="border border-cyan-900/50 p-12 rounded-full bg-black/40 backdrop-blur-sm">
+              <Upload className="w-12 h-12 text-cyan-700 mb-4 mx-auto" />
+              <p className="text-cyan-900 font-bold tracking-widest uppercase">System Idle</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".glb,.gltf,.fbx"
-        onChange={handleFileUpload}
-        className="hidden"
-      />
+      <input ref={fileInputRef} type="file" accept=".glb,.gltf,.fbx" onChange={handleFileUpload} className="hidden" />
     </div>
   );
 }
