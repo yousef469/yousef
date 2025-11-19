@@ -130,12 +130,17 @@ export default function ExplodeViewPage() {
           oldParts.forEach(part => sceneRef.current.remove(part));
         }
 
+        // Add model to scene first
+        const model = gltf.scene;
+        sceneRef.current.add(model);
+
         // Extract all meshes as separate parts
         const newParts = [];
         const positions = new Map();
 
         try {
-          gltf.scene.traverse((child) => {
+          // Traverse the model to find all meshes
+          model.traverse((child) => {
             if (child.isMesh) {
               child.userData.isPart = true;
               
@@ -146,7 +151,10 @@ export default function ExplodeViewPage() {
                 child.userData.originalMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
               }
               
-              // Save original position
+              // Save original world position
+              const worldPos = new THREE.Vector3();
+              child.getWorldPosition(worldPos);
+              
               positions.set(child, {
                 x: child.position.x,
                 y: child.position.y,
@@ -154,12 +162,12 @@ export default function ExplodeViewPage() {
               });
 
               newParts.push(child);
-              sceneRef.current.add(child);
             }
           });
 
           if (newParts.length === 0) {
             alert('No parts found in model. Make sure your model has separate meshes.');
+            sceneRef.current.remove(model);
             setIsLoading(false);
             URL.revokeObjectURL(url);
             return;
@@ -171,7 +179,7 @@ export default function ExplodeViewPage() {
           setIsLoading(false);
 
           // Center camera on model
-          const box = new THREE.Box3().setFromObject(gltf.scene);
+          const box = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
@@ -186,6 +194,7 @@ export default function ExplodeViewPage() {
         } catch (error) {
           console.error('Error processing model:', error);
           alert('Error processing model. Please try another file.');
+          sceneRef.current.remove(model);
           setIsLoading(false);
         }
 
