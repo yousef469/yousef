@@ -1101,6 +1101,9 @@ const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
 const CollaboratePage = lazy(() => import('./pages/CollaboratePage'));
 const MeetingSetupPage = lazy(() => import('./pages/MeetingSetupPage'));
 const CollaborateSessionPage = lazy(() => import('./pages/CollaborateSessionPage'));
+// New Virtual Classroom (Modern State Sync)
+const ClassroomSetup = lazy(() => import('./pages/ClassroomSetup'));
+const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CommunityProjectsPage = lazy(() => import('./pages/CommunityProjectsPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
@@ -1173,6 +1176,9 @@ export default function App() {
           <Route path="/collaborate" element={<ProtectedRoute><CollaboratePage /></ProtectedRoute>} />
           <Route path="/collaborate/setup" element={<ProtectedRoute><MeetingSetupPage /></ProtectedRoute>} />
           <Route path="/collaborate/session/:sessionId" element={<ProtectedRoute><CollaborateSessionPage /></ProtectedRoute>} />
+          {/* New Virtual Classroom Routes */}
+          <Route path="/classroom" element={<ProtectedRoute><ClassroomSetup /></ProtectedRoute>} />
+          <Route path="/classroom/:roomId" element={<ProtectedRoute><VirtualClassroom /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/community-projects" element={<ProtectedRoute><CommunityProjectsPage /></ProtectedRoute>} />
           <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
