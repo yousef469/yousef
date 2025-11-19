@@ -7,21 +7,24 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import classroomService from '../services/classroom';
-import { generateToken, getLiveKitUrl, isLiveKitConfigured } from '../services/livekit';
+import { createRoomUrl, isDailyConfigured, getDailyConfig } from '../services/daily';
 import ThreeJSViewerSynced from '../components/ThreeJSViewerSynced';
 
-// Lazy load LiveKit components (only if configured)
-let LiveKitRoom, VideoConference, RoomAudioRenderer;
-if (isLiveKitConfigured()) {
+// Lazy load Daily.co components (only if configured)
+let DailyProvider, useDaily, DailyVideo, DailyAudio;
+let dailyAvailable = false;
+
+if (isDailyConfigured()) {
   try {
-    const livekit = await import('@livekit/components-react');
-    LiveKitRoom = livekit.LiveKitRoom;
-    VideoConference = livekit.VideoConference;
-    RoomAudioRenderer = livekit.RoomAudioRenderer;
-    // Import styles
-    await import('@livekit/components-styles');
+    import('@daily-co/daily-react').then(daily => {
+      DailyProvider = daily.DailyProvider;
+      useDaily = daily.useDaily;
+      DailyVideo = daily.DailyVideo;
+      DailyAudio = daily.DailyAudio;
+      dailyAvailable = true;
+    });
   } catch (error) {
-    console.warn('LiveKit not installed. Video/audio disabled.');
+    console.warn('Daily.co not installed. Video/audio disabled.');
   }
 }
 
@@ -46,8 +49,8 @@ export default function VirtualClassroom() {
   // Media controls
   const [isMicOn, setIsMicOn] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(false);
-  const [liveKitToken, setLiveKitToken] = useState(null);
-  const [liveKitEnabled] = useState(isLiveKitConfigured());
+  const [dailyRoomUrl, setDailyRoomUrl] = useState(null);
+  const [videoEnabled] = useState(isDailyConfigured());
 
   // Initialize classroom
   useEffect(() => {
@@ -119,27 +122,13 @@ export default function VirtualClassroom() {
     };
   }, [roomId, user, followTeacher]);
 
-  // Initialize LiveKit (if configured)
+  // Initialize Daily.co (if configured)
   useEffect(() => {
-    const initLiveKit = async () => {
-      if (!liveKitEnabled || !isConnected) return;
-
-      try {
-        const token = await generateToken(
-          roomId,
-          user.email?.split('@')[0] || `User-${user.id.slice(0, 6)}`,
-          isTeacher
-        );
-        if (token) {
-          setLiveKitToken(token);
-        }
-      } catch (error) {
-        console.error('Failed to initialize LiveKit:', error);
-      }
-    };
-
-    initLiveKit();
-  }, [isConnected, roomId, user, isTeacher, liveKitEnabled]);
+    if (videoEnabled && isConnected) {
+      const roomUrl = createRoomUrl(roomId);
+      setDailyRoomUrl(roomUrl);
+    }
+  }, [isConnected, roomId, videoEnabled]);
 
   // Handle camera movement (teacher only)
   const handleCameraChange = () => {
@@ -368,28 +357,24 @@ export default function VirtualClassroom() {
 
           {/* Video/Audio Section */}
           <div className="border-t border-primary/20 p-4">
-            {liveKitEnabled && liveKitToken && LiveKitRoom ? (
-              <LiveKitRoom
-                token={liveKitToken}
-                serverUrl={getLiveKitUrl()}
-                connect={true}
-                audio={isMicOn}
-                video={isCameraOn}
-                className="h-full"
-                options={{
-                  adaptiveStream: true,
-                  dynacast: true,
-                }}
-              >
-                <VideoConference />
-                <RoomAudioRenderer />
-              </LiveKitRoom>
+            {videoEnabled && dailyRoomUrl ? (
+              <div className="h-full">
+                <iframe
+                  src={dailyRoomUrl}
+                  allow="camera; microphone; fullscreen; display-capture"
+                  className="w-full h-96 rounded-lg border border-primary/20"
+                  title="Video Conference"
+                />
+                <p className="text-xs text-text-muted text-center mt-2">
+                  Powered by Daily.co
+                </p>
+              </div>
             ) : (
               <>
                 <div className="flex items-center justify-center gap-4 mb-3">
                   <button
                     onClick={() => setIsMicOn(!isMicOn)}
-                    disabled={!liveKitEnabled}
+                    disabled={!videoEnabled}
                     className={`p-4 rounded-full transition-colors ${
                       isMicOn 
                         ? 'bg-primary/20 text-primary' 
@@ -400,7 +385,7 @@ export default function VirtualClassroom() {
                   </button>
                   <button
                     onClick={() => setIsCameraOn(!isCameraOn)}
-                    disabled={!liveKitEnabled}
+                    disabled={!videoEnabled}
                     className={`p-4 rounded-full transition-colors ${
                       isCameraOn 
                         ? 'bg-primary/20 text-primary' 
@@ -411,10 +396,18 @@ export default function VirtualClassroom() {
                   </button>
                 </div>
                 <p className="text-xs text-text-muted text-center">
-                  {liveKitEnabled 
+                  {videoEnabled 
                     ? 'Connecting to video...' 
-                    : 'Video/Audio: Add LiveKit credentials to enable'}
+                    : 'Video/Audio: Add Daily.co domain to enable'}
                 </p>
+                <a
+                  href="https://www.daily.co/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-center text-xs text-primary hover:text-primary-light mt-2"
+                >
+                  Get free Daily.co account →
+                </a>
               </>
             )}
           </div>
