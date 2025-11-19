@@ -190,10 +190,10 @@ const HomePageLoggedIn = () => {
             </button>
           </div>
 
-          {/* Collaborate */}
+          {/* Virtual Classroom */}
           <button
-            onClick={() => navigate('/collaborate')}
-            className="group relative bg-gradient-to-br from-yellow-500 via-amber-600 to-orange-500 hover:from-yellow-600 hover:via-amber-700 hover:to-orange-600 rounded-2xl p-8 border-2 border-yellow-400/50 hover:border-yellow-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-yellow-500/30"
+            onClick={() => navigate('/classroom')}
+            className="group relative bg-gradient-to-br from-purple-500 via-violet-600 to-indigo-500 hover:from-purple-600 hover:via-violet-700 hover:to-indigo-600 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
             
@@ -204,13 +204,24 @@ const HomePageLoggedIn = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">👥 {t('home.features.collaborate.title')}</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🎓 Virtual Classroom</h3>
               <p className="text-white/90 text-center mb-4">
-                {t('home.features.collaborate.fullDesc')}
+                Teach or learn with synchronized 3D models and video chat. Perfect for remote engineering education.
               </p>
 
+              <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
+                <div className="bg-white/10 rounded-lg p-2 text-center">
+                  <div className="font-bold text-white">Teachers</div>
+                  <div className="text-white/80 text-xs">Upload & control models</div>
+                </div>
+                <div className="bg-white/10 rounded-lg p-2 text-center">
+                  <div className="font-bold text-white">Students</div>
+                  <div className="text-white/80 text-xs">Follow & learn together</div>
+                </div>
+              </div>
+
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>{t('home.features.collaborate.button')}</span>
+                <span>Start Teaching or Join Class</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
