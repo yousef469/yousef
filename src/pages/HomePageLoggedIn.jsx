@@ -83,80 +83,47 @@ const HomePageLoggedIn = () => {
         </div>
       )}
 
-      {/* Main Sections Grid - 2 Primary Features */}
-      <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8">
-        {/* 3D Models Viewer */}
-        <button
-          onClick={() => navigate('/viewer')}
-          className="group relative bg-gradient-to-br from-primary to-primary-dark hover:from-primary-light hover:to-primary rounded-2xl p-8 border-2 border-primary hover:border-primary-light transition-all cursor-pointer hover:scale-105"
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-          
-          <div className="relative z-10">
-            <div className="flex justify-center gap-4 mb-6">
-              <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Rocket className="w-7 h-7 text-white" />
-              </div>
-              <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform delay-75">
-                <Plane className="w-7 h-7 text-white" />
-              </div>
-              <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform delay-150">
-                <Car className="w-7 h-7 text-white" />
-              </div>
-            </div>
-            
-            <h3 className="text-2xl font-bold mb-3 text-white text-center">{t('home.viewer.title')}</h3>
-            <p className="text-white/90 text-center mb-4">
-              {t('home.viewer.desc')}
-            </p>
-            
-            <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
-              <span>{t('home.viewer.button')}</span>
-              <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </div>
-        </button>
-
-        {/* Learn Mechanics */}
+      {/* Main Section - Learn Mechanics */}
+      <div className="max-w-3xl mx-auto mb-12">
         <button
           onClick={() => navigate('/learn')}
-          className="group relative bg-gradient-to-br from-secondary to-secondary-dark hover:from-secondary-light hover:to-secondary rounded-2xl p-8 border-2 border-secondary hover:border-secondary-light transition-all cursor-pointer hover:scale-105"
+          className="w-full group relative bg-gradient-to-br from-secondary to-secondary-dark hover:from-secondary-light hover:to-secondary rounded-2xl p-12 border-2 border-secondary hover:border-secondary-light transition-all cursor-pointer hover:scale-105"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
           
           <div className="relative z-10">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Rocket className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center gap-6 mb-8">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Rocket className="w-8 h-8 text-white" />
               </div>
-              <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Plane className="w-6 h-6 text-white" />
+              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Plane className="w-8 h-8 text-white" />
               </div>
-              <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Car className="w-6 h-6 text-white" />
+              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Car className="w-8 h-8 text-white" />
               </div>
             </div>
             
-            <h3 className="text-2xl font-bold mb-3 text-white text-center">Learn Mechanics</h3>
-            <p className="text-white/90 text-center text-sm mb-4">
+            <h3 className="text-3xl font-bold mb-4 text-white text-center">Learn Mechanics</h3>
+            <p className="text-white/90 text-center text-lg mb-6">
               Choose from Rockets, Planes, or Cars to start learning
             </p>
             
-            <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all">
+            <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all text-lg">
               <span>Explore Categories</span>
-              <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-2xl group-hover:translate-x-1 transition-transform">→</span>
             </div>
           </div>
         </button>
       </div>
 
-      {/* Interactive Features Section - 3 Additional Features */}
+      {/* Interactive Features Section */}
       <div className="mt-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
             {t('home.interactive.title')}
           </h2>
-          <p className="text-text">{t('home.interactive.subtitle')}</p>
+          <p className="text-text-secondary">{t('home.interactive.subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
