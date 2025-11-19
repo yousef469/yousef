@@ -16,6 +16,9 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1600,
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'esnext',
     commonjsOptions: {
       include: [/simple-peer/, /node_modules/],
       transformMixedEsModules: true
@@ -27,7 +30,9 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['lucide-react'],
           'services': ['@supabase/supabase-js', '@google/generative-ai'],
-          'webrtc': ['simple-peer', 'socket.io-client']
+          'webrtc': ['simple-peer', 'socket.io-client'],
+          'gsap': ['gsap'],
+          'livekit': ['@livekit/components-react', 'livekit-client']
         }
       }
     }
