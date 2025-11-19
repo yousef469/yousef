@@ -8,7 +8,7 @@ import classroomService from '../services/classroom';
 import { isDailyConfigured } from '../services/daily';
 import ThreeJSViewerSynced from '../components/ThreeJSViewerSynced';
 import DailyVideoChat from '../components/DailyVideoChat';
-import ModelUpload from '../components/ModelUpload';
+import ModelUploadModal from '../components/ModelUploadModal';
 
 export default function VirtualClassroom() {
   const { roomId } = useParams();
@@ -123,7 +123,7 @@ export default function VirtualClassroom() {
       setShowUploadModal(false);
     } catch (error) {
       console.error('Failed to upload model:', error);
-      throw error; // Re-throw so ModelUpload can show error
+      throw error; // Re-throw so ModelUploadModal can show error
     }
   };
 
@@ -213,7 +213,11 @@ export default function VirtualClassroom() {
         <div className="flex-1 relative">
           {currentModel ? (
             <ThreeJSViewerSynced
-              modelUrl={currentModel.url}
+              modelInfo={{
+                path: currentModel.url,
+                name: currentModel.name,
+                type: 'custom'
+              }}
               controlsRef={controlsRef}
               onCameraChange={handleCameraChange}
               enableControls={isTeacher || !followTeacher}
@@ -324,7 +328,7 @@ export default function VirtualClassroom() {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <ModelUpload
+        <ModelUploadModal
           onUpload={handleModelUpload}
           onClose={() => setShowUploadModal(false)}
         />
