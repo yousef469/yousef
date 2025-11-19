@@ -30,12 +30,44 @@ export default {
         text: {
           DEFAULT: '#FFFFFF',
           secondary: '#B8E0FF',
-          muted: '#7A9FBF',
+          muted: '#94A3B8',  // Improved contrast - lighter gray-blue
+        },
+        // Engineering status colors
+        success: {
+          DEFAULT: '#00FF88',  // Green for success
+          light: '#66FFAA',
+          dark: '#00CC6A',
+        },
+        warning: {
+          DEFAULT: '#FFC107',  // Yellow for warnings
+          light: '#FFD54F',
+          dark: '#FFA000',
+        },
+        danger: {
+          DEFAULT: '#FF3B30',  // Red for errors/danger
+          light: '#FF6B61',
+          dark: '#E52520',
+        },
+        info: {
+          DEFAULT: '#00D9FF',  // Cyan for info
+          light: '#5FFFFF',
+          dark: '#00A8CC',
         }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
       },
       animation: {
         'bounce': 'bounce 1s infinite',
-      }
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      backgroundImage: {
+        'grid-pattern': 'radial-gradient(rgba(26, 31, 58, 0.5) 1px, transparent 1px)',
+      },
+      backgroundSize: {
+        'grid': '40px 40px',
+      },
     },
   },
   plugins: [],
