@@ -179,114 +179,6 @@ function computeThrust(massFlow, isp, pe, pa, Ae) {
   return massFlow * ve + (pe - pa) * Ae;
 }
 
-function NozzlePlayground({ onParamsChange }) {
-  const [expansionRatio, setExpansionRatio] = useState(10);
-  const [ambientPressure, setAmbientPressure] = useState(101325);
-  const [throttle, setThrottle] = useState(1.0);
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const nominalMassFlow = 250;
-  const Ae = 0.5;
-  const pe = 101325 / Math.max(1, 1 / expansionRatio);
-
-  const massFlow = nominalMassFlow * throttle;
-  const isp = useMemo(() => computeIsp(expansionRatio, ambientPressure), [expansionRatio, ambientPressure]);
-  const thrust = useMemo(() => computeThrust(massFlow, isp, pe, ambientPressure, Ae), [massFlow, isp, pe, ambientPressure]);
-
-  useEffect(() => {
-    if (onParamsChange) {
-      onParamsChange({ expansionRatio, ambientPressure, throttle });
-    }
-  }, [expansionRatio, ambientPressure, throttle, onParamsChange]);
-
-  return (
-    <div className={`bg-gradient-to-br from-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-xl border border-gray-700 transition-all ${isExpanded ? 'p-6' : 'p-4'}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-cyan-400" />
-          <h3 className="font-semibold text-lg text-white">Nozzle Playground</h3>
-        </div>
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 hover:bg-white/10 rounded transition-colors text-white"
-        >
-          {isExpanded ? <X className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm text-gray-300">Expansion Ratio</label>
-            <span className="text-sm font-medium text-cyan-400">{expansionRatio.toFixed(1)}x</span>
-          </div>
-          <input
-            type="range"
-            min="1"
-            max="80"
-            value={expansionRatio}
-            onChange={e => setExpansionRatio(Number(e.target.value))}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm text-gray-300">Ambient Pressure</label>
-            <span className="text-sm font-medium text-cyan-400">{Math.round(ambientPressure)} Pa</span>
-          </div>
-          <input
-            type="range"
-            min="100"
-            max="101325"
-            value={ambientPressure}
-            onChange={e => setAmbientPressure(Number(e.target.value))}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm text-gray-300">Throttle</label>
-            <span className="text-sm font-medium text-cyan-400">{Math.round(throttle * 100)}%</span>
-          </div>
-          <input
-            type="range"
-            min="0.1"
-            max="1.0"
-            step="0.01"
-            value={throttle}
-            onChange={e => setThrottle(Number(e.target.value))}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        <div className="bg-black/40 p-3 rounded-lg border border-gray-700">
-          <div className="text-xs text-gray-400 mb-1">Specific Impulse</div>
-          <div className="text-xl font-bold text-cyan-400">{isp.toFixed(1)} s</div>
-        </div>
-        <div className="bg-black/40 p-3 rounded-lg border border-gray-700">
-          <div className="text-xs text-gray-400 mb-1">Thrust</div>
-          <div className="text-xl font-bold text-emerald-400">{(thrust / 1000).toFixed(2)} kN</div>
-        </div>
-      </div>
-
-      {isExpanded && (
-        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-          <div className="font-medium text-sm mb-2 text-blue-300">Key Insights</div>
-          <ul className="text-xs text-gray-300 space-y-1">
-            <li>• Higher expansion ratio increases vacuum performance (ISP)</li>
-            <li>• Lower ambient pressure improves effective expansion</li>
-            <li>• Thrust scales with mass flow × exhaust velocity</li>
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ============================================================================
 // MAIN APP COMPONENT
 // ============================================================================
@@ -312,11 +204,6 @@ export default function AllInOnePage() {
   const [autoRotate, setAutoRotate] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [nozzleParams, setNozzleParams] = useState({
-    expansionRatio: 10,
-    ambientPressure: 101325,
-    throttle: 1.0
-  });
 
   const handleSignOut = async () => {
     await signOut();
@@ -528,7 +415,6 @@ export default function AllInOnePage() {
             <ThreeJSViewer
               modelType={selectedModel.type.toLowerCase()}
               modelInfo={selectedModel}
-              nozzleParams={nozzleParams}
             />
           </div>
 
@@ -547,13 +433,6 @@ export default function AllInOnePage() {
               ))}
             </div>
           </div>
-
-          {/* Nozzle Playground */}
-          {selectedModel.category === 'rockets' && (
-            <div className="absolute bottom-4 right-4 z-20 w-96">
-              <NozzlePlayground onParamsChange={setNozzleParams} />
-            </div>
-          )}
         </main>
       </div>
 

@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Zap } from 'lucide-react';
+import { BookOpen, X, ArrowLeft } from 'lucide-react';
 import ModelList from '../components/ModelList';
 import ThreeJSViewer from '../components/ThreeJSViewer';
 import LessonsModal from '../components/LessonsModal';
-import NozzlePlayground from '../components/NozzlePlayground';
 
 const ModelViewerPage = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showLessons, setShowLessons] = useState(false);
-  const [nozzleParams, setNozzleParams] = useState({
-    expansionRatio: 10,
-    ambientPressure: 101325,
-    throttle: 1.0
-  });
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -122,7 +116,7 @@ const ModelViewerPage = () => {
               )}
             </div>
             
-            {/* Controls and Lessons Button */}
+            {/* Controls and Buttons */}
             <div className="flex items-center gap-4">
               <div className="text-xs text-gray-400 flex items-center gap-4">
                 <span>🖱️ Drag to rotate</span>
@@ -135,6 +129,13 @@ const ModelViewerPage = () => {
                 <BookOpen className="w-4 h-4" />
                 <span>Lessons</span>
               </button>
+              <button
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Exit</span>
+              </button>
             </div>
           </div>
         </header>
@@ -146,7 +147,6 @@ const ModelViewerPage = () => {
               <ThreeJSViewer 
                 modelType={selectedModel.type.toLowerCase()}
                 modelInfo={selectedModel}
-                nozzleParams={nozzleParams}
               />
             </div>
           ) : (
