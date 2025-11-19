@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Check, Zap, Crown, Rocket } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Check, Zap, Crown, Rocket, ArrowLeft } from 'lucide-react';
 import { PRICING_PLANS, createCheckoutSession } from '../services/stripe';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function PricingPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(null);
 
   const handleSubscribe = async (priceId, planName) => {
@@ -68,6 +70,15 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white py-20 px-4">
       <div className="max-w-7xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 px-4 py-2 mb-8 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Home</span>
+        </button>
+
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-4">

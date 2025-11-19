@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Zap, Settings, Info, RotateCw, Menu, X, BookOpen, Play, Maximize2, LogOut, User } from 'lucide-react';
+import { Rocket, Plane, Car, Zap, Settings, Info, RotateCw, Menu, X, BookOpen, Play, Maximize2, LogOut, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import ThreeJSViewer from '../components/ThreeJSViewer';
@@ -251,6 +251,14 @@ export default function AllInOnePage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline text-sm">Back</span>
+            </button>
+            
+            <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 hover:bg-gray-700 rounded-lg transition-colors"
             >
@@ -265,13 +273,6 @@ export default function AllInOnePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-            >
-              <X className="w-4 h-4" />
-              <span className="hidden sm:inline text-sm">Exit</span>
-            </button>
 
             <button
               onClick={() => setShowLessons(!showLessons)}
