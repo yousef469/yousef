@@ -4,7 +4,6 @@ import { Rocket, Plane, Car, Zap, Settings, Info, RotateCw, Menu, X, BookOpen, P
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import ThreeJSViewer from '../components/ThreeJSViewer';
-import AITutor from '../components/AITutor';
 
 // ============================================================================
 // DATA - Models and Lessons
@@ -484,9 +483,6 @@ export default function AllInOnePage() {
           </div>
         </div>
       )}
-
-      {/* AI Tutor Chat */}
-      <AITutor />
     </div>
   );
 }
