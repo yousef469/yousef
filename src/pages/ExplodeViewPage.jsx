@@ -60,6 +60,8 @@ export default function ExplodeViewPage() {
   const [loadingExplanation, setLoadingExplanation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [modelType, setModelType] = useState(''); // "Falcon 9", "Porsche 911", etc.
+  const [analyzingModel, setAnalyzingModel] = useState(false);
 
   // --- 1. Setup Scene ---
   useEffect(() => {
@@ -307,12 +309,10 @@ export default function ExplodeViewPage() {
         partsData.push({ id: i, name: pName, mesh: mesh });
       });
 
-      setParts(newParts);
-      setPartsList(partsData);
-      setOriginalStates(states);
-      setExplodeVectors(vectors);
+      // 3. AI MODEL IDENTIFICATION & SMART FILTERING
+      identifyAndFilterModel(newParts, partsData, states, vectors);
 
-      // 3. FIT CAMERA (The Fix for "Too Close")
+      // 4. FIT CAMERA (The Fix for "Too Close")
       // Re-calculate box now that parts are in the scene
       const finalBox = new THREE.Box3();
       newParts.forEach(p => finalBox.expandByObject(p));
@@ -351,7 +351,93 @@ export default function ExplodeViewPage() {
     });
   };
 
-  // --- 4. Animation Actions ---
+  // --- 4. AI Model Identification & Smart Filtering ---
+  const identifyAndFilterModel = async (allParts, allPartsData, states, vectors) => {
+    setAnalyzingModel(true);
+    
+    try {
+      // Get all part names for AI analysis
+      const partNames = allPartsData.map(p => p.name).join(', ');
+      
+      // AI Prompt to identify model and filter important parts
+      const identificationPrompt = `Analyze this 3D model parts list and identify what it is (e.g., "Falcon 9 Rocket", "Porsche 911", "Boeing 747"):
+
+Parts: ${partNames}
+
+Return JSON with:
+{
+  "modelType": "exact model name (e.g., Falcon 9, Porsche 911, F-22 Raptor)",
+  "category": "rocket|car|plane|spacecraft|vehicle",
+  "importantParts": ["list of ONLY the most important engineering parts - ignore small details like bolts, tires, screws"]
+}
+
+For ROCKETS: Include engine, nozzle, fuel tanks, payload section, guidance system, fins
+For CARS: Include engine, transmission, exhaust, suspension, chassis, drivetrain
+For PLANES: Include wings, engines, fuselage, tail, cockpit, landing gear, control surfaces
+For SPACECRAFT: Include propulsion, life support, solar panels, communication, payload bay
+
+DO NOT include: tires, bolts, screws, small brackets, minor details`;
+
+      const aiResponse = await generateResponse(identificationPrompt);
+      const match = aiResponse.match(/\{[\s\S]*\}/);
+      
+      if (match) {
+        const analysis = JSON.parse(match[0]);
+        setModelType(analysis.modelType || 'Unknown Model');
+        
+        // Filter parts - keep only important ones
+        const importantPartNames = analysis.importantParts || [];
+        const filteredParts = [];
+        const filteredPartsData = [];
+        const filteredStates = new Map();
+        const filteredVectors = new Map();
+        
+        allPartsData.forEach((partData) => {
+          const partName = partData.name.toLowerCase();
+          const isImportant = importantPartNames.some(important => 
+            partName.includes(important.toLowerCase()) || 
+            important.toLowerCase().includes(partName)
+          );
+          
+          if (isImportant) {
+            filteredParts.push(partData.mesh);
+            filteredPartsData.push(partData);
+            filteredStates.set(partData.mesh, states.get(partData.mesh));
+            filteredVectors.set(partData.mesh, vectors.get(partData.mesh));
+          } else {
+            // Hide unimportant parts
+            partData.mesh.visible = false;
+          }
+        });
+        
+        setParts(filteredParts);
+        setPartsList(filteredPartsData);
+        setOriginalStates(filteredStates);
+        setExplodeVectors(filteredVectors);
+        
+      } else {
+        // Fallback: show all parts
+        setParts(allParts);
+        setPartsList(allPartsData);
+        setOriginalStates(states);
+        setExplodeVectors(vectors);
+        setModelType('3D Model');
+      }
+      
+    } catch (error) {
+      console.error('AI identification failed:', error);
+      // Fallback: show all parts
+      setParts(allParts);
+      setPartsList(allPartsData);
+      setOriginalStates(states);
+      setExplodeVectors(vectors);
+      setModelType('3D Model');
+    } finally {
+      setAnalyzingModel(false);
+    }
+  };
+
+  // --- 5. Animation Actions ---
 
   const handleExplode = () => {
     if (!modelLoaded) return;
@@ -406,12 +492,45 @@ export default function ExplodeViewPage() {
     // Stop inspection spin
     selectedPart.userData.isInspecting = false;
 
-    // Restore all materials
-    parts.forEach(p => {
-      p.material = p.userData.originalMaterial.clone();
-      p.material.transparent = false;
-      p.material.opacity = 1;
+    // BRING ALL PARTS BACK WITH ANIMATION
+    parts.forEach((p, i) => {
+      const state = originalStates.get(p);
+      
+      // Make visible first
       p.visible = true;
+      
+      // Restore material
+      p.material = p.userData.originalMaterial.clone();
+      p.material.transparent = true;
+      p.material.opacity = 0; // Start invisible
+      
+      // Animate position back
+      gsap.to(p.position, {
+        x: state.pos.x,
+        y: state.pos.y,
+        z: state.pos.z,
+        duration: 1,
+        ease: "back.out(1.2)",
+        delay: i * 0.02
+      });
+      
+      // Fade in
+      gsap.to(p.material, {
+        opacity: 1,
+        duration: 0.8,
+        delay: i * 0.02,
+        onComplete: () => {
+          p.material.transparent = false;
+        }
+      });
+      
+      // Restore rotation
+      gsap.to(p.rotation, {
+        x: state.rot.x,
+        y: state.rot.y,
+        z: state.rot.z,
+        duration: 1
+      });
     });
 
     // Zoom out logic (Fit to whole model)
@@ -445,20 +564,32 @@ export default function ExplodeViewPage() {
     setSelectedPart(part);
     part.userData.isInspecting = true;
 
-    // 1. Dim others - Use material modification instead of replacement
-    parts.forEach(p => {
+    // 1. MAKE ALL OTHER PARTS DISAPPEAR WITH ANIMATION
+    parts.forEach((p, i) => {
       if (p !== part) {
-        // Store current material if not already stored
-        if (!p.userData.wireframeMaterial) {
-          p.userData.wireframeMaterial = new THREE.MeshBasicMaterial({
-            color: 0x003366,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.3,
-            side: THREE.DoubleSide
-          });
-        }
-        p.material = p.userData.wireframeMaterial;
+        // Animate parts flying away and fading out
+        const state = originalStates.get(p);
+        const vec = explodeVectors.get(p);
+        
+        gsap.to(p.position, {
+          x: state.pos.x + vec.x * 3, // Fly far away
+          y: state.pos.y + vec.y * 3,
+          z: state.pos.z + vec.z * 3,
+          duration: 0.8,
+          ease: "power2.in",
+          delay: i * 0.01
+        });
+        
+        gsap.to(p.material, {
+          opacity: 0,
+          duration: 0.6,
+          delay: i * 0.01,
+          onComplete: () => {
+            p.visible = false; // Hide completely
+          }
+        });
+        
+        p.material.transparent = true;
       } else {
         // Highlight Selected - Keep it solid and bright
         const mat = p.userData.originalMaterial.clone();
@@ -502,7 +633,22 @@ export default function ExplodeViewPage() {
     
     setLoadingExplanation(true);
     try {
-      const prompt = `Analyze mechanical part: "${partName}". Return JSON: {"purpose": "text", "material": "text", "cost": "text", "tip": "text"}`;
+      const contextPrompt = modelType 
+        ? `You are analyzing the "${partName}" component from a ${modelType}.` 
+        : `You are analyzing the "${partName}" component.`;
+      
+      const prompt = `${contextPrompt}
+
+Provide detailed engineering analysis in JSON format:
+{
+  "purpose": "Detailed explanation of what this part does and why it's critical",
+  "material": "Specific materials used (e.g., Titanium alloy, Carbon fiber, Aluminum 7075)",
+  "cost": "Realistic cost estimate with currency",
+  "tip": "Professional engineering insight or maintenance tip"
+}
+
+Be specific and technical. Use real-world engineering knowledge.`;
+      
       const text = await generateResponse(prompt);
       
       // Robust JSON parsing
@@ -551,9 +697,16 @@ export default function ExplodeViewPage() {
       <div className="z-20 px-6 py-4 border-b border-cyan-900/30 bg-black/90 backdrop-blur flex justify-between items-center">
         <div className="flex items-center gap-6">
           <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors"><ArrowLeft /></button>
-          <h1 className="text-xl font-bold tracking-widest text-cyan-500 flex items-center gap-2">
-            <Cpu className="w-5 h-5 animate-pulse" /> J.A.R.V.I.S. VIEW
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold tracking-widest text-cyan-500 flex items-center gap-2">
+              <Cpu className="w-5 h-5 animate-pulse" /> J.A.R.V.I.S. VIEW
+            </h1>
+            {modelType && (
+              <p className="text-xs text-cyan-400/60 mt-1">
+                {analyzingModel ? 'Analyzing model...' : `Identified: ${modelType}`}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex gap-4">
           {modelLoaded && (
@@ -594,7 +747,14 @@ export default function ExplodeViewPage() {
         {/* Sidebar */}
         <div className={`w-96 border-l border-cyan-900/30 bg-black/80 backdrop-blur absolute right-0 top-0 bottom-0 z-30 transition-transform duration-500 flex flex-col ${modelLoaded ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-4 border-b border-cyan-900/30 max-h-[400px] overflow-y-auto custom-scrollbar">
-            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-3">Parts Manifest</h3>
+            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-1">
+              {analyzingModel ? 'Analyzing Components...' : 'Critical Components'}
+            </h3>
+            {modelType && !analyzingModel && (
+              <p className="text-cyan-500/50 text-[9px] mb-3">
+                {partsList.length} key parts identified
+              </p>
+            )}
             <div className="space-y-[1px]">
               {partsList.map(p => (
                 <button 
