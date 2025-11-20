@@ -76,18 +76,19 @@ const callGeminiAPI = async (prompt, retries = 4) => {
       
       return text;
     } catch (error) {
-      // If it's the last attempt or not a retryable error, throw
-      if (attempt === retries || (!error.message.includes('503') && !error.message.includes('429') && !error.message.includes('UNAVAILABLE'))) {
+      // Check if this is a retryable error
+      const isRetryable = error.message.includes('503') || error.message.includes('429') || error.message.includes('UNAVAILABLE');
+      
+      // If it's the last attempt or not retryable, throw
+      if (attempt === retries || !isRetryable) {
         console.error('❌ API Error:', error);
         throw error;
       }
       
-      // If retryable error but not last attempt, continue to next iteration
-      if (attempt < retries) {
-        const delay = 1000 * attempt;
-        console.warn(`⚠️ Retryable error detected — retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
+      // Retry with exponential backoff
+      const delay = 1000 * attempt;
+      console.warn(`⚠️ API error (${error.message.substring(0, 50)}) — retrying in ${delay}ms... (attempt ${attempt}/${retries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 };
@@ -214,18 +215,19 @@ const callGeminiAPIWithImage = async (prompt, imageData, retries = 4) => {
       
       return text;
     } catch (error) {
-      // If it's the last attempt or not a retryable error, throw
-      if (attempt === retries || (!error.message.includes('503') && !error.message.includes('429') && !error.message.includes('UNAVAILABLE'))) {
+      // Check if this is a retryable error
+      const isRetryable = error.message.includes('503') || error.message.includes('429') || error.message.includes('UNAVAILABLE');
+      
+      // If it's the last attempt or not retryable, throw
+      if (attempt === retries || !isRetryable) {
         console.error('❌ Vision API Error:', error);
         throw error;
       }
       
-      // If retryable error but not last attempt, continue to next iteration
-      if (attempt < retries) {
-        const delay = 1500 * attempt;
-        console.warn(`⚠️ Retryable error detected — retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
+      // Retry with exponential backoff
+      const delay = 1500 * attempt;
+      console.warn(`⚠️ Vision API error (${error.message.substring(0, 50)}) — retrying in ${delay}ms... (attempt ${attempt}/${retries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 };
