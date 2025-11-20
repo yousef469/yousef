@@ -321,9 +321,13 @@ export default function ExplodeViewPage() {
         partsData.push({ id: i, name: pName, mesh: mesh });
       });
 
+      // IMPORTANT: Keep all parts visible initially
+      newParts.forEach(p => p.visible = true);
+      
       setParts(newParts);
       setOriginalStates(states);
       setExplodeVectors(vectors);
+      setPartsList(partsData); // Show all initially
 
       // 3. FIT CAMERA (The Fix for "Too Close")
       // Re-calculate box now that parts are in the scene
@@ -357,8 +361,8 @@ export default function ExplodeViewPage() {
       setIsLoading(false);
       URL.revokeObjectURL(url);
 
-      // TRIGGER AI IDENTIFICATION
-      identifyModel(partsData);
+      // TRIGGER AI IDENTIFICATION (after model is visible)
+      setTimeout(() => identifyModel(partsData), 500);
 
     }, undefined, (e) => {
       console.error(e);
@@ -369,6 +373,7 @@ export default function ExplodeViewPage() {
 
   // --- 4. AI Identification Logic ---
   const identifyModel = async (allPartsData) => {
+    console.log(`🔍 Analyzing ${allPartsData.length} parts...`);
     setAnalyzingModel(true);
     
     // Prepare a list of names for the AI (truncate if too long)
@@ -441,6 +446,9 @@ Return JSON:
         });
       }
       
+      console.log(`✅ Identified: ${type}`);
+      console.log(`📋 Showing ${filteredList.length} critical parts`);
+      
       setModelType(type);
       setPartsList(filteredList);
       
@@ -460,6 +468,8 @@ Return JSON:
       
       allPartsData.forEach(p => p.mesh.visible = false);
       sortedParts.forEach(p => p.mesh.visible = true);
+      
+      console.log(`⚠️ AI failed, showing ${sortedParts.length} largest parts`);
       
       setPartsList(sortedParts);
       setParts(sortedParts.map(p => p.mesh));
