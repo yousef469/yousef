@@ -54,9 +54,23 @@ const callGeminiAPI = async (prompt, retries = 4) => {
       const data = await response.json();
       console.log('✅ API Response received');
       
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      // Log full response for debugging
+      if (!data.candidates || data.candidates.length === 0) {
+        console.warn('⚠️ No candidates in response:', JSON.stringify(data));
+        throw new Error('No candidates in response');
+      }
       
-      if (!text) {
+      const candidate = data.candidates[0];
+      
+      // Check for safety blocks or finish reason
+      if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+        console.warn(`⚠️ Unusual finish reason: ${candidate.finishReason}`);
+      }
+      
+      const text = candidate?.content?.parts?.[0]?.text;
+      
+      if (!text || text.trim() === '') {
+        console.warn('⚠️ Empty text in response. Full candidate:', JSON.stringify(candidate));
         throw new Error('No text in response');
       }
       
