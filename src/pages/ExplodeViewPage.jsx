@@ -47,7 +47,6 @@ export default function ExplodeViewPage() {
   const raycasterRef = useRef(new THREE.Raycaster());
   const mouseRef = useRef(new THREE.Vector2());
   const fileInputRef = useRef(null);
-  const animationFrameRef = useRef(null);
 
   // State
   const [parts, setParts] = useState([]);
@@ -444,31 +443,31 @@ export default function ExplodeViewPage() {
     setSelectedPart(part);
     part.userData.isInspecting = true;
 
-    // 1. Dim others
+    // 1. Dim others - INCREASED OPACITY so they're visible
     parts.forEach(p => {
       if (p !== part) {
         p.material = new THREE.MeshBasicMaterial({
-          color: 0x001133, // Very dark blue schematic
+          color: 0x003366, // Brighter blue schematic
           wireframe: true,
           transparent: true,
-          opacity: 0.1
+          opacity: 0.3 // Increased from 0.1 to 0.3 for visibility
         });
       } else {
-        // Highlight Selected
+        // Highlight Selected - Keep it solid and bright
         p.material = p.userData.originalMaterial.clone();
         p.material.emissive = new THREE.Color(0x00ffff);
         p.material.emissiveIntensity = 0.5;
       }
     });
 
-    // 2. Focus Camera
+    // 2. Focus Camera - Better distance calculation
     const box = new THREE.Box3().setFromObject(part);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
 
-    // Smart zoom distance (not too close)
-    const zoomDist = maxDim * 3.0;
+    // Smart zoom distance - ensure minimum distance
+    const zoomDist = Math.max(maxDim * 4.0, 10); // Increased multiplier and added minimum
     
     // Calculate vector from current camera to object to maintain angle
     const offset = new THREE.Vector3().subVectors(cameraRef.current.position, center).normalize().multiplyScalar(zoomDist);
