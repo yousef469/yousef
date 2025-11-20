@@ -271,16 +271,26 @@ export default function ExplodeViewPage() {
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         
-        // Collect all meshes first
+        // Collect all meshes first using safe traversal
         const meshes = [];
         let idx = 0;
         
-        // Safely traverse the model
-        model.traverse((child) => {
-          if (child && child.isMesh) {
-            meshes.push(child);
+        // Manual safe traversal to avoid undefined children
+        const collectMeshes = (obj) => {
+          if (!obj) return;
+          
+          if (obj.isMesh) {
+            meshes.push(obj);
           }
-        });
+          
+          if (obj.children && Array.isArray(obj.children)) {
+            obj.children.forEach(child => {
+              if (child) collectMeshes(child);
+            });
+          }
+        };
+        
+        collectMeshes(model);
         
         // Process each mesh
         meshes.forEach((child) => {
