@@ -276,10 +276,14 @@ export default function ExplodeViewPage() {
           // Clone to avoid sharing materials between parts
           mesh.material = mesh.material.clone();
           
-          // Add metalness for tech look
-          if (mesh.material.isMeshStandardMaterial) {
-            mesh.material.metalness = 0.7;
-            mesh.material.roughness = 0.3;
+          // Ensure material is visible
+          if (mesh.material.isMeshStandardMaterial || mesh.material.isMeshPhysicalMaterial) {
+            mesh.material.metalness = 0.5;
+            mesh.material.roughness = 0.4;
+            // Ensure color is not black
+            if (mesh.material.color.r === 0 && mesh.material.color.g === 0 && mesh.material.color.b === 0) {
+              mesh.material.color.setHex(0x888888); // Gray if black
+            }
           }
         }
 
