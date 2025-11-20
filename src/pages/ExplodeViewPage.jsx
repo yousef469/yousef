@@ -284,7 +284,6 @@ export default function ExplodeViewPage() {
         
         // Process each mesh
         meshes.forEach((child) => {
-        if (child.isMesh) {
           // Material Setup for Tech Look
           child.castShadow = true;
           child.receiveShadow = true;
