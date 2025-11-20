@@ -323,12 +323,12 @@ export default function ExplodeViewPage() {
         }
       });
       
-      if (newParts.length === 0) {
-        alert('No parts found in model. Make sure your model has separate meshes.');
-        setIsLoading(false);
-        URL.revokeObjectURL(url);
-        return;
-      }
+        if (newParts.length === 0) {
+          alert('No parts found in model. Make sure your model has separate meshes.');
+          setIsLoading(false);
+          URL.revokeObjectURL(url);
+          return;
+        }
 
         setParts(newParts);
         setPartsList(partsData);
