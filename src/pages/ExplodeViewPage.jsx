@@ -383,22 +383,25 @@ export default function ExplodeViewPage() {
         // Build prompt for this batch
         const partsList = batch.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
         
-        const prompt = `You are an expert engineer analyzing a ${modelType}.
+        const prompt = `RESPOND WITH ONLY PURE JSON. NO EXPLANATION. NO MARKDOWN. NO TEXT OUTSIDE JSON.
 
-Analyze these ${batch.length} major components:
+You are analyzing a ${modelType}. Analyze these ${batch.length} parts:
 ${partsList}
 
-For EACH component, provide:
-1. Purpose: What it does and why it's critical
-2. Material: Specific materials (e.g., Titanium alloy, Carbon fiber)
-3. Cost: Realistic estimate with currency
-4. Tip: Engineering insight or maintenance note
-
-Return ONLY a JSON array (no markdown):
+Return ONLY this JSON array (copy this exact format):
 [
-  {"partName":"exact name","purpose":"...","material":"...","cost":"...","tip":"..."},
-  ...
-]`;
+  {"partName":"${batch[0].name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}${batch.length > 1 ? `,
+  {"partName":"${batch[1].name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}` : ''}${batch.length > 2 ? `,
+  {"partName":"${batch[2].name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}` : ''}
+]
+
+RULES:
+- Output ONLY the JSON array above
+- NO text before or after the JSON
+- NO markdown code blocks
+- NO explanations
+- If you cannot identify a part, use "Unknown" for that field`;
+
         
         const response = await generateResponse(prompt);
         
