@@ -141,15 +141,6 @@ export default function ExplodeViewPage() {
     const grid = new THREE.GridHelper(1000, 100, 0x1a1a1a, 0x0a0a0a);
     grid.position.y = -10;
     scene.add(grid);
-    
-    // Test cube to verify rendering
-    const testGeometry = new THREE.BoxGeometry(5, 5, 5);
-    const testMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    const testCube = new THREE.Mesh(testGeometry, testMaterial);
-    testCube.position.set(0, 0, 0);
-    testCube.userData.isTestCube = true;
-    scene.add(testCube);
-    console.log('✅ Added red test cube at origin');
 
     // Animation Loop
     const animate = () => {
@@ -299,9 +290,7 @@ export default function ExplodeViewPage() {
         const worldScale = new THREE.Vector3();
         mesh.matrixWorld.decompose(worldPos, worldQuat, worldScale);
 
-        // Logic to flatten:
-        // We are abandoning the parent structure.
-        // We set the mesh's position/rot/scale to the calculated World values.
+        // Keep flattening for explode to work
         mesh.removeFromParent();
         mesh.position.copy(worldPos);
         mesh.quaternion.copy(worldQuat);
@@ -366,12 +355,7 @@ export default function ExplodeViewPage() {
       setExplodeVectors(vectors);
       setPartsList(partsData); // Show all initially
       
-      console.log(`✅ Loaded ${newParts.length} parts`);
-      console.log('First part position:', newParts[0].position);
-      console.log('Camera position:', cameraRef.current.position);
-      console.log('Camera looking at:', controlsRef.current.target);
-
-      // 3. FIT CAMERA (The Fix for "Too Close")
+      // 3. FIT CAMERA (CRITICAL - Must run BEFORE logging)
       // Re-calculate box now that parts are in the scene
       const finalBox = new THREE.Box3();
       newParts.forEach(p => finalBox.expandByObject(p));
@@ -398,6 +382,12 @@ export default function ExplodeViewPage() {
       // Update Controls Target to center of model
       controlsRef.current.target.copy(finalCenter);
       controlsRef.current.update();
+      
+      console.log(`✅ Loaded ${newParts.length} parts`);
+      console.log('Model center:', finalCenter);
+      console.log('Model size:', finalSize);
+      console.log('Camera position AFTER fit:', cameraRef.current.position);
+      console.log('Camera looking at:', controlsRef.current.target);
 
       setModelLoaded(true);
       setIsLoading(false);
