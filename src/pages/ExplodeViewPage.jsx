@@ -217,8 +217,16 @@ export default function ExplodeViewPage() {
       setLoadingExplanation(false);
       return explanation;
     } catch (error) {
+      console.log('AI explanation unavailable:', error.message);
+      const fallback = { 
+        purpose: `${partName} - Mechanical component`, 
+        material: "Various materials", 
+        cost: "Varies by application", 
+        tip: "Consult technical documentation for specifications" 
+      };
+      setPartExplanations(prev => new Map(prev).set(partName, fallback));
       setLoadingExplanation(false);
-      return { purpose: "Error analyzing", material: "N/A", cost: "N/A", tip: "N/A" };
+      return fallback;
     }
   };
 
