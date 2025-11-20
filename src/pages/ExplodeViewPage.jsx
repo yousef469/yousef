@@ -377,6 +377,21 @@ export default function ExplodeViewPage() {
     console.log(`🔍 Analyzing ${allPartsData.length} parts...`);
     setAnalyzingModel(true);
     
+    // Check if names are too generic (Object 1, Object 2, etc.)
+    const genericNames = allPartsData.filter(p => 
+      /^(object|mesh|part|node|group)\s*\d+$/i.test(p.name.trim())
+    );
+    
+    if (genericNames.length > allPartsData.length * 0.5) {
+      console.log('⚠️ Model has generic names, skipping AI identification');
+      const filteredList = filterBySize(allPartsData);
+      setModelType('3D Model (Generic Names)');
+      setPartsList(filteredList);
+      setParts(filteredList.map(p => p.mesh));
+      setAnalyzingModel(false);
+      return;
+    }
+    
     // Prepare a list of names for the AI (truncate if too long)
     const namesList = allPartsData.map(p => p.name).slice(0, 100).join(', ');
     
@@ -720,9 +735,22 @@ Be specific and technical. Use real-world engineering knowledge.`;
         </div>
         <div className="flex gap-4">
           {modelLoaded && (
-            <button onClick={() => handleResetSelection()} className="p-2 rounded hover:bg-cyan-900/30 text-cyan-400 border border-transparent hover:border-cyan-500/50 transition-all" title="Fit View">
-              <Maximize className="w-5 h-5" />
-            </button>
+            <>
+              <button 
+                onClick={() => {
+                  // Show all parts
+                  parts.forEach(p => p.visible = true);
+                  setPartsList(parts.map((p, i) => ({ id: i, name: p.userData.partName, mesh: p })));
+                }} 
+                className="px-4 py-2 text-xs rounded bg-gray-700 hover:bg-gray-600 text-white transition-all"
+                title="Show All Parts"
+              >
+                SHOW ALL
+              </button>
+              <button onClick={() => handleResetSelection()} className="p-2 rounded hover:bg-cyan-900/30 text-cyan-400 border border-transparent hover:border-cyan-500/50 transition-all" title="Fit View">
+                <Maximize className="w-5 h-5" />
+              </button>
+            </>
           )}
           <button 
             onClick={handleExplode}
