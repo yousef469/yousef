@@ -270,11 +270,19 @@ export default function ExplodeViewPage() {
       // To make "explode" work, we need all parts to be children of the Scene,
       // NOT buried in groups. But we must preserve their World Transform.
       const meshes = [];
-      root.traverse((child) => {
-        if (child.isMesh) {
-          meshes.push(child);
+      
+      // FIXED: Recursive traversal to find ALL meshes
+      const findAllMeshes = (obj) => {
+        if (obj.isMesh) {
+          meshes.push(obj);
         }
-      });
+        if (obj.children) {
+          obj.children.forEach(child => findAllMeshes(child));
+        }
+      };
+      findAllMeshes(root);
+      
+      console.log(`🔍 Found ${meshes.length} meshes in model`);
 
       const newParts = [];
       const states = new Map();
@@ -376,7 +384,7 @@ export default function ExplodeViewPage() {
       setExplodeVectors(vectors);
       setPartsList(partsData); // Show all initially
       
-      // 3. FIT CAMERA (CRITICAL - Must run BEFORE logging)
+      // 3. FIT CAMERA (FIXED - Reasonable distance)
       // Re-calculate box now that parts are in the scene
       const finalBox = new THREE.Box3();
       newParts.forEach(p => finalBox.expandByObject(p));
@@ -384,20 +392,17 @@ export default function ExplodeViewPage() {
       const finalSize = finalBox.getSize(new THREE.Vector3());
       
       const maxDim = Math.max(finalSize.x, finalSize.y, finalSize.z);
-      const fov = cameraRef.current.fov * (Math.PI / 180);
       
-      // Calculate Z distance needed to fit the object
-      let cameraZ = Math.abs(maxDim / 2 * Math.tan(fov * 2));
-      cameraZ *= 2.5; // Multiplier 2.5 gives "Breathing Room"
-
-      // Move Camera
-      const newCamPos = new THREE.Vector3(
-        finalCenter.x + cameraZ,
-        finalCenter.y + (cameraZ * 0.5),
-        finalCenter.z + cameraZ
-      );
+      // FIXED: Reasonable camera distance (not 700 units!)
+      const cameraDistance = Math.max(maxDim * 2, 150); // Max 150-200 units
       
-      cameraRef.current.position.copy(newCamPos);
+      // Position camera at 45-degree angle
+      const angle = Math.PI / 4; // 45 degrees
+      const camX = finalCenter.x + Math.cos(angle) * cameraDistance;
+      const camY = finalCenter.y + cameraDistance * 0.5;
+      const camZ = finalCenter.z + Math.sin(angle) * cameraDistance;
+      
+      cameraRef.current.position.set(camX, camY, camZ);
       cameraRef.current.lookAt(finalCenter);
       
       // Update Controls Target to center of model
@@ -475,6 +480,12 @@ Rules:
     
     try {
       const response = await generateResponse(prompt);
+      
+      // FIXED: Check for empty response
+      if (!response || !response.trim()) {
+        throw new Error('Empty API response');
+      }
+      
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       
       let filteredList = [];
@@ -518,12 +529,13 @@ Rules:
       setParts(filteredList.map(p => p.mesh));
       
     } catch (e) {
-      console.error("AI Identification failed", e);
+      console.warn("⚠️ AI failed (non-critical):", e.message);
       // Fallback: show top 10 largest parts
       const filteredList = filterBySize(allPartsData);
       
-      console.log(`⚠️ AI failed, showing ${filteredList.length} largest parts`);
+      console.log(`✅ Fallback: showing ${filteredList.length} largest parts`);
       
+      setModelType(`${category} (AI Unavailable)`);
       setPartsList(filteredList);
       setParts(filteredList.map(p => p.mesh));
     } finally {
