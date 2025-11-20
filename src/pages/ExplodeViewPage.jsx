@@ -443,20 +443,26 @@ export default function ExplodeViewPage() {
     setSelectedPart(part);
     part.userData.isInspecting = true;
 
-    // 1. Dim others - INCREASED OPACITY so they're visible
+    // 1. Dim others - Use material modification instead of replacement
     parts.forEach(p => {
       if (p !== part) {
-        p.material = new THREE.MeshBasicMaterial({
-          color: 0x003366, // Brighter blue schematic
-          wireframe: true,
-          transparent: true,
-          opacity: 0.3 // Increased from 0.1 to 0.3 for visibility
-        });
+        // Store current material if not already stored
+        if (!p.userData.wireframeMaterial) {
+          p.userData.wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x003366,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide
+          });
+        }
+        p.material = p.userData.wireframeMaterial;
       } else {
         // Highlight Selected - Keep it solid and bright
-        p.material = p.userData.originalMaterial.clone();
-        p.material.emissive = new THREE.Color(0x00ffff);
-        p.material.emissiveIntensity = 0.5;
+        const mat = p.userData.originalMaterial.clone();
+        mat.emissive = new THREE.Color(0x00ffff);
+        mat.emissiveIntensity = 0.5;
+        p.material = mat;
       }
     });
 
