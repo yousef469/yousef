@@ -112,16 +112,20 @@ export default function ExplodeViewPage() {
     controls.screenSpacePanning = true;
     controlsRef.current = controls;
 
-    // Lighting (High Contrast Tech Style)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // Lighting (BRIGHT for visibility)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Increased brightness
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2.0); // Increased
     dirLight.position.set(10, 20, 10);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
     dirLight.shadow.mapSize.height = 2048;
     scene.add(dirLight);
+
+    const dirLight2 = new THREE.DirectionalLight(0xffffff, 1.0); // Additional light
+    dirLight2.position.set(-10, -20, -10);
+    scene.add(dirLight2);
 
     const blueRim = new THREE.SpotLight(0x00ffff, 50);
     blueRim.position.set(-20, 0, -10);
@@ -130,11 +134,22 @@ export default function ExplodeViewPage() {
     const purpleFill = new THREE.PointLight(0xbd00ff, 2);
     purpleFill.position.set(20, -10, 0);
     scene.add(purpleFill);
+    
+    console.log('✅ Scene setup complete with enhanced lighting');
 
     // Floor Grid (Dynamic)
     const grid = new THREE.GridHelper(1000, 100, 0x1a1a1a, 0x0a0a0a);
     grid.position.y = -10;
     scene.add(grid);
+    
+    // Test cube to verify rendering
+    const testGeometry = new THREE.BoxGeometry(5, 5, 5);
+    const testMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const testCube = new THREE.Mesh(testGeometry, testMaterial);
+    testCube.position.set(0, 0, 0);
+    testCube.userData.isTestCube = true;
+    scene.add(testCube);
+    console.log('✅ Added red test cube at origin');
 
     // Animation Loop
     const animate = () => {
@@ -322,13 +337,27 @@ export default function ExplodeViewPage() {
       });
 
       // IMPORTANT: Keep all parts visible and ensure proper rendering
-      newParts.forEach(p => {
+      newParts.forEach((p, i) => {
         p.visible = true;
-        // Force material update
+        p.frustumCulled = false; // Prevent culling
+        
+        // Force material update and ensure it's visible
         if (p.material) {
           p.material.needsUpdate = true;
           p.material.transparent = false;
           p.material.opacity = 1;
+          p.material.depthTest = true;
+          p.material.depthWrite = true;
+          
+          // Add bright color for debugging
+          if (i === 0) {
+            console.log('First part material:', {
+              type: p.material.type,
+              visible: p.visible,
+              opacity: p.material.opacity,
+              color: p.material.color
+            });
+          }
         }
       });
       
@@ -337,7 +366,10 @@ export default function ExplodeViewPage() {
       setExplodeVectors(vectors);
       setPartsList(partsData); // Show all initially
       
-      console.log(`✅ Loaded ${newParts.length} parts, all visible`);
+      console.log(`✅ Loaded ${newParts.length} parts`);
+      console.log('First part position:', newParts[0].position);
+      console.log('Camera position:', cameraRef.current.position);
+      console.log('Camera looking at:', controlsRef.current.target);
 
       // 3. FIT CAMERA (The Fix for "Too Close")
       // Re-calculate box now that parts are in the scene
