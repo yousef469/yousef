@@ -321,13 +321,23 @@ export default function ExplodeViewPage() {
         partsData.push({ id: i, name: pName, mesh: mesh });
       });
 
-      // IMPORTANT: Keep all parts visible initially
-      newParts.forEach(p => p.visible = true);
+      // IMPORTANT: Keep all parts visible and ensure proper rendering
+      newParts.forEach(p => {
+        p.visible = true;
+        // Force material update
+        if (p.material) {
+          p.material.needsUpdate = true;
+          p.material.transparent = false;
+          p.material.opacity = 1;
+        }
+      });
       
       setParts(newParts);
       setOriginalStates(states);
       setExplodeVectors(vectors);
       setPartsList(partsData); // Show all initially
+      
+      console.log(`✅ Loaded ${newParts.length} parts, all visible`);
 
       // 3. FIT CAMERA (The Fix for "Too Close")
       // Re-calculate box now that parts are in the scene
@@ -422,7 +432,7 @@ Rules:
         const data = JSON.parse(jsonMatch[0]);
         type = data.modelType || "3D Model";
         
-        // AGGRESSIVE FILTERING - Hide non-critical parts from scene
+        // Filter for sidebar only - keep all parts visible in 3D
         if (data.criticalParts && data.criticalParts.length > 0) {
           allPartsData.forEach((partData) => {
             const partName = partData.name.toLowerCase();
@@ -433,10 +443,9 @@ Rules:
             
             if (isImportant) {
               filteredList.push(partData);
-              partData.mesh.visible = true; // Show important parts
-            } else {
-              partData.mesh.visible = false; // HIDE unimportant parts from scene
             }
+            // Keep ALL parts visible in 3D scene
+            partData.mesh.visible = true;
           });
         }
       }
@@ -492,11 +501,11 @@ Rules:
       volume: p.volume.toFixed(2)
     })));
     
-    // Hide all parts first
-    allPartsData.forEach(p => p.mesh.visible = false);
-    
-    // Show only large parts
-    sortedParts.forEach(p => p.mesh.visible = true);
+    // DON'T hide parts - keep them all visible
+    // Just return the filtered list for the sidebar
+    allPartsData.forEach(p => {
+      p.mesh.visible = true; // Keep all visible
+    });
     
     return sortedParts;
   };
