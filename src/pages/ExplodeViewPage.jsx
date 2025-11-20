@@ -74,6 +74,7 @@ export default function ExplodeViewPage() {
   const [modelLoaded, setModelLoaded] = useState(false);
   const [modelType, setModelType] = useState(''); // "Falcon 9", "Porsche 911", etc.
   const [analyzingModel, setAnalyzingModel] = useState(false);
+  const [originalCenter, setOriginalCenter] = useState(new THREE.Vector3()); // NEVER recalculate!
 
   // --- 1. Setup Scene ---
   useEffect(() => {
@@ -218,13 +219,30 @@ export default function ExplodeViewPage() {
     }
   };
 
-  // --- 3. Helper: Classify by shape ---
+  // --- 3. Helper: Classify by shape (IMPROVED) ---
   const classifyByShape = (size) => {
-    const { x, y, z } = size;
+    const { x: width, y: height, z: length } = size;
     
-    if (y > x * 3 && y > z * 3) return 'Rocket';
-    if (x > y * 2 && x > z * 1.5) return 'Aircraft';
-    if (x > y * 1.5 && y < z) return 'Vehicle';
+    // Rocket: Tall and thin (height >> width, height >> length)
+    if (height > width * 1.5 && height > length * 1.5) {
+      return 'Rocket';
+    }
+    
+    // Plane: Wide wingspan (width >> length, flat)
+    if (width > length * 2 && height < width * 0.6) {
+      return 'Aircraft';
+    }
+    
+    // Car: Long and low (length > width, width ≈ height)
+    if (length > width * 2 && width > height * 0.5) {
+      return 'Vehicle';
+    }
+    
+    // Boat: Long and low (length > width, height small)
+    if (length > width * 2 && height < length * 0.5) {
+      return 'Boat';
+    }
+    
     return '3D Model';
   };
 
@@ -418,6 +436,9 @@ export default function ExplodeViewPage() {
       // Update Controls Target to center of model
       controlsRef.current.target.copy(finalCenter);
       controlsRef.current.update();
+      
+      // STORE ORIGINAL CENTER - Never recalculate!
+      setOriginalCenter(finalCenter.clone());
       
       console.log(`✅ Loaded ${newParts.length} parts`);
       console.log('Model center:', finalCenter);
@@ -680,19 +701,20 @@ Rules:
       });
     });
 
-    // Reset Camera
-    const box = new THREE.Box3().setFromObject(sceneRef.current);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const dist = maxDim * 2.0;
+    // Reset Camera - Use ORIGINAL center (never recalculate!)
+    const dist = 200; // Fixed distance
+    const angle = Math.PI / 4;
 
     gsap.to(cameraRef.current.position, {
-      x: center.x + dist, y: center.y + (dist * 0.5), z: center.z + dist,
-      duration: 1.2, ease: "power2.inOut"
+      x: originalCenter.x + Math.cos(angle) * dist,
+      y: originalCenter.y + dist * 0.5,
+      z: originalCenter.z + Math.sin(angle) * dist,
+      duration: 1.2,
+      ease: "power2.inOut"
     });
     gsap.to(controlsRef.current.target, {
-      x: center.x, y: center.y, z: center.z, duration: 1.2
+      x: originalCenter.x, y: originalCenter.y, z: originalCenter.z,
+      duration: 1.2
     });
 
     setSelectedPart(null);
