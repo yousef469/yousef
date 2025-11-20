@@ -410,6 +410,8 @@ RULES:
           continue;
         }
         
+        console.log(`📄 Batch ${batchNum} raw response:`, response.substring(0, 300));
+        
         // Try to parse JSON array
         let jsonMatch = response.match(/\[[\s\S]*\]/);
         
