@@ -360,12 +360,17 @@ export default function ExplodeViewPage() {
   
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
   const analyzeModelImage = async (imageObj, partsData) => {
+    // Filter to only major parts (ignore screws, bolts, pins)
+    const majorParts = partsData.filter(p => p.isMajor);
+    
+    console.log(`🎯 Analyzing ${majorParts.length} major parts (ignoring ${partsData.length - majorParts.length} small parts)`);
+    
     // Get part names for context (limit to avoid token overflow)
-    const partNames = partsData.slice(0, 20).map(p => p.name).join(', ');
+    const partNames = majorParts.slice(0, 15).map(p => p.name).join(', ');
     
     const prompt = `You are an expert engineer. Analyze this 3D model image.
 
-PART NAMES AVAILABLE: ${partNames}
+MAJOR COMPONENTS AVAILABLE: ${partNames}
 
 RESPOND WITH ONLY THIS EXACT JSON FORMAT (no markdown, no code blocks, no extra text):
 {"modelType":"Specific model name","category":"rocket or car or plane or boat or spacecraft or vehicle","confidence":"high or medium or low","criticalParts":["part1","part2","part3"]}
@@ -374,8 +379,10 @@ RULES:
 1. modelType must be specific (e.g., "SpaceX Falcon 9", "BMW M3", "Boeing 747")
 2. category must be one word from the list
 3. confidence must be high, medium, or low
-4. criticalParts must list 3-5 largest components matching the part names above
-5. Output ONLY the JSON, nothing else`;
+4. criticalParts must list 3-5 LARGEST structural/functional components from the list above
+5. IGNORE small parts like screws, bolts, pins, connectors
+6. Focus on: engines, fuselage, wings, chassis, tanks, major assemblies
+7. Output ONLY the JSON, nothing else`;
     
     // Convert base64 to format Gemini expects
     const base64Data = imageObj.data.split(',')[1];
@@ -510,6 +517,12 @@ RULES:
       const vectors = new Map();
       const partsData = [];
 
+      // Calculate size threshold for filtering small parts (5% of model size)
+      const maxModelDim = Math.max(scaledSize.x, scaledSize.y, scaledSize.z);
+      const sizeThreshold = maxModelDim * 0.05; // Parts smaller than 5% are considered "small"
+      
+      console.log(`🔍 Size threshold for major parts: ${sizeThreshold.toFixed(2)} units`);
+
       // Detach meshes from hierarchy and attach to scene, preserving world transforms
       meshes.forEach((mesh, i) => {
         // Setup Material
@@ -546,9 +559,19 @@ RULES:
         mesh.quaternion.copy(worldQuat);
         mesh.scale.copy(worldScale);
         
+        // Calculate part size for filtering
+        const partBox = new THREE.Box3().setFromObject(mesh);
+        const partSize = partBox.getSize(new THREE.Vector3());
+        const partDiagonal = partSize.length();
+        const partVolume = partSize.x * partSize.y * partSize.z;
+        
         // Metadata
         mesh.userData.isPart = true;
         mesh.userData.originalMaterial = mesh.material.clone();
+        mesh.userData.size = partDiagonal;
+        mesh.userData.volume = partVolume;
+        mesh.userData.isMajorPart = partDiagonal > sizeThreshold; // Flag major parts
+        
         let pName = mesh.name.replace(/_/g, ' ') || `Part ${i}`;
         mesh.userData.partName = pName;
 
@@ -572,8 +595,20 @@ RULES:
 
         sceneRef.current.add(mesh);
         newParts.push(mesh);
-        partsData.push({ id: i, name: pName, mesh: mesh });
+        partsData.push({ 
+          id: i, 
+          name: pName, 
+          mesh: mesh,
+          size: partDiagonal,
+          volume: partVolume,
+          isMajor: mesh.userData.isMajorPart
+        });
       });
+      
+      // Log filtering stats
+      const majorParts = partsData.filter(p => p.isMajor);
+      const minorParts = partsData.filter(p => !p.isMajor);
+      console.log(`📊 Parts breakdown: ${majorParts.length} major, ${minorParts.length} minor (screws/bolts/pins)`);
 
       // IMPORTANT: Keep all parts visible and ensure proper rendering
       newParts.forEach((p, i) => {
@@ -772,22 +807,20 @@ Rules:
   const filterBySize = (allPartsData) => {
     console.log('📏 Filtering by bounding box size...');
     
-    // Calculate size for each part
-    const partsWithSize = allPartsData.map(p => {
-      const box = new THREE.Box3().setFromObject(p.mesh);
-      const size = box.getSize(new THREE.Vector3());
-      const volume = size.x * size.y * size.z;
-      return { ...p, volume, size: size.length() };
-    });
+    // Filter to only major parts first (ignore screws, bolts, pins)
+    const majorParts = allPartsData.filter(p => p.isMajor);
+    
+    console.log(`🔍 Filtering from ${majorParts.length} major parts (ignoring ${allPartsData.length - majorParts.length} small parts)`);
     
     // Sort by volume (largest first) and take top 10
-    const sortedParts = partsWithSize
+    const sortedParts = majorParts
       .sort((a, b) => b.volume - a.volume)
       .slice(0, 10);
     
-    console.log('Top 10 parts by size:', sortedParts.map(p => ({
+    console.log('Top 10 major parts by size:', sortedParts.map(p => ({
       name: p.name,
-      volume: p.volume.toFixed(2)
+      volume: p.volume.toFixed(2),
+      size: p.size.toFixed(2)
     })));
     
     // DON'T hide parts - keep them all visible
