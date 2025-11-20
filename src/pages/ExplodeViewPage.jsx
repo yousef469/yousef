@@ -372,43 +372,97 @@ export default function ExplodeViewPage() {
     setAnalyzingModel(true);
     
     // Prepare a list of names for the AI (truncate if too long)
-    const namesList = allPartsData.map(p => p.name).slice(0, 50).join(', ');
+    const namesList = allPartsData.map(p => p.name).slice(0, 100).join(', ');
     
-    const prompt = `I have a 3D model with these part names: [${namesList}].
-    
-1. Identify what this object is (e.g., "SpaceX Falcon 9", "Porsche 911", "Human Heart").
-2. Identify the CRITICAL engineering components from the list (e.g., if it's a car: engine, chassis, wheels. If a rocket: nozzle, thruster, fairing). IGNORE small parts like screws, bolts, washers.
-    
-Return JSON ONLY:
+    const prompt = `You are analyzing a 3D engineering model. Part names: [${namesList}]
+
+TASK:
+1. Identify the exact model (e.g., "SpaceX Falcon 9", "Porsche 911 Turbo", "Boeing 747-400")
+2. Select ONLY 5-10 MAJOR components. Be VERY selective.
+
+RULES:
+- For ROCKETS: Only include: Main Engine, Nozzle, Fuel Tank, Payload Fairing, Guidance System
+- For CARS: Only include: Engine Block, Transmission, Chassis, Exhaust System, Suspension
+- For PLANES: Only include: Wings, Fuselage, Engines, Tail Assembly, Landing Gear
+- IGNORE: Small parts, bolts, screws, brackets, panels, covers, minor details
+- Return MAXIMUM 10 parts
+
+Return JSON:
 {
-  "modelType": "Name of the Model",
-  "criticalParts": ["exact_name_from_list_1", "exact_name_from_list_2"]
+  "modelType": "Exact Model Name",
+  "criticalParts": ["part_name_1", "part_name_2", "part_name_3"]
 }`;
     
     try {
       const response = await generateResponse(prompt);
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       
-      let filteredList = allPartsData; // Default to all
+      let filteredList = [];
       let type = "Unknown Model";
       
       if (jsonMatch) {
         const data = JSON.parse(jsonMatch[0]);
-        type = data.modelType;
+        type = data.modelType || "3D Model";
         
-        // Filter the Sidebar List
+        // AGGRESSIVE FILTERING - Hide non-critical parts from scene
         if (data.criticalParts && data.criticalParts.length > 0) {
-          filteredList = allPartsData.filter(p =>
-            data.criticalParts.some(crit => p.name.includes(crit) || crit.includes(p.name))
-          );
+          allPartsData.forEach((partData) => {
+            const partName = partData.name.toLowerCase();
+            const isImportant = data.criticalParts.some(crit => {
+              const critLower = crit.toLowerCase();
+              return partName.includes(critLower) || critLower.includes(partName);
+            });
+            
+            if (isImportant) {
+              filteredList.push(partData);
+              partData.mesh.visible = true; // Show important parts
+            } else {
+              partData.mesh.visible = false; // HIDE unimportant parts from scene
+            }
+          });
         }
       }
       
+      // If filtering failed or too aggressive, show top 10 largest parts
+      if (filteredList.length === 0) {
+        // Sort by bounding box size and take top 10
+        const sortedParts = [...allPartsData].sort((a, b) => {
+          const boxA = new THREE.Box3().setFromObject(a.mesh);
+          const boxB = new THREE.Box3().setFromObject(b.mesh);
+          const sizeA = boxA.getSize(new THREE.Vector3()).length();
+          const sizeB = boxB.getSize(new THREE.Vector3()).length();
+          return sizeB - sizeA;
+        }).slice(0, 10);
+        
+        allPartsData.forEach(p => p.mesh.visible = false);
+        sortedParts.forEach(p => {
+          p.mesh.visible = true;
+          filteredList.push(p);
+        });
+      }
+      
       setModelType(type);
-      setPartsList(filteredList.length > 0 ? filteredList : allPartsData.slice(0, 20)); // Fallback if filter too aggressive
+      setPartsList(filteredList);
+      
+      // Update parts array to only include visible parts
+      setParts(filteredList.map(p => p.mesh));
+      
     } catch (e) {
       console.error("AI Identification failed", e);
-      setPartsList(allPartsData);
+      // Fallback: show top 10 largest parts
+      const sortedParts = [...allPartsData].sort((a, b) => {
+        const boxA = new THREE.Box3().setFromObject(a.mesh);
+        const boxB = new THREE.Box3().setFromObject(b.mesh);
+        const sizeA = boxA.getSize(new THREE.Vector3()).length();
+        const sizeB = boxB.getSize(new THREE.Vector3()).length();
+        return sizeB - sizeA;
+      }).slice(0, 10);
+      
+      allPartsData.forEach(p => p.mesh.visible = false);
+      sortedParts.forEach(p => p.mesh.visible = true);
+      
+      setPartsList(sortedParts);
+      setParts(sortedParts.map(p => p.mesh));
     } finally {
       setAnalyzingModel(false);
     }
