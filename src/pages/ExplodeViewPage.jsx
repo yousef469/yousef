@@ -10,7 +10,7 @@ import gsap from 'gsap';
 import { generateResponse } from '../services/gemini';
 
 // --- HUD Overlay (Visuals) ---
-const HUDOverlay = ({ selectedPartName }) => (
+const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing }) => (
   <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
     {/* Tech Corners */}
     <div className="absolute top-6 left-6 w-32 h-32 border-l-2 border-t-2 border-cyan-500/40 rounded-tl-3xl opacity-80" />
@@ -22,14 +22,26 @@ const HUDOverlay = ({ selectedPartName }) => (
     <div className="absolute top-0 left-1/2 w-[1px] h-12 bg-cyan-500/50" />
     <div className="absolute bottom-0 left-1/2 w-[1px] h-12 bg-cyan-500/50" />
     
-    {selectedPartName && (
+    {/* Center Status */}
+    {(selectedPartName || isAnalyzing) && (
       <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
         <div className="bg-black/80 border border-cyan-400/50 px-8 py-3 rounded backdrop-blur-md shadow-[0_0_20px_rgba(0,255,255,0.2)]">
           <div className="flex items-center gap-3">
-            <Crosshair className="w-4 h-4 text-cyan-400 animate-spin-slow" />
-            <span className="text-cyan-400 font-mono font-bold tracking-[0.15em] text-sm">
-              ANALYZING: {selectedPartName.toUpperCase()}
-            </span>
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
+                <span className="text-cyan-400 font-mono font-bold tracking-[0.15em] text-sm">
+                  IDENTIFYING BLUEPRINT...
+                </span>
+              </>
+            ) : (
+              <>
+                <Crosshair className="w-4 h-4 text-cyan-400 animate-spin-slow" />
+                <span className="text-cyan-400 font-mono font-bold tracking-[0.15em] text-sm">
+                  ANALYZING: {selectedPartName ? selectedPartName.toUpperCase() : "SYSTEM READY"}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -309,10 +321,11 @@ export default function ExplodeViewPage() {
         partsData.push({ id: i, name: pName, mesh: mesh });
       });
 
-      // 3. AI MODEL IDENTIFICATION & SMART FILTERING
-      identifyAndFilterModel(newParts, partsData, states, vectors);
+      setParts(newParts);
+      setOriginalStates(states);
+      setExplodeVectors(vectors);
 
-      // 4. FIT CAMERA (The Fix for "Too Close")
+      // 3. FIT CAMERA (The Fix for "Too Close")
       // Re-calculate box now that parts are in the scene
       const finalBox = new THREE.Box3();
       newParts.forEach(p => finalBox.expandByObject(p));
@@ -344,6 +357,9 @@ export default function ExplodeViewPage() {
       setIsLoading(false);
       URL.revokeObjectURL(url);
 
+      // TRIGGER AI IDENTIFICATION
+      identifyModel(partsData);
+
     }, undefined, (e) => {
       console.error(e);
       setIsLoading(false);
@@ -351,87 +367,48 @@ export default function ExplodeViewPage() {
     });
   };
 
-  // --- 4. AI Model Identification & Smart Filtering ---
-  const identifyAndFilterModel = async (allParts, allPartsData, states, vectors) => {
+  // --- 4. AI Identification Logic ---
+  const identifyModel = async (allPartsData) => {
     setAnalyzingModel(true);
     
-    try {
-      // Get all part names for AI analysis
-      const partNames = allPartsData.map(p => p.name).join(', ');
-      
-      // AI Prompt to identify model and filter important parts
-      const identificationPrompt = `Analyze this 3D model parts list and identify what it is (e.g., "Falcon 9 Rocket", "Porsche 911", "Boeing 747"):
-
-Parts: ${partNames}
-
-Return JSON with:
+    // Prepare a list of names for the AI (truncate if too long)
+    const namesList = allPartsData.map(p => p.name).slice(0, 50).join(', ');
+    
+    const prompt = `I have a 3D model with these part names: [${namesList}].
+    
+1. Identify what this object is (e.g., "SpaceX Falcon 9", "Porsche 911", "Human Heart").
+2. Identify the CRITICAL engineering components from the list (e.g., if it's a car: engine, chassis, wheels. If a rocket: nozzle, thruster, fairing). IGNORE small parts like screws, bolts, washers.
+    
+Return JSON ONLY:
 {
-  "modelType": "exact model name (e.g., Falcon 9, Porsche 911, F-22 Raptor)",
-  "category": "rocket|car|plane|spacecraft|vehicle",
-  "importantParts": ["list of ONLY the most important engineering parts - ignore small details like bolts, tires, screws"]
-}
-
-For ROCKETS: Include engine, nozzle, fuel tanks, payload section, guidance system, fins
-For CARS: Include engine, transmission, exhaust, suspension, chassis, drivetrain
-For PLANES: Include wings, engines, fuselage, tail, cockpit, landing gear, control surfaces
-For SPACECRAFT: Include propulsion, life support, solar panels, communication, payload bay
-
-DO NOT include: tires, bolts, screws, small brackets, minor details`;
-
-      const aiResponse = await generateResponse(identificationPrompt);
-      const match = aiResponse.match(/\{[\s\S]*\}/);
+  "modelType": "Name of the Model",
+  "criticalParts": ["exact_name_from_list_1", "exact_name_from_list_2"]
+}`;
+    
+    try {
+      const response = await generateResponse(prompt);
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
       
-      if (match) {
-        const analysis = JSON.parse(match[0]);
-        setModelType(analysis.modelType || 'Unknown Model');
+      let filteredList = allPartsData; // Default to all
+      let type = "Unknown Model";
+      
+      if (jsonMatch) {
+        const data = JSON.parse(jsonMatch[0]);
+        type = data.modelType;
         
-        // Filter parts - keep only important ones
-        const importantPartNames = analysis.importantParts || [];
-        const filteredParts = [];
-        const filteredPartsData = [];
-        const filteredStates = new Map();
-        const filteredVectors = new Map();
-        
-        allPartsData.forEach((partData) => {
-          const partName = partData.name.toLowerCase();
-          const isImportant = importantPartNames.some(important => 
-            partName.includes(important.toLowerCase()) || 
-            important.toLowerCase().includes(partName)
+        // Filter the Sidebar List
+        if (data.criticalParts && data.criticalParts.length > 0) {
+          filteredList = allPartsData.filter(p =>
+            data.criticalParts.some(crit => p.name.includes(crit) || crit.includes(p.name))
           );
-          
-          if (isImportant) {
-            filteredParts.push(partData.mesh);
-            filteredPartsData.push(partData);
-            filteredStates.set(partData.mesh, states.get(partData.mesh));
-            filteredVectors.set(partData.mesh, vectors.get(partData.mesh));
-          } else {
-            // Hide unimportant parts
-            partData.mesh.visible = false;
-          }
-        });
-        
-        setParts(filteredParts);
-        setPartsList(filteredPartsData);
-        setOriginalStates(filteredStates);
-        setExplodeVectors(filteredVectors);
-        
-      } else {
-        // Fallback: show all parts
-        setParts(allParts);
-        setPartsList(allPartsData);
-        setOriginalStates(states);
-        setExplodeVectors(vectors);
-        setModelType('3D Model');
+        }
       }
       
-    } catch (error) {
-      console.error('AI identification failed:', error);
-      // Fallback: show all parts
-      setParts(allParts);
+      setModelType(type);
+      setPartsList(filteredList.length > 0 ? filteredList : allPartsData.slice(0, 20)); // Fallback if filter too aggressive
+    } catch (e) {
+      console.error("AI Identification failed", e);
       setPartsList(allPartsData);
-      setOriginalStates(states);
-      setExplodeVectors(vectors);
-      setModelType('3D Model');
     } finally {
       setAnalyzingModel(false);
     }
@@ -488,70 +465,48 @@ DO NOT include: tires, bolts, screws, small brackets, minor details`;
 
   const handleResetSelection = () => {
     if (!selectedPart) return;
-    
-    // Stop inspection spin
     selectedPart.userData.isInspecting = false;
 
-    // BRING ALL PARTS BACK WITH ANIMATION
+    // BRING EVERYTHING BACK
     parts.forEach((p, i) => {
       const state = originalStates.get(p);
-      
-      // Make visible first
       p.visible = true;
-      
-      // Restore material
-      p.material = p.userData.originalMaterial.clone();
       p.material.transparent = true;
-      p.material.opacity = 0; // Start invisible
+      p.material.opacity = 0;
       
-      // Animate position back
+      if (p.material.emissive) {
+        p.material.emissive.setHex(0x000000); // Reset glow
+      }
+
+      // Move back
       gsap.to(p.position, {
-        x: state.pos.x,
-        y: state.pos.y,
-        z: state.pos.z,
-        duration: 1,
-        ease: "back.out(1.2)",
-        delay: i * 0.02
+        x: state.pos.x, y: state.pos.y, z: state.pos.z,
+        duration: 1, ease: "back.out(1.2)", delay: i * 0.005
       });
-      
       // Fade in
       gsap.to(p.material, {
-        opacity: 1,
-        duration: 0.8,
-        delay: i * 0.02,
-        onComplete: () => {
-          p.material.transparent = false;
-        }
+        opacity: 1, duration: 0.8, delay: i * 0.005,
+        onComplete: () => { p.material.transparent = false; }
       });
-      
-      // Restore rotation
+      // Rotate back
       gsap.to(p.rotation, {
-        x: state.rot.x,
-        y: state.rot.y,
-        z: state.rot.z,
-        duration: 1
+        x: state.rot.x, y: state.rot.y, z: state.rot.z, duration: 1
       });
     });
 
-    // Zoom out logic (Fit to whole model)
-    const finalBox = new THREE.Box3();
-    parts.forEach(p => finalBox.expandByObject(p));
-    const center = finalBox.getCenter(new THREE.Vector3());
-    const size = finalBox.getSize(new THREE.Vector3());
+    // Reset Camera
+    const box = new THREE.Box3().setFromObject(sceneRef.current);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = cameraRef.current.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 * Math.tan(fov * 2)) * 2.5;
+    const dist = maxDim * 2.0;
 
     gsap.to(cameraRef.current.position, {
-      x: center.x + cameraZ,
-      y: center.y + (cameraZ * 0.5),
-      z: center.z + cameraZ,
-      duration: 1.2,
-      ease: "power2.inOut"
+      x: center.x + dist, y: center.y + (dist * 0.5), z: center.z + dist,
+      duration: 1.2, ease: "power2.inOut"
     });
     gsap.to(controlsRef.current.target, {
-      x: center.x, y: center.y, z: center.z,
-      duration: 1.2
+      x: center.x, y: center.y, z: center.z, duration: 1.2
     });
 
     setSelectedPart(null);
@@ -564,34 +519,26 @@ DO NOT include: tires, bolts, screws, small brackets, minor details`;
     setSelectedPart(part);
     part.userData.isInspecting = true;
 
-    // 1. MAKE ALL OTHER PARTS DISAPPEAR WITH ANIMATION
+    // 1. DISAPPEAR ANIMATION FOR OTHERS
     parts.forEach((p, i) => {
       if (p !== part) {
-        // Animate parts flying away and fading out
-        const state = originalStates.get(p);
         const vec = explodeVectors.get(p);
         
+        // Fly away fast
         gsap.to(p.position, {
-          x: state.pos.x + vec.x * 3, // Fly far away
-          y: state.pos.y + vec.y * 3,
-          z: state.pos.z + vec.z * 3,
-          duration: 0.8,
-          ease: "power2.in",
-          delay: i * 0.01
+          x: p.position.x + (vec.x * 5),
+          y: p.position.y + (vec.y * 5),
+          z: p.position.z + (vec.z * 5),
+          duration: 0.8, ease: "power2.in"
         });
-        
-        gsap.to(p.material, {
-          opacity: 0,
-          duration: 0.6,
-          delay: i * 0.01,
-          onComplete: () => {
-            p.visible = false; // Hide completely
-          }
-        });
-        
+        // Fade out
         p.material.transparent = true;
+        gsap.to(p.material, {
+          opacity: 0, duration: 0.5,
+          onComplete: () => { p.visible = false; }
+        });
       } else {
-        // Highlight Selected - Keep it solid and bright
+        // Highlight Selected
         const mat = p.userData.originalMaterial.clone();
         mat.emissive = new THREE.Color(0x00ffff);
         mat.emissiveIntensity = 0.5;
@@ -679,15 +626,10 @@ Be specific and technical. Use real-world engineering knowledge.`;
   };
 
   const handleClick = () => {
-    if (!raycasterRef.current || !mouseRef.current) return;
     raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
-    const intersects = raycasterRef.current.intersectObjects(parts, false);
-    
-    if (intersects.length > 0) {
-      handlePartSelect(intersects[0].object);
-    } else {
-      handleResetSelection();
-    }
+    const intersects = raycasterRef.current.intersectObjects(parts.filter(p => p.visible), false);
+    if (intersects.length > 0) handlePartSelect(intersects[0].object);
+    else handleResetSelection();
   };
 
   return (
@@ -701,11 +643,7 @@ Be specific and technical. Use real-world engineering knowledge.`;
             <h1 className="text-xl font-bold tracking-widest text-cyan-500 flex items-center gap-2">
               <Cpu className="w-5 h-5 animate-pulse" /> J.A.R.V.I.S. VIEW
             </h1>
-            {modelType && (
-              <p className="text-xs text-cyan-400/60 mt-1">
-                {analyzingModel ? 'Analyzing model...' : `Identified: ${modelType}`}
-              </p>
-            )}
+            {modelType && <p className="text-[10px] text-cyan-400/60 tracking-widest mt-1">TARGET: {modelType.toUpperCase()}</p>}
           </div>
         </div>
         <div className="flex gap-4">
@@ -735,7 +673,7 @@ Be specific and technical. Use real-world engineering knowledge.`;
       {/* Main Content */}
       <div className="flex-1 relative flex overflow-hidden">
         
-        {modelLoaded && <HUDOverlay selectedPartName={selectedPart?.userData?.partName} />}
+        {modelLoaded && <HUDOverlay selectedPartName={selectedPart?.userData?.partName} modelType={modelType} isAnalyzing={analyzingModel} />}
         
         <div 
           ref={containerRef}
@@ -747,14 +685,9 @@ Be specific and technical. Use real-world engineering knowledge.`;
         {/* Sidebar */}
         <div className={`w-96 border-l border-cyan-900/30 bg-black/80 backdrop-blur absolute right-0 top-0 bottom-0 z-30 transition-transform duration-500 flex flex-col ${modelLoaded ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-4 border-b border-cyan-900/30 max-h-[400px] overflow-y-auto custom-scrollbar">
-            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-1">
-              {analyzingModel ? 'Analyzing Components...' : 'Critical Components'}
+            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-3">
+              {analyzingModel ? "Scanning Systems..." : `Critical Components (${partsList.length})`}
             </h3>
-            {modelType && !analyzingModel && (
-              <p className="text-cyan-500/50 text-[9px] mb-3">
-                {partsList.length} key parts identified
-              </p>
-            )}
             <div className="space-y-[1px]">
               {partsList.map(p => (
                 <button 
