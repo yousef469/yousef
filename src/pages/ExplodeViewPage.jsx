@@ -413,15 +413,24 @@ export default function ExplodeViewPage() {
     console.log(`🔍 Analyzing ${allPartsData.length} parts...`);
     setAnalyzingModel(true);
     
+    // STEP 1: Detect model type by bounding box shape
+    const allMeshes = allPartsData.map(p => p.mesh);
+    const modelBox = new THREE.Box3();
+    allMeshes.forEach(m => modelBox.expandByObject(m));
+    const modelSize = modelBox.getSize(new THREE.Vector3());
+    
+    const category = classifyByShape(modelSize);
+    console.log(`📐 Shape analysis: ${modelSize.x.toFixed(1)} × ${modelSize.y.toFixed(1)} × ${modelSize.z.toFixed(1)} → ${category}`);
+    
     // Check if names are too generic (Object 1, Object 2, etc.)
     const genericNames = allPartsData.filter(p => 
       /^(object|mesh|part|node|group)\s*\d+$/i.test(p.name.trim())
     );
     
     if (genericNames.length > allPartsData.length * 0.5) {
-      console.log('⚠️ Model has generic names, skipping AI identification');
+      console.log('⚠️ Model has generic names, using shape-based classification');
       const filteredList = filterBySize(allPartsData);
-      setModelType('3D Model (Generic Names)');
+      setModelType(`${category} (Shape Detected)`);
       setPartsList(filteredList);
       setParts(filteredList.map(p => p.mesh));
       setAnalyzingModel(false);
@@ -503,6 +512,42 @@ Rules:
     } finally {
       setAnalyzingModel(false);
     }
+  };
+
+  // Helper function to classify model by bounding box shape
+  const classifyByShape = (size) => {
+    const { x, y, z } = size;
+    const maxDim = Math.max(x, y, z);
+    const ratioXY = x / y;
+    const ratioYZ = y / z;
+    const ratioXZ = x / z;
+    
+    // Rocket: Very tall (Y >> X, Y >> Z), cylindrical
+    if (y > x * 3 && y > z * 3 && Math.abs(x - z) < maxDim * 0.3) {
+      return 'Rocket';
+    }
+    
+    // Plane: Wide wings (X >> Y, X >> Z), flat
+    if (x > y * 2 && x > z * 1.5 && y < z) {
+      return 'Aircraft';
+    }
+    
+    // Car: Long (X > Y), low (Y < Z), rectangular
+    if (x > y * 1.5 && y < z && ratioXZ > 1.2) {
+      return 'Vehicle';
+    }
+    
+    // Boat: Long (X > Y), curved bottom
+    if (x > y * 1.5 && x > z * 1.2) {
+      return 'Boat';
+    }
+    
+    // Spacecraft: Roughly cubic or complex
+    if (Math.abs(ratioXY - 1) < 0.5 && Math.abs(ratioYZ - 1) < 0.5) {
+      return 'Spacecraft';
+    }
+    
+    return '3D Model';
   };
 
   // Helper function to filter by size
