@@ -9,7 +9,7 @@ console.log('🔑 API Key Status [FRESH BUILD]:', {
 });
 
 // Direct API call using v1 endpoint with Gemini 2.5 Flash (stable multimodal model)
-const callGeminiAPI = async (prompt, retries = 3) => {
+const callGeminiAPI = async (prompt, retries = 4) => {
   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
   
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -42,8 +42,8 @@ const callGeminiAPI = async (prompt, retries = 3) => {
         
         // Retry on 503 (overloaded) or 429 (rate limit)
         if ((response.status === 503 || response.status === 429) && attempt < retries) {
-          const delay = 800 * attempt; // Exponential backoff
-          console.warn(`⚠️ Gemini overloaded (${response.status}) — retrying in ${delay}ms...`);
+          const delay = 1000 * attempt; // Exponential backoff: 1s, 2s, 3s, 4s
+          console.warn(`⚠️ Gemini overloaded (${response.status}) — retrying in ${delay}ms... (${attempt}/${retries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         }
@@ -63,9 +63,16 @@ const callGeminiAPI = async (prompt, retries = 3) => {
       return text;
     } catch (error) {
       // If it's the last attempt or not a retryable error, throw
-      if (attempt === retries || !error.message.includes('503') && !error.message.includes('429')) {
+      if (attempt === retries || (!error.message.includes('503') && !error.message.includes('429') && !error.message.includes('UNAVAILABLE'))) {
         console.error('❌ API Error:', error);
         throw error;
+      }
+      
+      // If retryable error but not last attempt, continue to next iteration
+      if (attempt < retries) {
+        const delay = 1000 * attempt;
+        console.warn(`⚠️ Retryable error detected — retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
@@ -130,7 +137,7 @@ Please try again. If the issue persists, check your API key at https://aistudio.
 };
 
 // API call with image support (for AI Vision)
-const callGeminiAPIWithImage = async (prompt, imageData, retries = 3) => {
+const callGeminiAPIWithImage = async (prompt, imageData, retries = 4) => {
   // Use gemini-2.5-flash which is stable and supports vision (1M token input, 65k output)
   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
   
@@ -170,8 +177,8 @@ const callGeminiAPIWithImage = async (prompt, imageData, retries = 3) => {
         
         // Retry on 503 (overloaded) or 429 (rate limit)
         if ((response.status === 503 || response.status === 429) && attempt < retries) {
-          const delay = 1000 * attempt; // Exponential backoff (longer for vision)
-          console.warn(`⚠️ Vision API overloaded (${response.status}) — retrying in ${delay}ms...`);
+          const delay = 1500 * attempt; // Longer backoff for vision: 1.5s, 3s, 4.5s, 6s
+          console.warn(`⚠️ Vision API overloaded (${response.status}) — retrying in ${delay}ms... (${attempt}/${retries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         }
@@ -194,9 +201,16 @@ const callGeminiAPIWithImage = async (prompt, imageData, retries = 3) => {
       return text;
     } catch (error) {
       // If it's the last attempt or not a retryable error, throw
-      if (attempt === retries || !error.message.includes('503') && !error.message.includes('429')) {
+      if (attempt === retries || (!error.message.includes('503') && !error.message.includes('429') && !error.message.includes('UNAVAILABLE'))) {
         console.error('❌ Vision API Error:', error);
         throw error;
+      }
+      
+      // If retryable error but not last attempt, continue to next iteration
+      if (attempt < retries) {
+        const delay = 1500 * attempt;
+        console.warn(`⚠️ Retryable error detected — retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
