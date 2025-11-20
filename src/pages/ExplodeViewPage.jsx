@@ -259,8 +259,15 @@ export default function ExplodeViewPage() {
       // Step 2: Send primary view to Gemini Vision API
       const identification = await analyzeModelImage(images[0], partsData);
       
+      // Validate response
+      if (!identification || !identification.modelType) {
+        throw new Error('Invalid AI response - missing modelType');
+      }
+      
       // Step 3: Update UI with results
-      setModelType(`${identification.modelType} (${identification.confidence} confidence)`);
+      const modelName = identification.modelType || 'Unknown Model';
+      const confidence = identification.confidence || 'low';
+      setModelType(`${modelName} (${confidence} confidence)`);
       
       // Step 4: Filter parts based on AI-identified critical components
       let filteredList = [];
@@ -288,7 +295,7 @@ export default function ExplodeViewPage() {
       }
       
       setPartsList(filteredList);
-      console.log(`✅ AI Vision identified: ${identification.modelType} | Showing ${filteredList.length} parts`);
+      console.log(`✅ AI Vision identified: ${modelName} | Showing ${filteredList.length} parts`);
       
     } catch (error) {
       console.warn('⚠️ AI Vision failed, using shape detection:', error.message);

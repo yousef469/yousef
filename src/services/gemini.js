@@ -8,9 +8,9 @@ console.log('🔑 API Key Status [FRESH BUILD]:', {
   firstChars: API_KEY?.substring(0, 10) + '...'
 });
 
-// Direct API call using v1 endpoint with Gemini 1.5 Flash (stable model)
+// Direct API call using v1 endpoint with Gemini 2.5 Flash (stable multimodal model)
 const callGeminiAPI = async (prompt) => {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
   
   try {
     console.log('🚀 Calling Gemini API directly...');
@@ -116,11 +116,11 @@ Please try again. If the issue persists, check your API key at https://aistudio.
 
 // API call with image support (for AI Vision)
 const callGeminiAPIWithImage = async (prompt, imageData) => {
-  // Use gemini-1.5-flash which is stable and supports vision
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+  // Use gemini-2.5-flash which is stable and supports vision (1M token input, 65k output)
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
   
   try {
-    console.log('🚀 Calling Gemini Vision API (gemini-1.5-flash)...');
+    console.log('🚀 Calling Gemini Vision API (gemini-2.5-flash)...');
     
     const response = await fetch(url, {
       method: 'POST',
