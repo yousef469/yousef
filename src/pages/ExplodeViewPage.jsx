@@ -246,7 +246,7 @@ export default function ExplodeViewPage() {
     return '3D Model';
   };
 
-  // --- 3.5. AI Vision Identification (MULTI-ANGLE) ---
+  // --- 3.5. AI Vision Identification (MULTI-ANGLE + BATCH ANALYSIS) ---
   const identifyModelByVision = async (allParts, partsData) => {
     setAnalyzingModel(true);
     console.log('📸 Capturing multi-angle images for AI vision analysis...');
@@ -256,7 +256,7 @@ export default function ExplodeViewPage() {
       const images = await captureMultiAngleImages();
       console.log(`📷 Captured ${images.length} views`);
       
-      // Step 2: Send primary view to Gemini Vision API
+      // Step 2: Send primary view to Gemini Vision API for model identification
       const identification = await analyzeModelImage(images[0], partsData);
       
       // Validate response
@@ -296,6 +296,10 @@ export default function ExplodeViewPage() {
       
       setPartsList(filteredList);
       console.log(`✅ AI Vision identified: ${modelName} | Showing ${filteredList.length} parts`);
+      
+      // Step 5: BATCH ANALYZE major parts automatically (pre-cache explanations)
+      console.log('🤖 Starting batch analysis of major parts...');
+      await batchAnalyzeParts(filteredList, modelName);
       
     } catch (error) {
       console.warn('⚠️ AI Vision failed, using shape detection:', error.message);
@@ -358,6 +362,59 @@ export default function ExplodeViewPage() {
     });
   };
   
+  // Batch analyze major parts (pre-cache explanations)
+  const batchAnalyzeParts = async (majorParts, modelType) => {
+    if (majorParts.length === 0) return;
+    
+    console.log(`🔄 Batch analyzing ${majorParts.length} major parts...`);
+    
+    // Build a batch prompt for all parts at once
+    const partsList = majorParts.map((p, i) => `${i + 1}. ${p.name}`).join('\n');
+    
+    const prompt = `You are analyzing a ${modelType}. Provide engineering details for these major components:
+
+${partsList}
+
+For EACH part, return JSON in this format:
+{"partName":"exact name from list","purpose":"what it does","material":"materials used","cost":"estimated cost","tip":"engineering insight"}
+
+Return a JSON array with one object per part. Use temperature 0 for consistency.`;
+    
+    try {
+      const response = await generateResponse(prompt);
+      
+      if (!response || !response.trim()) {
+        console.warn('⚠️ Empty batch analysis response');
+        return;
+      }
+      
+      // Try to parse JSON array
+      const jsonMatch = response.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const analyses = JSON.parse(jsonMatch[0]);
+        
+        // Cache each analysis
+        analyses.forEach(analysis => {
+          if (analysis.partName) {
+            setPartExplanations(prev => new Map(prev).set(analysis.partName, {
+              purpose: analysis.purpose || 'Component analysis',
+              material: analysis.material || 'Various materials',
+              cost: analysis.cost || 'Contact supplier',
+              tip: analysis.tip || 'Refer to technical documentation'
+            }));
+          }
+        });
+        
+        console.log(`✅ Batch analyzed ${analyses.length} parts successfully`);
+      } else {
+        console.warn('⚠️ Could not parse batch analysis JSON');
+      }
+    } catch (error) {
+      console.warn('⚠️ Batch analysis failed (non-critical):', error.message);
+      // Don't throw - this is optional enhancement
+    }
+  };
+
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
   const analyzeModelImage = async (imageObj, partsData) => {
     // Filter to only major parts (ignore screws, bolts, pins)
@@ -995,9 +1052,15 @@ Rules:
   };
 
   const generatePartExplanation = async (partName) => {
-    if (partExplanations.has(partName)) return;
+    // Check if already cached from batch analysis
+    if (partExplanations.has(partName)) {
+      console.log(`✅ Using cached analysis for ${partName}`);
+      return;
+    }
     
     setLoadingExplanation(true);
+    console.log(`🔍 Generating individual analysis for ${partName}...`);
+    
     try {
       const contextPrompt = modelType 
         ? `You are analyzing the "${partName}" component from a ${modelType}.` 
@@ -1013,7 +1076,7 @@ Provide detailed engineering analysis in JSON format:
   "tip": "Professional engineering insight or maintenance tip"
 }
 
-Be specific and technical. Use real-world engineering knowledge.`;
+Be specific and technical. Use real-world engineering knowledge. Output ONLY the JSON.`;
       
       const text = await generateResponse(prompt);
       
@@ -1031,8 +1094,10 @@ Be specific and technical. Use real-world engineering knowledge.`;
       };
       
       setPartExplanations(prev => new Map(prev).set(partName, json));
+      console.log(`✅ Generated analysis for ${partName}`);
     } catch (e) {
-      // Silently handle errors - don't log to console
+      console.warn(`⚠️ Failed to analyze ${partName}:`, e.message);
+      // Provide fallback data
       setPartExplanations(prev => new Map(prev).set(partName, { 
         purpose: "This component is part of the assembly structure", 
         material: "Varies by design", 
