@@ -378,6 +378,34 @@ export default function ExplodeViewPage() {
         setPartsList(partsData);
         setOriginalPositions(positions);
         setExplodeOffsets(offsets);
+        
+        // Frame the model properly in camera view
+        const modelBox = new THREE.Box3();
+        newParts.forEach(part => modelBox.expandByObject(part));
+        const modelSize = modelBox.getSize(new THREE.Vector3());
+        const modelCenter = modelBox.getCenter(new THREE.Vector3());
+        
+        const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z);
+        const fov = cameraRef.current.fov * (Math.PI / 180);
+        const cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5; // 1.5x for padding
+        
+        // Position camera to view the model
+        cameraRef.current.position.set(
+          modelCenter.x + cameraDistance * 0.7,
+          modelCenter.y + cameraDistance * 0.5,
+          modelCenter.z + cameraDistance
+        );
+        cameraRef.current.lookAt(modelCenter);
+        controlsRef.current.target.copy(modelCenter);
+        controlsRef.current.update();
+        
+        console.log('Model loaded:', {
+          parts: newParts.length,
+          size: modelSize,
+          center: modelCenter,
+          cameraDistance
+        });
+        
         setModelLoaded(true);
         setIsLoading(false);
         URL.revokeObjectURL(url);
