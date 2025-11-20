@@ -361,24 +361,21 @@ export default function ExplodeViewPage() {
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
   const analyzeModelImage = async (imageObj, partsData) => {
     // Get part names for context (limit to avoid token overflow)
-    const partNames = partsData.slice(0, 30).map(p => p.name).join(', ');
+    const partNames = partsData.slice(0, 20).map(p => p.name).join(', ');
     
-    const prompt = `Analyze this 3D model image and identify it.
+    const prompt = `You are an expert engineer. Analyze this 3D model image.
 
-PART NAMES: ${partNames}
+PART NAMES AVAILABLE: ${partNames}
 
-Return ONLY valid JSON (no markdown, no extra text):
-{
-  "modelType": "Specific name (e.g., SpaceX Falcon 9, BMW M3, Boeing 747)",
-  "category": "rocket|car|plane|boat|spacecraft|vehicle",
-  "confidence": "high|medium|low",
-  "criticalParts": ["part1", "part2", "part3"]
-}
+RESPOND WITH ONLY THIS EXACT JSON FORMAT (no markdown, no code blocks, no extra text):
+{"modelType":"Specific model name","category":"rocket or car or plane or boat or spacecraft or vehicle","confidence":"high or medium or low","criticalParts":["part1","part2","part3"]}
 
-Rules:
-- Be specific with model names
-- List 3-5 largest components for criticalParts
-- Match part names from the list above`;
+RULES:
+1. modelType must be specific (e.g., "SpaceX Falcon 9", "BMW M3", "Boeing 747")
+2. category must be one word from the list
+3. confidence must be high, medium, or low
+4. criticalParts must list 3-5 largest components matching the part names above
+5. Output ONLY the JSON, nothing else`;
     
     // Convert base64 to format Gemini expects
     const base64Data = imageObj.data.split(',')[1];
@@ -397,21 +394,49 @@ Rules:
       throw new Error('Empty response from AI Vision');
     }
     
-    // Try to extract JSON from response (handle markdown code blocks)
-    let jsonMatch = response.match(/\{[\s\S]*\}/);
+    console.log('📄 Full AI response:', response);
     
-    // If wrapped in markdown, extract it
-    if (!jsonMatch && response.includes('```')) {
-      const codeBlock = response.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
-      if (codeBlock) jsonMatch = [codeBlock[1]];
+    // Try multiple JSON extraction methods
+    let jsonData = null;
+    
+    // Method 1: Direct JSON parse (if response is pure JSON)
+    try {
+      jsonData = JSON.parse(response);
+      console.log('✅ Parsed JSON directly');
+    } catch (e) {
+      // Method 2: Extract from markdown code block
+      const codeBlock = response.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      if (codeBlock) {
+        try {
+          jsonData = JSON.parse(codeBlock[1]);
+          console.log('✅ Parsed JSON from code block');
+        } catch (e2) {
+          // Method 3: Find first complete JSON object
+          const jsonMatch = response.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
+          if (jsonMatch) {
+            try {
+              jsonData = JSON.parse(jsonMatch[0]);
+              console.log('✅ Parsed JSON from regex match');
+            } catch (e3) {
+              console.warn('❌ All JSON parsing methods failed');
+            }
+          }
+        }
+      }
     }
     
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
-    } else {
-      console.warn('Could not parse JSON from response:', response);
+    if (!jsonData) {
+      console.warn('Could not parse JSON from response:', response.substring(0, 500));
       throw new Error('Invalid JSON response');
     }
+    
+    // Validate required fields
+    if (!jsonData.modelType || !jsonData.category) {
+      console.warn('Missing required fields in JSON:', jsonData);
+      throw new Error('Incomplete JSON response');
+    }
+    
+    return jsonData;
   };
 
   // --- 4. Model Loading Logic (The Fix) ---

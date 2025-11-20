@@ -140,10 +140,10 @@ const callGeminiAPIWithImage = async (prompt, imageData) => {
           ]
         }],
         generationConfig: {
-          temperature: 0.4,
-          topK: 32,
-          topP: 0.95,
-          maxOutputTokens: 1024,
+          temperature: 0,  // Deterministic output for structured JSON
+          topK: 40,
+          topP: 0.9,
+          maxOutputTokens: 2048,  // Increased for complete JSON
         }
       })
     });
@@ -162,6 +162,8 @@ const callGeminiAPIWithImage = async (prompt, imageData) => {
       console.warn('⚠️ Empty response from Vision API');
       throw new Error('No text in vision response');
     }
+    
+    console.log('📄 Raw AI response:', text.substring(0, 200) + '...');
     
     return text;
   } catch (error) {
