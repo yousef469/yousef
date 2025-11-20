@@ -362,7 +362,8 @@ export default function ExplodeViewPage() {
       URL.revokeObjectURL(url);
 
       // TRIGGER AI IDENTIFICATION (after model is visible)
-      setTimeout(() => identifyModel(partsData), 500);
+      // If it fails, will automatically use size-based filtering
+      setTimeout(() => identifyModel(partsData), 1000);
 
     }, undefined, (e) => {
       console.error(e);
@@ -379,24 +380,21 @@ export default function ExplodeViewPage() {
     // Prepare a list of names for the AI (truncate if too long)
     const namesList = allPartsData.map(p => p.name).slice(0, 100).join(', ');
     
-    const prompt = `You are analyzing a 3D engineering model. Part names: [${namesList}]
+    const prompt = `Analyze 3D model parts: ${namesList}
 
-TASK:
-1. Identify the exact model (e.g., "SpaceX Falcon 9", "Porsche 911 Turbo", "Boeing 747-400")
-2. Select ONLY 5-10 MAJOR components. Be VERY selective.
+Identify the model and select 5-10 LARGEST components only.
 
-RULES:
-- For ROCKETS: Only include: Main Engine, Nozzle, Fuel Tank, Payload Fairing, Guidance System
-- For CARS: Only include: Engine Block, Transmission, Chassis, Exhaust System, Suspension
-- For PLANES: Only include: Wings, Fuselage, Engines, Tail Assembly, Landing Gear
-- IGNORE: Small parts, bolts, screws, brackets, panels, covers, minor details
-- Return MAXIMUM 10 parts
-
-Return JSON:
+Return ONLY this JSON (no other text):
 {
-  "modelType": "Exact Model Name",
-  "criticalParts": ["part_name_1", "part_name_2", "part_name_3"]
-}`;
+  "modelType": "Model Name",
+  "criticalParts": ["part1", "part2"]
+}
+
+Rules:
+- Rockets: engine, nozzle, tank, fairing
+- Cars: engine, chassis, transmission
+- Planes: wings, fuselage, engines
+- IGNORE small parts`;
     
     try {
       const response = await generateResponse(prompt);
@@ -430,20 +428,8 @@ Return JSON:
       
       // If filtering failed or too aggressive, show top 10 largest parts
       if (filteredList.length === 0) {
-        // Sort by bounding box size and take top 10
-        const sortedParts = [...allPartsData].sort((a, b) => {
-          const boxA = new THREE.Box3().setFromObject(a.mesh);
-          const boxB = new THREE.Box3().setFromObject(b.mesh);
-          const sizeA = boxA.getSize(new THREE.Vector3()).length();
-          const sizeB = boxB.getSize(new THREE.Vector3()).length();
-          return sizeB - sizeA;
-        }).slice(0, 10);
-        
-        allPartsData.forEach(p => p.mesh.visible = false);
-        sortedParts.forEach(p => {
-          p.mesh.visible = true;
-          filteredList.push(p);
-        });
+        console.log('⚠️ No parts matched, using size-based filtering');
+        filteredList = filterBySize(allPartsData);
       }
       
       console.log(`✅ Identified: ${type}`);
@@ -458,24 +444,46 @@ Return JSON:
     } catch (e) {
       console.error("AI Identification failed", e);
       // Fallback: show top 10 largest parts
-      const sortedParts = [...allPartsData].sort((a, b) => {
-        const boxA = new THREE.Box3().setFromObject(a.mesh);
-        const boxB = new THREE.Box3().setFromObject(b.mesh);
-        const sizeA = boxA.getSize(new THREE.Vector3()).length();
-        const sizeB = boxB.getSize(new THREE.Vector3()).length();
-        return sizeB - sizeA;
-      }).slice(0, 10);
+      const filteredList = filterBySize(allPartsData);
       
-      allPartsData.forEach(p => p.mesh.visible = false);
-      sortedParts.forEach(p => p.mesh.visible = true);
+      console.log(`⚠️ AI failed, showing ${filteredList.length} largest parts`);
       
-      console.log(`⚠️ AI failed, showing ${sortedParts.length} largest parts`);
-      
-      setPartsList(sortedParts);
-      setParts(sortedParts.map(p => p.mesh));
+      setPartsList(filteredList);
+      setParts(filteredList.map(p => p.mesh));
     } finally {
       setAnalyzingModel(false);
     }
+  };
+
+  // Helper function to filter by size
+  const filterBySize = (allPartsData) => {
+    console.log('📏 Filtering by bounding box size...');
+    
+    // Calculate size for each part
+    const partsWithSize = allPartsData.map(p => {
+      const box = new THREE.Box3().setFromObject(p.mesh);
+      const size = box.getSize(new THREE.Vector3());
+      const volume = size.x * size.y * size.z;
+      return { ...p, volume, size: size.length() };
+    });
+    
+    // Sort by volume (largest first) and take top 10
+    const sortedParts = partsWithSize
+      .sort((a, b) => b.volume - a.volume)
+      .slice(0, 10);
+    
+    console.log('Top 10 parts by size:', sortedParts.map(p => ({
+      name: p.name,
+      volume: p.volume.toFixed(2)
+    })));
+    
+    // Hide all parts first
+    allPartsData.forEach(p => p.mesh.visible = false);
+    
+    // Show only large parts
+    sortedParts.forEach(p => p.mesh.visible = true);
+    
+    return sortedParts;
   };
 
   // --- 5. Animation Actions ---
