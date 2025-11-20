@@ -267,19 +267,23 @@ export default function ExplodeViewPage() {
         const offsets = new Map();
         const partsData = [];
         
-        // Add model to scene first
-        sceneRef.current.add(model);
-        
+        // Calculate bounding box BEFORE adding to scene
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         
-        // Center the model
-        if (model.position) {
-          model.position.sub(center);
-        }
-  
-      let idx = 0;
-      model.traverse((child) => {
+        // Collect all meshes first
+        const meshes = [];
+        let idx = 0;
+        
+        // Safely traverse the model
+        model.traverse((child) => {
+          if (child && child.isMesh) {
+            meshes.push(child);
+          }
+        });
+        
+        // Process each mesh
+        meshes.forEach((child) => {
         if (child.isMesh) {
           // Material Setup for Tech Look
           child.castShadow = true;
@@ -317,11 +321,18 @@ export default function ExplodeViewPage() {
           
           offsets.set(child, direction.multiplyScalar(distance));
 
-          sceneRef.current.add(child); // Add directly to scene for easier control
+          // Remove from parent and add to scene for independent control
+          if (child.parent) {
+            child.parent.remove(child);
+          }
+          
+          // Adjust position relative to center
+          child.position.sub(center);
+          
+          sceneRef.current.add(child);
           newParts.push(child);
           partsData.push({ id: idx++, name: child.userData.partName, mesh: child });
-        }
-      });
+        });
       
         if (newParts.length === 0) {
           alert('No parts found in model. Make sure your model has separate meshes.');
