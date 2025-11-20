@@ -56,8 +56,15 @@ const callGeminiAPI = async (prompt) => {
   }
 };
 
-export const generateResponse = async (prompt, context = '') => {
+export const generateResponse = async (prompt, options = {}) => {
   try {
+    // Check if this is an image-based request
+    if (options.inline_data) {
+      return await callGeminiAPIWithImage(prompt, options.inline_data);
+    }
+    
+    // Text-only request
+    const context = typeof options === 'string' ? options : '';
     const fullPrompt = context 
       ? `Context: ${context}\n\nQuestion: ${prompt}\n\nProvide a detailed, practical engineering explanation with examples.`
       : `${prompt}\n\nProvide a detailed, practical engineering explanation with examples.`;
@@ -104,6 +111,61 @@ The free tier allows 15 requests per minute. Please try again shortly.`;
 ${error.message}
 
 Please try again. If the issue persists, check your API key at https://aistudio.google.com/`;
+  }
+};
+
+// API call with image support (for AI Vision)
+const callGeminiAPIWithImage = async (prompt, imageData) => {
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
+  
+  try {
+    console.log('🚀 Calling Gemini Vision API...');
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { 
+              inline_data: {
+                mime_type: imageData.mime_type,
+                data: imageData.data
+              }
+            }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.4,
+          topK: 32,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Vision API Response received');
+    
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!text) {
+      console.warn('⚠️ Empty response from Vision API');
+      throw new Error('No text in vision response');
+    }
+    
+    return text;
+  } catch (error) {
+    console.error('❌ Vision API Error:', error);
+    throw error;
   }
 };
 

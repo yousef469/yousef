@@ -308,7 +308,7 @@ export default function ExplodeViewPage() {
     }
   };
   
-  // Capture model from multiple angles
+  // Capture model from multiple angles (OPTIMIZED)
   const captureMultiAngleImages = async () => {
     return new Promise((resolve) => {
       const images = [];
@@ -334,12 +334,12 @@ export default function ExplodeViewPage() {
         cameraRef.current.position.set(x, y, z);
         cameraRef.current.lookAt(originalCenter);
         
-        // Render and capture
+        // Render and capture with JPEG compression (smaller file size)
         rendererRef.current.render(sceneRef.current, cameraRef.current);
-        const imageData = rendererRef.current.domElement.toDataURL('image/png');
+        const imageData = rendererRef.current.domElement.toDataURL('image/jpeg', 0.8);
         images.push({ name, data: imageData });
         
-        console.log(`📷 Captured ${name} view`);
+        console.log(`📷 Captured ${name} view (${(imageData.length / 1024).toFixed(0)}KB)`);
       });
       
       // Restore original camera position
@@ -353,40 +353,36 @@ export default function ExplodeViewPage() {
   
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
   const analyzeModelImage = async (imageObj, partsData) => {
-    // Get part names for context
-    const partNames = partsData.slice(0, 50).map(p => p.name).join(', ');
+    // Get part names for context (limit to avoid token overflow)
+    const partNames = partsData.slice(0, 30).map(p => p.name).join(', ');
     
-    const prompt = `You are an expert engineer analyzing a 3D model.
+    const prompt = `Analyze this 3D model image and identify it.
 
-IMAGE: This is a rendered view of a 3D engineering model.
 PART NAMES: ${partNames}
 
-Analyze the visual appearance and part names to identify:
-1. What specific model/vehicle this is (be as specific as possible)
-2. The category (rocket, car, plane, boat, spacecraft, etc.)
-3. The 5-10 MOST CRITICAL/LARGEST components visible
-
-Return ONLY this JSON format:
+Return ONLY valid JSON (no markdown, no extra text):
 {
-  "modelType": "Specific model name (e.g., SpaceX Falcon 9 Heavy, BMW M3 E46, Boeing 747-400)",
-  "category": "rocket|car|plane|boat|spacecraft|vehicle|robot",
+  "modelType": "Specific name (e.g., SpaceX Falcon 9, BMW M3, Boeing 747)",
+  "category": "rocket|car|plane|boat|spacecraft|vehicle",
   "confidence": "high|medium|low",
-  "criticalParts": ["engine", "fuselage", "wing", "etc"]
+  "criticalParts": ["part1", "part2", "part3"]
 }
 
 Rules:
-- Be specific with model names when possible
-- For criticalParts, list ONLY the largest/most important components
-- Match part names from the provided list when possible
-- Confidence: high = certain identification, medium = likely match, low = generic category only`;
+- Be specific with model names
+- List 3-5 largest components for criticalParts
+- Match part names from the list above`;
     
     // Convert base64 to format Gemini expects
     const base64Data = imageObj.data.split(',')[1];
     
+    // Detect mime type from data URL
+    const mimeType = imageObj.data.match(/data:(image\/[^;]+);/)?.[1] || 'image/jpeg';
+    
     const response = await generateResponse(prompt, {
       inline_data: {
         data: base64Data,
-        mime_type: 'image/png'
+        mime_type: mimeType
       }
     });
     
@@ -394,10 +390,19 @@ Rules:
       throw new Error('Empty response from AI Vision');
     }
     
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    // Try to extract JSON from response (handle markdown code blocks)
+    let jsonMatch = response.match(/\{[\s\S]*\}/);
+    
+    // If wrapped in markdown, extract it
+    if (!jsonMatch && response.includes('```')) {
+      const codeBlock = response.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+      if (codeBlock) jsonMatch = [codeBlock[1]];
+    }
+    
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     } else {
+      console.warn('Could not parse JSON from response:', response);
       throw new Error('Invalid JSON response');
     }
   };
