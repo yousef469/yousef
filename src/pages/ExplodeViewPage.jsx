@@ -248,8 +248,25 @@ export default function ExplodeViewPage() {
       const box = new THREE.Box3().setFromObject(root);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
+      
+      // AUTO-SCALE: Normalize ALL models to ~100 units
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      const targetSize = 100;
+      const scaleFactor = targetSize / maxDimension;
+      
+      console.log(`📏 Original: ${maxDimension.toFixed(2)} units → Scaling ${scaleFactor.toFixed(4)}x`);
+      
+      root.scale.multiplyScalar(scaleFactor);
+      root.updateMatrixWorld(true);
+      
+      // Recalculate after scaling
+      const scaledBox = new THREE.Box3().setFromObject(root);
+      const scaledSize = scaledBox.getSize(new THREE.Vector3());
+      const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+      
+      console.log(`✅ Scaled: ${Math.max(scaledSize.x, scaledSize.y, scaledSize.z).toFixed(2)} units`);
 
-      // 2. Flatten and Reparent logic
+      // 2. Flatten and Reparent logic (use scaled values)
       // To make "explode" work, we need all parts to be children of the Scene,
       // NOT buried in groups. But we must preserve their World Transform.
       const meshes = [];
@@ -307,14 +324,14 @@ export default function ExplodeViewPage() {
         mesh.userData.partName = pName;
 
         // Calculate Explode Vector (Direction from Center of Model to Part Center)
-        // Note: We use the 'center' we calculated from the whole model earlier
-        const explodeDir = new THREE.Vector3().subVectors(worldPos, center).normalize();
+        // Note: We use the 'scaledCenter' we calculated from the whole model earlier
+        const explodeDir = new THREE.Vector3().subVectors(worldPos, scaledCenter).normalize();
         
         // Fallback for parts exactly at center
         if (explodeDir.lengthSq() === 0) explodeDir.set(Math.random(), Math.random(), Math.random()).normalize();
         
-        // Variable explode distance based on model size
-        const maxDim = Math.max(size.x, size.y, size.z);
+        // Variable explode distance based on SCALED model size
+        const maxDim = Math.max(scaledSize.x, scaledSize.y, scaledSize.z);
         const explodeDist = maxDim * 0.5 + (Math.random() * maxDim * 0.2);
         
         vectors.set(mesh, explodeDir.multiplyScalar(explodeDist));
