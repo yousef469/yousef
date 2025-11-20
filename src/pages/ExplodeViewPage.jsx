@@ -178,7 +178,7 @@ export default function ExplodeViewPage() {
         containerRef.current.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [hoveredPart, selectedPart]);
 
   // --- 2. Raycasting (Interaction) ---
   const handleMouseMove = (e) => {
