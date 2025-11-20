@@ -218,7 +218,17 @@ export default function ExplodeViewPage() {
     }
   };
 
-  // --- 3. Model Loading Logic (The Fix) ---
+  // --- 3. Helper: Classify by shape ---
+  const classifyByShape = (size) => {
+    const { x, y, z } = size;
+    
+    if (y > x * 3 && y > z * 3) return 'Rocket';
+    if (x > y * 2 && x > z * 1.5) return 'Aircraft';
+    if (x > y * 1.5 && y < z) return 'Vehicle';
+    return '3D Model';
+  };
+
+  // --- 4. Model Loading Logic (The Fix) ---
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -419,9 +429,25 @@ export default function ExplodeViewPage() {
       setIsLoading(false);
       URL.revokeObjectURL(url);
 
-      // TRIGGER AI IDENTIFICATION (after model is visible)
-      // If it fails, will automatically use size-based filtering
-      setTimeout(() => identifyModel(partsData), 1000);
+      // SKIP AI IDENTIFICATION - Use shape-based classification only
+      // This prevents 503 errors from breaking the viewer
+      console.log('⚡ Skipping AI identification (using shape detection only)');
+      
+      // Classify by shape immediately
+      const allMeshes = newParts;
+      const shapeBox = new THREE.Box3();
+      allMeshes.forEach(m => shapeBox.expandByObject(m));
+      const shapeSize = shapeBox.getSize(new THREE.Vector3());
+      const category = classifyByShape(shapeSize);
+      
+      setModelType(`${category} (Shape Detected)`);
+      
+      // Show top 10 largest parts
+      setTimeout(() => {
+        const filteredList = filterBySize(partsData);
+        setPartsList(filteredList);
+        console.log(`✅ Showing ${filteredList.length} largest parts`);
+      }, 500);
 
     }, undefined, (e) => {
       console.error(e);
@@ -543,41 +569,7 @@ Rules:
     }
   };
 
-  // Helper function to classify model by bounding box shape
-  const classifyByShape = (size) => {
-    const { x, y, z } = size;
-    const maxDim = Math.max(x, y, z);
-    const ratioXY = x / y;
-    const ratioYZ = y / z;
-    const ratioXZ = x / z;
-    
-    // Rocket: Very tall (Y >> X, Y >> Z), cylindrical
-    if (y > x * 3 && y > z * 3 && Math.abs(x - z) < maxDim * 0.3) {
-      return 'Rocket';
-    }
-    
-    // Plane: Wide wings (X >> Y, X >> Z), flat
-    if (x > y * 2 && x > z * 1.5 && y < z) {
-      return 'Aircraft';
-    }
-    
-    // Car: Long (X > Y), low (Y < Z), rectangular
-    if (x > y * 1.5 && y < z && ratioXZ > 1.2) {
-      return 'Vehicle';
-    }
-    
-    // Boat: Long (X > Y), curved bottom
-    if (x > y * 1.5 && x > z * 1.2) {
-      return 'Boat';
-    }
-    
-    // Spacecraft: Roughly cubic or complex
-    if (Math.abs(ratioXY - 1) < 0.5 && Math.abs(ratioYZ - 1) < 0.5) {
-      return 'Spacecraft';
-    }
-    
-    return '3D Model';
-  };
+
 
   // Helper function to filter by size
   const filterBySize = (allPartsData) => {
