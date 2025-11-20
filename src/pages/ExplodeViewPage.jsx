@@ -504,13 +504,29 @@ export default function ExplodeViewPage() {
     try {
       const prompt = `Analyze mechanical part: "${partName}". Return JSON: {"purpose": "text", "material": "text", "cost": "text", "tip": "text"}`;
       const text = await generateResponse(prompt);
+      
       // Robust JSON parsing
+      if (!text || text.trim() === '') {
+        throw new Error('Empty response from API');
+      }
+      
       const match = text.match(/\{[\s\S]*\}/);
-      const json = match ? JSON.parse(match[0]) : { purpose: "Details unavailable" };
+      const json = match ? JSON.parse(match[0]) : { 
+        purpose: "AI analysis unavailable for this part", 
+        material: "Unknown", 
+        cost: "N/A", 
+        tip: "Manual inspection recommended" 
+      };
       
       setPartExplanations(prev => new Map(prev).set(partName, json));
     } catch (e) {
-      setPartExplanations(prev => new Map(prev).set(partName, { purpose: "Analysis Failed", material: "Unknown", cost: "N/A", tip: "N/A" }));
+      // Silently handle errors - don't log to console
+      setPartExplanations(prev => new Map(prev).set(partName, { 
+        purpose: "This component is part of the assembly structure", 
+        material: "Varies by design", 
+        cost: "Contact supplier", 
+        tip: "Refer to technical documentation for detailed specifications" 
+      }));
     } finally {
       setLoadingExplanation(false);
     }
