@@ -338,13 +338,29 @@ export default function ExplodeViewPage() {
           
           offsets.set(child, direction.multiplyScalar(distance));
 
+          // Get world position before removing from parent
+          const worldPosition = new THREE.Vector3();
+          const worldRotation = new THREE.Euler();
+          const worldScale = new THREE.Vector3();
+          
+          child.getWorldPosition(worldPosition);
+          child.getWorldQuaternion(new THREE.Quaternion().setFromEuler(worldRotation));
+          child.getWorldScale(worldScale);
+          
           // Remove from parent and add to scene for independent control
           if (child.parent) {
             child.parent.remove(child);
           }
           
+          // Set world position/rotation/scale
+          child.position.copy(worldPosition);
+          child.scale.copy(worldScale);
+          
           // Adjust position relative to center
           child.position.sub(center);
+          
+          // Make sure it's visible
+          child.visible = true;
           
           sceneRef.current.add(child);
           newParts.push(child);
