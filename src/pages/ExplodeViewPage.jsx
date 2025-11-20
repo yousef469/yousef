@@ -175,12 +175,12 @@ export default function ExplodeViewPage() {
     if (intersects.length > 0) {
       const obj = intersects[0].object;
       if (hoveredPart !== obj) {
-        // Clear old hover
-        if (hoveredPart && hoveredPart !== selectedPart) {
+        // Clear old hover - check if material has emissive property
+        if (hoveredPart && hoveredPart !== selectedPart && hoveredPart.material.emissive) {
           hoveredPart.material.emissive.setHex(0x000000);
         }
-        // Set new hover
-        if (obj !== selectedPart) {
+        // Set new hover - only if not selected and material supports emissive
+        if (obj !== selectedPart && obj.material.emissive) {
           obj.material.emissive = new THREE.Color(0x00ffff);
           obj.material.emissiveIntensity = 0.3;
         }
@@ -189,7 +189,9 @@ export default function ExplodeViewPage() {
       }
     } else {
       if (hoveredPart) {
-        if (hoveredPart !== selectedPart) hoveredPart.material.emissive.setHex(0x000000);
+        if (hoveredPart !== selectedPart && hoveredPart.material.emissive) {
+          hoveredPart.material.emissive.setHex(0x000000);
+        }
         setHoveredPart(null);
         containerRef.current.style.cursor = 'default';
       }
