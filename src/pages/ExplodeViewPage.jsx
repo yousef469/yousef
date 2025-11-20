@@ -240,6 +240,14 @@ export default function ExplodeViewPage() {
     loader.load(url, (gltf) => {
       const model = extension === 'fbx' ? gltf : gltf.scene;
       
+      if (!model) {
+        console.error('Model is undefined');
+        setIsLoading(false);
+        alert('Failed to load model - invalid file');
+        URL.revokeObjectURL(url);
+        return;
+      }
+      
       // Clean scene
       if (sceneRef.current) {
         const partsToRemove = sceneRef.current.children.filter(c => c.userData.isPart || c.userData.isWireframe);
@@ -272,8 +280,14 @@ export default function ExplodeViewPage() {
           child.receiveShadow = true;
           // Save original material but upgrade to Physical for better metal look
           const oldMat = child.material;
+          
+          // Handle array materials
+          const baseColor = Array.isArray(oldMat) 
+            ? (oldMat[0]?.color || 0x888888)
+            : (oldMat?.color || 0x888888);
+          
           const newMat = new THREE.MeshPhysicalMaterial({
-            color: oldMat.color || 0x888888,
+            color: baseColor,
             metalness: 0.8,
             roughness: 0.2,
             clearcoat: 1.0,
@@ -292,7 +306,7 @@ export default function ExplodeViewPage() {
           // Calculate Explode Vector (from center of scene 0,0,0 since we centered model)
           const worldPos = new THREE.Vector3();
           child.getWorldPosition(worldPos);
-          const direction = worldPos.normalize(); // Direction from center
+          const direction = worldPos.clone().normalize(); // Direction from center
           const distance = 2 + Math.random() * 3; // Randomize distance for organic look
           
           offsets.set(child, direction.multiplyScalar(distance));
@@ -302,6 +316,13 @@ export default function ExplodeViewPage() {
           partsData.push({ id: idx++, name: child.userData.partName, mesh: child });
         }
       });
+      
+      if (newParts.length === 0) {
+        alert('No parts found in model. Make sure your model has separate meshes.');
+        setIsLoading(false);
+        URL.revokeObjectURL(url);
+        return;
+      }
 
       setParts(newParts);
       setPartsList(partsData);
