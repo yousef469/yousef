@@ -238,39 +238,45 @@ export default function ExplodeViewPage() {
     }
 
     loader.load(url, (gltf) => {
-      const model = extension === 'fbx' ? gltf : gltf.scene;
-      
-      if (!model) {
-        console.error('Model is undefined');
-        setIsLoading(false);
-        alert('Failed to load model - invalid file');
-        URL.revokeObjectURL(url);
-        return;
-      }
-      
-      // Clean scene
-      if (sceneRef.current) {
-        const partsToRemove = sceneRef.current.children.filter(c => c.userData.isPart || c.userData.isWireframe);
-        partsToRemove.forEach(p => sceneRef.current.remove(p));
-      }
+      try {
+        const model = extension === 'fbx' ? gltf : gltf.scene;
+        
+        if (!model || !model.traverse) {
+          console.error('Model is invalid or undefined', model);
+          setIsLoading(false);
+          alert('Failed to load model - invalid file format');
+          URL.revokeObjectURL(url);
+          return;
+        }
+        
+        // Clean scene
+        if (sceneRef.current) {
+          const partsToRemove = sceneRef.current.children.filter(c => c.userData.isPart || c.userData.isWireframe);
+          partsToRemove.forEach(p => sceneRef.current.remove(p));
+        }
 
-      // Reset states
-      setParts([]);
-      setPartsList([]);
-      setSelectedPart(null);
-      setIsExploded(false);
+        // Reset states
+        setParts([]);
+        setPartsList([]);
+        setSelectedPart(null);
+        setIsExploded(false);
 
-      // Process Mesh
-      const newParts = [];
-      const positions = new Map();
-      const offsets = new Map();
-      const partsData = [];
-      
-      const box = new THREE.Box3().setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      
-      // Center the model first
-      model.position.sub(center);
+        // Process Mesh
+        const newParts = [];
+        const positions = new Map();
+        const offsets = new Map();
+        const partsData = [];
+        
+        // Add model to scene first
+        sceneRef.current.add(model);
+        
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        
+        // Center the model
+        if (model.position) {
+          model.position.sub(center);
+        }
   
       let idx = 0;
       model.traverse((child) => {
@@ -324,17 +330,24 @@ export default function ExplodeViewPage() {
         return;
       }
 
-      setParts(newParts);
-      setPartsList(partsData);
-      setOriginalPositions(positions);
-      setExplodeOffsets(offsets);
-      setModelLoaded(true);
-      setIsLoading(false);
-      URL.revokeObjectURL(url);
+        setParts(newParts);
+        setPartsList(partsData);
+        setOriginalPositions(positions);
+        setExplodeOffsets(offsets);
+        setModelLoaded(true);
+        setIsLoading(false);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error processing model:', error);
+        setIsLoading(false);
+        alert('Error processing model: ' + error.message);
+        URL.revokeObjectURL(url);
+      }
     }, undefined, (e) => {
-      console.error(e);
+      console.error('Error loading model:', e);
       setIsLoading(false);
-      alert("Failed to load model");
+      alert("Failed to load model file");
+      URL.revokeObjectURL(url);
     });
   };
 
