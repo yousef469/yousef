@@ -246,6 +246,162 @@ export default function ExplodeViewPage() {
     return '3D Model';
   };
 
+  // --- 3.5. AI Vision Identification (MULTI-ANGLE) ---
+  const identifyModelByVision = async (allParts, partsData) => {
+    setAnalyzingModel(true);
+    console.log('📸 Capturing multi-angle images for AI vision analysis...');
+    
+    try {
+      // Step 1: Capture multiple angles for better accuracy
+      const images = await captureMultiAngleImages();
+      console.log(`📷 Captured ${images.length} views`);
+      
+      // Step 2: Send primary view to Gemini Vision API
+      const identification = await analyzeModelImage(images[0], partsData);
+      
+      // Step 3: Update UI with results
+      setModelType(`${identification.modelType} (${identification.confidence} confidence)`);
+      
+      // Step 4: Filter parts based on AI-identified critical components
+      let filteredList = [];
+      
+      if (identification.criticalParts && identification.criticalParts.length > 0) {
+        console.log('🎯 AI identified critical parts:', identification.criticalParts);
+        
+        partsData.forEach((partData) => {
+          const partName = partData.name.toLowerCase();
+          const isImportant = identification.criticalParts.some(crit => {
+            const critLower = crit.toLowerCase();
+            return partName.includes(critLower) || critLower.includes(partName);
+          });
+          
+          if (isImportant) {
+            filteredList.push(partData);
+          }
+        });
+      }
+      
+      // Fallback to size-based if no matches
+      if (filteredList.length === 0) {
+        console.log('⚠️ No critical parts matched, using size filter');
+        filteredList = filterBySize(partsData);
+      }
+      
+      setPartsList(filteredList);
+      console.log(`✅ AI Vision identified: ${identification.modelType} | Showing ${filteredList.length} parts`);
+      
+    } catch (error) {
+      console.warn('⚠️ AI Vision failed, using shape detection:', error.message);
+      
+      // Fallback to shape detection
+      const shapeBox = new THREE.Box3();
+      allParts.forEach(m => shapeBox.expandByObject(m));
+      const shapeSize = shapeBox.getSize(new THREE.Vector3());
+      const category = classifyByShape(shapeSize);
+      
+      setModelType(`${category} (Shape Detected)`);
+      
+      const filteredList = filterBySize(partsData);
+      setPartsList(filteredList);
+    } finally {
+      setAnalyzingModel(false);
+    }
+  };
+  
+  // Capture model from multiple angles
+  const captureMultiAngleImages = async () => {
+    return new Promise((resolve) => {
+      const images = [];
+      const angles = [
+        { name: 'front', rotation: 0 },
+        { name: 'side', rotation: Math.PI / 2 },
+        { name: 'top', rotation: 0, elevation: Math.PI / 3 }
+      ];
+      
+      // Store original camera position
+      const originalPos = cameraRef.current.position.clone();
+      const originalTarget = controlsRef.current.target.clone();
+      
+      // Calculate distance from center
+      const distance = originalPos.distanceTo(originalCenter);
+      
+      angles.forEach(({ name, rotation, elevation = 0 }) => {
+        // Position camera at angle
+        const x = originalCenter.x + Math.cos(rotation) * Math.cos(elevation) * distance;
+        const y = originalCenter.y + Math.sin(elevation) * distance;
+        const z = originalCenter.z + Math.sin(rotation) * Math.cos(elevation) * distance;
+        
+        cameraRef.current.position.set(x, y, z);
+        cameraRef.current.lookAt(originalCenter);
+        
+        // Render and capture
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+        const imageData = rendererRef.current.domElement.toDataURL('image/png');
+        images.push({ name, data: imageData });
+        
+        console.log(`📷 Captured ${name} view`);
+      });
+      
+      // Restore original camera position
+      cameraRef.current.position.copy(originalPos);
+      cameraRef.current.lookAt(originalTarget);
+      controlsRef.current.target.copy(originalTarget);
+      
+      resolve(images);
+    });
+  };
+  
+  // Analyze image with Gemini Vision (ENHANCED PROMPT)
+  const analyzeModelImage = async (imageObj, partsData) => {
+    // Get part names for context
+    const partNames = partsData.slice(0, 50).map(p => p.name).join(', ');
+    
+    const prompt = `You are an expert engineer analyzing a 3D model.
+
+IMAGE: This is a rendered view of a 3D engineering model.
+PART NAMES: ${partNames}
+
+Analyze the visual appearance and part names to identify:
+1. What specific model/vehicle this is (be as specific as possible)
+2. The category (rocket, car, plane, boat, spacecraft, etc.)
+3. The 5-10 MOST CRITICAL/LARGEST components visible
+
+Return ONLY this JSON format:
+{
+  "modelType": "Specific model name (e.g., SpaceX Falcon 9 Heavy, BMW M3 E46, Boeing 747-400)",
+  "category": "rocket|car|plane|boat|spacecraft|vehicle|robot",
+  "confidence": "high|medium|low",
+  "criticalParts": ["engine", "fuselage", "wing", "etc"]
+}
+
+Rules:
+- Be specific with model names when possible
+- For criticalParts, list ONLY the largest/most important components
+- Match part names from the provided list when possible
+- Confidence: high = certain identification, medium = likely match, low = generic category only`;
+    
+    // Convert base64 to format Gemini expects
+    const base64Data = imageObj.data.split(',')[1];
+    
+    const response = await generateResponse(prompt, {
+      inline_data: {
+        data: base64Data,
+        mime_type: 'image/png'
+      }
+    });
+    
+    if (!response || !response.trim()) {
+      throw new Error('Empty response from AI Vision');
+    }
+    
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    } else {
+      throw new Error('Invalid JSON response');
+    }
+  };
+
   // --- 4. Model Loading Logic (The Fix) ---
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -450,25 +606,10 @@ export default function ExplodeViewPage() {
       setIsLoading(false);
       URL.revokeObjectURL(url);
 
-      // SKIP AI IDENTIFICATION - Use shape-based classification only
-      // This prevents 503 errors from breaking the viewer
-      console.log('⚡ Skipping AI identification (using shape detection only)');
-      
-      // Classify by shape immediately
-      const allMeshes = newParts;
-      const shapeBox = new THREE.Box3();
-      allMeshes.forEach(m => shapeBox.expandByObject(m));
-      const shapeSize = shapeBox.getSize(new THREE.Vector3());
-      const category = classifyByShape(shapeSize);
-      
-      setModelType(`${category} (Shape Detected)`);
-      
-      // Show top 10 largest parts
+      // AI VISION IDENTIFICATION - Multi-angle capture and analysis
       setTimeout(() => {
-        const filteredList = filterBySize(partsData);
-        setPartsList(filteredList);
-        console.log(`✅ Showing ${filteredList.length} largest parts`);
-      }, 500);
+        identifyModelByVision(newParts, partsData);
+      }, 1000);
 
     }, undefined, (e) => {
       console.error(e);
