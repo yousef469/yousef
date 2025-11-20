@@ -480,7 +480,7 @@ export default function ExplodeViewPage() {
       const filteredList = filterBySize(allPartsData);
       setModelType(`${category} (Shape Detected)`);
       setPartsList(filteredList);
-      setParts(filteredList.map(p => p.mesh));
+      // NEVER filter parts array - keep all meshes for raycasting/explode
       setAnalyzingModel(false);
       return;
     }
@@ -550,9 +550,7 @@ Rules:
       
       setModelType(type);
       setPartsList(filteredList);
-      
-      // Update parts array to only include visible parts
-      setParts(filteredList.map(p => p.mesh));
+      // NEVER filter parts array - keep all meshes for raycasting/explode
       
     } catch (e) {
       console.warn("⚠️ AI failed (non-critical):", e.message);
@@ -563,7 +561,7 @@ Rules:
       
       setModelType(`${category} (AI Unavailable)`);
       setPartsList(filteredList);
-      setParts(filteredList.map(p => p.mesh));
+      // NEVER filter parts array - keep all meshes for raycasting/explode
     } finally {
       setAnalyzingModel(false);
     }
