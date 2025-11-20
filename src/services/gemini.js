@@ -27,7 +27,7 @@ const callGeminiAPI = async (prompt) => {
           }]
         }],
         generationConfig: {
-          temperature: 0.9,
+          temperature: 0.2,  // Low temperature for consistent, structured output
           topK: 40,
           topP: 0.95,
           maxOutputTokens: 2048,

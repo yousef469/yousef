@@ -362,57 +362,93 @@ export default function ExplodeViewPage() {
     });
   };
   
-  // Batch analyze major parts (pre-cache explanations)
+  // Batch analyze major parts (pre-cache explanations) - SMALL BATCHES
   const batchAnalyzeParts = async (majorParts, modelType) => {
     if (majorParts.length === 0) return;
     
-    console.log(`🔄 Batch analyzing ${majorParts.length} major parts...`);
+    console.log(`🔄 Batch analyzing ${majorParts.length} major parts in small batches...`);
     
-    // Build a batch prompt for all parts at once
-    const partsList = majorParts.map((p, i) => `${i + 1}. ${p.name}`).join('\n');
+    // Process in small batches of 3 parts to avoid overwhelming the API
+    const BATCH_SIZE = 3;
+    let successCount = 0;
     
-    const prompt = `You are analyzing a ${modelType}. Provide engineering details for these major components:
+    for (let i = 0; i < majorParts.length; i += BATCH_SIZE) {
+      const batch = majorParts.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(majorParts.length / BATCH_SIZE);
+      
+      console.log(`📦 Processing batch ${batchNum}/${totalBatches} (${batch.length} parts)...`);
+      
+      try {
+        // Build prompt for this batch
+        const partsList = batch.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
+        
+        const prompt = `You are an expert engineer analyzing a ${modelType}.
 
+Analyze these ${batch.length} major components:
 ${partsList}
 
-For EACH part, return JSON in this format:
-{"partName":"exact name from list","purpose":"what it does","material":"materials used","cost":"estimated cost","tip":"engineering insight"}
+For EACH component, provide:
+1. Purpose: What it does and why it's critical
+2. Material: Specific materials (e.g., Titanium alloy, Carbon fiber)
+3. Cost: Realistic estimate with currency
+4. Tip: Engineering insight or maintenance note
 
-Return a JSON array with one object per part. Use temperature 0 for consistency.`;
-    
-    try {
-      const response = await generateResponse(prompt);
-      
-      if (!response || !response.trim()) {
-        console.warn('⚠️ Empty batch analysis response');
-        return;
-      }
-      
-      // Try to parse JSON array
-      const jsonMatch = response.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const analyses = JSON.parse(jsonMatch[0]);
+Return ONLY a JSON array (no markdown):
+[
+  {"partName":"exact name","purpose":"...","material":"...","cost":"...","tip":"..."},
+  ...
+]`;
         
-        // Cache each analysis
-        analyses.forEach(analysis => {
-          if (analysis.partName) {
-            setPartExplanations(prev => new Map(prev).set(analysis.partName, {
-              purpose: analysis.purpose || 'Component analysis',
-              material: analysis.material || 'Various materials',
-              cost: analysis.cost || 'Contact supplier',
-              tip: analysis.tip || 'Refer to technical documentation'
-            }));
-          }
-        });
+        const response = await generateResponse(prompt);
         
-        console.log(`✅ Batch analyzed ${analyses.length} parts successfully`);
-      } else {
-        console.warn('⚠️ Could not parse batch analysis JSON');
+        if (!response || !response.trim()) {
+          console.warn(`⚠️ Empty response for batch ${batchNum}`);
+          continue;
+        }
+        
+        // Try to parse JSON array
+        let jsonMatch = response.match(/\[[\s\S]*\]/);
+        
+        // If wrapped in markdown, extract it
+        if (!jsonMatch && response.includes('```')) {
+          const codeBlock = response.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/);
+          if (codeBlock) jsonMatch = [codeBlock[1]];
+        }
+        
+        if (jsonMatch) {
+          const analyses = JSON.parse(jsonMatch[0]);
+          
+          // Cache each analysis
+          analyses.forEach(analysis => {
+            if (analysis.partName) {
+              setPartExplanations(prev => new Map(prev).set(analysis.partName, {
+                purpose: analysis.purpose || 'Component analysis',
+                material: analysis.material || 'Various materials',
+                cost: analysis.cost || 'Contact supplier',
+                tip: analysis.tip || 'Refer to technical documentation'
+              }));
+              successCount++;
+            }
+          });
+          
+          console.log(`✅ Batch ${batchNum} analyzed ${analyses.length} parts`);
+        } else {
+          console.warn(`⚠️ Could not parse JSON from batch ${batchNum}`);
+        }
+        
+        // Small delay between batches to avoid rate limiting
+        if (i + BATCH_SIZE < majorParts.length) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+      } catch (error) {
+        console.warn(`⚠️ Batch ${batchNum} failed:`, error.message);
+        // Continue with next batch
       }
-    } catch (error) {
-      console.warn('⚠️ Batch analysis failed (non-critical):', error.message);
-      // Don't throw - this is optional enhancement
     }
+    
+    console.log(`✅ Batch analysis complete: ${successCount}/${majorParts.length} parts analyzed`);
   };
 
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
