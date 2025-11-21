@@ -22,7 +22,8 @@ export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 
 - ✅ Returns full API response object for flexible parsing
 
 **Key Improvements:**
-- Added `generationConfig` with `responseMimeType: "application/json"` and `maxOutputTokens`
+- Added `generationConfig` with `maxOutputTokens` (NOTE: Flash 2.5 does NOT support `responseMimeType`)
+- JSON enforcement done via prompt instead (Flash 2.5 compatible)
 - Checks `res.status >= 500` before trying to parse response
 - Validates `finishReason !== 'MAX_TOKENS'` before accepting response
 - Validates text is not empty before accepting response
@@ -120,6 +121,8 @@ To test the fix:
 - Prevents Gemini from generating responses that are too long
 - Model identification: 300 tokens (perfect for JSON)
 - Part analysis: 400 tokens (default)
+- **IMPORTANT:** Removed `responseMimeType` (not supported in Flash 2.5)
+- JSON enforcement done via prompt: "YOU MUST RESPOND WITH VALID JSON ONLY"
 
 ### ✅ FIX 2: Individual Part Processing
 - Changed from batch processing (3 parts) to individual processing (1 part)

@@ -377,19 +377,20 @@ export default function ExplodeViewPage() {
       console.log(`📦 Processing part ${i + 1}/${majorParts.length}: ${part.name}...`);
       
       try {
-        const prompt = `RESPOND WITH ONLY PURE JSON. NO EXPLANATION. NO MARKDOWN. NO TEXT OUTSIDE JSON.
+        const prompt = `You are analyzing a ${modelType}. Analyze this part: ${part.name}
 
-You are analyzing a ${modelType}. Analyze this part: ${part.name}
+YOU MUST RESPOND WITH VALID JSON ONLY. NO EXPLANATION. NO ADDITIONAL TEXT.
 
-Return ONLY this JSON object (copy this exact format):
+Return this exact JSON format:
 {"partName":"${part.name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}
 
-RULES:
-- Output ONLY the JSON object above
+CRITICAL RULES:
+- Output ONLY valid JSON
 - NO text before or after the JSON
-- NO markdown code blocks
-- NO explanations
+- NO markdown code blocks (no \`\`\`)
+- NO explanations or commentary
 - Keep each field under 50 characters
+- If you can't fit everything, summarize but keep valid JSON
 - If you cannot identify the part, use "Unknown" for that field`;
 
         
@@ -457,17 +458,21 @@ RULES:
 
 MAJOR COMPONENTS AVAILABLE: ${partNames}
 
-RESPOND WITH ONLY THIS EXACT JSON FORMAT (no markdown, no code blocks, no extra text):
+YOU MUST RESPOND WITH VALID JSON ONLY. NO EXPLANATION. NO ADDITIONAL TEXT.
+
+Return this exact JSON format:
 {"modelType":"Specific model name","category":"rocket or car or plane or boat or spacecraft or vehicle","confidence":"high or medium or low","criticalParts":["part1","part2","part3"]}
 
-RULES:
-1. modelType must be specific (e.g., "SpaceX Falcon 9", "BMW M3", "Boeing 747")
-2. category must be one word from the list
-3. confidence must be high, medium, or low
-4. criticalParts must list 3-5 LARGEST structural/functional components from the list above
-5. IGNORE small parts like screws, bolts, pins, connectors
-6. Focus on: engines, fuselage, wings, chassis, tanks, major assemblies
-7. Output ONLY the JSON, nothing else`;
+CRITICAL RULES:
+1. Output ONLY valid JSON - no text before or after
+2. NO markdown code blocks (no \`\`\`)
+3. modelType must be specific (e.g., "SpaceX Falcon 9", "BMW M3", "Boeing 747")
+4. category must be one word from the list
+5. confidence must be high, medium, or low
+6. criticalParts must list 3-5 LARGEST structural/functional components from the list above
+7. IGNORE small parts like screws, bolts, pins, connectors
+8. Focus on: engines, fuselage, wings, chassis, tanks, major assemblies
+9. If you can't fit everything, summarize but keep valid JSON`;
     
     // Convert base64 to format Gemini expects
     const base64Data = imageObj.data.split(',')[1];

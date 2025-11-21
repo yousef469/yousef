@@ -240,10 +240,12 @@ export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 
       { parts: images.map(img => ({ inline_data: img })) }
     ],
     // FIX 1: Add generationConfig to prevent MAX_TOKENS error
+    // NOTE: Flash 2.5 does NOT support responseMimeType (only Pro/Realtime)
     generationConfig: {
-      responseMimeType: "application/json",
+      temperature: 0.2,
       maxOutputTokens: maxTokens,  // Prevents token overflow
-      temperature: 0.2
+      topK: 40,
+      topP: 0.95
     }
   };
 
