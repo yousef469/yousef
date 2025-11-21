@@ -8,37 +8,27 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_KEY = 'AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q'; // Use same key as gemini.js
-
+  // Use Vercel Serverless Function (secure - API key hidden on server)
   const callGeminiAPI = async (prompt) => {
-    // Use v1 API with gemini-2.5-flash (from available models list)
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-    
-    const response = await fetch(url, {
+    const response = await fetch('/api/gemini/text', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        }
+        prompt,
+        maxTokens: 500,
+        retries: 4
       })
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+      throw new Error(errorData.error || `API Error: ${response.status}`);
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data.text; // Serverless function returns text at top level
     
     if (!text) {
       throw new Error('No text in response');
