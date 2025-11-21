@@ -37,10 +37,10 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      'https://engineeruim.vercel.app', 
+      'https://engineeruim.vercel.app',
+      'https://engineeruim-eight.vercel.app',
       'https://www.engineeruim.com', 
       'https://engineerium.vercel.app',
-      'https://yousef-one.vercel.app',
       'http://localhost:3000',
       /\.vercel\.app$/ // Allow all Vercel preview deployments
     ],
