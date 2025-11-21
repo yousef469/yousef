@@ -1,18 +1,19 @@
-// ✅ SECURE: API calls go through backend proxy
-// Frontend → Backend → Gemini API → Backend → Frontend
+// ✅ SECURE: API calls go through Vercel Serverless Functions
+// Frontend → Vercel Function → Gemini API → Vercel Function → Frontend
 // API key is hidden on server, never exposed to users
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+// Use relative URLs - works both locally (Vite proxy) and on Vercel
+const API_BASE = '/api/gemini';
 
-console.log('🔐 Gemini API: Using SECURE backend proxy');
-console.log('📡 Backend URL:', BACKEND_URL);
+console.log('�  Gemini API: Using SECURE Vercel Serverless Functions');
+console.log('📡 API Base:', API_BASE);
 
 // Secure Vision API call (with images) through backend
 export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 256) {
-  console.log(`🔮 Calling backend vision proxy: ${images.length} images, ${maxTokens} tokens`);
+  console.log(`🔮 Calling Vercel function: ${images.length} images, ${maxTokens} tokens`);
   
   try {
-    const response = await fetch(`${BACKEND_URL}/api/gemini/vision`, {
+    const response = await fetch(`${API_BASE}/vision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -41,12 +42,12 @@ export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 
   }
 }
 
-// Secure Text API call (no images) through backend
+// Secure Text API call (no images) through Vercel function
 const callGeminiAPI = async (prompt, retries = 4) => {
-  console.log(`💬 Calling backend text proxy`);
+  console.log(`💬 Calling Vercel function`);
   
   try {
-    const response = await fetch(`${BACKEND_URL}/api/gemini/text`, {
+    const response = await fetch(`${API_BASE}/text`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
