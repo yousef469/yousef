@@ -43,10 +43,9 @@ const callGeminiAPI = async (prompt, retries = 4) => {
             }]
           }],
           generationConfig: {
-            temperature: 0.2,  // Low temperature for consistent, structured output
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 256,  // CRITICAL: Low limit prevents MAX_TOKENS errors
+            temperature: 0.1,
+            topP: 0.8
           }
         })
       });
@@ -248,19 +247,19 @@ const callGeminiAPIWithImage = async (prompt, imageData, retries = 4) => {
 };
 
 // 🔥 STABLE MULTI-IMAGE VISION API - Never crashes with proper retry logic
-export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 400) {
+export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 256) {
   const payload = {
     contents: [
       { parts: [{ text: prompt }] },
       { parts: images.map(img => ({ inline_data: img })) }
     ],
-    // FIX 1: Add generationConfig to prevent MAX_TOKENS error
+    // CRITICAL FIX: Low maxOutputTokens prevents MAX_TOKENS errors with vision
+    // Vision requests consume LOTS of input tokens, so output must be small
     // NOTE: Flash 2.5 does NOT support responseMimeType (only Pro/Realtime)
     generationConfig: {
-      temperature: 0.2,
-      maxOutputTokens: maxTokens,  // Prevents token overflow
-      topK: 40,
-      topP: 0.95
+      maxOutputTokens: maxTokens,  // Default 256 - SAFE for vision + images
+      temperature: 0.1,
+      topP: 0.8
     }
   };
 

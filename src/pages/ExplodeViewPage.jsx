@@ -479,11 +479,11 @@ RULES:
     const mimeType = imageObj.data.match(/data:(image\/[^;]+);/)?.[1] || 'image/jpeg';
     
     // 🔥 Use the new stable callGeminiVision with proper retry logic
-    // maxTokens=300 is perfect for model identification JSON (prevents MAX_TOKENS)
+    // CRITICAL: maxTokens=200 prevents MAX_TOKENS with vision (images consume input tokens)
     const apiResponse = await callGeminiVision(prompt, [{
       mime_type: mimeType,
       data: base64Data
-    }], 5, 300);
+    }], 5, 200);
     
     // Extract text from API response (already validated in callGeminiVision)
     const response = apiResponse.candidates?.[0]?.content?.parts?.[0]?.text;
