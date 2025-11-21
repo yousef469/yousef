@@ -4,16 +4,24 @@
 // Current setup: Frontend → Gemini API (INSECURE - key visible to users)
 
 // NEW API KEY (old one was leaked and blocked by Google)
+// OLD (BLOCKED): AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q
+// NEW (ACTIVE):  AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4
 const API_KEY = 'AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4';
 
-console.log('🔑 API Key Status [NEW KEY - Nov 21, 2025]:', {
+console.log('🔑 API Key Status [✅ NEW KEY ACTIVE - Nov 21, 2025]:', {
   exists: !!API_KEY,
   length: API_KEY?.length,
   startsWithAIza: API_KEY?.startsWith('AIza'),
-  firstChars: API_KEY?.substring(0, 10) + '...'
+  firstChars: API_KEY?.substring(0, 10) + '...',
+  lastChars: '...' + API_KEY?.substring(API_KEY.length - 4),
+  isNewKey: API_KEY?.includes('VAN') // New key contains 'VAN', old key contains 'V6-'
 });
 
 console.warn('⚠️ SECURITY: API key is exposed in frontend code. Move to backend ASAP!');
+
+if (API_KEY?.includes('V6-')) {
+  console.error('❌ WRONG KEY! Still using OLD BLOCKED key. Update to: AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4');
+}
 
 // Direct API call using v1 endpoint with Gemini 2.5 Flash (stable multimodal model)
 const callGeminiAPI = async (prompt, retries = 4) => {
