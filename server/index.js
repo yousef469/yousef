@@ -112,11 +112,12 @@ app.post('/api/gemini/vision', async (req, res) => {
         }
 
         console.log(`✅ Gemini Vision success on attempt ${attempt}`);
+        console.log(`📄 Extracted text length: ${text.length} chars`);
         
-        // Return both the full response AND extracted text for convenience
+        // Return ONLY the text at top level (keep full response for debugging)
         return res.json({
-          ...data,
-          text: text  // Add extracted text at top level for easy access
+          text: text,           // Primary: extracted text for easy access
+          fullResponse: data    // Secondary: full Gemini response for debugging
         });
 
       } catch (err) {
@@ -190,11 +191,12 @@ app.post('/api/gemini/text', async (req, res) => {
         }
 
         console.log(`✅ Gemini Text success`);
+        console.log(`📄 Extracted text length: ${text.length} chars`);
         
-        // Return both the full response AND extracted text for convenience
+        // Return ONLY the text at top level (keep full response for debugging)
         return res.json({
-          ...data,
-          text: text  // Add extracted text at top level for easy access
+          text: text,           // Primary: extracted text for easy access
+          fullResponse: data    // Secondary: full Gemini response for debugging
         });
 
       } catch (err) {
