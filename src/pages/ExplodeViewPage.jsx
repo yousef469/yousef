@@ -254,7 +254,7 @@ export default function ExplodeViewPage() {
     try {
       // Step 1: Capture multiple angles for better accuracy
       const images = await captureMultiAngleImages();
-      console.log(`📷 Captured ${images.length} views`);
+      console.log(`📷 Captured ${images.length} views (optimized for <20k vision tokens)`);
       
       // Step 2: Send primary view to Gemini Vision API for model identification
       const identification = await analyzeModelImage(images[0], partsData);
@@ -319,14 +319,16 @@ export default function ExplodeViewPage() {
     }
   };
   
-  // Capture model from multiple angles (OPTIMIZED)
+  // Capture model from multiple angles (OPTIMIZED - 2 images max to stay under 20k token limit)
   const captureMultiAngleImages = async () => {
     return new Promise((resolve) => {
       const images = [];
+      // REDUCED: 3 images → 2 images (front + isometric)
+      // 3 images = ~70KB = ~20k+ vision tokens = MAX_TOKENS error
+      // 2 images = ~46KB = ~13k vision tokens = SAFE
       const angles = [
-        { name: 'front', rotation: 0 },
-        { name: 'side', rotation: Math.PI / 2 },
-        { name: 'top', rotation: 0, elevation: Math.PI / 3 }
+        { name: 'front', rotation: 0, elevation: 0 },
+        { name: 'isometric', rotation: Math.PI / 4, elevation: Math.PI / 6 }
       ];
       
       // Store original camera position

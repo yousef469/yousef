@@ -1,12 +1,19 @@
-// Direct API implementation using v1 API - Hardcoded key to bypass Vercel env issues
-const API_KEY = 'AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q';
+// ⚠️ SECURITY WARNING: API key exposed in frontend!
+// TODO: Move Gemini API calls to backend server to protect the key
+// Frontend → Backend → Gemini API → Backend → Frontend
+// Current setup: Frontend → Gemini API (INSECURE - key visible to users)
 
-console.log('🔑 API Key Status [FRESH BUILD]:', {
+// NEW API KEY (old one was leaked and blocked by Google)
+const API_KEY = 'AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4';
+
+console.log('🔑 API Key Status [NEW KEY - Nov 21, 2025]:', {
   exists: !!API_KEY,
   length: API_KEY?.length,
   startsWithAIza: API_KEY?.startsWith('AIza'),
   firstChars: API_KEY?.substring(0, 10) + '...'
 });
+
+console.warn('⚠️ SECURITY: API key is exposed in frontend code. Move to backend ASAP!');
 
 // Direct API call using v1 endpoint with Gemini 2.5 Flash (stable multimodal model)
 const callGeminiAPI = async (prompt, retries = 4) => {

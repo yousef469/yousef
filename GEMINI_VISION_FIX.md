@@ -114,7 +114,7 @@ To test the fix:
 3. Verify AI successfully identifies the model type
 4. Check that part explanations are generated
 
-## All 3 Fixes Applied
+## All Fixes Applied
 
 ### ✅ FIX 1: maxOutputTokens Configuration
 - Added `generationConfig` with `maxOutputTokens` parameter
@@ -123,6 +123,18 @@ To test the fix:
 - Part analysis: 400 tokens (default)
 - **IMPORTANT:** Removed `responseMimeType` (not supported in Flash 2.5)
 - JSON enforcement done via prompt: "YOU MUST RESPOND WITH VALID JSON ONLY"
+
+### ✅ FIX 4: Reduced Image Count (Nov 21, 2025)
+- **Problem:** 3 images = ~70KB = ~20k+ vision tokens = MAX_TOKENS error
+- **Solution:** Reduced to 2 images (front + isometric)
+- **Result:** 2 images = ~46KB = ~13k vision tokens = SAFE
+- Stays well under Gemini Flash Vision's 20k token input limit
+
+### ⚠️ SECURITY FIX: New API Key (Nov 21, 2025)
+- **Old key leaked and blocked:** `AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q`
+- **New key installed:** `AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4`
+- **WARNING:** Key still exposed in frontend (temporary fix)
+- **TODO:** Move API calls to backend server (see SECURITY_API_KEY.md)
 
 ### ✅ FIX 2: Individual Part Processing
 - Changed from batch processing (3 parts) to individual processing (1 part)
