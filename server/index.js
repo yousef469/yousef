@@ -112,7 +112,12 @@ app.post('/api/gemini/vision', async (req, res) => {
         }
 
         console.log(`✅ Gemini Vision success on attempt ${attempt}`);
-        return res.json(data);
+        
+        // Return both the full response AND extracted text for convenience
+        return res.json({
+          ...data,
+          text: text  // Add extracted text at top level for easy access
+        });
 
       } catch (err) {
         console.warn(`⚠️ Attempt ${attempt} failed:`, err.message);
@@ -185,7 +190,12 @@ app.post('/api/gemini/text', async (req, res) => {
         }
 
         console.log(`✅ Gemini Text success`);
-        return res.json(data);
+        
+        // Return both the full response AND extracted text for convenience
+        return res.json({
+          ...data,
+          text: text  // Add extracted text at top level for easy access
+        });
 
       } catch (err) {
         console.warn(`⚠️ Attempt ${attempt} failed:`, err.message);

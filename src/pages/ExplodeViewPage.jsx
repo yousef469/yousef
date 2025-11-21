@@ -485,8 +485,14 @@ RULES:
       data: base64Data
     }], 5, 200);
     
-    // Extract text from API response (already validated in callGeminiVision)
-    const response = apiResponse.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Extract text from API response
+    // Backend returns text at top level for convenience, with fallback to nested path
+    const response = apiResponse.text || apiResponse.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!response || !response.trim()) {
+      console.error('❌ Empty response from backend:', apiResponse);
+      throw new Error('Empty response from AI Vision');
+    }
     
     console.log('📄 Full AI response:', response);
     

@@ -30,6 +30,9 @@ export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 
 
     const data = await response.json();
     console.log('✅ Backend vision response received');
+    
+    // Backend now returns text at top level for convenience
+    // But keep full response for compatibility
     return data;
 
   } catch (error) {
