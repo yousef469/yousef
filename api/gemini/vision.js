@@ -16,9 +16,24 @@ export default async function handler(req, res) {
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     
+    // Debug logging
+    console.log('🔍 Environment check:', {
+      hasKey: !!GEMINI_API_KEY,
+      keyLength: GEMINI_API_KEY?.length || 0,
+      keyPrefix: GEMINI_API_KEY?.substring(0, 10) || 'none',
+      allGeminiKeys: Object.keys(process.env).filter(k => k.includes('GEMINI'))
+    });
+    
     if (!GEMINI_API_KEY) {
       console.error('❌ GEMINI_API_KEY not found in environment variables!');
-      return res.status(500).json({ error: 'API key not configured' });
+      console.error('Available env keys:', Object.keys(process.env).slice(0, 10));
+      return res.status(500).json({ 
+        error: 'API key not configured',
+        debug: {
+          hasKey: false,
+          availableKeys: Object.keys(process.env).filter(k => k.includes('GEMINI'))
+        }
+      });
     }
 
     console.log(`🔮 Gemini Vision request: ${images.length} images, maxTokens: ${maxTokens}`);
