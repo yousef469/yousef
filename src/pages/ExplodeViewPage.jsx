@@ -362,98 +362,85 @@ export default function ExplodeViewPage() {
     });
   };
   
-  // Batch analyze major parts (pre-cache explanations) - SMALL BATCHES
+  // FIX 2: Analyze parts INDIVIDUALLY (not in batches) to prevent MAX_TOKENS
   const batchAnalyzeParts = async (majorParts, modelType) => {
     if (majorParts.length === 0) return;
     
-    console.log(`🔄 Batch analyzing ${majorParts.length} major parts in small batches...`);
+    console.log(`🔄 Analyzing ${majorParts.length} major parts individually (100% stable)...`);
     
-    // Process in small batches of 3 parts to avoid overwhelming the API
-    const BATCH_SIZE = 3;
     let successCount = 0;
     
-    for (let i = 0; i < majorParts.length; i += BATCH_SIZE) {
-      const batch = majorParts.slice(i, i + BATCH_SIZE);
-      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-      const totalBatches = Math.ceil(majorParts.length / BATCH_SIZE);
+    // Process each part individually to avoid MAX_TOKENS
+    for (let i = 0; i < majorParts.length; i++) {
+      const part = majorParts[i];
       
-      console.log(`📦 Processing batch ${batchNum}/${totalBatches} (${batch.length} parts)...`);
+      console.log(`📦 Processing part ${i + 1}/${majorParts.length}: ${part.name}...`);
       
       try {
-        // Build prompt for this batch
-        const partsList = batch.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
-        
         const prompt = `RESPOND WITH ONLY PURE JSON. NO EXPLANATION. NO MARKDOWN. NO TEXT OUTSIDE JSON.
 
-You are analyzing a ${modelType}. Analyze these ${batch.length} parts:
-${partsList}
+You are analyzing a ${modelType}. Analyze this part: ${part.name}
 
-Return ONLY this JSON array (copy this exact format):
-[
-  {"partName":"${batch[0].name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}${batch.length > 1 ? `,
-  {"partName":"${batch[1].name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}` : ''}${batch.length > 2 ? `,
-  {"partName":"${batch[2].name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}` : ''}
-]
+Return ONLY this JSON object (copy this exact format):
+{"partName":"${part.name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}
 
 RULES:
-- Output ONLY the JSON array above
+- Output ONLY the JSON object above
 - NO text before or after the JSON
 - NO markdown code blocks
 - NO explanations
-- If you cannot identify a part, use "Unknown" for that field`;
+- Keep each field under 50 characters
+- If you cannot identify the part, use "Unknown" for that field`;
 
         
         const response = await generateResponse(prompt);
         
         if (!response || !response.trim()) {
-          console.warn(`⚠️ Empty response for batch ${batchNum}`);
+          console.warn(`⚠️ Empty response for ${part.name}`);
           continue;
         }
         
-        console.log(`📄 Batch ${batchNum} raw response:`, response.substring(0, 300));
+        console.log(`📄 ${part.name} raw response:`, response.substring(0, 200));
         
-        // Try to parse JSON array
-        let jsonMatch = response.match(/\[[\s\S]*\]/);
+        // Try to parse JSON object
+        let jsonMatch = response.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
         
         // If wrapped in markdown, extract it
         if (!jsonMatch && response.includes('```')) {
-          const codeBlock = response.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/);
+          const codeBlock = response.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
           if (codeBlock) jsonMatch = [codeBlock[1]];
         }
         
         if (jsonMatch) {
-          const analyses = JSON.parse(jsonMatch[0]);
+          const analysis = JSON.parse(jsonMatch[0]);
           
-          // Cache each analysis
-          analyses.forEach(analysis => {
-            if (analysis.partName) {
-              setPartExplanations(prev => new Map(prev).set(analysis.partName, {
-                purpose: analysis.purpose || 'Component analysis',
-                material: analysis.material || 'Various materials',
-                cost: analysis.cost || 'Contact supplier',
-                tip: analysis.tip || 'Refer to technical documentation'
-              }));
-              successCount++;
-            }
-          });
-          
-          console.log(`✅ Batch ${batchNum} analyzed ${analyses.length} parts`);
+          // Cache the analysis
+          if (analysis.partName) {
+            setPartExplanations(prev => new Map(prev).set(analysis.partName, {
+              purpose: analysis.purpose || 'Component analysis',
+              material: analysis.material || 'Various materials',
+              cost: analysis.cost || 'Contact supplier',
+              tip: analysis.tip || 'Refer to technical documentation'
+            }));
+            successCount++;
+            console.log(`✅ ${part.name} analyzed successfully`);
+          }
         } else {
-          console.warn(`⚠️ Could not parse JSON from batch ${batchNum}`);
+          console.warn(`⚠️ Could not parse JSON for ${part.name}`);
         }
         
-        // Small delay between batches to avoid rate limiting
-        if (i + BATCH_SIZE < majorParts.length) {
-          await new Promise(resolve => setTimeout(resolve, 500));
+        // Small delay between parts to avoid rate limiting
+        if (i < majorParts.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 800));
         }
         
       } catch (error) {
-        console.warn(`⚠️ Batch ${batchNum} failed:`, error.message);
-        // Continue with next batch
+        console.warn(`⚠️ ${part.name} failed:`, error.message);
+        // Continue with next part
       }
     }
     
-    console.log(`✅ Batch analysis complete: ${successCount}/${majorParts.length} parts analyzed`);
+    console.log(`✅ Individual analysis complete: ${successCount}/${majorParts.length} parts analyzed`);
   };
 
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
@@ -489,17 +476,14 @@ RULES:
     const mimeType = imageObj.data.match(/data:(image\/[^;]+);/)?.[1] || 'image/jpeg';
     
     // 🔥 Use the new stable callGeminiVision with proper retry logic
+    // maxTokens=300 is perfect for model identification JSON (prevents MAX_TOKENS)
     const apiResponse = await callGeminiVision(prompt, [{
       mime_type: mimeType,
       data: base64Data
-    }]);
+    }], 5, 300);
     
-    // Extract text from API response
+    // Extract text from API response (already validated in callGeminiVision)
     const response = apiResponse.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!response || !response.trim()) {
-      throw new Error('Empty response from AI Vision');
-    }
     
     console.log('📄 Full AI response:', response);
     

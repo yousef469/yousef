@@ -233,12 +233,18 @@ const callGeminiAPIWithImage = async (prompt, imageData, retries = 4) => {
 };
 
 // 🔥 STABLE MULTI-IMAGE VISION API - Never crashes with proper retry logic
-export async function callGeminiVision(prompt, images, retries = 5) {
+export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 400) {
   const payload = {
     contents: [
       { parts: [{ text: prompt }] },
       { parts: images.map(img => ({ inline_data: img })) }
-    ]
+    ],
+    // FIX 1: Add generationConfig to prevent MAX_TOKENS error
+    generationConfig: {
+      responseMimeType: "application/json",
+      maxOutputTokens: maxTokens,  // Prevents token overflow
+      temperature: 0.2
+    }
   };
 
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -265,7 +271,32 @@ export async function callGeminiVision(prompt, images, retries = 5) {
       }
 
       const data = await res.json();
-      console.log(`✅ Gemini responded successfully on retry ${attempt}`);
+      
+      // FIX 3: Check for MAX_TOKENS and empty responses INSIDE retry loop
+      const candidate = data.candidates?.[0];
+      const finishReason = candidate?.finishReason;
+      const text = candidate?.content?.parts?.[0]?.text;
+      
+      // If MAX_TOKENS or empty response, retry
+      if (finishReason === 'MAX_TOKENS') {
+        console.warn(`⚠️ MAX_TOKENS hit on attempt ${attempt}. Retrying...`);
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, attempt * 1000));
+          continue;
+        }
+        throw new Error('MAX_TOKENS: Response too long');
+      }
+      
+      if (!text || text.trim().length === 0) {
+        console.warn(`⚠️ No text in response on attempt ${attempt}. Retrying...`);
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, attempt * 1000));
+          continue;
+        }
+        throw new Error('No text in response');
+      }
+      
+      console.log(`✅ Gemini responded successfully on attempt ${attempt}`);
       return data; // success
     } catch (err) {
       console.warn(`⚠️ Retry ${attempt} failed:`, err.message);
