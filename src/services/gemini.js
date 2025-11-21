@@ -1,109 +1,76 @@
-// ⚠️ SECURITY WARNING: API key exposed in frontend!
-// TODO: Move Gemini API calls to backend server to protect the key
+// ✅ SECURE: API calls go through backend proxy
 // Frontend → Backend → Gemini API → Backend → Frontend
-// Current setup: Frontend → Gemini API (INSECURE - key visible to users)
+// API key is hidden on server, never exposed to users
 
-// NEW API KEY (old one was leaked and blocked by Google)
-// OLD (BLOCKED): AIzaSyBnhkRzMRAtedkpKO3dFxke-W6rJc6V6-Q
-// NEW (ACTIVE):  AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4
-const API_KEY = 'AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-console.log('🔑 API Key Status [✅ NEW KEY ACTIVE - Nov 21, 2025]:', {
-  exists: !!API_KEY,
-  length: API_KEY?.length,
-  startsWithAIza: API_KEY?.startsWith('AIza'),
-  firstChars: API_KEY?.substring(0, 10) + '...',
-  lastChars: '...' + API_KEY?.substring(API_KEY.length - 4),
-  isNewKey: API_KEY?.includes('VAN') // New key contains 'VAN', old key contains 'V6-'
-});
+console.log('🔐 Gemini API: Using SECURE backend proxy');
+console.log('📡 Backend URL:', BACKEND_URL);
 
-console.warn('⚠️ SECURITY: API key is exposed in frontend code. Move to backend ASAP!');
+// Secure Vision API call (with images) through backend
+export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 256) {
+  console.log(`🔮 Calling backend vision proxy: ${images.length} images, ${maxTokens} tokens`);
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/gemini/vision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt,
+        images,
+        maxTokens,
+        retries
+      })
+    });
 
-if (API_KEY?.includes('V6-')) {
-  console.error('❌ WRONG KEY! Still using OLD BLOCKED key. Update to: AIzaSyAivJTVh9dfu8d5Tun0sD4fYgMLVANl6S4');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || `Backend error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Backend vision response received');
+    return data;
+
+  } catch (error) {
+    console.error('❌ Backend vision error:', error);
+    throw error;
+  }
 }
 
-// Direct API call using v1 endpoint with Gemini 2.5 Flash (stable multimodal model)
+// Secure Text API call (no images) through backend
 const callGeminiAPI = async (prompt, retries = 4) => {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+  console.log(`💬 Calling backend text proxy`);
   
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      console.log(`🚀 Calling Gemini API (attempt ${attempt}/${retries})...`);
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            maxOutputTokens: 256,  // CRITICAL: Low limit prevents MAX_TOKENS errors
-            temperature: 0.1,
-            topP: 0.8
-          }
-        })
-      });
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/gemini/text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt,
+        maxTokens: 256,
+        retries
+      })
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        const errorMsg = `API Error: ${response.status} - ${JSON.stringify(errorData)}`;
-        
-        // Retry on 503 (overloaded) or 429 (rate limit)
-        if ((response.status === 503 || response.status === 429) && attempt < retries) {
-          const delay = 1000 * attempt; // Exponential backoff: 1s, 2s, 3s, 4s
-          console.warn(`⚠️ Gemini overloaded (${response.status}) — retrying in ${delay}ms... (${attempt}/${retries})`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
-        }
-        
-        throw new Error(errorMsg);
-      }
-
-      const data = await response.json();
-      console.log('✅ API Response received');
-      
-      // Log full response for debugging
-      if (!data.candidates || data.candidates.length === 0) {
-        console.warn('⚠️ No candidates in response:', JSON.stringify(data));
-        throw new Error('No candidates in response');
-      }
-      
-      const candidate = data.candidates[0];
-      
-      // Check for safety blocks or finish reason
-      if (candidate.finishReason && candidate.finishReason !== 'STOP') {
-        console.warn(`⚠️ Unusual finish reason: ${candidate.finishReason}`);
-      }
-      
-      const text = candidate?.content?.parts?.[0]?.text;
-      
-      if (!text || text.trim() === '') {
-        console.warn('⚠️ Empty text in response. Full candidate:', JSON.stringify(candidate));
-        throw new Error('No text in response');
-      }
-      
-      return text;
-    } catch (error) {
-      // Check if this is a retryable error
-      const isRetryable = error.message.includes('503') || error.message.includes('429') || error.message.includes('UNAVAILABLE');
-      
-      // If it's the last attempt or not retryable, throw
-      if (attempt === retries || !isRetryable) {
-        console.error('❌ API Error:', error);
-        throw error;
-      }
-      
-      // Retry with exponential backoff
-      const delay = 1000 * attempt;
-      console.warn(`⚠️ API error (${error.message.substring(0, 50)}) — retrying in ${delay}ms... (attempt ${attempt}/${retries})`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || `Backend error: ${response.status}`);
     }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      throw new Error('No text in response');
+    }
+
+    console.log('✅ Backend text response received');
+    return text;
+
+  } catch (error) {
+    console.error('❌ Backend text error:', error);
+    throw error;
   }
 };
 
@@ -111,7 +78,11 @@ export const generateResponse = async (prompt, options = {}) => {
   try {
     // Check if this is an image-based request
     if (options.inline_data) {
-      return await callGeminiAPIWithImage(prompt, options.inline_data);
+      // Legacy support - convert to new format
+      return await callGeminiVision(prompt, [{
+        mime_type: options.inline_data.mime_type,
+        data: options.inline_data.data
+      }]);
     }
     
     // Text-only request
@@ -132,12 +103,8 @@ Your API key doesn't have access to the Gemini models. Please:
 
 1. Go to https://aistudio.google.com/app/apikey
 2. Create a BRAND NEW API key
-3. Make sure you're signed in with a Google account
-4. Copy the entire key
-5. Add it to Vercel environment variables:
-   - Name: VITE_GEMINI_API_KEY
-   - Value: your_new_key
-6. Redeploy
+3. Update GEMINI_API_KEY in server .env file
+4. Restart the backend server
 
 Current error: ${error.message}`;
     }
@@ -161,169 +128,9 @@ The free tier allows 15 requests per minute. Please try again shortly.`;
 
 ${error.message}
 
-Please try again. If the issue persists, check your API key at https://aistudio.google.com/`;
+Please try again. If the issue persists, check your backend server and API key.`;
   }
 };
-
-// API call with image support (for AI Vision)
-const callGeminiAPIWithImage = async (prompt, imageData, retries = 4) => {
-  // Use gemini-2.5-flash which is stable and supports vision (1M token input, 65k output)
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-  
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      console.log(`🚀 Calling Gemini Vision API (attempt ${attempt}/${retries})...`);
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              { 
-                inline_data: {
-                  mime_type: imageData.mime_type,
-                  data: imageData.data
-                }
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0,  // Deterministic output for structured JSON
-            topK: 40,
-            topP: 0.9,
-            maxOutputTokens: 2048,  // Increased for complete JSON
-          }
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        const errorMsg = `API Error: ${response.status} - ${JSON.stringify(errorData)}`;
-        
-        // Retry on 503 (overloaded) or 429 (rate limit)
-        if ((response.status === 503 || response.status === 429) && attempt < retries) {
-          const delay = 1500 * attempt; // Longer backoff for vision: 1.5s, 3s, 4.5s, 6s
-          console.warn(`⚠️ Vision API overloaded (${response.status}) — retrying in ${delay}ms... (${attempt}/${retries})`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
-        }
-        
-        throw new Error(errorMsg);
-      }
-
-      const data = await response.json();
-      console.log('✅ Vision API Response received');
-      
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (!text) {
-        console.warn('⚠️ Empty response from Vision API');
-        throw new Error('No text in vision response');
-      }
-      
-      console.log('📄 Raw AI response:', text.substring(0, 200) + '...');
-      
-      return text;
-    } catch (error) {
-      // Check if this is a retryable error
-      const isRetryable = error.message.includes('503') || error.message.includes('429') || error.message.includes('UNAVAILABLE');
-      
-      // If it's the last attempt or not retryable, throw
-      if (attempt === retries || !isRetryable) {
-        console.error('❌ Vision API Error:', error);
-        throw error;
-      }
-      
-      // Retry with exponential backoff
-      const delay = 1500 * attempt;
-      console.warn(`⚠️ Vision API error (${error.message.substring(0, 50)}) — retrying in ${delay}ms... (attempt ${attempt}/${retries})`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-};
-
-// 🔥 STABLE MULTI-IMAGE VISION API - Never crashes with proper retry logic
-export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 256) {
-  const payload = {
-    contents: [
-      { parts: [{ text: prompt }] },
-      { parts: images.map(img => ({ inline_data: img })) }
-    ],
-    // CRITICAL FIX: Low maxOutputTokens prevents MAX_TOKENS errors with vision
-    // Vision requests consume LOTS of input tokens, so output must be small
-    // NOTE: Flash 2.5 does NOT support responseMimeType (only Pro/Realtime)
-    generationConfig: {
-      maxOutputTokens: maxTokens,  // Default 256 - SAFE for vision + images
-      temperature: 0.1,
-      topP: 0.8
-    }
-  };
-
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }
-      );
-
-      // If API returns a temporary 5xx error → retry
-      if (res.status >= 500) {
-        console.warn(`⚠️ Gemini overloaded (HTTP ${res.status}). Retrying ${attempt}/${retries}...`);
-        await new Promise(r => setTimeout(r, attempt * 1000)); // exponential delay
-        continue;
-      }
-
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`Gemini Error ${res.status}: ${txt}`);
-      }
-
-      const data = await res.json();
-      
-      // FIX 3: Check for MAX_TOKENS and empty responses INSIDE retry loop
-      const candidate = data.candidates?.[0];
-      const finishReason = candidate?.finishReason;
-      const text = candidate?.content?.parts?.[0]?.text;
-      
-      // If MAX_TOKENS or empty response, retry
-      if (finishReason === 'MAX_TOKENS') {
-        console.warn(`⚠️ MAX_TOKENS hit on attempt ${attempt}. Retrying...`);
-        if (attempt < retries) {
-          await new Promise(r => setTimeout(r, attempt * 1000));
-          continue;
-        }
-        throw new Error('MAX_TOKENS: Response too long');
-      }
-      
-      if (!text || text.trim().length === 0) {
-        console.warn(`⚠️ No text in response on attempt ${attempt}. Retrying...`);
-        if (attempt < retries) {
-          await new Promise(r => setTimeout(r, attempt * 1000));
-          continue;
-        }
-        throw new Error('No text in response');
-      }
-      
-      console.log(`✅ Gemini responded successfully on attempt ${attempt}`);
-      return data; // success
-    } catch (err) {
-      console.warn(`⚠️ Retry ${attempt} failed:`, err.message);
-      if (attempt < retries) {
-        await new Promise(r => setTimeout(r, attempt * 1000));
-      }
-    }
-  }
-
-  throw new Error("❌ Gemini failed after all retries");
-}
 
 // System prompt for engineering tutor
 const SYSTEM_PROMPT = `You are an expert aerospace and automotive engineering tutor. You help students understand:
@@ -442,7 +249,7 @@ Use specific examples and data.`;
 };
 
 export const testAPI = async () => {
-  console.log('🧪 Testing Gemini API...');
+  console.log('🧪 Testing Gemini API through backend...');
   try {
     const response = await callGeminiAPI('Say "Hello! API test successful!"');
     return { success: true, message: response };
