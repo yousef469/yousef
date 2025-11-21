@@ -377,22 +377,20 @@ export default function ExplodeViewPage() {
       console.log(`📦 Processing part ${i + 1}/${majorParts.length}: ${part.name}...`);
       
       try {
-        const prompt = `You are analyzing a ${modelType}. Analyze this part: ${part.name}
+        const prompt = `Analyze this ${modelType} part: ${part.name}
 
-YOU MUST RESPOND WITH VALID JSON ONLY. NO EXPLANATION. NO ADDITIONAL TEXT.
+YOU MUST RESPOND WITH VALID JSON ONLY.
 
-Return this exact JSON format:
-{"partName":"${part.name}","purpose":"what it does","material":"materials used","cost":"$X","tip":"engineering note"}
+Return exactly:
+{"partName":"${part.name}","purpose":"brief purpose","material":"material type","cost":"estimate","tip":"1 sentence"}
 
-CRITICAL RULES:
-- Output ONLY valid JSON
-- NO text before or after the JSON
-- NO markdown code blocks (no \`\`\`)
-- NO explanations or commentary
-- Keep each field under 50 characters
-- If you can't fit everything, summarize but keep valid JSON
-- If you cannot identify the part, use "Unknown" for that field`;
+RULES:
+- ONLY valid JSON output
+- NO markdown blocks
+- Keep ALL fields under 40 characters
+- If unknown, use "Unknown"`;
 
+        console.log(`📝 Prompt tokens: ~${Math.ceil(prompt.length / 4)} (${prompt.length} chars)`);
         
         const response = await generateResponse(prompt);
         
@@ -451,28 +449,26 @@ CRITICAL RULES:
     
     console.log(`🎯 Analyzing ${majorParts.length} major parts (ignoring ${partsData.length - majorParts.length} small parts)`);
     
-    // Get part names for context (limit to avoid token overflow)
-    const partNames = majorParts.slice(0, 15).map(p => p.name).join(', ');
+    // Get part names for context (limit to 10 to keep prompt small)
+    const partNames = majorParts.slice(0, 10).map(p => p.name).join(', ');
     
-    const prompt = `You are an expert engineer. Analyze this 3D model image.
+    console.log(`📝 Prompt size: ~${partNames.length} chars for part names`);
+    
+    const prompt = `Identify this 3D model. Parts visible: ${partNames}
 
-MAJOR COMPONENTS AVAILABLE: ${partNames}
+YOU MUST RESPOND WITH VALID JSON ONLY.
 
-YOU MUST RESPOND WITH VALID JSON ONLY. NO EXPLANATION. NO ADDITIONAL TEXT.
+Return exactly:
+{"modelType":"specific name","category":"rocket/car/plane/boat/spacecraft/vehicle","confidence":"high/medium/low","criticalParts":["part1","part2","part3"]}
 
-Return this exact JSON format:
-{"modelType":"Specific model name","category":"rocket or car or plane or boat or spacecraft or vehicle","confidence":"high or medium or low","criticalParts":["part1","part2","part3"]}
-
-CRITICAL RULES:
-1. Output ONLY valid JSON - no text before or after
-2. NO markdown code blocks (no \`\`\`)
-3. modelType must be specific (e.g., "SpaceX Falcon 9", "BMW M3", "Boeing 747")
-4. category must be one word from the list
-5. confidence must be high, medium, or low
-6. criticalParts must list 3-5 LARGEST structural/functional components from the list above
-7. IGNORE small parts like screws, bolts, pins, connectors
-8. Focus on: engines, fuselage, wings, chassis, tanks, major assemblies
-9. If you can't fit everything, summarize but keep valid JSON`;
+RULES:
+- ONLY valid JSON output
+- NO markdown blocks
+- modelType: specific (e.g., "SpaceX Falcon 9", "BMW M3")
+- criticalParts: 3-5 LARGEST parts from list above
+- Ignore screws/bolts/pins`;
+    
+    console.log(`📝 Model ID prompt tokens: ~${Math.ceil(prompt.length / 4)} (${prompt.length} chars)`);
     
     // Convert base64 to format Gemini expects
     const base64Data = imageObj.data.split(',')[1];
