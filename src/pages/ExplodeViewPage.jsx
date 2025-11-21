@@ -7,7 +7,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
-import { generateResponse } from '../services/gemini';
+import { generateResponse, callGeminiVision } from '../services/gemini';
 
 // --- HUD Overlay (Visuals) ---
 const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing }) => (
@@ -488,12 +488,14 @@ RULES:
     // Detect mime type from data URL
     const mimeType = imageObj.data.match(/data:(image\/[^;]+);/)?.[1] || 'image/jpeg';
     
-    const response = await generateResponse(prompt, {
-      inline_data: {
-        data: base64Data,
-        mime_type: mimeType
-      }
-    });
+    // 🔥 Use the new stable callGeminiVision with proper retry logic
+    const apiResponse = await callGeminiVision(prompt, [{
+      mime_type: mimeType,
+      data: base64Data
+    }]);
+    
+    // Extract text from API response
+    const response = apiResponse.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!response || !response.trim()) {
       throw new Error('Empty response from AI Vision');

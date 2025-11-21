@@ -232,6 +232,52 @@ const callGeminiAPIWithImage = async (prompt, imageData, retries = 4) => {
   }
 };
 
+// 🔥 STABLE MULTI-IMAGE VISION API - Never crashes with proper retry logic
+export async function callGeminiVision(prompt, images, retries = 5) {
+  const payload = {
+    contents: [
+      { parts: [{ text: prompt }] },
+      { parts: images.map(img => ({ inline_data: img })) }
+    ]
+  };
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      // If API returns a temporary 5xx error → retry
+      if (res.status >= 500) {
+        console.warn(`⚠️ Gemini overloaded (HTTP ${res.status}). Retrying ${attempt}/${retries}...`);
+        await new Promise(r => setTimeout(r, attempt * 1000)); // exponential delay
+        continue;
+      }
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Gemini Error ${res.status}: ${txt}`);
+      }
+
+      const data = await res.json();
+      console.log(`✅ Gemini responded successfully on retry ${attempt}`);
+      return data; // success
+    } catch (err) {
+      console.warn(`⚠️ Retry ${attempt} failed:`, err.message);
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, attempt * 1000));
+      }
+    }
+  }
+
+  throw new Error("❌ Gemini failed after all retries");
+}
+
 // System prompt for engineering tutor
 const SYSTEM_PROMPT = `You are an expert aerospace and automotive engineering tutor. You help students understand:
 - Rocket propulsion and orbital mechanics
