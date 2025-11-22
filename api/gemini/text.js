@@ -20,20 +20,11 @@ export default async function handler(req, res) {
 
     console.log(`💬 Gemini Text request: ${prompt.substring(0, 50)}...`);
 
-    // List of models to try (in order of preference)
-    const modelsToTry = [
-      'gemini-1.5-flash',
-      'gemini-1.5-pro',
-      'gemini-pro' // Legacy fallback
-    ];
-
-    // Loop through models until one works
-    for (const model of modelsToTry) {
-      try {
-        console.log(`🔄 Trying model: ${model}...`);
-        
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+    console.log('🔄 Using gemini-1.5-flash (1500 requests/day limit)');
+    
+    // We use gemini-1.5-flash because it is stable and has high limits (1500/day)
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -49,33 +40,21 @@ export default async function handler(req, res) {
           }
         );
 
-        if (response.ok) {
-          const data = await response.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-          if (!text) {
-            throw new Error('No text in response');
-          }
-
-          console.log(`✅ Success with ${model}`);
-          return res.status(200).json({ text });
-        } else {
-          const err = await response.text();
-          console.warn(`⚠️ ${model} failed: ${response.status} - ${err}`);
-          // If it's a 404, continue to next model
-          if (response.status !== 404) {
-            throw new Error(`Google API Error: ${response.status} ${err}`);
-          }
-        }
-      } catch (error) {
-        console.error(`❌ Error with ${model}:`, error.message);
-      }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ Gemini API Error: ${response.status} - ${errorText}`);
+      return res.status(response.status).json({ error: `Gemini API error: ${response.status}`, details: errorText });
     }
 
-    // If all models failed
-    return res.status(500).json({ 
-      error: 'All AI models failed (404). Check your API Key permissions.' 
-    });
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      throw new Error('No text in response');
+    }
+
+    console.log('✅ Gemini Text Success');
+    return res.status(200).json({ text });
 
   } catch (error) {
     console.error('❌ Gemini Text proxy error:', error);

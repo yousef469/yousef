@@ -463,9 +463,10 @@ RULES:
           console.warn(`⚠️ Could not parse JSON for ${part.name}`);
         }
         
-        // Small delay between parts to avoid rate limiting
+        // Delay to respect Free Tier limits (15 requests/min = 1 request every 4 seconds)
         if (i < majorParts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 800));
+          console.log('⏳ Waiting 4 seconds to respect Free Tier limits...');
+          await new Promise(resolve => setTimeout(resolve, 4000));
         }
         
       } catch (error) {
