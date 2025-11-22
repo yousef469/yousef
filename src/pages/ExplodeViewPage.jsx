@@ -401,15 +401,18 @@ export default function ExplodeViewPage() {
   const batchAnalyzeParts = async (majorParts, modelType) => {
     if (majorParts.length === 0) return;
     
-    console.log(`🔄 Analyzing ${majorParts.length} major parts individually (100% stable)...`);
+    // RATE LIMIT PROTECTION: Only analyze top 5 parts to stay under 15 req/min
+    const partsToAnalyze = majorParts.slice(0, 5);
+    
+    console.log(`🔄 Analyzing ${partsToAnalyze.length} major parts (limited to 5 for rate limits)...`);
     
     let successCount = 0;
     
     // Process each part individually to avoid MAX_TOKENS
-    for (let i = 0; i < majorParts.length; i++) {
+    for (let i = 0; i < partsToAnalyze.length; i++) {
       const part = majorParts[i];
       
-      console.log(`📦 Processing part ${i + 1}/${majorParts.length}: ${part.name}...`);
+      console.log(`📦 Processing part ${i + 1}/${partsToAnalyze.length}: ${part.name}...`);
       
       try {
         const prompt = `Analyze this ${modelType} part: ${part.name}
@@ -464,7 +467,7 @@ RULES:
         }
         
         // Delay to respect Free Tier limits (15 requests/min = 1 request every 4 seconds)
-        if (i < majorParts.length - 1) {
+        if (i < partsToAnalyze.length - 1) {
           console.log('⏳ Waiting 4 seconds to respect Free Tier limits...');
           await new Promise(resolve => setTimeout(resolve, 4000));
         }
@@ -475,7 +478,7 @@ RULES:
       }
     }
     
-    console.log(`✅ Individual analysis complete: ${successCount}/${majorParts.length} parts analyzed`);
+    console.log(`✅ Individual analysis complete: ${successCount}/${partsToAnalyze.length} parts analyzed`);
   };
 
   // Analyze image with Gemini Vision (ENHANCED PROMPT)
