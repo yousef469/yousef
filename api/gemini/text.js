@@ -20,11 +20,11 @@ export default async function handler(req, res) {
 
     console.log(`💬 Gemini Text request: ${prompt.substring(0, 50)}...`);
 
-    console.log('🔄 Using gemini-2.0-flash-exp (available in MENA region including Saudi Arabia)');
+    console.log('🔄 Using gemini-2.5-pro (best reasoning for engineering analysis, available in Saudi Arabia)');
     
-    // Using gemini-2.0-flash-exp which is available in Saudi Arabia
+    // Using gemini-2.5-pro for superior engineering reasoning
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -17,11 +17,11 @@ export default async function handler(req, res) {
   });
 
   try {
-    console.log('🔄 Using gemini-2.0-flash-exp (available in MENA region including Saudi Arabia)');
+    console.log('🔄 Using gemini-2.5-pro (best vision understanding for engineering models, available in Saudi Arabia)');
     
-    // Using gemini-2.0-flash-exp which supports vision and is available in Saudi Arabia
+    // Using gemini-2.5-pro for superior engineering vision analysis
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
