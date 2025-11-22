@@ -20,17 +20,38 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check active session
-    getCurrentUser().then(({ user }) => {
-      setUser(user);
-      if (user) {
-        identifyUser(user.id, {
-          email: user.email,
-          name: user.user_metadata?.full_name,
-          createdAt: user.created_at,
-        });
+    const initAuth = async () => {
+      try {
+        // First check if there's a session in the URL (from OAuth callback)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        
+        if (accessToken) {
+          console.log('🔑 Found access token in URL, setting session...');
+          // Let Supabase handle the session from the URL
+          await supabase.auth.getSession();
+        }
+        
+        // Now get the current user
+        const { user } = await getCurrentUser();
+        console.log('👤 Current user:', user?.email || 'none');
+        
+        setUser(user);
+        if (user) {
+          identifyUser(user.id, {
+            email: user.email,
+            name: user.user_metadata?.full_name,
+            createdAt: user.created_at,
+          });
+        }
+      } catch (error) {
+        console.error('Auth init error:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+    
+    initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = onAuthStateChange((event, session) => {

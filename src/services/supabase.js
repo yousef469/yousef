@@ -3,7 +3,16 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ptwjvfuwwjpfcivlqjxo.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0d2p2ZnV3d2pwZmNpdmxxanhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNjg5OTUsImV4cCI6MjA3NjY0NDk5NX0.XZMuH_2Vb7bqlpTT7AF0gi3aaf2Whs0On-QDaV8vBL0';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage,
+    storageKey: 'supabase.auth.token',
+    flowType: 'pkce'
+  }
+});
 
 // ============================================
 // AUTHENTICATION
