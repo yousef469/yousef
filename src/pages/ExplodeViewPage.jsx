@@ -304,6 +304,15 @@ export default function ExplodeViewPage() {
     } catch (error) {
       console.warn('⚠️ AI Vision failed, using shape detection:', error.message);
       
+      // Ensure all parts stay visible
+      allParts.forEach(p => {
+        p.visible = true;
+        if (p.material) {
+          p.material.opacity = 1;
+          p.material.transparent = false;
+        }
+      });
+      
       // Fallback to shape detection
       const shapeBox = new THREE.Box3();
       allParts.forEach(m => shapeBox.expandByObject(m));
@@ -338,6 +347,15 @@ export default function ExplodeViewPage() {
       // Calculate distance from center
       const distance = originalPos.distanceTo(originalCenter);
       
+      // Ensure all parts are visible before capturing
+      parts.forEach(p => {
+        p.visible = true;
+        if (p.material) {
+          p.material.opacity = 1;
+          p.material.transparent = false;
+        }
+      });
+      
       angles.forEach(({ name, rotation, elevation = 0 }) => {
         // Position camera at angle
         const x = originalCenter.x + Math.cos(rotation) * Math.cos(elevation) * distance;
@@ -346,6 +364,7 @@ export default function ExplodeViewPage() {
         
         cameraRef.current.position.set(x, y, z);
         cameraRef.current.lookAt(originalCenter);
+        cameraRef.current.updateProjectionMatrix();
         
         // Render and capture with JPEG compression (smaller file size)
         rendererRef.current.render(sceneRef.current, cameraRef.current);
@@ -359,6 +378,7 @@ export default function ExplodeViewPage() {
       cameraRef.current.position.copy(originalPos);
       cameraRef.current.lookAt(originalTarget);
       controlsRef.current.target.copy(originalTarget);
+      cameraRef.current.updateProjectionMatrix();
       
       resolve(images);
     });
