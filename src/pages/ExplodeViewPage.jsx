@@ -96,7 +96,12 @@ export default function ExplodeViewPage() {
     cameraRef.current = camera;
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true, 
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true // REQUIRED FOR SCREENSHOTS - prevents GL_INVALID_OPERATION
+    });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
@@ -366,10 +371,18 @@ export default function ExplodeViewPage() {
         cameraRef.current.lookAt(originalCenter);
         cameraRef.current.updateProjectionMatrix();
         
-        // Render and capture with JPEG compression (smaller file size)
+        // Force render BEFORE capturing to ensure buffer is ready
         rendererRef.current.render(sceneRef.current, cameraRef.current);
+        
+        // Capture with JPEG compression (smaller file size)
         const imageData = rendererRef.current.domElement.toDataURL('image/jpeg', 0.8);
-        images.push({ name, data: imageData });
+        
+        // Send full data URI - backend will clean the base64 prefix
+        images.push({ 
+          name, 
+          mime_type: 'image/jpeg',
+          data: imageData 
+        });
         
         console.log(`📷 Captured ${name} view (${(imageData.length / 1024).toFixed(0)}KB)`);
       });
