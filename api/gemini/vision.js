@@ -43,9 +43,27 @@ export default async function handler(req, res) {
     // Log the full response for debugging
     console.log('📦 Full Gemini response:', JSON.stringify(data, null, 2));
     
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Try multiple ways to extract text from response
+    let text = null;
     
-    if (!text) {
+    // Method 1: Standard path
+    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      text = data.candidates[0].content.parts[0].text;
+    }
+    // Method 2: Direct text field
+    else if (data.text) {
+      text = data.text;
+    }
+    // Method 3: Response.text() method result
+    else if (data.response?.text) {
+      text = data.response.text;
+    }
+    // Method 4: Check if entire response is text
+    else if (typeof data === 'string') {
+      text = data;
+    }
+    
+    if (!text || text.trim().length === 0) {
       console.error('❌ No text found in response structure:', JSON.stringify(data));
       return res.status(500).json({ 
         error: 'No text in response',
