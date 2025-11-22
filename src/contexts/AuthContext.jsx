@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = onAuthStateChange((event, session) => {
+      console.log('🔔 Auth state change:', event, session?.user?.email);
       const newUser = session?.user ?? null;
       setUser(newUser);
       
@@ -43,8 +44,18 @@ export const AuthProvider = ({ children }) => {
           name: newUser.user_metadata?.full_name,
           createdAt: newUser.created_at,
         });
+        
+        // Handle successful sign in
+        if (event === 'SIGNED_IN') {
+          console.log('✅ User signed in successfully');
+        }
       } else {
         resetUser();
+        
+        // Handle sign out
+        if (event === 'SIGNED_OUT') {
+          console.log('👋 User signed out');
+        }
       }
       
       setLoading(false);

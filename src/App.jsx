@@ -41,6 +41,7 @@ const BeginnerLessonPage = lazy(() => import('./pages/BeginnerLessonPage'));
 const BeginnerQuizPage = lazy(() => import('./pages/BeginnerQuizPage'));
 const LearningHubPage = lazy(() => import('./pages/LearningHubPage'));
 const TestCurriculumPage = lazy(() => import('./pages/TestCurriculumPage'));
+const AuthCallback = lazy(() => import('./pages/auth/callback'));
 
 // ==================== 3D VIEWER COMPONENT ====================
 const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
@@ -1150,6 +1151,7 @@ export default function App() {
           <Routes>
           <Route path="/" element={<HomeRouter />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/learn" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
           <Route path="/learn/sections" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />

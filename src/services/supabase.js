@@ -46,8 +46,8 @@ export const onAuthStateChange = (callback) => {
 
 // Social Authentication
 export const signInWithGoogle = async () => {
-  // Get the current origin dynamically
-  const redirectUrl = `${window.location.origin}/`;
+  // Redirect to auth callback page to handle the token
+  const redirectUrl = `${window.location.origin}/auth/callback`;
   
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -66,7 +66,7 @@ export const signInWithApple = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
     options: {
-      redirectTo: `${window.location.origin}/`
+      redirectTo: `${window.location.origin}/auth/callback`
     }
   });
   return { data, error };
