@@ -1,10 +1,11 @@
 // Mixpanel disabled - was causing crashes
 // All functions are no-ops until re-enabled
 const MIXPANEL_ENABLED = false;
+const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN || null;
 
 // Helper to safely call mixpanel methods (currently disabled)
 const safeMixpanel = (fn) => {
-  if (!MIXPANEL_ENABLED) return;
+  if (!MIXPANEL_ENABLED || !MIXPANEL_TOKEN) return;
   try {
     fn();
   } catch (error) {
