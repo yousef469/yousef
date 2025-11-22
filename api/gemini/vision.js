@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       };
     });
 
-    console.log(`🔄 Using gemini-2.5-pro for ${cleanImages.length} images`);
+    console.log(`🔄 Using gemini-1.5-flash-8b for ${cleanImages.length} images (most reliable model)`);
 
     // CORRECT GEMINI CONTENT FORMAT - text and images in ONE message
     const contentParts = [
@@ -38,22 +38,30 @@ export default async function handler(req, res) {
       ...cleanImages
     ];
 
+    const requestBody = {
+      contents: [{
+        role: 'user',
+        parts: contentParts
+      }],
+      generationConfig: {
+        maxOutputTokens: 1024, // Increased from 500 - vision needs more tokens
+        temperature: 0.1,
+        topP: 0.8
+      }
+    };
+
+    console.log('📤 Request structure:', JSON.stringify({
+      model: 'gemini-1.5-flash-8b',
+      contentParts: contentParts.length,
+      maxTokens: 1024
+    }));
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: contentParts
-          }],
-          generationConfig: {
-            maxOutputTokens: maxTokens,
-            temperature: 0.1,
-            topP: 0.8
-          }
-        })
+        body: JSON.stringify(requestBody)
       }
     );
 
@@ -67,17 +75,21 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    console.log('📦 Gemini response received');
+    console.log('📦 Full Gemini response:', JSON.stringify(data, null, 2));
 
     // Extract text from response
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     if (!text || text.trim().length === 0) {
       console.warn('⚠️ Empty response from Gemini');
-      return res.status(200).json({ text: '' });
+      console.warn('Response structure:', JSON.stringify(data));
+      return res.status(200).json({ 
+        text: '(empty response - check Vercel logs for details)',
+        debug: data
+      });
     }
 
-    console.log('✅ Gemini Vision Success');
+    console.log('✅ Gemini Vision Success - Text length:', text.length);
     return res.status(200).json({ text });
 
   } catch (error) {
