@@ -17,11 +17,11 @@ export default async function handler(req, res) {
   });
 
   try {
-    console.log('🔄 Using gemini-1.5-flash (1500 requests/day limit)');
+    console.log('🔄 Using gemini-pro-vision (legacy model, works with all API keys)');
     
-    // We use gemini-1.5-flash because it is stable and has high limits (1500/day)
+    // Using gemini-pro-vision for maximum compatibility
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
