@@ -39,10 +39,18 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
+    
+    // Log the full response for debugging
+    console.log('📦 Full Gemini response:', JSON.stringify(data, null, 2));
+    
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!text) {
-      return res.status(500).json({ error: 'No text in response' });
+      console.error('❌ No text found in response structure:', JSON.stringify(data));
+      return res.status(500).json({ 
+        error: 'No text in response',
+        debug: data 
+      });
     }
     
     console.log('✅ Gemini Vision Success');
