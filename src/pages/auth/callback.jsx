@@ -11,50 +11,71 @@ export default function AuthCallback() {
         console.log('📍 Current URL:', window.location.href);
         console.log('📍 Hash:', window.location.hash);
         
-        setStatus('Verifying authentication...');
+        // Check if we have hash params (OAuth callback)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
         
-        // Wait a moment for Supabase to process the hash
-        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('🔑 Access token in URL:', !!accessToken);
+        console.log('🔄 Refresh token in URL:', !!refreshToken);
         
-        // Get the session from the URL hash
-        const { data, error } = await supabase.auth.getSession();
+        if (!accessToken) {
+          console.log('⚠️ No access token in URL, checking existing session...');
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            console.log('✅ Found existing session, redirecting...');
+            window.location.href = '/';
+            return;
+          }
+          console.log('❌ No session found, redirecting to home...');
+          window.location.href = '/';
+          return;
+        }
         
-        console.log('📦 Session data:', data);
-        console.log('❌ Session error:', error);
+        setStatus('Processing authentication tokens...');
+        
+        // Set the session from the tokens in the URL
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+        
+        console.log('📦 Set session result:', data);
+        console.log('❌ Set session error:', error);
         
         if (error) {
-          console.error('❌ Auth callback error:', error);
+          console.error('❌ Failed to set session:', error);
           setStatus('Authentication failed, redirecting...');
           setTimeout(() => {
             window.location.href = '/';
-          }, 1000);
+          }, 1500);
           return;
         }
         
         if (data.session) {
           console.log('✅ Auth successful! User:', data.session.user.email);
-          console.log('🔑 Access token exists:', !!data.session.access_token);
+          console.log('💾 Session saved to localStorage');
           
           setStatus('Success! Redirecting to dashboard...');
           
-          // Wait a moment to ensure the auth state is propagated
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Wait to ensure the session is fully saved
+          await new Promise(resolve => setTimeout(resolve, 500));
           
-          // Force a full page reload to ensure auth state is picked up
+          // Redirect to home (will show logged in page)
           window.location.href = '/';
         } else {
-          console.log('⚠️ No session found in callback');
-          setStatus('No session found, redirecting...');
+          console.log('⚠️ No session created');
+          setStatus('No session created, redirecting...');
           setTimeout(() => {
             window.location.href = '/';
-          }, 1000);
+          }, 1500);
         }
       } catch (error) {
         console.error('❌ Auth callback error:', error);
         setStatus('Error occurred, redirecting...');
         setTimeout(() => {
           window.location.href = '/';
-        }, 1000);
+        }, 1500);
       }
     };
 

@@ -22,17 +22,7 @@ export const AuthProvider = ({ children }) => {
     // Check active session
     const initAuth = async () => {
       try {
-        // First check if there's a session in the URL (from OAuth callback)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get('access_token');
-        
-        if (accessToken) {
-          console.log('🔑 Found access token in URL, setting session...');
-          // Let Supabase handle the session from the URL
-          await supabase.auth.getSession();
-        }
-        
-        // Now get the current user
+        // Get the current user from stored session
         const { user } = await getCurrentUser();
         console.log('👤 Current user:', user?.email || 'none');
         
