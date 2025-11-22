@@ -1,6 +1,5 @@
-// Vercel Serverless Function for Gemini Text API
+// Vercel Serverless Function for Gemini Text API with Model Fallback
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -21,11 +20,20 @@ export default async function handler(req, res) {
 
     console.log(`💬 Gemini Text request: ${prompt.substring(0, 50)}...`);
 
-    for (let attempt = 1; attempt <= retries; attempt++) {
+    // List of models to try (in order of preference)
+    const modelsToTry = [
+      'gemini-1.5-flash',
+      'gemini-1.5-pro',
+      'gemini-pro' // Legacy fallback
+    ];
+
+    // Loop through models until one works
+    for (const model of modelsToTry) {
       try {
-        // Using specific version "gemini-1.5-flash-001" for stability
+        console.log(`🔄 Trying model: ${model}...`);
+        
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -41,46 +49,32 @@ export default async function handler(req, res) {
           }
         );
 
-        if (response.status >= 500 && attempt < retries) {
-          console.warn(`⚠️ Retry ${attempt}/${retries}...`);
-          await new Promise(r => setTimeout(r, attempt * 1000));
-          continue;
+        if (response.ok) {
+          const data = await response.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+          if (!text) {
+            throw new Error('No text in response');
+          }
+
+          console.log(`✅ Success with ${model}`);
+          return res.status(200).json({ text });
+        } else {
+          const err = await response.text();
+          console.warn(`⚠️ ${model} failed: ${response.status} - ${err}`);
+          // If it's a 404, continue to next model
+          if (response.status !== 404) {
+            throw new Error(`Google API Error: ${response.status} ${err}`);
+          }
         }
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          return res.status(response.status).json({ 
-            error: `Gemini API error: ${response.status}`,
-            details: errorText
-          });
-        }
-
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!text) {
-          throw new Error('No text in response');
-        }
-
-        console.log(`✅ Gemini Text success`);
-        console.log(`📄 Extracted text length: ${text.length} chars`);
-        
-        // Return ONLY the text at top level (keep full response for debugging)
-        return res.status(200).json({
-          text: text,           // Primary: extracted text for easy access
-          fullResponse: data    // Secondary: full Gemini response for debugging
-        });
-
-      } catch (err) {
-        console.warn(`⚠️ Attempt ${attempt} failed:`, err.message);
-        if (attempt < retries) {
-          await new Promise(r => setTimeout(r, attempt * 1000));
-        }
+      } catch (error) {
+        console.error(`❌ Error with ${model}:`, error.message);
       }
     }
 
+    // If all models failed
     return res.status(500).json({ 
-      error: 'Gemini Text failed after all retries' 
+      error: 'All AI models failed (404). Check your API Key permissions.' 
     });
 
   } catch (error) {
