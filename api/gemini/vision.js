@@ -32,10 +32,12 @@ export default async function handler(req, res) {
 
     console.log(`🔮 Vision request: ${cleanImages.length} imgs, ${maxTokens} tokens`);
 
+    // UPDATED URL: Using 'gemini-1.5-flash-latest' which is more reliable for vision
+    const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        const response = await fetch(MODEL_URL,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -55,9 +57,11 @@ export default async function handler(req, res) {
         );
 
         if (!response.ok) {
-          // If error is 500+, throw to trigger retry. If 400 (bad request), stop immediately.
-          if (response.status >= 500) throw new Error(`Server error ${response.status}`);
           const errText = await response.text();
+          // If 404, it means model name issue. Try 500 retry logic only for server errors.
+          if (response.status === 404) throw new Error(`Model 404: ${errText}`);
+          if (response.status >= 500) throw new Error(`Server error ${response.status}`);
+          
           return res.status(response.status).json({ error: `Gemini refused: ${errText}` });
         }
 
@@ -66,13 +70,12 @@ export default async function handler(req, res) {
 
         if (!text) throw new Error('Empty response from AI');
 
-        console.log(`✅ Vision success on attempt ${attempt}`);
+        console.log('✅ Gemini Success!');
         return res.status(200).json({ text, fullResponse: data });
 
       } catch (err) {
         console.warn(`⚠️ Attempt ${attempt} failed:`, err.message);
-        // Only wait if we have retries left, and keep wait time SHORT (500ms)
-        if (attempt < retries) await new Promise(r => setTimeout(r, 500));
+        if (attempt < retries) await new Promise(r => setTimeout(r, 1000));
       }
     }
 
