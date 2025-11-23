@@ -1,2 +1,5 @@
-# Force clean build
-.vercel
+# Local development files
+.kiro/
+md folders/
+ai-backend/
+*.log

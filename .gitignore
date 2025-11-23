@@ -1,14 +1,14 @@
 # Dependencies
-node_modules
-/.pnp
+node_modules/
+.pnp/
 .pnp.js
 
 # Testing
-/coverage
+/coverage/
 
-# Production
-/build
-/dist
+# Production build
+/build/
+/dist/
 
 # Environment variables
 .env
@@ -24,10 +24,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Editor directories and files
+# Editor files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
@@ -35,7 +35,5 @@ lerna-debug.log*
 *.sln
 *.sw?
 
-# Vercel
-.vercel
-
-.vercel
+# Vercel build cache
+.vercel/
