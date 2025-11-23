@@ -1,53 +1,49 @@
-// ✅ SECURE: API calls go through Express Backend Server
-// Frontend → Backend Server → Gemini API → Backend Server → Frontend
-// API key is hidden on server, never exposed to users
+// ✅ DIRECT API: Calls Gemini directly from frontend (simple, no backend needed)
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Use backend server URL (Railway/Render) or fallback to relative URL for local dev
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, ''); // Remove trailing slash
-const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-console.log('🚀 Gemini API: Using Express Backend Server');
-console.log('📡 VITE_BACKEND_URL env var:', import.meta.env.VITE_BACKEND_URL || '❌ NOT SET!');
-console.log('📡 Backend URL:', BACKEND_URL || 'Using relative URL (local dev)');
-console.log('📡 API Base:', API_BASE);
+if (!API_KEY) {
+  console.warn('⚠️ VITE_GEMINI_API_KEY not found in environment variables');
+}
 
-// Part classification removed - Engo Bot only
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
-// Secure Text API call (no images) through backend server
+console.log('🚀 Gemini API: Direct frontend calls');
+console.log('🔑 API Key:', API_KEY ? '✅ Found' : '❌ Missing');
+
+// Direct Gemini API call
 const callGeminiAPI = async (prompt, retries = 4) => {
-  console.log(`💬 Calling backend server at: ${API_BASE}/text`);
+  if (!genAI) {
+    throw new Error('Gemini API key not configured. Add VITE_GEMINI_API_KEY to your .env file');
+  }
+
+  console.log('💬 Calling Gemini API directly...');
   
-  try {
-    const response = await fetch(`${API_BASE}/text`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        maxTokens: 256,
-        retries
-      })
-    });
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
-    console.log('📥 Response status:', response.status);
+      if (!text) {
+        throw new Error('No text in response');
+      }
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || `Backend error: ${response.status}`);
+      console.log('✅ Gemini response received');
+      return text;
+
+    } catch (error) {
+      console.error(`❌ Attempt ${attempt + 1}/${retries} failed:`, error);
+      
+      if (attempt === retries - 1) {
+        throw error;
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
     }
-
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) {
-      throw new Error('No text in response');
-    }
-
-    console.log('✅ Backend text response received');
-    return text;
-
-  } catch (error) {
-    console.error('❌ Backend text error:', error);
-    throw error;
   }
 };
 
