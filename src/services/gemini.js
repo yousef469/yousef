@@ -1,20 +1,21 @@
-// ✅ SECURE: API calls go through Vercel Serverless Functions
-// Frontend → Vercel Function → Gemini API → Vercel Function → Frontend
+// ✅ SECURE: API calls go through Express Backend Server
+// Frontend → Backend Server → Gemini API → Backend Server → Frontend
 // API key is hidden on server, never exposed to users
 
-// Use relative URLs - works both locally (Vite proxy) and on Vercel
 // Use backend server URL (Railway/Render) or fallback to relative URL for local dev
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, ''); // Remove trailing slash
 const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 
-console.log('�  Gemini API: Using SECURE Vercel Serverless Functions');
+console.log('🚀 Gemini API: Using Express Backend Server');
+console.log('📡 VITE_BACKEND_URL env var:', import.meta.env.VITE_BACKEND_URL || '❌ NOT SET!');
+console.log('📡 Backend URL:', BACKEND_URL || 'Using relative URL (local dev)');
 console.log('📡 API Base:', API_BASE);
 
 // Part classification removed - Engo Bot only
 
-// Secure Text API call (no images) through Vercel function
+// Secure Text API call (no images) through backend server
 const callGeminiAPI = async (prompt, retries = 4) => {
-  console.log(`💬 Calling Vercel function`);
+  console.log(`💬 Calling backend server at: ${API_BASE}/text`);
   
   try {
     const response = await fetch(`${API_BASE}/text`, {
@@ -26,6 +27,8 @@ const callGeminiAPI = async (prompt, retries = 4) => {
         retries
       })
     });
+
+    console.log('📥 Response status:', response.status);
 
     if (!response.ok) {
       const error = await response.json();
