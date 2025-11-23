@@ -54,30 +54,64 @@ app.post('/api/gemini/vision', async (req, res) => {
 
     console.log(`🔮 Gemini Vision: ${cleanImages.length} images, ${maxTokens} tokens`);
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: [{ text: prompt }, ...cleanImages]
-          }],
-          generationConfig: {
-            maxOutputTokens: maxTokens,
-            temperature: 0.1,
-            topP: 0.8
-          }
-        })
-      }
-    );
+    // Try multiple models in order of preference (for regional availability)
+    const modelsToTry = [
+      'gemini-1.5-flash',
+      'gemini-1.5-pro', 
+      'gemini-pro-vision'
+    ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Gemini API Error:', errorText);
-      return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
+    let lastError = null;
+    
+    for (const model of modelsToTry) {
+      try {
+        console.log(`🔄 Trying model: ${model}`);
+        
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                role: 'user',
+                parts: [{ text: prompt }, ...cleanImages]
+              }],
+              generationConfig: {
+                maxOutputTokens: maxTokens,
+                temperature: 0.1,
+                topP: 0.8
+              }
+            })
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          console.log(`✅ Success with ${model}`);
+          return res.json({ text });
+        }
+
+        const errorText = await response.text();
+        console.warn(`⚠️ ${model} failed: ${response.status}`);
+        lastError = errorText;
+        
+        // If 404, try next model. If other error, stop.
+        if (response.status !== 404) {
+          return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
+        }
+      } catch (error) {
+        console.warn(`⚠️ ${model} error:`, error.message);
+        lastError = error.message;
+      }
     }
+
+    // All models failed
+    console.error('❌ All Gemini models unavailable in this region');
+    return res.status(404).json({ 
+      error: 'Gemini API not available in your region. Using shape detection fallback.' 
+    });
 
     const data = await response.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
