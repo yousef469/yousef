@@ -7,7 +7,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
-import { generateResponse, classifyParts } from '../services/gemini';
+import { generateResponse } from '../services/gemini';
 
 // --- HUD Overlay (Visuals) ---
 const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing }) => (
@@ -264,27 +264,7 @@ export default function ExplodeViewPage() {
       
       console.log(`✅ Shape detection: Showing ${filteredList.length} major parts`);
       
-      // Optional: Try AI classification (text-only, no images)
-      try {
-        const partsToClassify = filteredList.slice(0, 5).map(p => ({
-          name: p.name,
-          vertices: p.mesh.geometry.attributes.position.count
-        }));
-        
-        const classifications = await classifyParts('generic', 'Unknown Model', partsToClassify);
-        console.log('✅ AI classifications:', classifications);
-        
-        // Update parts with AI categories
-        filteredList.forEach(part => {
-          const classification = classifications.find(c => c.partName === part.name);
-          if (classification) {
-            part.aiCategory = classification.category;
-            part.aiReason = classification.reason;
-          }
-        });
-      } catch (aiError) {
-        console.warn('⚠️ AI classification failed (optional):', aiError.message);
-      }
+      // AI classification removed - using shape detection only
       
     } catch (error) {
       console.warn('⚠️ Classification failed, using basic shape detection:', error.message);

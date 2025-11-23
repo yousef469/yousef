@@ -27,79 +27,8 @@ app.get('/health', (req, res) => {
 });
 
 // ============================================
-// GEMINI API ENDPOINTS - TEXT ONLY
+// GEMINI API ENDPOINTS - ENGO BOT ONLY
 // ============================================
-
-// Gemini Part Classification (Text-Based)
-app.post('/api/gemini/classify', async (req, res) => {
-  try {
-    const { type, modelName, parts } = req.body;
-
-    if (!type || !modelName || !parts || !Array.isArray(parts)) {
-      return res.status(400).json({ error: 'Missing required fields: type, modelName, parts' });
-    }
-
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
-      return res.status(500).json({ error: 'API key missing' });
-    }
-
-    const prompt = `You are an engineering classifier. Your job is to categorize parts based on their names and mesh size.
-
-Machine type: ${type}
-Model: ${modelName}
-
-Parts:
-${parts.map(p => `- ${p.name}, vertices: ${p.vertices}`).join('\n')}
-
-Return ONLY valid JSON array (no markdown, no explanation):
-[
-  { "partName": "part_name", "category": "engine|body|wing|wheel|structural|fastener", "reason": "brief reason" }
-]`;
-
-    console.log(`🔮 Classifying ${parts.length} parts for ${type} ${modelName}`);
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            maxOutputTokens: 2048,
-            temperature: 0.3
-          }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Gemini API Error:', errorText);
-      return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
-    }
-
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
-    
-    // Clean up markdown code blocks if present
-    const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    
-    try {
-      const classifications = JSON.parse(cleanText);
-      console.log(`✅ Classified ${classifications.length} parts`);
-      return res.json(classifications);
-    } catch (parseError) {
-      console.error('❌ Failed to parse Gemini response:', cleanText);
-      return res.status(500).json({ error: 'Invalid JSON response from AI' });
-    }
-
-  } catch (error) {
-    console.error('❌ Classification Error:', error);
-    return res.status(500).json({ error: error.message });
-  }
-});
 
 // Gemini Text API
 app.post('/api/gemini/text', async (req, res) => {

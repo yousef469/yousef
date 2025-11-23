@@ -10,36 +10,7 @@ const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 console.log('�  Gemini API: Using SECURE Vercel Serverless Functions');
 console.log('📡 API Base:', API_BASE);
 
-// Text-based part classification (no images needed!)
-export async function classifyParts(type, modelName, parts) {
-  console.log(`🔮 Classifying ${parts.length} parts for ${type} ${modelName}`);
-  
-  try {
-    const response = await fetch(`${API_BASE}/classify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type,
-        modelName,
-        parts
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || `Backend error: ${response.status}`);
-    }
-
-    const classifications = await response.json();
-    console.log('✅ Part classification received');
-    
-    return classifications;
-
-  } catch (error) {
-    console.error('❌ Classification error:', error);
-    throw error;
-  }
-}
+// Part classification removed - Engo Bot only
 
 // Secure Text API call (no images) through Vercel function
 const callGeminiAPI = async (prompt, retries = 4) => {
