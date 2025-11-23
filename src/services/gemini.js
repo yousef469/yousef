@@ -1,49 +1,43 @@
-// ✅ DIRECT API: Calls Gemini directly from frontend (simple, no backend needed)
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// ✅ BACKEND API: Calls through backend server (bypasses regional restrictions)
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+console.log('🚀 Gemini API: Using backend server');
+console.log('📡 Backend URL:', BACKEND_URL || '❌ NOT SET');
 
-if (!API_KEY) {
-  console.warn('⚠️ VITE_GEMINI_API_KEY not found in environment variables');
-}
-
-const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
-
-console.log('🚀 Gemini API: Direct frontend calls');
-console.log('🔑 API Key:', API_KEY ? '✅ Found' : '❌ Missing');
-
-// Direct Gemini API call
+// Backend API call
 const callGeminiAPI = async (prompt, retries = 4) => {
-  if (!genAI) {
-    throw new Error('Gemini API key not configured. Add VITE_GEMINI_API_KEY to your .env file');
-  }
-
-  console.log('💬 Calling Gemini API directly...');
+  console.log(`💬 Calling backend at: ${API_BASE}/text`);
   
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+  try {
+    const response = await fetch(`${API_BASE}/text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt,
+        maxTokens: 512,
+        retries
+      })
+    });
 
-      if (!text) {
-        throw new Error('No text in response');
-      }
-
-      console.log('✅ Gemini response received');
-      return text;
-
-    } catch (error) {
-      console.error(`❌ Attempt ${attempt + 1}/${retries} failed:`, error);
-      
-      if (attempt === retries - 1) {
-        throw error;
-      }
-      
-      // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || `Backend error: ${response.status}`);
     }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      throw new Error('No text in response');
+    }
+
+    console.log('✅ Backend response received');
+    return text;
+
+  } catch (error) {
+    console.error('❌ Backend error:', error);
+    throw error;
   }
 };
 

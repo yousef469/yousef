@@ -8,21 +8,27 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Direct Gemini API call
+  // Backend API call
   const callGeminiAPI = async (prompt) => {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+    const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+    const API_URL = BACKEND_URL ? `${BACKEND_URL}/api/gemini/text` : '/api/gemini/text';
     
-    if (!API_KEY) {
-      throw new Error('API key not configured');
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt,
+        maxTokens: 512
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `API Error: ${response.status}`);
     }
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-    
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!text) {
       throw new Error('No text in response');
