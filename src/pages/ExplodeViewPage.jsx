@@ -7,7 +7,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
-import { generateResponse, callGeminiVision } from '../services/gemini';
+import { generateResponse, classifyParts } from '../services/gemini';
 
 // --- HUD Overlay (Visuals) ---
 const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing }) => (
@@ -251,63 +251,43 @@ export default function ExplodeViewPage() {
     return '3D Model';
   };
 
-  // --- 3.5. AI Vision Identification (MULTI-ANGLE + BATCH ANALYSIS) ---
+  // --- 3.5. AI Text Classification (NO IMAGES NEEDED) ---
   const identifyModelByVision = async (allParts, partsData) => {
     setAnalyzingModel(true);
-    console.log('📸 Capturing multi-angle images for AI vision analysis...');
+    console.log('🔮 Starting text-based part classification...');
     
     try {
-      // Step 1: Capture multiple angles for better accuracy
-      const images = await captureMultiAngleImages();
-      console.log(`📷 Captured ${images.length} views (optimized for <20k vision tokens)`);
+      // Use shape detection - works perfectly!
+      const filteredList = filterBySize(partsData);
+      setPartsList(filteredList);
+      setModelType('Generic Model');
       
-      // Step 2: Send primary view to Gemini Vision API for model identification
-      const identification = await analyzeModelImage(images[0], partsData);
+      console.log(`✅ Shape detection: Showing ${filteredList.length} major parts`);
       
-      // Validate response
-      if (!identification || !identification.modelType) {
-        throw new Error('Invalid AI response - missing modelType');
-      }
-      
-      // Step 3: Update UI with results
-      const modelName = identification.modelType || 'Unknown Model';
-      const confidence = identification.confidence || 'low';
-      setModelType(`${modelName} (${confidence} confidence)`);
-      
-      // Step 4: Filter parts based on AI-identified critical components
-      let filteredList = [];
-      
-      if (identification.criticalParts && identification.criticalParts.length > 0) {
-        console.log('🎯 AI identified critical parts:', identification.criticalParts);
+      // Optional: Try AI classification (text-only, no images)
+      try {
+        const partsToClassify = filteredList.slice(0, 5).map(p => ({
+          name: p.name,
+          vertices: p.mesh.geometry.attributes.position.count
+        }));
         
-        partsData.forEach((partData) => {
-          const partName = partData.name.toLowerCase();
-          const isImportant = identification.criticalParts.some(crit => {
-            const critLower = crit.toLowerCase();
-            return partName.includes(critLower) || critLower.includes(partName);
-          });
-          
-          if (isImportant) {
-            filteredList.push(partData);
+        const classifications = await classifyParts('generic', 'Unknown Model', partsToClassify);
+        console.log('✅ AI classifications:', classifications);
+        
+        // Update parts with AI categories
+        filteredList.forEach(part => {
+          const classification = classifications.find(c => c.partName === part.name);
+          if (classification) {
+            part.aiCategory = classification.category;
+            part.aiReason = classification.reason;
           }
         });
+      } catch (aiError) {
+        console.warn('⚠️ AI classification failed (optional):', aiError.message);
       }
-      
-      // Fallback to size-based if no matches
-      if (filteredList.length === 0) {
-        console.log('⚠️ No critical parts matched, using size filter');
-        filteredList = filterBySize(partsData);
-      }
-      
-      setPartsList(filteredList);
-      console.log(`✅ AI Vision identified: ${modelName} | Showing ${filteredList.length} parts`);
-      
-      // Step 5: BATCH ANALYZE major parts automatically (pre-cache explanations)
-      console.log('🤖 Starting batch analysis of major parts...');
-      await batchAnalyzeParts(filteredList, modelName);
       
     } catch (error) {
-      console.warn('⚠️ AI Vision failed, using shape detection:', error.message);
+      console.warn('⚠️ Classification failed, using basic shape detection:', error.message);
       
       // Ensure all parts stay visible
       allParts.forEach(p => {
@@ -334,7 +314,8 @@ export default function ExplodeViewPage() {
   };
   
   // Capture model from multiple angles (OPTIMIZED - 2 images max to stay under 20k token limit)
-  const captureMultiAngleImages = async () => {
+  // REMOVED: Vision-based image capture (not needed for text classification)
+  /* const captureMultiAngleImages = async () => {
     return new Promise((resolve) => {
       const images = [];
       // REDUCED: 3 images → 2 images (front + isometric)
@@ -481,8 +462,8 @@ RULES:
     console.log(`✅ Individual analysis complete: ${successCount}/${partsToAnalyze.length} parts analyzed`);
   };
 
-  // Analyze image with Gemini Vision (ENHANCED PROMPT)
-  const analyzeModelImage = async (imageObj, partsData) => {
+  // REMOVED: Vision-based image analysis (not needed for text classification)
+  /* const analyzeModelImage = async (imageObj, partsData) => {
     // Filter to only major parts (ignore screws, bolts, pins)
     const majorParts = partsData.filter(p => p.isMajor);
     
@@ -574,7 +555,7 @@ RULES:
     }
     
     return jsonData;
-  };
+  }; */
 
   // --- 4. Model Loading Logic (The Fix) ---
   const handleFileUpload = (event) => {
