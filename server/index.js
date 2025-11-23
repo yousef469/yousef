@@ -27,16 +27,16 @@ app.get('/health', (req, res) => {
 });
 
 // ============================================
-// GEMINI API ENDPOINTS
+// GEMINI API ENDPOINTS - TEXT ONLY
 // ============================================
 
-// Gemini Vision API
-app.post('/api/gemini/vision', async (req, res) => {
+// Gemini Part Classification (Text-Based)
+app.post('/api/gemini/classify', async (req, res) => {
   try {
-    const { prompt, images, maxTokens = 1024 } = req.body;
+    const { type, modelName, parts } = req.body;
 
-    if (!prompt || !images || !Array.isArray(images)) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!type || !modelName || !parts || !Array.isArray(parts)) {
+      return res.status(400).json({ error: 'Missing required fields: type, modelName, parts' });
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -44,83 +44,59 @@ app.post('/api/gemini/vision', async (req, res) => {
       return res.status(500).json({ error: 'API key missing' });
     }
 
-    // Clean Base64 data
-    const cleanImages = images.map(img => ({
-      inline_data: {
-        mime_type: img.mime_type || 'image/jpeg',
-        data: img.data.includes('base64,') ? img.data.split('base64,')[1] : img.data
-      }
-    }));
+    const prompt = `You are an engineering classifier. Your job is to categorize parts based on their names and mesh size.
 
-    console.log(`🔮 Gemini Vision: ${cleanImages.length} images, ${maxTokens} tokens`);
+Machine type: ${type}
+Model: ${modelName}
 
-    // Try multiple models in order of preference (for regional availability)
-    const modelsToTry = [
-      'gemini-1.5-flash',
-      'gemini-1.5-pro', 
-      'gemini-pro-vision'
-    ];
+Parts:
+${parts.map(p => `- ${p.name}, vertices: ${p.vertices}`).join('\n')}
 
-    let lastError = null;
-    
-    for (const model of modelsToTry) {
-      try {
-        console.log(`🔄 Trying model: ${model}`);
-        
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                role: 'user',
-                parts: [{ text: prompt }, ...cleanImages]
-              }],
-              generationConfig: {
-                maxOutputTokens: maxTokens,
-                temperature: 0.1,
-                topP: 0.8
-              }
-            })
+Return ONLY valid JSON array (no markdown, no explanation):
+[
+  { "partName": "part_name", "category": "engine|body|wing|wheel|structural|fastener", "reason": "brief reason" }
+]`;
+
+    console.log(`🔮 Classifying ${parts.length} parts for ${type} ${modelName}`);
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            maxOutputTokens: 2048,
+            temperature: 0.3
           }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          console.log(`✅ Success with ${model}`);
-          return res.json({ text });
-        }
-
-        const errorText = await response.text();
-        console.warn(`⚠️ ${model} failed: ${response.status}`);
-        lastError = errorText;
-        
-        // If 404, try next model. If other error, stop.
-        if (response.status !== 404) {
-          return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
-        }
-      } catch (error) {
-        console.warn(`⚠️ ${model} error:`, error.message);
-        lastError = error.message;
+        })
       }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Gemini API Error:', errorText);
+      return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
     }
 
-    // All models failed
-    console.error('❌ All Gemini models unavailable in this region');
-    return res.status(404).json({ 
-      error: 'Gemini API not available in your region. Using shape detection fallback.' 
-    });
-
     const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    console.log('✅ Gemini Vision Success');
-    return res.json({ text });
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+    
+    // Clean up markdown code blocks if present
+    const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    try {
+      const classifications = JSON.parse(cleanText);
+      console.log(`✅ Classified ${classifications.length} parts`);
+      return res.json(classifications);
+    } catch (parseError) {
+      console.error('❌ Failed to parse Gemini response:', cleanText);
+      return res.status(500).json({ error: 'Invalid JSON response from AI' });
+    }
 
   } catch (error) {
-    console.error('❌ Vision API Error:', error);
+    console.error('❌ Classification Error:', error);
     return res.status(500).json({ error: error.message });
   }
 });

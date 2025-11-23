@@ -10,19 +10,18 @@ const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 console.log('�  Gemini API: Using SECURE Vercel Serverless Functions');
 console.log('📡 API Base:', API_BASE);
 
-// Secure Vision API call (with images) through backend
-export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 256) {
-  console.log(`🔮 Calling Vercel function: ${images.length} images, ${maxTokens} tokens`);
+// Text-based part classification (no images needed!)
+export async function classifyParts(type, modelName, parts) {
+  console.log(`🔮 Classifying ${parts.length} parts for ${type} ${modelName}`);
   
   try {
-    const response = await fetch(`${API_BASE}/vision`, {
+    const response = await fetch(`${API_BASE}/classify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        prompt,
-        images,
-        maxTokens,
-        retries
+        type,
+        modelName,
+        parts
       })
     });
 
@@ -31,15 +30,13 @@ export async function callGeminiVision(prompt, images, retries = 5, maxTokens = 
       throw new Error(error.error || `Backend error: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log('✅ Backend vision response received');
+    const classifications = await response.json();
+    console.log('✅ Part classification received');
     
-    // Backend now returns text at top level for convenience
-    // But keep full response for compatibility
-    return data;
+    return classifications;
 
   } catch (error) {
-    console.error('❌ Backend vision error:', error);
+    console.error('❌ Classification error:', error);
     throw error;
   }
 }
