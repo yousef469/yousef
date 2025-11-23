@@ -27,10 +27,122 @@ app.get('/health', (req, res) => {
 });
 
 // ============================================
+// GEMINI API ENDPOINTS
 // ============================================
-// NOTE: Gemini API moved to Vercel Serverless Functions
-// This server only handles WebRTC signaling and Stripe payments
-// Gemini endpoints are now at /api/gemini/* (Vercel Serverless)
+
+// Gemini Vision API
+app.post('/api/gemini/vision', async (req, res) => {
+  try {
+    const { prompt, images, maxTokens = 1024 } = req.body;
+
+    if (!prompt || !images || !Array.isArray(images)) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'API key missing' });
+    }
+
+    // Clean Base64 data
+    const cleanImages = images.map(img => ({
+      inline_data: {
+        mime_type: img.mime_type || 'image/jpeg',
+        data: img.data.includes('base64,') ? img.data.split('base64,')[1] : img.data
+      }
+    }));
+
+    console.log(`🔮 Gemini Vision: ${cleanImages.length} images, ${maxTokens} tokens`);
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{ text: prompt }, ...cleanImages]
+          }],
+          generationConfig: {
+            maxOutputTokens: maxTokens,
+            temperature: 0.1,
+            topP: 0.8
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Gemini API Error:', errorText);
+      return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
+    }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    console.log('✅ Gemini Vision Success');
+    return res.json({ text });
+
+  } catch (error) {
+    console.error('❌ Vision API Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Gemini Text API
+app.post('/api/gemini/text', async (req, res) => {
+  try {
+    const { prompt, maxTokens = 1024 } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Missing prompt' });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'API key missing' });
+    }
+
+    console.log(`💬 Gemini Text: ${maxTokens} tokens`);
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            maxOutputTokens: maxTokens,
+            temperature: 0.7
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Gemini API Error:', errorText);
+      return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
+    }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    console.log('✅ Gemini Text Success');
+    return res.json({ text });
+
+  } catch (error) {
+    console.error('❌ Text API Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // ============================================
 
 const server = http.createServer(app);
