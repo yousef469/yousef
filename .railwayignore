@@ -1,0 +1,23 @@
+# Ignore documentation and temp files
+md folders/
+*.md
+!server/*.md
+!README.md
+
+# Ignore frontend files (we only deploy backend)
+src/
+public/
+index.html
+vite.config.js
+tailwind.config.js
+postcss.config.js
+
+# Ignore git and IDE files
+.git/
+.vscode/
+.idea/
+
+# Ignore environment files (use Railway env vars instead)
+.env
+.env.local
+.env.example
