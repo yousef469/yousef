@@ -30,6 +30,58 @@ app.get('/health', (req, res) => {
 // GEMINI API ENDPOINTS - ENGO BOT ONLY
 // ============================================
 
+// Gemini Text API (for Engo Bot)
+app.post('/api/gemini/text', async (req, res) => {
+  try {
+    const { prompt, maxTokens = 1024 } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Missing prompt' });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'API key missing' });
+    }
+
+    console.log(`💬 Engo Bot: ${maxTokens} tokens`);
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            maxOutputTokens: maxTokens,
+            temperature: 0.7
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Gemini API Error:', errorText);
+      return res.status(response.status).json({ error: `Gemini API Failed: ${response.status}` });
+    }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    console.log('✅ Engo Bot response sent');
+    return res.json({ text });
+
+  } catch (error) {
+    console.error('❌ Text API Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Gemini Text API
 app.post('/api/gemini/text', async (req, res) => {
   try {
