@@ -3,7 +3,9 @@
 // API key is hidden on server, never exposed to users
 
 // Use relative URLs - works both locally (Vite proxy) and on Vercel
-const API_BASE = '/api/gemini';
+// Use backend server URL (Railway/Render) or fallback to relative URL for local dev
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 
 console.log('�  Gemini API: Using SECURE Vercel Serverless Functions');
 console.log('📡 API Base:', API_BASE);
