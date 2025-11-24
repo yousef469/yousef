@@ -576,6 +576,35 @@ RULES:
 
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
+      
+      // FIX: Prevent WebGL immutable texture errors
+      if (!extension || extension !== 'fbx') {
+        gltf.scene.traverse((child) => {
+          if (child.isMesh && child.material) {
+            const materials = Array.isArray(child.material) ? child.material : [child.material];
+            materials.forEach(m => {
+              // Fix main texture
+              if (m.map) {
+                m.map.generateMipmaps = false;
+                m.map.minFilter = THREE.LinearFilter;
+                m.map.magFilter = THREE.LinearFilter;
+                m.map.needsUpdate = true;
+              }
+              
+              // Fix other textures
+              const texList = ['normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'lightMap'];
+              texList.forEach((t) => {
+                if (m[t]) {
+                  m[t].generateMipmaps = false;
+                  m[t].minFilter = THREE.LinearFilter;
+                  m[t].magFilter = THREE.LinearFilter;
+                  m[t].needsUpdate = true;
+                }
+              });
+            });
+          }
+        });
+      }
 
       // cleanup old
       if (sceneRef.current) {
