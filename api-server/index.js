@@ -25,6 +25,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
 
+// Test endpoint
+app.get('/api/gemini/test', (req, res) => {
+  res.json({ message: 'Gemini API endpoint is reachable' });
+});
+
 // Gemini Text API
 app.post('/api/gemini/text', async (req, res) => {
   try {
