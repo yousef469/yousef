@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import { generateResponse } from '../services/gemini';
@@ -569,36 +571,42 @@ RULES:
     
     let loader = extension === 'fbx' ? new FBXLoader() : new GLTFLoader();
     if (extension !== 'fbx') {
+      // Setup DRACO decoder
       const draco = new DRACOLoader();
       draco.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
       loader.setDRACOLoader(draco);
+      
+      // Setup KTX2 decoder for compressed textures
+      const ktx2Loader = new KTX2Loader();
+      ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/libs/basis/');
+      ktx2Loader.detectSupport(rendererRef.current);
+      loader.setKTX2Loader(ktx2Loader);
+      
+      // Setup Meshopt decoder
+      loader.setMeshoptDecoder(MeshoptDecoder);
     }
 
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // FIX: Prevent WebGL immutable texture errors
+      // FIX: Only modify NON-compressed textures
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
           if (child.isMesh && child.material) {
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.forEach(m => {
-              // Fix main texture
-              if (m.map) {
-                m.map.generateMipmaps = false;
-                m.map.minFilter = THREE.LinearFilter;
-                m.map.magFilter = THREE.LinearFilter;
-                m.map.needsUpdate = true;
-              }
+              const maps = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'lightMap'];
               
-              // Fix other textures
-              const texList = ['normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'lightMap'];
-              texList.forEach((t) => {
-                if (m[t]) {
-                  m[t].generateMipmaps = false;
-                  m[t].minFilter = THREE.LinearFilter;
-                  m[t].magFilter = THREE.LinearFilter;
-                  m[t].needsUpdate = true;
+              maps.forEach((key) => {
+                const tex = m[key];
+                if (!tex) return;
+                
+                // ONLY fix non-compressed textures (KTX2 textures are immutable)
+                if (!tex.isCompressedTexture) {
+                  tex.generateMipmaps = false;
+                  tex.minFilter = THREE.LinearFilter;
+                  tex.magFilter = THREE.LinearFilter;
+                  tex.needsUpdate = true;
                 }
               });
             });
