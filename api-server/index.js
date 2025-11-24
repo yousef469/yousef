@@ -30,6 +30,9 @@ app.get('/api/gemini/test', (req, res) => {
   res.json({ message: 'Gemini API endpoint is reachable' });
 });
 
+// Handle OPTIONS for CORS preflight
+app.options('/api/gemini/text', cors());
+
 // Gemini Text API
 app.post('/api/gemini/text', async (req, res) => {
   try {
