@@ -84,6 +84,10 @@ app.post('/api/gemini/text', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Gemini API Proxy running on port ${PORT}`);
+const HOST = '0.0.0.0'; // Required for Render
+
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Gemini API Proxy running on ${HOST}:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`API Key configured: ${process.env.GEMINI_API_KEY ? 'Yes' : 'No'}`);
 });
