@@ -642,34 +642,31 @@ RULES:
         mesh.receiveShadow = true;
         
         // Ensure double side rendering (Fixes invisible parts)
+        // DON'T clone materials - modify them directly to avoid texture errors
         if (mesh.material) {
           // Handle array of materials
           if (Array.isArray(mesh.material)) {
-            mesh.material = mesh.material.map(mat => {
-              const cloned = mat.clone();
-              cloned.side = THREE.DoubleSide;
-              if (cloned.isMeshStandardMaterial || cloned.isMeshPhysicalMaterial) {
-                cloned.metalness = 0.5;
-                cloned.roughness = 0.4;
-                if (cloned.color.r === 0 && cloned.color.g === 0 && cloned.color.b === 0) {
-                  cloned.color.setHex(0x888888);
+            mesh.material.forEach(mat => {
+              mat.side = THREE.DoubleSide;
+              if (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial) {
+                mat.metalness = 0.5;
+                mat.roughness = 0.4;
+                if (mat.color.r === 0 && mat.color.g === 0 && mat.color.b === 0) {
+                  mat.color.setHex(0x888888);
                 }
               }
-              return cloned;
             });
           } else {
             // Single material
-            const cloned = mesh.material.clone();
-            cloned.side = THREE.DoubleSide;
+            mesh.material.side = THREE.DoubleSide;
             
-            if (cloned.isMeshStandardMaterial || cloned.isMeshPhysicalMaterial) {
-              cloned.metalness = 0.5;
-              cloned.roughness = 0.4;
-              if (cloned.color.r === 0 && cloned.color.g === 0 && cloned.color.b === 0) {
-                cloned.color.setHex(0x888888);
+            if (mesh.material.isMeshStandardMaterial || mesh.material.isMeshPhysicalMaterial) {
+              mesh.material.metalness = 0.5;
+              mesh.material.roughness = 0.4;
+              if (mesh.material.color.r === 0 && mesh.material.color.g === 0 && mesh.material.color.b === 0) {
+                mesh.material.color.setHex(0x888888);
               }
             }
-            mesh.material = cloned;
           }
         }
 
