@@ -179,7 +179,14 @@ export default function ExplodeViewPage() {
       frameCount++;
       if (frameCount % 60 === 0) {
         scene.traverse((obj) => {
-          if (obj.userData.isPart && obj.visible) {
+          if (obj.userData.isPart) {
+            // Ensure part stays visible
+            if (!obj.visible) obj.visible = true;
+            
+            // Ensure part is in scene
+            if (!obj.parent) scene.add(obj);
+            
+            // Fix material opacity
             const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
             materials.forEach(mat => {
               if (mat && !mat.transparent && mat.opacity !== 1) {
