@@ -86,6 +86,7 @@ export default function ExplodeViewPage() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x05070a); // Deep UI Black/Blue
     scene.fog = new THREE.FogExp2(0x05070a, 0.002); // Soft fog for depth
+    scene.environment = null; // Prevent HDR environment map issues
     sceneRef.current = scene;
 
     // Camera - Initial setup (will be moved by fitCamera)
@@ -108,8 +109,12 @@ export default function ExplodeViewPage() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    
+    // FIX: Prevent texture immutability issues
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.capabilities.getMaxAnisotropy = () => 1;
+    
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
