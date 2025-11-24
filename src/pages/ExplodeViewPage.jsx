@@ -149,19 +149,40 @@ export default function ExplodeViewPage() {
     scene.add(grid);
 
     // Animation Loop
+    let frameCount = 0;
     const animate = () => {
       requestAnimationFrame(animate);
       controls.update();
       
       // Hover Effect Pulse
       if (hoveredPart && !selectedPart) {
-        const pulse = (Math.sin(Date.now() * 0.005) + 1) * 0.5;
-        hoveredPart.material.emissiveIntensity = 0.2 + (pulse * 0.2);
+        const materials = Array.isArray(hoveredPart.material) ? hoveredPart.material : [hoveredPart.material];
+        materials.forEach(mat => {
+          if (mat && mat.emissive) {
+            const pulse = (Math.sin(Date.now() * 0.005) + 1) * 0.5;
+            mat.emissiveIntensity = 0.2 + (pulse * 0.2);
+          }
+        });
       }
       
       // Inspection Rotation
       if (selectedPart && selectedPart.userData.isInspecting) {
         selectedPart.rotation.y += 0.002;
+      }
+      
+      // Periodic visibility check (every 60 frames = ~1 second)
+      frameCount++;
+      if (frameCount % 60 === 0) {
+        scene.traverse((obj) => {
+          if (obj.userData.isPart && obj.visible) {
+            const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+            materials.forEach(mat => {
+              if (mat && !mat.transparent && mat.opacity !== 1) {
+                mat.opacity = 1; // Fix any opacity drift
+              }
+            });
+          }
+        });
       }
       
       renderer.render(scene, camera);
@@ -723,22 +744,26 @@ RULES:
         p.frustumCulled = false; // Prevent culling
         
         // Force material update and ensure it's visible
-        if (p.material) {
-          p.material.needsUpdate = true;
-          p.material.transparent = false;
-          p.material.opacity = 1;
-          p.material.depthTest = true;
-          p.material.depthWrite = true;
-          
-          // Add bright color for debugging
-          if (i === 0) {
-            console.log('First part material:', {
-              type: p.material.type,
-              visible: p.visible,
-              opacity: p.material.opacity,
-              color: p.material.color
-            });
+        const materials = Array.isArray(p.material) ? p.material : [p.material];
+        materials.forEach(mat => {
+          if (mat) {
+            mat.needsUpdate = true;
+            mat.transparent = false;
+            mat.opacity = 1;
+            mat.depthTest = true;
+            mat.depthWrite = true;
+            mat.visible = true;
           }
+        });
+        
+        // Add bright color for debugging
+        if (i === 0) {
+          console.log('First part material:', {
+            type: materials[0]?.type,
+            visible: p.visible,
+            opacity: materials[0]?.opacity,
+            color: materials[0]?.color
+          });
         }
       });
       
