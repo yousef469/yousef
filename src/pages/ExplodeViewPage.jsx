@@ -769,10 +769,13 @@ RULES:
       setIsLoading(false);
       URL.revokeObjectURL(url);
 
-      // AI VISION IDENTIFICATION - Multi-angle capture and analysis
+      // Shape-based identification (AI disabled)
       setTimeout(() => {
-        identifyModelByVision(newParts, partsData);
-      }, 1000);
+        const filteredList = filterBySize(partsData);
+        setPartsList(filteredList);
+        setModelType('3D Model');
+        console.log(`✅ Showing ${filteredList.length} major parts`);
+      }, 500);
 
     }, undefined, (e) => {
       console.error(e);
@@ -1081,66 +1084,23 @@ Rules:
       duration: 1
     });
 
-    // 3. Get AI Data
-    await generatePartExplanation(part.userData.partName);
+    // 3. Show static part info (AI disabled)
+    // await generatePartExplanation(part.userData.partName);
   };
 
   const generatePartExplanation = async (partName) => {
-    // Check if already cached from batch analysis
+    // AI disabled - provide static information
     if (partExplanations.has(partName)) {
-      console.log(`✅ Using cached analysis for ${partName}`);
       return;
     }
     
-    setLoadingExplanation(true);
-    console.log(`🔍 Generating individual analysis for ${partName}...`);
-    
-    try {
-      const contextPrompt = modelType 
-        ? `You are analyzing the "${partName}" component from a ${modelType}.` 
-        : `You are analyzing the "${partName}" component.`;
-      
-      const prompt = `${contextPrompt}
-
-Provide detailed engineering analysis in JSON format:
-{
-  "purpose": "Detailed explanation of what this part does and why it's critical",
-  "material": "Specific materials used (e.g., Titanium alloy, Carbon fiber, Aluminum 7075)",
-  "cost": "Realistic cost estimate with currency",
-  "tip": "Professional engineering insight or maintenance tip"
-}
-
-Be specific and technical. Use real-world engineering knowledge. Output ONLY the JSON.`;
-      
-      const text = await generateResponse(prompt);
-      
-      // Robust JSON parsing
-      if (!text || text.trim() === '') {
-        throw new Error('Empty response from API');
-      }
-      
-      const match = text.match(/\{[\s\S]*\}/);
-      const json = match ? JSON.parse(match[0]) : { 
-        purpose: "AI analysis unavailable for this part", 
-        material: "Unknown", 
-        cost: "N/A", 
-        tip: "Manual inspection recommended" 
-      };
-      
-      setPartExplanations(prev => new Map(prev).set(partName, json));
-      console.log(`✅ Generated analysis for ${partName}`);
-    } catch (e) {
-      console.warn(`⚠️ Failed to analyze ${partName}:`, e.message);
-      // Provide fallback data
-      setPartExplanations(prev => new Map(prev).set(partName, { 
-        purpose: "This component is part of the assembly structure", 
-        material: "Varies by design", 
-        cost: "Contact supplier", 
-        tip: "Refer to technical documentation for detailed specifications" 
-      }));
-    } finally {
-      setLoadingExplanation(false);
-    }
+    // Set default explanation immediately
+    setPartExplanations(prev => new Map(prev).set(partName, { 
+      purpose: `This is the ${partName} component. It's a critical part of the assembly structure. Inspect for wear, damage, or misalignment during maintenance.`, 
+      material: "Varies by design (typically aluminum alloy, steel, or composite materials)", 
+      cost: "Contact manufacturer for pricing", 
+      tip: "Refer to technical documentation for detailed specifications and maintenance procedures" 
+    }));
   };
 
   const handleClick = () => {
@@ -1214,7 +1174,10 @@ Be specific and technical. Use real-world engineering knowledge. Output ONLY the
         />
 
         {/* Sidebar */}
-        <div className={`w-96 border-l border-cyan-900/30 bg-black/80 backdrop-blur absolute right-0 top-0 bottom-0 z-30 transition-transform duration-500 flex flex-col ${modelLoaded ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div 
+          className={`w-96 border-l border-cyan-900/30 bg-black/80 backdrop-blur absolute right-0 top-0 bottom-0 z-30 transition-transform duration-500 flex flex-col ${modelLoaded ? 'translate-x-0' : 'translate-x-full'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="p-4 border-b border-cyan-900/30 max-h-[400px] overflow-y-auto custom-scrollbar">
             <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-3">
               {analyzingModel ? "Scanning Systems..." : `Critical Components (${partsList.length})`}
