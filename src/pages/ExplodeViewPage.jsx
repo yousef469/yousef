@@ -622,18 +622,33 @@ RULES:
         
         // Ensure double side rendering (Fixes invisible parts)
         if (mesh.material) {
-          mesh.material.side = THREE.DoubleSide;
-          // Clone to avoid sharing materials between parts
-          mesh.material = mesh.material.clone();
-          
-          // Ensure material is visible
-          if (mesh.material.isMeshStandardMaterial || mesh.material.isMeshPhysicalMaterial) {
-            mesh.material.metalness = 0.5;
-            mesh.material.roughness = 0.4;
-            // Ensure color is not black
-            if (mesh.material.color.r === 0 && mesh.material.color.g === 0 && mesh.material.color.b === 0) {
-              mesh.material.color.setHex(0x888888); // Gray if black
+          // Handle array of materials
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map(mat => {
+              const cloned = mat.clone();
+              cloned.side = THREE.DoubleSide;
+              if (cloned.isMeshStandardMaterial || cloned.isMeshPhysicalMaterial) {
+                cloned.metalness = 0.5;
+                cloned.roughness = 0.4;
+                if (cloned.color.r === 0 && cloned.color.g === 0 && cloned.color.b === 0) {
+                  cloned.color.setHex(0x888888);
+                }
+              }
+              return cloned;
+            });
+          } else {
+            // Single material
+            const cloned = mesh.material.clone();
+            cloned.side = THREE.DoubleSide;
+            
+            if (cloned.isMeshStandardMaterial || cloned.isMeshPhysicalMaterial) {
+              cloned.metalness = 0.5;
+              cloned.roughness = 0.4;
+              if (cloned.color.r === 0 && cloned.color.g === 0 && cloned.color.b === 0) {
+                cloned.color.setHex(0x888888);
+              }
             }
+            mesh.material = cloned;
           }
         }
 
@@ -658,7 +673,8 @@ RULES:
         
         // Metadata
         mesh.userData.isPart = true;
-        mesh.userData.originalMaterial = mesh.material.clone();
+        // Store reference to original material (don't clone again to avoid texture issues)
+        mesh.userData.originalMaterial = mesh.material;
         mesh.userData.size = partDiagonal;
         mesh.userData.volume = partVolume;
         mesh.userData.isMajorPart = partDiagonal > sizeThreshold; // Flag major parts
@@ -983,11 +999,31 @@ Rules:
     parts.forEach((p, i) => {
       const state = originalStates.get(p);
       p.visible = true;
-      p.material.transparent = true;
-      p.material.opacity = 0;
       
-      if (p.material.emissive) {
-        p.material.emissive.setHex(0x000000); // Reset glow
+      // Handle array materials
+      if (Array.isArray(p.material)) {
+        p.material.forEach(mat => {
+          mat.transparent = true;
+          mat.opacity = 0;
+          if (mat.emissive) mat.emissive.setHex(0x000000);
+          gsap.to(mat, {
+            opacity: 1, duration: 0.8, delay: i * 0.005,
+            onComplete: () => { mat.transparent = false; }
+          });
+        });
+      } else {
+        p.material.transparent = true;
+        p.material.opacity = 0;
+        
+        if (p.material.emissive) {
+          p.material.emissive.setHex(0x000000); // Reset glow
+        }
+
+        // Fade in
+        gsap.to(p.material, {
+          opacity: 1, duration: 0.8, delay: i * 0.005,
+          onComplete: () => { p.material.transparent = false; }
+        });
       }
 
       // Move back
@@ -995,11 +1031,7 @@ Rules:
         x: state.pos.x, y: state.pos.y, z: state.pos.z,
         duration: 1, ease: "back.out(1.2)", delay: i * 0.005
       });
-      // Fade in
-      gsap.to(p.material, {
-        opacity: 1, duration: 0.8, delay: i * 0.005,
-        onComplete: () => { p.material.transparent = false; }
-      });
+      
       // Rotate back
       gsap.to(p.rotation, {
         x: state.rot.x, y: state.rot.y, z: state.rot.z, duration: 1
@@ -1044,18 +1076,26 @@ Rules:
           z: p.position.z + (vec.z * 5),
           duration: 0.8, ease: "power2.in"
         });
-        // Fade out
-        p.material.transparent = true;
-        gsap.to(p.material, {
-          opacity: 0, duration: 0.5,
-          onComplete: () => { p.visible = false; }
-        });
+        // Fade out - handle array materials
+        if (Array.isArray(p.material)) {
+          p.material.forEach(mat => {
+            mat.transparent = true;
+            gsap.to(mat, { opacity: 0, duration: 0.5 });
+          });
+          gsap.delayedCall(0.5, () => { p.visible = false; });
+        } else {
+          p.material.transparent = true;
+          gsap.to(p.material, {
+            opacity: 0, duration: 0.5,
+            onComplete: () => { p.visible = false; }
+          });
+        }
       } else {
-        // Highlight Selected
-        const mat = p.userData.originalMaterial.clone();
-        mat.emissive = new THREE.Color(0x00ffff);
-        mat.emissiveIntensity = 0.5;
-        p.material = mat;
+        // Highlight Selected - modify existing material instead of cloning
+        if (p.material.emissive) {
+          p.material.emissive = new THREE.Color(0x00ffff);
+          p.material.emissiveIntensity = 0.5;
+        }
       }
     });
 
