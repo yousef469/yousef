@@ -5,8 +5,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import { generateResponse } from '../services/gemini';
@@ -576,44 +574,38 @@ RULES:
     
     let loader = extension === 'fbx' ? new FBXLoader() : new GLTFLoader();
     if (extension !== 'fbx') {
-      // Setup DRACO decoder
+      // Setup DRACO decoder only (skip KTX2 and Meshopt to prevent texture issues)
       const draco = new DRACOLoader();
       draco.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
       loader.setDRACOLoader(draco);
-      
-      // Setup KTX2 decoder for compressed textures
-      const ktx2Loader = new KTX2Loader();
-      ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/libs/basis/');
-      ktx2Loader.detectSupport(rendererRef.current);
-      loader.setKTX2Loader(ktx2Loader);
-      
-      // Setup Meshopt decoder
-      loader.setMeshoptDecoder(MeshoptDecoder);
     }
 
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // FIX: Only modify NON-compressed textures
+      // SAFE LOADER: Remove problematic textures to prevent disappearing
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
           if (child.isMesh && child.material) {
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.forEach(m => {
-              const maps = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'lightMap'];
+              // Keep basic color but remove texture maps that cause issues
+              // This ensures geometry always stays visible
+              m.map = null;
+              m.normalMap = null;
+              m.metalnessMap = null;
+              m.roughnessMap = null;
+              m.emissiveMap = null;
+              m.envMap = null;
+              m.aoMap = null;
+              m.lightMap = null;
               
-              maps.forEach((key) => {
-                const tex = m[key];
-                if (!tex) return;
-                
-                // ONLY fix non-compressed textures (KTX2 textures are immutable)
-                if (!tex.isCompressedTexture) {
-                  tex.generateMipmaps = false;
-                  tex.minFilter = THREE.LinearFilter;
-                  tex.magFilter = THREE.LinearFilter;
-                  tex.needsUpdate = true;
-                }
-              });
+              // Ensure material is visible with solid color
+              if (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0)) {
+                m.color = new THREE.Color(0x888888);
+              }
+              
+              m.needsUpdate = true;
             });
           }
         });
