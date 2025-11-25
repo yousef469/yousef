@@ -8,39 +8,21 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Direct API call (works on localhost)
+  // Use Google's SDK (works better than direct fetch)
   const callGeminiAPI = async (prompt) => {
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
     
     if (!API_KEY) {
       throw new Error('API key not configured. Add VITE_GEMINI_API_KEY to .env');
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: [{ text: prompt }]
-          }],
-          generationConfig: {
-            maxOutputTokens: 512,
-            temperature: 0.7
-          }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
     
     if (!text) {
       throw new Error('No text in response');
