@@ -1137,7 +1137,7 @@ export default function App() {
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
-      {/* <FloatingAIHelper /> */}
+      <FloatingAIHelper />
       <Router>
         <ScrollToTop />
         <React.Suspense fallback={

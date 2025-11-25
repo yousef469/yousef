@@ -8,23 +8,35 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Backend API call
+  // Direct API call (works on localhost)
   const callGeminiAPI = async (prompt) => {
-    const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-    const API_URL = BACKEND_URL ? `${BACKEND_URL}/api/gemini/text` : '/api/gemini/text';
+    const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
     
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        maxTokens: 512
-      })
-    });
+    if (!API_KEY) {
+      throw new Error('API key not configured. Add VITE_GEMINI_API_KEY to .env');
+    }
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            maxOutputTokens: 512,
+            temperature: 0.7
+          }
+        })
+      }
+    );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `API Error: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
