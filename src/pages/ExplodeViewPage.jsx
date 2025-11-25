@@ -77,6 +77,8 @@ export default function ExplodeViewPage() {
   const [originalCenter, setOriginalCenter] = useState(new THREE.Vector3()); // NEVER recalculate!
   const [modelInput, setModelInput] = useState('');
   const [modelInfo, setModelInfo] = useState(null);
+  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
+  const imageInputRef = useRef(null);
 
   // --- 1. Setup Scene ---
   useEffect(() => {
@@ -592,17 +594,34 @@ RULES:
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // Keep textures but ensure materials are visible
+      // Ensure materials are visible and stable
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
           if (child.isMesh && child.material) {
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.forEach(m => {
-              // Ensure material is visible
+              // Keep textures but ensure visibility
               m.side = THREE.DoubleSide;
+              m.transparent = false;
+              m.opacity = 1;
+              m.depthWrite = true;
+              m.depthTest = true;
+              
+              // Ensure color is visible
               if (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0)) {
                 m.color = new THREE.Color(0x888888);
               }
+              
+              // Fix texture settings to prevent GL errors
+              const textures = [m.map, m.normalMap, m.roughnessMap, m.metalnessMap, m.emissiveMap];
+              textures.forEach(tex => {
+                if (tex && !tex.isCompressedTexture) {
+                  tex.generateMipmaps = false;
+                  tex.minFilter = THREE.LinearFilter;
+                  tex.magFilter = THREE.LinearFilter;
+                }
+              });
+              
               m.needsUpdate = true;
             });
           }
@@ -1234,6 +1253,65 @@ Rules:
     }
   };
 
+  const handleImageAnalysis = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsAnalyzingImage(true);
+    setModelInfo(null);
+
+    try {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai');
+      const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+      
+      const genAI = new GoogleGenerativeAI(API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      await new Promise((resolve) => {
+        reader.onload = async () => {
+          const base64 = reader.result.split(',')[1];
+          
+          const prompt = `Identify this vehicle/aircraft/rocket. Provide:
+- Exact model name (e.g., "BMW M4", "Falcon 9", "F-22 Raptor")
+- Type (Car/Rocket/Aircraft)
+- Key specifications
+
+Format as: MODEL_NAME | TYPE | SPECS`;
+
+          const result = await model.generateContent([
+            prompt,
+            { inlineData: { data: base64, mimeType: file.type } }
+          ]);
+          
+          const response = await result.response;
+          const text = response.text();
+          
+          // Parse response
+          const lines = text.split('\n');
+          const modelName = lines[0]?.split('|')[0]?.trim() || 'Unknown Model';
+          
+          setModelType(modelName);
+          setModelInput(modelName);
+          setModelInfo({ 
+            type: 'AI Identified',
+            analysis: text 
+          });
+          
+          resolve();
+        };
+      });
+    } catch (error) {
+      console.error('Vision error:', error);
+      setModelInfo({ error: 'Failed to analyze image. Try manual input instead.' });
+    } finally {
+      setIsAnalyzingImage(false);
+    }
+  };
+
   return (
     <div className="h-screen bg-black text-white font-mono overflow-hidden flex flex-col">
       
@@ -1326,7 +1404,7 @@ Rules:
           {/* Model Info Input */}
           <div className="p-4 border-b border-cyan-900/30 bg-black/50">
             <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-2">Model Identification</h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-2">
               <input
                 type="text"
                 value={modelInput}
@@ -1334,18 +1412,49 @@ Rules:
                 onKeyDown={(e) => e.key === 'Enter' && handleModelLookup()}
                 placeholder="e.g., BMW M4, Falcon 9..."
                 className="flex-1 bg-gray-900 text-white text-xs px-3 py-2 rounded border border-cyan-900/50 focus:border-cyan-500 focus:outline-none"
+                disabled={isAnalyzingImage}
               />
               <button
                 onClick={handleModelLookup}
-                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-xs rounded transition-all"
+                disabled={isAnalyzingImage}
+                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-xs rounded transition-all disabled:opacity-50"
               >
                 IDENTIFY
               </button>
             </div>
+            <button
+              onClick={() => imageInputRef.current?.click()}
+              disabled={isAnalyzingImage}
+              className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isAnalyzingImage ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  ANALYZING IMAGE...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  AI VISION: UPLOAD IMAGE
+                </>
+              )}
+            </button>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageAnalysis}
+              className="hidden"
+            />
             {modelInfo && (
               <div className="mt-3 p-3 bg-cyan-950/20 border border-cyan-900/50 rounded text-xs">
                 {modelInfo.error ? (
                   <p className="text-red-400">{modelInfo.error}</p>
+                ) : modelInfo.analysis ? (
+                  <div className="space-y-2 text-gray-300">
+                    <div className="text-purple-400 font-bold">🤖 AI Vision Analysis:</div>
+                    <p className="whitespace-pre-wrap">{modelInfo.analysis}</p>
+                  </div>
                 ) : (
                   <div className="space-y-1 text-gray-300">
                     <div><span className="text-cyan-400">Type:</span> {modelInfo.type}</div>
