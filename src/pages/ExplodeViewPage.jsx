@@ -594,35 +594,17 @@ RULES:
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // Ensure materials are visible and stable
+      // DON'T modify textures - just ensure materials are visible
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
           if (child.isMesh && child.material) {
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.forEach(m => {
-              // Keep textures but ensure visibility
               m.side = THREE.DoubleSide;
-              m.transparent = false;
-              m.opacity = 1;
-              m.depthWrite = true;
-              m.depthTest = true;
-              
-              // Ensure color is visible
-              if (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0)) {
+              // Ensure color is visible if no texture
+              if (!m.map && (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0))) {
                 m.color = new THREE.Color(0x888888);
               }
-              
-              // Fix texture settings to prevent GL errors
-              const textures = [m.map, m.normalMap, m.roughnessMap, m.metalnessMap, m.emissiveMap];
-              textures.forEach(tex => {
-                if (tex && !tex.isCompressedTexture) {
-                  tex.generateMipmaps = false;
-                  tex.minFilter = THREE.LinearFilter;
-                  tex.magFilter = THREE.LinearFilter;
-                }
-              });
-              
-              m.needsUpdate = true;
             });
           }
         });
@@ -858,13 +840,66 @@ RULES:
       setIsLoading(false);
       URL.revokeObjectURL(url);
 
-      // Shape-based identification (AI disabled)
-      setTimeout(() => {
+      // Auto-analyze model with AI vision
+      setTimeout(async () => {
         const filteredList = filterBySize(partsData);
         setPartsList(filteredList);
-        setModelType('3D Model');
+        
+        // Capture screenshot and analyze
+        try {
+          setIsAnalyzingImage(true);
+          
+          // Render current view
+          rendererRef.current.render(sceneRef.current, cameraRef.current);
+          
+          // Capture as JPEG
+          const screenshot = rendererRef.current.domElement.toDataURL('image/jpeg', 0.8);
+          const base64 = screenshot.split(',')[1];
+          
+          // Analyze with AI
+          const { GoogleGenerativeAI } = await import('@google/generative-ai');
+          const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+          
+          if (API_KEY) {
+            const genAI = new GoogleGenerativeAI(API_KEY);
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+            const prompt = `Identify this 3D model. What vehicle/aircraft/rocket is this? Provide:
+- Exact model name
+- Type (Car/Rocket/Aircraft/Spacecraft)
+- Brief description
+
+Be specific if you recognize it, or describe what type of vehicle it appears to be.`;
+
+            const result = await model.generateContent([
+              prompt,
+              { inlineData: { data: base64, mimeType: 'image/jpeg' } }
+            ]);
+            
+            const response = await result.response;
+            const text = response.text();
+            
+            console.log('🤖 AI identified model:', text);
+            
+            // Extract model name from first line
+            const firstLine = text.split('\n')[0];
+            const modelName = firstLine.replace(/[*#-]/g, '').trim();
+            
+            setModelType(modelName || '3D Model');
+            setModelInfo({ 
+              type: 'AI Identified',
+              analysis: text 
+            });
+          }
+        } catch (error) {
+          console.warn('AI analysis failed:', error);
+          setModelType('3D Model');
+        } finally {
+          setIsAnalyzingImage(false);
+        }
+        
         console.log(`✅ Showing ${filteredList.length} major parts`);
-      }, 500);
+      }, 1000);
 
     }, undefined, (e) => {
       console.error(e);
