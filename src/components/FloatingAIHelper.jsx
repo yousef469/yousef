@@ -8,25 +8,27 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Use Google's SDK (works better than direct fetch)
+  // Direct API with SDK (exact copy from working project)
   const callGeminiAPI = async (prompt) => {
     const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
     
     if (!API_KEY) {
-      throw new Error('API key not configured. Add VITE_GEMINI_API_KEY to .env');
+      throw new Error('API key not configured');
     }
 
     const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-pro',
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 512,
+      }
+    });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    
-    if (!text) {
-      throw new Error('No text in response');
-    }
     
     return text;
   };
