@@ -594,18 +594,33 @@ RULES:
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // DON'T modify textures - just ensure materials are visible
+      // Setup materials properly without modifying textures
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
-          if (child.isMesh && child.material) {
-            const materials = Array.isArray(child.material) ? child.material : [child.material];
-            materials.forEach(m => {
-              m.side = THREE.DoubleSide;
-              // Ensure color is visible if no texture
-              if (!m.map && (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0))) {
-                m.color = new THREE.Color(0x888888);
-              }
-            });
+          if (child.isMesh) {
+            // Fix normals
+            if (child.geometry) {
+              child.geometry.computeVertexNormals();
+            }
+            
+            // Setup materials
+            if (child.material) {
+              const materials = Array.isArray(child.material) ? child.material : [child.material];
+              materials.forEach(m => {
+                m.side = THREE.DoubleSide;
+                m.transparent = false;
+                m.opacity = 1;
+                
+                // Ensure color is visible if no texture
+                if (!m.map && (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0))) {
+                  m.color = new THREE.Color(0x888888);
+                }
+                
+                // Store original opacity for animations
+                m.userData = m.userData || {};
+                m.userData.originalOpacity = 1;
+              });
+            }
           }
         });
       }
@@ -1108,31 +1123,21 @@ Rules:
       const state = originalStates.get(p);
       p.visible = true;
       
-      // Handle array materials
-      if (Array.isArray(p.material)) {
-        p.material.forEach(mat => {
-          mat.transparent = true;
-          mat.opacity = 0;
+      // Reset materials to full opacity
+      const materials = Array.isArray(p.material) ? p.material : [p.material];
+      materials.forEach(mat => {
+        if (mat) {
           if (mat.emissive) mat.emissive.setHex(0x000000);
           gsap.to(mat, {
-            opacity: 1, duration: 0.8, delay: i * 0.005,
-            onComplete: () => { mat.transparent = false; }
+            opacity: 1, 
+            duration: 0.8, 
+            delay: i * 0.005,
+            onComplete: () => { 
+              mat.transparent = false;
+            }
           });
-        });
-      } else {
-        p.material.transparent = true;
-        p.material.opacity = 0;
-        
-        if (p.material.emissive) {
-          p.material.emissive.setHex(0x000000); // Reset glow
         }
-
-        // Fade in
-        gsap.to(p.material, {
-          opacity: 1, duration: 0.8, delay: i * 0.005,
-          onComplete: () => { p.material.transparent = false; }
-        });
-      }
+      });
 
       // Move back
       gsap.to(p.position, {
