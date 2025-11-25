@@ -75,6 +75,8 @@ export default function ExplodeViewPage() {
   const [modelType, setModelType] = useState(''); // "Falcon 9", "Porsche 911", etc.
   const [analyzingModel, setAnalyzingModel] = useState(false);
   const [originalCenter, setOriginalCenter] = useState(new THREE.Vector3()); // NEVER recalculate!
+  const [modelInput, setModelInput] = useState('');
+  const [modelInfo, setModelInfo] = useState(null);
 
   // --- 1. Setup Scene ---
   useEffect(() => {
@@ -590,28 +592,17 @@ RULES:
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // SAFE LOADER: Remove problematic textures to prevent disappearing
+      // Keep textures but ensure materials are visible
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
           if (child.isMesh && child.material) {
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.forEach(m => {
-              // Keep basic color but remove texture maps that cause issues
-              // This ensures geometry always stays visible
-              m.map = null;
-              m.normalMap = null;
-              m.metalnessMap = null;
-              m.roughnessMap = null;
-              m.emissiveMap = null;
-              m.envMap = null;
-              m.aoMap = null;
-              m.lightMap = null;
-              
-              // Ensure material is visible with solid color
+              // Ensure material is visible
+              m.side = THREE.DoubleSide;
               if (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0)) {
                 m.color = new THREE.Color(0x888888);
               }
-              
               m.needsUpdate = true;
             });
           }
@@ -1213,6 +1204,36 @@ Rules:
     else handleResetSelection();
   };
 
+  // Vehicle database (hardcoded specs)
+  const vehicleDatabase = {
+    // Cars
+    'bmw m4': { type: 'Car', engine: '3.0L Twin-Turbo I6', hp: '503 hp', torque: '479 lb-ft', transmission: '6-speed manual / 8-speed auto', drivetrain: 'RWD', weight: '3,835 lbs', topSpeed: '180 mph', acceleration: '3.8s 0-60 mph' },
+    'porsche 911': { type: 'Car', engine: '3.0L Twin-Turbo Flat-6', hp: '379-640 hp', torque: '331-590 lb-ft', transmission: '7-speed manual / 8-speed PDK', drivetrain: 'RWD/AWD', weight: '3,354 lbs', topSpeed: '191 mph', acceleration: '3.2s 0-60 mph' },
+    'tesla model s': { type: 'Car', engine: 'Dual Motor Electric', hp: '670 hp', torque: '713 lb-ft', transmission: 'Single-speed', drivetrain: 'AWD', weight: '4,561 lbs', topSpeed: '155 mph', acceleration: '3.1s 0-60 mph' },
+    'ford mustang': { type: 'Car', engine: '5.0L V8', hp: '450 hp', torque: '410 lb-ft', transmission: '6-speed manual / 10-speed auto', drivetrain: 'RWD', weight: '3,825 lbs', topSpeed: '155 mph', acceleration: '4.3s 0-60 mph' },
+    
+    // Rockets
+    'falcon 9': { type: 'Rocket', engine: '9x Merlin 1D', thrust: '1.7M lbf', fuel: 'RP-1/LOX', stages: '2', height: '70m', diameter: '3.7m', payload: '22,800 kg to LEO', reusable: 'Yes' },
+    'spacex starship': { type: 'Rocket', engine: '33x Raptor', thrust: '17M lbf', fuel: 'Methane/LOX', stages: '2', height: '120m', diameter: '9m', payload: '100,000 kg to LEO', reusable: 'Yes' },
+    'saturn v': { type: 'Rocket', engine: '5x F-1', thrust: '7.6M lbf', fuel: 'RP-1/LOX', stages: '3', height: '111m', diameter: '10m', payload: '140,000 kg to LEO', reusable: 'No' },
+    
+    // Aircraft
+    'f-22 raptor': { type: 'Aircraft', engine: '2x Pratt & Whitney F119', thrust: '35,000 lbf each', maxSpeed: 'Mach 2.25', range: '1,840 mi', ceiling: '65,000 ft', crew: '1', armament: 'AIM-120, AIM-9, 20mm cannon' },
+    'boeing 747': { type: 'Aircraft', engine: '4x turbofan', thrust: '63,300 lbf each', maxSpeed: '614 mph', range: '8,000 mi', ceiling: '45,000 ft', capacity: '416 passengers', wingspan: '211 ft' },
+    'cessna 172': { type: 'Aircraft', engine: 'Lycoming IO-360', hp: '180 hp', maxSpeed: '140 mph', range: '640 mi', ceiling: '14,000 ft', crew: '1 + 3 passengers', fuel: 'Avgas' }
+  };
+
+  const handleModelLookup = () => {
+    const query = modelInput.toLowerCase().trim();
+    const info = vehicleDatabase[query];
+    if (info) {
+      setModelInfo(info);
+      setModelType(query.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
+    } else {
+      setModelInfo({ error: 'Model not found in database. Try: BMW M4, Falcon 9, F-22 Raptor, etc.' });
+    }
+  };
+
   return (
     <div className="h-screen bg-black text-white font-mono overflow-hidden flex flex-col">
       
@@ -1300,6 +1321,41 @@ Rules:
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Model Info Input */}
+          <div className="p-4 border-b border-cyan-900/30 bg-black/50">
+            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-2">Model Identification</h3>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={modelInput}
+                onChange={(e) => setModelInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleModelLookup()}
+                placeholder="e.g., BMW M4, Falcon 9..."
+                className="flex-1 bg-gray-900 text-white text-xs px-3 py-2 rounded border border-cyan-900/50 focus:border-cyan-500 focus:outline-none"
+              />
+              <button
+                onClick={handleModelLookup}
+                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-xs rounded transition-all"
+              >
+                IDENTIFY
+              </button>
+            </div>
+            {modelInfo && (
+              <div className="mt-3 p-3 bg-cyan-950/20 border border-cyan-900/50 rounded text-xs">
+                {modelInfo.error ? (
+                  <p className="text-red-400">{modelInfo.error}</p>
+                ) : (
+                  <div className="space-y-1 text-gray-300">
+                    <div><span className="text-cyan-400">Type:</span> {modelInfo.type}</div>
+                    {Object.entries(modelInfo).filter(([k]) => k !== 'type').map(([key, val]) => (
+                      <div key={key}><span className="text-cyan-400 capitalize">{key}:</span> {val}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Detail Panel */}
