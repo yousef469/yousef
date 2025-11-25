@@ -8,27 +8,27 @@ export default function FloatingAIHelper() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Direct API with SDK (exact copy from working project)
+  // Use backend server (works from Saudi Arabia)
   const callGeminiAPI = async (prompt) => {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+    const BACKEND_URL = 'https://engineerium-gemini-api.onrender.com';
     
-    if (!API_KEY) {
-      throw new Error('API key not configured');
+    const response = await fetch(`${BACKEND_URL}/api/gemini/text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, maxTokens: 512 })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Backend error' }));
+      throw new Error(errorData.error || `Backend error: ${response.status}`);
     }
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: 'models/gemini-1.0-pro',
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 512,
-      }
-    });
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    if (!text) {
+      throw new Error('No text in response');
+    }
     
     return text;
   };
