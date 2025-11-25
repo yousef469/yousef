@@ -19,7 +19,7 @@ export default function FloatingAIHelper() {
 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
+      model: 'models/gemini-1.0-pro',
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 512,
