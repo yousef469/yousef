@@ -1172,38 +1172,26 @@ Rules:
     setSelectedPart(part);
     part.userData.isInspecting = true;
 
-    // 1. DISAPPEAR ANIMATION FOR OTHERS
+    // 1. DIM OTHER PARTS (don't hide them)
     parts.forEach((p, i) => {
       if (p !== part) {
-        const vec = explodeVectors.get(p);
-        
-        // Fly away fast
-        gsap.to(p.position, {
-          x: p.position.x + (vec.x * 5),
-          y: p.position.y + (vec.y * 5),
-          z: p.position.z + (vec.z * 5),
-          duration: 0.8, ease: "power2.in"
-        });
-        // Fade out - handle array materials
-        if (Array.isArray(p.material)) {
-          p.material.forEach(mat => {
+        // Just dim other parts, keep them visible
+        const materials = Array.isArray(p.material) ? p.material : [p.material];
+        materials.forEach(mat => {
+          if (mat) {
             mat.transparent = true;
-            gsap.to(mat, { opacity: 0, duration: 0.5 });
-          });
-          gsap.delayedCall(0.5, () => { p.visible = false; });
-        } else {
-          p.material.transparent = true;
-          gsap.to(p.material, {
-            opacity: 0, duration: 0.5,
-            onComplete: () => { p.visible = false; }
-          });
-        }
+            gsap.to(mat, { opacity: 0.3, duration: 0.5 });
+          }
+        });
       } else {
-        // Highlight Selected - modify existing material instead of cloning
-        if (p.material.emissive) {
-          p.material.emissive = new THREE.Color(0x00ffff);
-          p.material.emissiveIntensity = 0.5;
-        }
+        // Highlight Selected
+        const materials = Array.isArray(p.material) ? p.material : [p.material];
+        materials.forEach(mat => {
+          if (mat && mat.emissive) {
+            mat.emissive = new THREE.Color(0x00ffff);
+            mat.emissiveIntensity = 0.5;
+          }
+        });
       }
     });
 
