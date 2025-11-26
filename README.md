@@ -27,13 +27,38 @@
 - **Mathematics** (15+ lessons): Calculus, differential equations, linear algebra
 - **Physics** (10+ lessons): Mechanics, thermodynamics, electromagnetism
 
+### 🚀 Career Projects (NEW!)
+Build portfolio-worthy engineering projects with real-world applications:
+- **Rocket Engine Nozzle** - Design and optimize thrust systems
+- **Solar Panel System** - Calculate energy production and savings
+- **Robotic Arm (3-Joint)** - Forward kinematics and control
+- **Car Transmission** - Gear ratios and performance optimization
+- **8 More Projects** - Electric cars, aircraft wings, drones, and more!
+
+Each project includes:
+- Interactive controls and real-time calculations
+- Professional visualizations and graphs
+- AI-powered insights and explanations
+- Downloadable PDF reports for portfolios
+
 ### 🤖 AI-Powered Features
 - **EnGo AI Tutor**: Context-aware tutoring powered by Google Gemini 2.0 Flash
+  - Detects current lesson and subject
+  - Provides context-specific explanations
+  - Quick help buttons for common questions
+  - Real-time feedback on your work
 - **JARVIS 3D Viewer**: AI-powered model identification with detailed specs
   - Supports: Cars, Rockets, Aircraft, Boats, Tanks, Trains, Motorcycles, Robots
   - Auto-generates technical specifications
   - Historical context and usage information
   - Color-coded information sections
+
+### 👥 Community Features
+- **Community Q&A**: Ask questions and share knowledge
+- **Project Showcase**: Share your engineering projects
+- **Voting System**: Upvote helpful answers
+- **Subject-specific Groups**: Rockets, Cars, Planes, Electronics, etc.
+- **Search & Filters**: Find relevant discussions easily
 
 ### 🎮 Gamification System
 - XP and leveling system
@@ -48,6 +73,7 @@
 - **Orbital Transfer Calculator**: Hohmann transfers and delta-v calculations
 - **Lift Calculator**: Aircraft lift calculations
 - **3D Model Viewer**: Interactive rotation, zoom, explode mode
+- **Career Project Simulators**: Real-time engineering simulations
 - **Component Diagrams**: Interactive car and aircraft diagrams
 
 ### 🎨 3D Models Library
@@ -72,6 +98,39 @@
 
 ### 👥 User Features
 - Supabase authentication (Email/Password + Google OAuth)
+- Personal progress dashboard
+- Bookmarks and notes system
+- Achievement tracking
+- Profile customization
+
+---
+
+## 🆕 Latest Updates (December 2024)
+
+### Career Projects System
+- **4 Interactive Projects Live**: Rocket Nozzle, Solar Panel, Robotic Arm, Car Transmission
+- Real-time engineering calculations and simulations
+- Professional report generation for portfolios
+- AI-powered insights and optimization tips
+
+### Enhanced AI Tutor
+- Context-aware responses based on current lesson
+- Subject-specific explanations (rockets, cars, planes, etc.)
+- Quick help buttons for common questions
+- Progress-aware tutoring (knows your level and XP)
+
+### Community Platform
+- Reddit-style Q&A system
+- Post creation with categories (Questions, Projects, Designs, Discussions)
+- Voting system with real-time updates
+- Subject-specific filtering
+- Search functionality
+
+### UI/UX Improvements
+- Solid sticky headers for better visibility
+- Improved navigation and routing
+- Enhanced mobile responsiveness
+- Better loading states and error handling
 - User profiles and progress tracking
 - Favorites system
 - Continue learning feature
@@ -146,10 +205,16 @@
 - **i18next** - Internationalization
 
 ### Backend & Services
-- **Supabase** - Authentication, database, storage
-- **Google Gemini 2.0 Flash** - AI tutoring and model identification
+- **Supabase** - Authentication, database, storage, community system
+- **Google Gemini 2.0 Flash** - AI tutoring, model identification, project insights
 - **Mixpanel** - Analytics and user tracking
 - **Vercel** - Hosting and deployment
+
+### Career Projects
+- **Real-time Calculations** - Physics and engineering formulas
+- **SVG Visualizations** - Dynamic diagrams and graphs
+- **Interactive Controls** - Sliders, inputs, and presets
+- **Report Generation** - PDF-ready project summaries
 
 ### 3D & Graphics
 - **Three.js** - WebGL rendering
