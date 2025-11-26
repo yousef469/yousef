@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Plus, TrendingUp, MessageCircle, Share2, Loader2, Users as UsersIcon } from 'lucide-react';
+import { ArrowLeft, Search, Plus, TrendingUp, MessageCircle, Share2, Loader2, Briefcase } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createPost, getPosts, votePost } from '../services/community';
 
