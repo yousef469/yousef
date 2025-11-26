@@ -1117,7 +1117,6 @@ const MathPhysicsEngineeringPage = lazy(() => import('./pages/MathPhysicsEnginee
 const ElectronicsPage = lazy(() => import('./pages/ElectronicsPage'));
 const BooksPage = lazy(() => import('./pages/BooksPage'));
 import Leaderboard from './components/Leaderboard';
-import CommunityQA from './components/CommunityQA';
 
 // Wrapper pages for routes
 const LeaderboardPage = () => (
@@ -1137,8 +1136,8 @@ export default function App() {
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
-      <FloatingAIHelper />
       <Router>
+        <FloatingAIHelper />
         <ScrollToTop />
         <React.Suspense fallback={
           <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -1216,7 +1215,6 @@ export default function App() {
           <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
           <Route path="/progression" element={<ProtectedRoute><ProgressionPage /></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-          <Route path="/community" element={<ProtectedRoute><CommunityQA /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
