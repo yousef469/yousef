@@ -45,7 +45,6 @@ const HomePageLoggedIn = () => {
               
               <nav className="hidden md:flex items-center gap-6">
                 <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">About</button>
-                <button onClick={() => navigate('/community')} className="text-white hover:text-primary transition-colors font-medium">Community</button>
                 <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">Pricing</button>
               </nav>
             </div>
@@ -184,9 +183,9 @@ const HomePageLoggedIn = () => {
             </div>
           </button>
 
-          {/* Community Projects */}
+          {/* Community */}
           <button
-            onClick={() => navigate('/community-projects')}
+            onClick={() => navigate('/community')}
             className="group relative bg-gradient-to-br from-pink-500 via-rose-600 to-red-500 hover:from-pink-600 hover:via-rose-700 hover:to-red-600 rounded-2xl p-8 border-2 border-pink-400/50 hover:border-pink-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-pink-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
@@ -198,13 +197,13 @@ const HomePageLoggedIn = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">🌍 Community Projects</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🌍 Community</h3>
               <p className="text-white/90 text-center mb-4">
-                Explore and contribute to community engineering projects
+                Ask questions, share projects, and learn together
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Explore Projects</span>
+                <span>Join Community</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Plus, TrendingUp, Users, MessageCircle, Heart, Share2, Briefcase, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Plus, TrendingUp, MessageCircle, Share2, Loader2, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createPost, getPosts, votePost } from '../services/community';
 
@@ -36,15 +36,34 @@ export default function CommunityPage() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const category = activeTab === 'help' ? 'question' : 'project';
-      const data = await getPosts({ 
-        category,
+      // For help tab, show questions and discussions
+      // For projects tab, show projects and designs
+      const filters = {
         search: searchQuery,
         sortBy: 'recent'
-      });
-      setPosts(data || []);
+      };
+      
+      // Don't filter by category - show all posts for now
+      // Later we can add more sophisticated filtering
+      
+      const data = await getPosts(filters);
+      
+      // Filter on client side based on tab
+      let filteredData = data || [];
+      if (activeTab === 'help') {
+        filteredData = filteredData.filter(post => 
+          post.category === 'question' || post.category === 'discussion'
+        );
+      } else {
+        filteredData = filteredData.filter(post => 
+          post.category === 'project' || post.category === 'design'
+        );
+      }
+      
+      setPosts(filteredData);
     } catch (error) {
       console.error('Error fetching posts:', error);
+      // If tables don't exist, show empty state
       setPosts([]);
     } finally {
       setLoading(false);
@@ -52,19 +71,36 @@ export default function CommunityPage() {
   };
 
   const handleCreatePost = async () => {
-    if (!newPost.title.trim() || !newPost.content.trim()) return;
+    if (!newPost.title.trim() || !newPost.content.trim()) {
+      alert('Please fill in both title and content');
+      return;
+    }
 
     try {
-      await createPost({
+      const postData = {
         ...newPost,
         user_id: user.id
-      });
+      };
+      
+      console.log('Creating post:', postData);
+      await createPost(postData);
+      
       setShowCreateModal(false);
       setNewPost({ title: '', content: '', category: 'question', subject: 'general' });
-      fetchPosts();
+      
+      // Refresh posts to show the new one
+      await fetchPosts();
+      
+      alert('Post created successfully!');
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Failed to create post. Please try again.');
+      
+      // Check if it's a database error
+      if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        alert('Database tables not set up yet. Please run the SQL schema in Supabase first. Check COMMUNITY_SCHEMA.sql file.');
+      } else {
+        alert('Failed to create post: ' + (error.message || 'Unknown error'));
+      }
     }
   };
 
@@ -115,7 +151,12 @@ export default function CommunityPage() {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold">Community</h1>
             <button 
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {
+                // Set default category based on active tab
+                const defaultCategory = activeTab === 'help' ? 'question' : 'project';
+                setNewPost({ title: '', content: '', category: defaultCategory, subject: 'general' });
+                setShowCreateModal(true);
+              }}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
             >
               <Plus className="w-5 h-5" />
