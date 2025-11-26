@@ -60,6 +60,10 @@ export default function ExplodeViewPage() {
   const mouseRef = useRef(new THREE.Vector2());
   const fileInputRef = useRef(null);
 
+  // 🔥 CRITICAL FIX: Use refs for animation loop to prevent scene reset
+  const hoveredPartRef = useRef(null);
+  const selectedPartRef = useRef(null);
+
   // State
   const [parts, setParts] = useState([]);
   const [partsList, setPartsList] = useState([]);
@@ -115,7 +119,7 @@ export default function ExplodeViewPage() {
     // FIX: Prevent texture immutability issues
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.NoToneMapping;
-    renderer.capabilities.getMaxAnisotropy = () => 1;
+    // Don't override capabilities - causes texture errors
     
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -163,11 +167,15 @@ export default function ExplodeViewPage() {
       requestAnimationFrame(animate);
       controls.update();
       
-      // Hover Effect Pulse
-      if (hoveredPart && !selectedPart) {
-        const materials = Array.isArray(hoveredPart.material) ? hoveredPart.material : [hoveredPart.material];
+      // 🔥 FIX: Use refs instead of state to avoid stale closures
+      const currentHover = hoveredPartRef.current;
+      const currentSelect = selectedPartRef.current;
+      
+      // Hover Effect Pulse - SAFE: Only modify intensity, not color
+      if (currentHover && !currentSelect) {
+        const materials = Array.isArray(currentHover.material) ? currentHover.material : [currentHover.material];
         materials.forEach(mat => {
-          if (mat && mat.emissive) {
+          if (mat && mat.emissive && mat.userData.isHovered) {
             const pulse = (Math.sin(Date.now() * 0.005) + 1) * 0.5;
             mat.emissiveIntensity = 0.2 + (pulse * 0.2);
           }
@@ -175,8 +183,8 @@ export default function ExplodeViewPage() {
       }
       
       // Inspection Rotation
-      if (selectedPart && selectedPart.userData.isInspecting) {
-        selectedPart.rotation.y += 0.002;
+      if (currentSelect && currentSelect.userData.isInspecting) {
+        currentSelect.rotation.y += 0.002;
       }
       
       // Periodic visibility check (every 60 frames = ~1 second)
@@ -220,11 +228,11 @@ export default function ExplodeViewPage() {
         containerRef.current.removeChild(renderer.domElement);
       }
     };
-  }, [hoveredPart, selectedPart]);
+  }, []); // 🔥 CRITICAL FIX: Empty array - scene only created ONCE
 
-  // --- 2. Raycasting (Interaction) ---
+  // --- 2. Raycasting (Interaction) - Using Refs ---
   const handleMouseMove = (e) => {
-    if (!parts.length) return;
+    if (!parts.length || !containerRef.current) return;
     
     const rect = containerRef.current.getBoundingClientRect();
     mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -235,26 +243,51 @@ export default function ExplodeViewPage() {
     // Intersect parts
     const intersects = raycasterRef.current.intersectObjects(parts, false);
 
+    // 🔥 FIX: Use refs for comparison to avoid stale state
+    const currentHover = hoveredPartRef.current;
+    const currentSelect = selectedPartRef.current;
+
     if (intersects.length > 0) {
       const obj = intersects[0].object;
-      if (hoveredPart !== obj) {
-        // Clear old hover - check if material has emissive property
-        if (hoveredPart && hoveredPart !== selectedPart && hoveredPart.material.emissive) {
-          hoveredPart.material.emissive.setHex(0x000000);
+      if (currentHover !== obj) {
+        // Clear old hover - SAFE: Only reset hex, don't create new Color
+        if (currentHover && currentHover !== currentSelect) {
+          const materials = Array.isArray(currentHover.material) ? currentHover.material : [currentHover.material];
+          materials.forEach(mat => {
+            if (mat && mat.emissive) {
+              mat.emissive.setHex(0x000000);
+              mat.emissiveIntensity = 0;
+              mat.userData.isHovered = false;
+            }
+          });
         }
-        // Set new hover - only if not selected and material supports emissive
-        if (obj !== selectedPart && obj.material.emissive) {
-          obj.material.emissive = new THREE.Color(0x00ffff);
-          obj.material.emissiveIntensity = 0.3;
+        // Set new hover - SAFE: Only modify existing emissive, don't create new
+        if (obj !== currentSelect) {
+          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+          materials.forEach(mat => {
+            if (mat && mat.emissive) {
+              mat.emissive.setHex(0x00ffff);
+              mat.emissiveIntensity = 0.3;
+              mat.userData.isHovered = true;
+            }
+          });
         }
+        // Update both ref and state
+        hoveredPartRef.current = obj;
         setHoveredPart(obj);
         containerRef.current.style.cursor = 'pointer';
       }
     } else {
-      if (hoveredPart) {
-        if (hoveredPart !== selectedPart && hoveredPart.material.emissive) {
-          hoveredPart.material.emissive.setHex(0x000000);
-        }
+      if (currentHover) {
+        const materials = Array.isArray(currentHover.material) ? currentHover.material : [currentHover.material];
+        materials.forEach(mat => {
+          if (mat && mat.emissive && currentHover !== currentSelect) {
+            mat.emissive.setHex(0x000000);
+            mat.emissiveIntensity = 0;
+            mat.userData.isHovered = false;
+          }
+        });
+        hoveredPartRef.current = null;
         setHoveredPart(null);
         containerRef.current.style.cursor = 'default';
       }
@@ -594,7 +627,7 @@ RULES:
     loader.load(url, (gltf) => {
       const root = extension === 'fbx' ? gltf : gltf.scene;
       
-      // Setup materials properly without modifying textures
+      // 🔥 CRITICAL FIX: Clone materials to avoid texture immutability errors
       if (!extension || extension !== 'fbx') {
         gltf.scene.traverse((child) => {
           if (child.isMesh) {
@@ -603,23 +636,29 @@ RULES:
               child.geometry.computeVertexNormals();
             }
             
-            // Setup materials
+            // 🔥 CLONE materials to make them mutable
             if (child.material) {
               const materials = Array.isArray(child.material) ? child.material : [child.material];
-              materials.forEach(m => {
-                m.side = THREE.DoubleSide;
-                m.transparent = false;
-                m.opacity = 1;
+              const clonedMaterials = materials.map(m => {
+                const cloned = m.clone();
+                cloned.side = THREE.DoubleSide;
+                cloned.transparent = false;
+                cloned.opacity = 1;
                 
                 // Ensure color is visible if no texture
-                if (!m.map && (!m.color || (m.color.r === 0 && m.color.g === 0 && m.color.b === 0))) {
-                  m.color = new THREE.Color(0x888888);
+                if (!cloned.map && (!cloned.color || (cloned.color.r === 0 && cloned.color.g === 0 && cloned.color.b === 0))) {
+                  cloned.color.setHex(0x888888); // SAFE: Use setHex on cloned material
                 }
                 
                 // Store original opacity for animations
-                m.userData = m.userData || {};
-                m.userData.originalOpacity = 1;
+                cloned.userData = cloned.userData || {};
+                cloned.userData.originalOpacity = 1;
+                
+                return cloned;
               });
+              
+              // Replace with cloned materials
+              child.material = Array.isArray(child.material) ? clonedMaterials : clonedMaterials[0];
             }
           }
         });
@@ -783,31 +822,40 @@ RULES:
       const minorParts = partsData.filter(p => !p.isMajor);
       console.log(`📊 Parts breakdown: ${majorParts.length} major, ${minorParts.length} minor (screws/bolts/pins)`);
 
-      // IMPORTANT: Keep all parts visible and ensure proper rendering
+      // 🔥 CRITICAL FIX: Freeze materials to prevent shader recompilation
       newParts.forEach((p, i) => {
         p.visible = true;
         p.frustumCulled = false; // Prevent culling
         
-        // Force material update and ensure it's visible
+        // FREEZE materials - prevents GL_INVALID_OPERATION and disappearing models
         const materials = Array.isArray(p.material) ? p.material : [p.material];
         materials.forEach(mat => {
           if (mat) {
-            mat.needsUpdate = true;
+            // Initial setup
             mat.transparent = false;
             mat.opacity = 1;
             mat.depthTest = true;
             mat.depthWrite = true;
             mat.visible = true;
+            
+            // 🔥 FREEZE SHADER RECOMPILATION - This is the key fix!
+            mat.needsUpdate = false;
+            
+            // Store original state for safe modifications
+            mat.userData = mat.userData || {};
+            mat.userData.originalOpacity = 1;
+            mat.userData.isHovered = false;
+            mat.userData.isSelected = false;
           }
         });
         
-        // Add bright color for debugging
+        // Debug first part
         if (i === 0) {
-          console.log('First part material:', {
+          console.log('✅ First part material frozen:', {
             type: materials[0]?.type,
             visible: p.visible,
             opacity: materials[0]?.opacity,
-            color: materials[0]?.color
+            needsUpdate: materials[0]?.needsUpdate
           });
         }
       });
@@ -864,27 +912,127 @@ RULES:
         try {
           setIsAnalyzingImage(true);
           
-          // Render current view
+          // 🔥 CRITICAL: Force render BEFORE screenshot to ensure buffer is ready
           rendererRef.current.render(sceneRef.current, cameraRef.current);
           
-          // Capture as JPEG
-          const screenshot = rendererRef.current.domElement.toDataURL('image/jpeg', 0.8);
-          const base64 = screenshot.split(',')[1];
+          // Small delay to ensure render completes
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Capture as JPEG with error handling
+          let screenshot, base64;
+          try {
+            screenshot = rendererRef.current.domElement.toDataURL('image/jpeg', 0.8);
+            base64 = screenshot.split(',')[1];
+          } catch (screenshotError) {
+            console.warn('Screenshot failed, using text-only analysis:', screenshotError);
+            // Continue without screenshot - AI will work with part names only
+            base64 = null;
+          }
           
           // Analyze with AI
           const { GoogleGenerativeAI } = await import('@google/generative-ai');
           const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
           
-          if (API_KEY) {
+          if (API_KEY && base64) {
             const genAI = new GoogleGenerativeAI(API_KEY);
             const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-            const prompt = `Identify this 3D model. What vehicle/aircraft/rocket is this? Provide:
-- Exact model name
-- Type (Car/Rocket/Aircraft/Spacecraft)
-- Brief description
+            const prompt = `Identify this 3D model and provide COMPLETE technical specifications with historical context.
 
-Be specific if you recognize it, or describe what type of vehicle it appears to be.`;
+YOU MUST respond with ONLY valid JSON. Adapt fields based on vehicle type.
+
+ALWAYS INCLUDE THESE FIELDS:
+{
+  "modelName": "Full official name",
+  "transportation": "Primary purpose/role",
+  "type": "Car/Rocket/Aircraft/Boat/Tank/Train/Motorcycle/Robot",
+  "history": "Historical context: when used, wars participated in, famous missions, production years, why discontinued",
+  "notableFacts": "Interesting facts: racing victories, records, famous uses, cultural impact"
+}
+
+FOR CARS/MOTORCYCLES ADD:
+{
+  "engine": "Engine spec",
+  "hp": "Horsepower",
+  "torque": "Torque",
+  "topSpeed": "Top speed",
+  "acceleration": "0-60 time",
+  "racing": "Racing history if applicable",
+  "productionYears": "Years produced",
+  "cost": "Original/current price"
+}
+
+FOR ROCKETS ADD:
+{
+  "engine": "Engine config",
+  "thrust": "Thrust",
+  "fuel": "Propellant",
+  "payload": "Payload capacity",
+  "missions": "Notable missions and dates",
+  "lastFlight": "Last flight date and mission",
+  "reusable": "Reusability details",
+  "productionStatus": "Active/Retired and why",
+  "firstFlight": "First flight date"
+}
+
+FOR AIRCRAFT ADD:
+{
+  "engine": "Engine type",
+  "maxSpeed": "Max speed",
+  "range": "Range",
+  "purpose": "Passenger/Cargo/Military/Fighter",
+  "wars": "Wars participated in (WWI/WWII/etc)",
+  "capacity": "Passenger/cargo capacity",
+  "armament": "Weapons if military",
+  "productionYears": "Years produced",
+  "notableOperators": "Countries/airlines that used it"
+}
+
+FOR BOATS ADD:
+{
+  "boatType": "Fishing/Cargo/Passenger/Military/Yacht",
+  "engine": "Engine type",
+  "topSpeed": "Top speed in knots",
+  "range": "Range in nautical miles",
+  "capacity": "Passenger/cargo capacity",
+  "purpose": "Primary use"
+}
+
+FOR TANKS ADD:
+{
+  "armament": "Main gun and weapons",
+  "armor": "Armor thickness",
+  "topSpeed": "Top speed",
+  "wars": "Wars used in",
+  "crew": "Crew size",
+  "productionYears": "Years produced"
+}
+
+FOR TRAINS ADD:
+{
+  "trainType": "Passenger/Freight/High-speed",
+  "topSpeed": "Top speed",
+  "capacity": "Passenger/cargo capacity",
+  "powerType": "Steam/Diesel/Electric",
+  "routes": "Famous routes",
+  "productionYears": "Years in service"
+}
+
+FOR ROBOTS ADD:
+{
+  "robotType": "Industrial/Military/Humanoid/etc",
+  "purpose": "Primary function",
+  "manufacturer": "Company",
+  "capabilities": "What it can do",
+  "deploymentYear": "When introduced"
+}
+
+CRITICAL RULES:
+- Return ONLY JSON, no markdown
+- Omit fields that don't apply
+- Provide REAL data with units
+- Include rich historical context
+- Mention specific years, wars, missions, records`;
 
             const result = await model.generateContent([
               prompt,
@@ -894,17 +1042,41 @@ Be specific if you recognize it, or describe what type of vehicle it appears to 
             const response = await result.response;
             const text = response.text();
             
-            console.log('🤖 AI identified model:', text);
+            console.log('🤖 AI response:', text.substring(0, 300));
             
-            // Extract model name from first line
-            const firstLine = text.split('\n')[0];
-            const modelName = firstLine.replace(/[*#-]/g, '').trim();
-            
-            setModelType(modelName || '3D Model');
-            setModelInfo({ 
-              type: 'AI Identified',
-              analysis: text 
-            });
+            // Try to parse JSON response
+            try {
+              // Extract JSON from response (might be wrapped in markdown)
+              let jsonText = text;
+              const jsonMatch = text.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                jsonText = jsonMatch[0];
+              }
+              
+              const specs = JSON.parse(jsonText);
+              
+              console.log('✅ Parsed AI specs:', specs);
+              
+              // Set model name and info
+              setModelType(specs.modelName || '3D Model');
+              setModelInfo(specs);
+              
+            } catch (parseError) {
+              console.warn('⚠️ Failed to parse JSON, trying fallback extraction:', parseError);
+              
+              // Fallback: Try to extract model name from text
+              let modelName = '3D Model';
+              const nameMatch = text.match(/modelName["']?\s*:\s*["']([^"']+)["']/);
+              if (nameMatch) {
+                modelName = nameMatch[1];
+              }
+              
+              setModelType(modelName);
+              setModelInfo({ 
+                type: 'AI Identified',
+                analysis: text 
+              });
+            }
           }
         } catch (error) {
           console.warn('AI analysis failed:', error);
@@ -1070,8 +1242,8 @@ Rules:
   const handleExplode = () => {
     if (!modelLoaded) return;
     
-    // If something is selected, reset it first
-    if (selectedPart) handleResetSelection();
+    // If something is selected, reset it first - use ref
+    if (selectedPartRef.current) handleResetSelection();
 
     if (isExploded) {
       // IMPLODE
@@ -1115,19 +1287,25 @@ Rules:
   };
 
   const handleResetSelection = () => {
-    if (!selectedPart) return;
-    selectedPart.userData.isInspecting = false;
+    // 🔥 FIX: Use ref instead of state
+    if (!selectedPartRef.current) return;
+    selectedPartRef.current.userData.isInspecting = false;
 
     // BRING EVERYTHING BACK
     parts.forEach((p, i) => {
       const state = originalStates.get(p);
       p.visible = true;
       
-      // Reset materials to full opacity
+      // Reset materials to full opacity - SAFE: No material recreation
       const materials = Array.isArray(p.material) ? p.material : [p.material];
       materials.forEach(mat => {
         if (mat) {
-          if (mat.emissive) mat.emissive.setHex(0x000000);
+          if (mat.emissive) {
+            mat.emissive.setHex(0x000000);
+            mat.emissiveIntensity = 0;
+          }
+          mat.userData.isSelected = false;
+          mat.userData.isHovered = false;
           gsap.to(mat, {
             opacity: 1, 
             duration: 0.8, 
@@ -1167,17 +1345,22 @@ Rules:
       duration: 1.2
     });
 
+    // Update both ref and state
+    selectedPartRef.current = null;
     setSelectedPart(null);
   };
 
   const handlePartSelect = async (part) => {
-    if (selectedPart === part) return;
-    if (selectedPart) handleResetSelection();
+    // 🔥 FIX: Use ref for comparison
+    if (selectedPartRef.current === part) return;
+    if (selectedPartRef.current) handleResetSelection();
 
+    // Update both ref and state
+    selectedPartRef.current = part;
     setSelectedPart(part);
     part.userData.isInspecting = true;
 
-    // 1. DIM OTHER PARTS (don't hide them)
+    // 1. DIM OTHER PARTS (don't hide them) - SAFE: No material recreation
     parts.forEach((p, i) => {
       if (p !== part) {
         // Just dim other parts, keep them visible
@@ -1189,12 +1372,13 @@ Rules:
           }
         });
       } else {
-        // Highlight Selected
+        // Highlight Selected - SAFE: Only modify existing emissive, don't create new Color
         const materials = Array.isArray(p.material) ? p.material : [p.material];
         materials.forEach(mat => {
           if (mat && mat.emissive) {
-            mat.emissive = new THREE.Color(0x00ffff);
+            mat.emissive.setHex(0x00ffff); // SAFE: setHex instead of new Color
             mat.emissiveIntensity = 0.5;
+            mat.userData.isSelected = true;
           }
         });
       }
@@ -1245,40 +1429,8 @@ Rules:
   };
 
   const handleClick = () => {
-    raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
-    const intersects = raycasterRef.current.intersectObjects(parts.filter(p => p.visible), false);
-    if (intersects.length > 0) handlePartSelect(intersects[0].object);
-    else handleResetSelection();
-  };
-
-  // Vehicle database (hardcoded specs)
-  const vehicleDatabase = {
-    // Cars
-    'bmw m4': { type: 'Car', engine: '3.0L Twin-Turbo I6', hp: '503 hp', torque: '479 lb-ft', transmission: '6-speed manual / 8-speed auto', drivetrain: 'RWD', weight: '3,835 lbs', topSpeed: '180 mph', acceleration: '3.8s 0-60 mph' },
-    'porsche 911': { type: 'Car', engine: '3.0L Twin-Turbo Flat-6', hp: '379-640 hp', torque: '331-590 lb-ft', transmission: '7-speed manual / 8-speed PDK', drivetrain: 'RWD/AWD', weight: '3,354 lbs', topSpeed: '191 mph', acceleration: '3.2s 0-60 mph' },
-    'tesla model s': { type: 'Car', engine: 'Dual Motor Electric', hp: '670 hp', torque: '713 lb-ft', transmission: 'Single-speed', drivetrain: 'AWD', weight: '4,561 lbs', topSpeed: '155 mph', acceleration: '3.1s 0-60 mph' },
-    'ford mustang': { type: 'Car', engine: '5.0L V8', hp: '450 hp', torque: '410 lb-ft', transmission: '6-speed manual / 10-speed auto', drivetrain: 'RWD', weight: '3,825 lbs', topSpeed: '155 mph', acceleration: '4.3s 0-60 mph' },
-    
-    // Rockets
-    'falcon 9': { type: 'Rocket', engine: '9x Merlin 1D', thrust: '1.7M lbf', fuel: 'RP-1/LOX', stages: '2', height: '70m', diameter: '3.7m', payload: '22,800 kg to LEO', reusable: 'Yes' },
-    'spacex starship': { type: 'Rocket', engine: '33x Raptor', thrust: '17M lbf', fuel: 'Methane/LOX', stages: '2', height: '120m', diameter: '9m', payload: '100,000 kg to LEO', reusable: 'Yes' },
-    'saturn v': { type: 'Rocket', engine: '5x F-1', thrust: '7.6M lbf', fuel: 'RP-1/LOX', stages: '3', height: '111m', diameter: '10m', payload: '140,000 kg to LEO', reusable: 'No' },
-    
-    // Aircraft
-    'f-22 raptor': { type: 'Aircraft', engine: '2x Pratt & Whitney F119', thrust: '35,000 lbf each', maxSpeed: 'Mach 2.25', range: '1,840 mi', ceiling: '65,000 ft', crew: '1', armament: 'AIM-120, AIM-9, 20mm cannon' },
-    'boeing 747': { type: 'Aircraft', engine: '4x turbofan', thrust: '63,300 lbf each', maxSpeed: '614 mph', range: '8,000 mi', ceiling: '45,000 ft', capacity: '416 passengers', wingspan: '211 ft' },
-    'cessna 172': { type: 'Aircraft', engine: 'Lycoming IO-360', hp: '180 hp', maxSpeed: '140 mph', range: '640 mi', ceiling: '14,000 ft', crew: '1 + 3 passengers', fuel: 'Avgas' }
-  };
-
-  const handleModelLookup = () => {
-    const query = modelInput.toLowerCase().trim();
-    const info = vehicleDatabase[query];
-    if (info) {
-      setModelInfo(info);
-      setModelType(query.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
-    } else {
-      setModelInfo({ error: 'Model not found in database. Try: BMW M4, Falcon 9, F-22 Raptor, etc.' });
-    }
+    // Disabled - no part selection on click
+    // Just allow orbit controls to work
   };
 
   const handleImageAnalysis = async (event) => {
@@ -1324,10 +1476,23 @@ Format as: MODEL_NAME | TYPE | SPECS`;
           
           setModelType(modelName);
           setModelInput(modelName);
-          setModelInfo({ 
-            type: 'AI Identified',
-            analysis: text 
-          });
+          
+          // 🔥 AUTO-LOOKUP: Check if model exists in database
+          const lookupKey = modelName.toLowerCase().trim();
+          const dbInfo = vehicleDatabase[lookupKey];
+          
+          if (dbInfo) {
+            // Found in database - show detailed specs!
+            console.log('✅ Found detailed specs in database:', lookupKey);
+            setModelInfo(dbInfo);
+          } else {
+            // Not in database - show AI analysis
+            console.log('⚠️ Model not in database, showing AI analysis');
+            setModelInfo({ 
+              type: 'AI Identified',
+              analysis: text 
+            });
+          }
           
           resolve();
         };
@@ -1414,68 +1579,25 @@ Format as: MODEL_NAME | TYPE | SPECS`;
             </h3>
             <div className="space-y-[1px]">
               {partsList.map(p => (
-                <button 
+                <div 
                   key={p.id}
-                  onClick={(e) => {e.stopPropagation(); handlePartSelect(p.mesh)}}
-                  className={`w-full text-left px-4 py-2 text-xs font-medium border-l-2 transition-all ${
-                    selectedPart === p.mesh 
-                      ? 'border-cyan-500 bg-cyan-950 text-cyan-300' 
-                      : 'border-transparent text-gray-500 hover:text-gray-300 hover:bg-white/5'
-                  }`}
+                  className="w-full text-left px-4 py-2 text-xs font-medium border-l-2 border-transparent text-gray-400"
                 >
                   {p.name.toUpperCase()}
-                </button>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Model Info Input */}
-          <div className="p-4 border-b border-cyan-900/30 bg-black/50">
-            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-2">Model Identification</h3>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={modelInput}
-                onChange={(e) => setModelInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleModelLookup()}
-                placeholder="e.g., BMW M4, Falcon 9..."
-                className="flex-1 bg-gray-900 text-white text-xs px-3 py-2 rounded border border-cyan-900/50 focus:border-cyan-500 focus:outline-none"
-                disabled={isAnalyzingImage}
-              />
-              <button
-                onClick={handleModelLookup}
-                disabled={isAnalyzingImage}
-                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-xs rounded transition-all disabled:opacity-50"
-              >
-                IDENTIFY
-              </button>
-            </div>
-            <button
-              onClick={() => imageInputRef.current?.click()}
-              disabled={isAnalyzingImage}
-              className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isAnalyzingImage ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  ANALYZING IMAGE...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  AI VISION: UPLOAD IMAGE
-                </>
-              )}
-            </button>
-            <input
-              ref={imageInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageAnalysis}
-              className="hidden"
-            />
+          {/* Model Info Display */}
+          <div className="p-4 border-b border-cyan-900/30 bg-black/50">{isAnalyzingImage && (
+              <div className="flex items-center justify-center gap-2 text-purple-400 mb-3">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-xs font-bold">ANALYZING MODEL...</span>
+              </div>
+            )}
             {modelInfo && (
-              <div className="mt-3 p-3 bg-cyan-950/20 border border-cyan-900/50 rounded text-xs">
+              <div className="mt-3 p-4 bg-black/60 border border-purple-500/30 rounded-lg text-xs max-h-[500px] overflow-y-auto custom-scrollbar">
                 {modelInfo.error ? (
                   <p className="text-red-400">{modelInfo.error}</p>
                 ) : modelInfo.analysis ? (
@@ -1484,68 +1606,127 @@ Format as: MODEL_NAME | TYPE | SPECS`;
                     <p className="whitespace-pre-wrap">{modelInfo.analysis}</p>
                   </div>
                 ) : (
-                  <div className="space-y-1 text-gray-300">
-                    <div><span className="text-cyan-400">Type:</span> {modelInfo.type}</div>
-                    {Object.entries(modelInfo).filter(([k]) => k !== 'type').map(([key, val]) => (
-                      <div key={key}><span className="text-cyan-400 capitalize">{key}:</span> {val}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Detail Panel */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            {selectedPart ? (
-              <div className="animate-in fade-in duration-500">
-                <div className="border-b border-cyan-500/30 pb-4 mb-6">
-                  <h2 className="text-2xl text-cyan-400 font-bold font-mono break-words">{selectedPart.userData.partName.toUpperCase()}</h2>
-                  <div className="flex items-center gap-2 mt-2 text-[10px] text-cyan-700 uppercase tracking-widest">
-                    <span className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"/> System Online
-                  </div>
-                </div>
-
-                {loadingExplanation ? (
-                  <div className="space-y-3 opacity-50">
-                    <div className="h-2 bg-cyan-900 rounded w-full animate-pulse"/>
-                    <div className="h-2 bg-cyan-900 rounded w-3/4 animate-pulse"/>
-                    <div className="h-2 bg-cyan-900 rounded w-1/2 animate-pulse"/>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="bg-cyan-950/30 p-4 rounded border border-cyan-900/50">
-                      <p className="text-gray-300 text-sm leading-relaxed">
-                        {partExplanations.get(selectedPart.userData.partName)?.purpose || "Data unavailable."}
-                      </p>
+                  <div className="space-y-3">
+                    {/* Model Name Header */}
+                    {modelInfo.modelName && (
+                      <div className="border-b border-purple-500/30 pb-2 mb-3">
+                        <div className="text-purple-400 font-bold text-sm mb-1">MODEL NAME</div>
+                        <div className="text-white font-bold text-lg">{modelInfo.modelName}</div>
+                      </div>
+                    )}
+                    
+                    {/* Transportation Type */}
+                    {modelInfo.transportation && (
+                      <div>
+                        <div className="text-purple-400 font-bold mb-1">TRANSPORTATION</div>
+                        <div className="text-white">{modelInfo.transportation}</div>
+                      </div>
+                    )}
+                    
+                    {/* Engine Section */}
+                    {modelInfo.engine && (
+                      <div className="bg-purple-950/20 p-3 rounded border border-purple-500/20">
+                        <div className="text-purple-400 font-bold mb-2 text-sm">🔧 ENGINE</div>
+                        <div className="space-y-1.5">
+                          <div><span className="text-purple-300">Type:</span> <span className="text-white">{modelInfo.engine}</span></div>
+                          {modelInfo.engineCost && <div><span className="text-purple-300">Cost:</span> <span className="text-white">{modelInfo.engineCost}</span></div>}
+                          {modelInfo.hp && <div><span className="text-purple-300">Power:</span> <span className="text-white">{modelInfo.hp}</span></div>}
+                          {modelInfo.torque && <div><span className="text-purple-300">Torque:</span> <span className="text-white">{modelInfo.torque}</span></div>}
+                          {modelInfo.thrust && <div><span className="text-purple-300">Thrust:</span> <span className="text-white">{modelInfo.thrust}</span></div>}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Fuel Section */}
+                    {(modelInfo.fuel || modelInfo.fuelType) && (
+                      <div className="bg-orange-950/20 p-3 rounded border border-orange-500/20">
+                        <div className="text-orange-400 font-bold mb-2 text-sm">⛽ FUEL SYSTEM</div>
+                        <div className="space-y-1.5">
+                          {modelInfo.fuel && <div><span className="text-orange-300">Type:</span> <span className="text-white">{modelInfo.fuel}</span></div>}
+                          {modelInfo.fuelType && <div><span className="text-orange-300">Type:</span> <span className="text-white">{modelInfo.fuelType}</span></div>}
+                          {modelInfo.fuelCapacity && <div><span className="text-orange-300">Capacity:</span> <span className="text-white">{modelInfo.fuelCapacity}</span></div>}
+                          {modelInfo.range && <div><span className="text-orange-300">Range:</span> <span className="text-white">{modelInfo.range}</span></div>}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Performance Section */}
+                    <div className="bg-cyan-950/20 p-3 rounded border border-cyan-500/20">
+                      <div className="text-cyan-400 font-bold mb-2 text-sm">⚡ PERFORMANCE</div>
+                      <div className="space-y-1.5">
+                        {modelInfo.topSpeed && <div><span className="text-cyan-300">Top Speed:</span> <span className="text-white">{modelInfo.topSpeed}</span></div>}
+                        {modelInfo.maxSpeed && <div><span className="text-cyan-300">Max Speed:</span> <span className="text-white">{modelInfo.maxSpeed}</span></div>}
+                        {modelInfo.cruiseSpeed && <div><span className="text-cyan-300">Cruise:</span> <span className="text-white">{modelInfo.cruiseSpeed}</span></div>}
+                        {modelInfo.acceleration && <div><span className="text-cyan-300">0-60 mph:</span> <span className="text-white">{modelInfo.acceleration}</span></div>}
+                        {modelInfo.payload && <div><span className="text-cyan-300">Payload:</span> <span className="text-white">{modelInfo.payload}</span></div>}
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 bg-black border border-cyan-900/30 rounded">
-                        <div className="text-[10px] text-gray-500 uppercase mb-1">Material</div>
-                        <div className="text-cyan-300 text-sm">{partExplanations.get(selectedPart.userData.partName)?.material || "Unknown"}</div>
+                    {/* Space/Flight Capabilities (Rockets/Aircraft) */}
+                    {(modelInfo.reusable || modelInfo.spaceTime || modelInfo.flightTime) && (
+                      <div className="bg-green-950/20 p-3 rounded border border-green-500/20">
+                        <div className="text-green-400 font-bold mb-2 text-sm">🚀 MISSION CAPABILITIES</div>
+                        <div className="space-y-1.5">
+                          {modelInfo.reusable && <div><span className="text-green-300">Reusable:</span> <span className="text-white">{modelInfo.reusable}</span></div>}
+                          {modelInfo.landingSafety && <div><span className="text-green-300">Landing Safety:</span> <span className="text-white">{modelInfo.landingSafety}</span></div>}
+                          {modelInfo.spaceTime && <div><span className="text-green-300">Space Duration:</span> <span className="text-white">{modelInfo.spaceTime}</span></div>}
+                          {modelInfo.flightTime && <div><span className="text-green-300">Flight Time:</span> <span className="text-white">{modelInfo.flightTime}</span></div>}
+                          {modelInfo.reusability && <div><span className="text-green-300">Reusability:</span> <span className="text-white">{modelInfo.reusability}</span></div>}
+                          {modelInfo.ceiling && <div><span className="text-green-300">Service Ceiling:</span> <span className="text-white">{modelInfo.ceiling}</span></div>}
+                        </div>
                       </div>
-                      <div className="p-3 bg-black border border-cyan-900/30 rounded">
-                        <div className="text-[10px] text-gray-500 uppercase mb-1">Est. Cost</div>
-                        <div className="text-green-400 text-sm">{partExplanations.get(selectedPart.userData.partName)?.cost || "N/A"}</div>
+                    )}
+                    
+                    {/* Cost Section */}
+                    <div className="bg-yellow-950/20 p-3 rounded border border-yellow-500/20">
+                      <div className="text-yellow-400 font-bold mb-2 text-sm">💰 COST</div>
+                      <div className="space-y-1.5">
+                        {modelInfo.cost && <div><span className="text-yellow-300">Total Cost:</span> <span className="text-white font-bold">{modelInfo.cost}</span></div>}
+                        {modelInfo.productionCost && <div><span className="text-yellow-300">Production:</span> <span className="text-white">{modelInfo.productionCost}</span></div>}
                       </div>
                     </div>
-
-                    <div className="p-4 border border-orange-500/20 bg-orange-950/10 rounded">
-                      <div className="text-[10px] text-orange-500 uppercase mb-1 font-bold">Engineer's Note</div>
-                      <p className="text-orange-200/70 text-xs italic">
-                        "{partExplanations.get(selectedPart.userData.partName)?.tip || "No additional notes."}"
-                      </p>
+                    
+                    {/* History & Context Section */}
+                    {(modelInfo.history || modelInfo.notableFacts || modelInfo.missions || modelInfo.wars) && (
+                      <div className="bg-blue-950/20 p-3 rounded border border-blue-500/20">
+                        <div className="text-blue-400 font-bold mb-2 text-sm">📜 HISTORY & CONTEXT</div>
+                        <div className="space-y-2 text-xs">
+                          {modelInfo.history && <p className="text-gray-300 leading-relaxed">{modelInfo.history}</p>}
+                          {modelInfo.missions && <div><span className="text-blue-300">Notable Missions:</span> <span className="text-white">{modelInfo.missions}</span></div>}
+                          {modelInfo.lastFlight && <div><span className="text-blue-300">Last Flight:</span> <span className="text-white">{modelInfo.lastFlight}</span></div>}
+                          {modelInfo.firstFlight && <div><span className="text-blue-300">First Flight:</span> <span className="text-white">{modelInfo.firstFlight}</span></div>}
+                          {modelInfo.wars && <div><span className="text-blue-300">Wars:</span> <span className="text-white">{modelInfo.wars}</span></div>}
+                          {modelInfo.productionYears && <div><span className="text-blue-300">Production:</span> <span className="text-white">{modelInfo.productionYears}</span></div>}
+                          {modelInfo.productionStatus && <div><span className="text-blue-300">Status:</span> <span className="text-white">{modelInfo.productionStatus}</span></div>}
+                          {modelInfo.racing && <div><span className="text-blue-300">Racing:</span> <span className="text-white">{modelInfo.racing}</span></div>}
+                          {modelInfo.notableFacts && <p className="text-gray-300 leading-relaxed italic mt-2">💡 {modelInfo.notableFacts}</p>}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Additional Specs */}
+                    <div className="space-y-1.5 text-xs">
+                      {modelInfo.weight && <div><span className="text-purple-300">Weight:</span> <span className="text-gray-300">{modelInfo.weight}</span></div>}
+                      {modelInfo.height && <div><span className="text-purple-300">Height:</span> <span className="text-gray-300">{modelInfo.height}</span></div>}
+                      {modelInfo.diameter && <div><span className="text-purple-300">Diameter:</span> <span className="text-gray-300">{modelInfo.diameter}</span></div>}
+                      {modelInfo.wingspan && <div><span className="text-purple-300">Wingspan:</span> <span className="text-gray-300">{modelInfo.wingspan}</span></div>}
+                      {modelInfo.stages && <div><span className="text-purple-300">Stages:</span> <span className="text-gray-300">{modelInfo.stages}</span></div>}
+                      {modelInfo.transmission && <div><span className="text-purple-300">Transmission:</span> <span className="text-gray-300">{modelInfo.transmission}</span></div>}
+                      {modelInfo.drivetrain && <div><span className="text-purple-300">Drivetrain:</span> <span className="text-gray-300">{modelInfo.drivetrain}</span></div>}
+                      {modelInfo.crew && <div><span className="text-purple-300">Crew:</span> <span className="text-gray-300">{modelInfo.crew}</span></div>}
+                      {modelInfo.capacity && <div><span className="text-purple-300">Capacity:</span> <span className="text-gray-300">{modelInfo.capacity}</span></div>}
+                      {modelInfo.armament && <div><span className="text-purple-300">Armament:</span> <span className="text-gray-300">{modelInfo.armament}</span></div>}
+                      {modelInfo.boatType && <div><span className="text-purple-300">Boat Type:</span> <span className="text-gray-300">{modelInfo.boatType}</span></div>}
+                      {modelInfo.trainType && <div><span className="text-purple-300">Train Type:</span> <span className="text-gray-300">{modelInfo.trainType}</span></div>}
+                      {modelInfo.robotType && <div><span className="text-purple-300">Robot Type:</span> <span className="text-gray-300">{modelInfo.robotType}</span></div>}
                     </div>
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="h-full flex items-center justify-center opacity-20">
-                <Scan className="w-24 h-24 stroke-1" />
-              </div>
             )}
           </div>
+
+
         </div>
 
         {!modelLoaded && !isLoading && (

@@ -1,2 +1,0 @@
-Rebuild trigger: 2024-11-04 23:55:00
-This forces Vercel to rebuild with the latest HomePage.jsx that has all 5 features.

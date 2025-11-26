@@ -1,2 +1,0 @@
-Force rebuild timestamp: 2024-11-04 23:45:00
-This file forces Vercel to do a fresh build.
