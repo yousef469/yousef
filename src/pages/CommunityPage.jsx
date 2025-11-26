@@ -1,12 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Plus, TrendingUp, Users, MessageCircle, Heart, Share2, Briefcase } from 'lucide-react';
+import { ArrowLeft, Search, Plus, TrendingUp, Users, MessageCircle, Heart, Share2, Briefcase, Loader2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { createPost, getPosts, votePost } from '../services/community';
 
 export default function CommunityPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('help'); // 'help' or 'projects'
   const [searchQuery, setSearchQuery] = useState('');
   const [followedGroups, setFollowedGroups] = useState(new Set(['rockets', 'physics']));
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    category: 'question',
+    subject: 'general'
+  });
 
   const groups = [
     { id: 'rockets', name: 'r/RocketEngineering', members: '12.5k', icon: '🚀', color: 'orange' },
@@ -17,63 +29,63 @@ export default function CommunityPage() {
     { id: 'math', name: 'r/EngineeringMath', members: '9.8k', icon: '📐', color: 'green' }
   ];
 
-  const helpPosts = [
-    {
-      id: 1,
-      group: 'rockets',
-      author: 'u/SpaceEnthusiast',
-      title: 'Help with calculating delta-v for my rocket design',
-      content: 'I\'m working on a model rocket and need help with the Tsiolkovsky equation...',
-      upvotes: 45,
-      comments: 12,
-      time: '2h ago'
-    },
-    {
-      id: 2,
-      group: 'physics',
-      author: 'u/StudentEng',
-      title: 'Confused about Newton\'s third law in rocket propulsion',
-      content: 'Can someone explain how the exhaust velocity relates to thrust?',
-      upvotes: 32,
-      comments: 8,
-      time: '4h ago'
-    },
-    {
-      id: 3,
-      group: 'cars',
-      author: 'u/GearHead99',
-      title: 'Brake distance calculation seems off',
-      content: 'My calculations don\'t match real-world data. What am I missing?',
-      upvotes: 28,
-      comments: 15,
-      time: '6h ago'
-    }
-  ];
+  useEffect(() => {
+    fetchPosts();
+  }, [activeTab, searchQuery]);
 
-  const projectPosts = [
-    {
-      id: 1,
-      group: 'rockets',
-      author: 'u/RocketBuilder',
-      title: 'Built a working rocket simulator with Unity!',
-      content: 'After 3 months of work, here\'s my physics-based rocket sim...',
-      upvotes: 234,
-      comments: 45,
-      time: '1d ago',
-      image: '🚀'
-    },
-    {
-      id: 2,
-      group: 'electronics',
-      author: 'u/CircuitMaster',
-      title: 'My DIY robotic arm project - Full tutorial',
-      content: 'Complete guide with code and schematics...',
-      upvotes: 189,
-      comments: 32,
-      time: '2d ago',
-      image: '🤖'
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const category = activeTab === 'help' ? 'question' : 'project';
+      const data = await getPosts({ 
+        category,
+        search: searchQuery,
+        sortBy: 'recent'
+      });
+      setPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      setPosts([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const handleCreatePost = async () => {
+    if (!newPost.title.trim() || !newPost.content.trim()) return;
+
+    try {
+      await createPost({
+        ...newPost,
+        user_id: user.id
+      });
+      setShowCreateModal(false);
+      setNewPost({ title: '', content: '', category: 'question', subject: 'general' });
+      fetchPosts();
+    } catch (error) {
+      console.error('Error creating post:', error);
+      alert('Failed to create post. Please try again.');
+    }
+  };
+
+  const handleVote = async (postId, voteType) => {
+    try {
+      await votePost(user.id, postId, voteType);
+      fetchPosts();
+    } catch (error) {
+      console.error('Error voting:', error);
+    }
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInHours = Math.floor((now - time) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    return `${Math.floor(diffInHours / 24)}d ago`;
+  };
 
   const toggleFollow = (groupId) => {
     setFollowedGroups(prev => {
@@ -86,8 +98,6 @@ export default function CommunityPage() {
       return newSet;
     });
   };
-
-  const posts = activeTab === 'help' ? helpPosts : projectPosts;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -104,7 +114,10 @@ export default function CommunityPage() {
 
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold">Community</h1>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors">
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
+            >
               <Plus className="w-5 h-5" />
               Create Post
             </button>
@@ -154,54 +167,72 @@ export default function CommunityPage() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Feed */}
           <div className="lg:col-span-2 space-y-4">
-            {posts.map((post) => (
-              <div
-                key={post.id}
-                className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition-colors cursor-pointer"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex flex-col items-center gap-1">
-                    <button className="text-gray-400 hover:text-orange-500">
-                      <TrendingUp className="w-5 h-5" />
-                    </button>
-                    <span className="text-sm font-bold">{post.upvotes}</span>
-                    <button className="text-gray-400 hover:text-blue-500">
-                      <TrendingUp className="w-5 h-5 rotate-180" />
-                    </button>
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                      <span className="font-semibold">{groups.find(g => g.id === post.group)?.name}</span>
-                      <span>•</span>
-                      <span>{post.author}</span>
-                      <span>•</span>
-                      <span>{post.time}</span>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-12 text-center">
+                <MessageCircle className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+                <h3 className="text-xl font-bold mb-2">No posts yet</h3>
+                <p className="text-gray-400 mb-4">Be the first to start a discussion!</p>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
+                >
+                  Create First Post
+                </button>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-center gap-1">
+                      <button 
+                        onClick={() => handleVote(post.id, 'up')}
+                        className="text-gray-400 hover:text-orange-500"
+                      >
+                        <TrendingUp className="w-5 h-5" />
+                      </button>
+                      <span className="text-sm font-bold">{post.upvotes - post.downvotes}</span>
+                      <button 
+                        onClick={() => handleVote(post.id, 'down')}
+                        className="text-gray-400 hover:text-blue-500"
+                      >
+                        <TrendingUp className="w-5 h-5 rotate-180" />
+                      </button>
                     </div>
 
-                    <h3 className="text-lg font-bold mb-2">{post.title}</h3>
-                    <p className="text-gray-300 mb-3">{post.content}</p>
-
-                    {post.image && (
-                      <div className="w-full h-48 bg-gradient-to-br from-blue-900 to-purple-900 rounded-lg flex items-center justify-center text-6xl mb-3">
-                        {post.image}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                        <span className="font-semibold">{groups.find(g => g.id === post.subject)?.name || 'General'}</span>
+                        <span>•</span>
+                        <span>u/{user?.email?.split('@')[0] || 'Anonymous'}</span>
+                        <span>•</span>
+                        <span>{formatTimeAgo(post.created_at)}</span>
                       </div>
-                    )}
 
-                    <div className="flex items-center gap-4 text-sm text-gray-400">
-                      <button className="flex items-center gap-1 hover:text-white">
-                        <MessageCircle className="w-4 h-4" />
-                        {post.comments} Comments
-                      </button>
-                      <button className="flex items-center gap-1 hover:text-white">
-                        <Share2 className="w-4 h-4" />
-                        Share
-                      </button>
+                      <h3 className="text-lg font-bold mb-2">{post.title}</h3>
+                      <p className="text-gray-300 mb-3">{post.content}</p>
+
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <button className="flex items-center gap-1 hover:text-white">
+                          <MessageCircle className="w-4 h-4" />
+                          0 Comments
+                        </button>
+                        <button className="flex items-center gap-1 hover:text-white">
+                          <Share2 className="w-4 h-4" />
+                          Share
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Sidebar */}
@@ -254,6 +285,89 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Post Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-6">Create New Post</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={newPost.title}
+                    onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                    placeholder="What's your question or topic?"
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Category</label>
+                    <select
+                      value={newPost.category}
+                      onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="question">Question</option>
+                      <option value="design">Design</option>
+                      <option value="project">Project</option>
+                      <option value="discussion">Discussion</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Subject</label>
+                    <select
+                      value={newPost.subject}
+                      onChange={(e) => setNewPost({ ...newPost, subject: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="general">General</option>
+                      <option value="rockets">Rockets</option>
+                      <option value="cars">Cars</option>
+                      <option value="planes">Planes</option>
+                      <option value="electronics">Electronics</option>
+                      <option value="mathematics">Mathematics</option>
+                      <option value="physics">Physics</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Content</label>
+                  <textarea
+                    value={newPost.content}
+                    onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                    placeholder="Describe your question, design, or start a discussion..."
+                    rows={8}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreatePost}
+                  disabled={!newPost.title.trim() || !newPost.content.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-semibold transition-colors"
+                >
+                  Create Post
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

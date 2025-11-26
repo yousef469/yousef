@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { Bot, X, Send, Minimize2, Maximize2 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Bot, X, Send, Minimize2, Maximize2, BookOpen, Brain } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useProgress } from '../contexts/ProgressContext';
+import { useLocation } from 'react-router-dom';
 
 export default function FloatingAIHelper() {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,6 +10,58 @@ export default function FloatingAIHelper() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+  const { user } = useAuth();
+  const { userProgress } = useProgress();
+  const location = useLocation();
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Get current context
+  const getCurrentContext = () => {
+    const path = location.pathname;
+    let context = {
+      page: 'general',
+      subject: null,
+      lessonId: null,
+      userLevel: userProgress?.level || 1,
+      totalXP: userProgress?.totalXP || 0,
+      completedLessons: userProgress?.completedLessons || []
+    };
+
+    // Detect current page context
+    if (path.includes('/rockets/lesson/')) {
+      context.page = 'lesson';
+      context.subject = 'rockets';
+      context.lessonId = path.split('/').pop();
+    } else if (path.includes('/cars/lesson/')) {
+      context.page = 'lesson';
+      context.subject = 'cars';
+      context.lessonId = path.split('/').pop();
+    } else if (path.includes('/planes/lesson/')) {
+      context.page = 'lesson';
+      context.subject = 'planes';
+      context.lessonId = path.split('/').pop();
+    } else if (path.includes('/electronics/lesson/')) {
+      context.page = 'lesson';
+      context.subject = 'electronics';
+      context.lessonId = path.split('/').pop();
+    } else if (path.includes('/mathematics/lesson/')) {
+      context.page = 'lesson';
+      context.subject = 'mathematics';
+      context.lessonId = path.split('/').pop();
+    } else if (path.includes('/explode-view')) {
+      context.page = '3d-viewer';
+    } else if (path.includes('/games/map/')) {
+      context.page = 'game-map';
+      context.subject = path.split('/').pop();
+    }
+
+    return context;
+  };
 
   // Direct API with correct model name
   const callGeminiAPI = async (prompt) => {
@@ -42,10 +97,22 @@ export default function FloatingAIHelper() {
     setIsLoading(true);
 
     try {
-      const systemPrompt = `You are an AI engineering tutor for Engineerium, an interactive engineering education platform. 
-Help users understand aerospace, automotive, and general engineering concepts. 
-Be concise, clear, and educational. Use emojis occasionally to make learning fun.
-Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineering fundamentals.`;
+      const context = getCurrentContext();
+      
+      // Build context-aware system prompt
+      let systemPrompt = `You are EnGo, an AI engineering tutor for Engineerium. `;
+      
+      if (context.page === 'lesson') {
+        systemPrompt += `The user is currently studying a ${context.subject} lesson (ID: ${context.lessonId}). They are at level ${context.userLevel} with ${context.totalXP} XP and have completed ${context.completedLessons.length} lessons. Provide educational assistance specific to ${context.subject} engineering. Use step-by-step explanations, relate concepts to real-world applications, and encourage learning. `;
+      } else if (context.page === '3d-viewer') {
+        systemPrompt += `The user is using the 3D model viewer. Help them understand engineering specifications, technical details, and the engineering principles behind what they're viewing. `;
+      } else if (context.page === 'game-map') {
+        systemPrompt += `The user is on the ${context.subject} game map, choosing lessons. Help them understand the learning path, prerequisites, and what they'll learn. Motivate them to continue their engineering journey. `;
+      } else {
+        systemPrompt += `The user is at level ${context.userLevel} with ${context.totalXP} XP. Help them with engineering concepts across rockets, cars, planes, electronics, and mathematics. `;
+      }
+      
+      systemPrompt += `Be concise, clear, and educational. Use emojis occasionally to make learning fun.`;
 
       const conversationHistory = messages
         .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
@@ -55,7 +122,7 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
 
       const text = await callGeminiAPI(fullPrompt);
 
-      setMessages(prev => [...prev, { role: 'assistant', content: text }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: text, context: context.page }]);
     } catch (error) {
       console.error('AI Error:', error);
       
@@ -109,7 +176,21 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
           </div>
           <div>
             <h3 className="text-white font-bold">EnGo</h3>
-            <p className="text-xs text-gray-400">Your AI Companion</p>
+            <p className="text-xs text-gray-400">
+              {getCurrentContext().page === 'lesson' ? (
+                <span className="flex items-center gap-1">
+                  <BookOpen className="w-3 h-3" />
+                  {getCurrentContext().subject} lesson
+                </span>
+              ) : getCurrentContext().page === '3d-viewer' ? (
+                <span className="flex items-center gap-1">
+                  <Brain className="w-3 h-3" />
+                  3D model analysis
+                </span>
+              ) : (
+                `Level ${getCurrentContext().userLevel} • ${getCurrentContext().totalXP} XP`
+              )}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -130,13 +211,50 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
 
       {!isMinimized && (
         <>
+          {/* Quick Help Buttons */}
+          {messages.length === 0 && (
+            <div className="p-4 border-b border-gray-700">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <button 
+                  onClick={() => setInput('Explain this concept step by step')}
+                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                >
+                  📚 Explain Concept
+                </button>
+                <button 
+                  onClick={() => setInput('Help me with this calculation')}
+                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                >
+                  🧮 Help with Math
+                </button>
+                <button 
+                  onClick={() => setInput('Draw a diagram to show how this works')}
+                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                >
+                  📊 Draw Diagram
+                </button>
+                <button 
+                  onClick={() => setInput('What are real-world applications?')}
+                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                >
+                  🌍 Real Examples
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(600px-140px)]">
             {messages.length === 0 && (
               <div className="text-center text-gray-500 mt-20">
                 <Bot className="w-16 h-16 mx-auto mb-4 text-blue-500" />
                 <p className="text-lg font-semibold mb-2">Hi! I'm EnGo 👋</p>
-                <p className="text-sm">Your AI engineering companion! Ask me anything!</p>
+                <p className="text-sm">
+                  {getCurrentContext().page === 'lesson' ? 
+                    `I can help you understand ${getCurrentContext().subject} concepts!` :
+                    'Your AI engineering companion! Ask me anything!'
+                  }
+                </p>
               </div>
             )}
             
@@ -168,6 +286,7 @@ Focus on: rockets, planes, cars, physics, mathematics, electronics, and engineer
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
