@@ -80,7 +80,7 @@ export const careerProjects = [
     ],
     skills: ['Mechanical Engineering', 'Dynamics', 'Optimization'],
     locked: false,
-    comingSoon: true
+    comingSoon: false
   },
   {
     id: 'electric-car',

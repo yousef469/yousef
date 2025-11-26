@@ -38,7 +38,7 @@ export default function CareerProjectsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
       {/* Header */}
-      <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur sticky top-0 z-10">
+      <div className="border-b border-gray-700 bg-gray-900 sticky top-0 z-10 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <button
             onClick={() => navigate('/')}

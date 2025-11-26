@@ -1105,13 +1105,13 @@ const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
 // Explode View Mode
 const ExplodeViewPage = lazy(() => import('./pages/ExplodeViewPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
-const CommunityProjectsPage = lazy(() => import('./pages/CommunityProjectsPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
 const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const CareerProjectsPage = lazy(() => import('./pages/CareerProjectsPage'));
 const RocketNozzleProject = lazy(() => import('./pages/projects/RocketNozzleProject'));
 const SolarPanelProject = lazy(() => import('./pages/projects/SolarPanelProject'));
 const RoboticArmProject = lazy(() => import('./pages/projects/RoboticArmProject'));
+const CarTransmissionProject = lazy(() => import('./pages/projects/CarTransmissionProject'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const PhysicsPage = lazy(() => import('./pages/PhysicsPage'));
 const MathematicsPage = lazy(() => import('./pages/MathematicsPage'));
@@ -1183,13 +1183,13 @@ export default function App() {
           {/* Explode View Mode */}
           <Route path="/explode-view" element={<ProtectedRoute><ExplodeViewPage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
-          <Route path="/community-projects" element={<ProtectedRoute><CommunityProjectsPage /></ProtectedRoute>} />
           <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
           <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
           <Route path="/career-projects" element={<ProtectedRoute><CareerProjectsPage /></ProtectedRoute>} />
           <Route path="/projects/rocket-nozzle" element={<ProtectedRoute><RocketNozzleProject /></ProtectedRoute>} />
           <Route path="/projects/solar-panel-system" element={<ProtectedRoute><SolarPanelProject /></ProtectedRoute>} />
           <Route path="/projects/robotic-arm" element={<ProtectedRoute><RoboticArmProject /></ProtectedRoute>} />
+          <Route path="/projects/car-transmission" element={<ProtectedRoute><CarTransmissionProject /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
           <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
