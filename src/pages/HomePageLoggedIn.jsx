@@ -209,6 +209,32 @@ const HomePageLoggedIn = () => {
             </div>
           </button>
 
+          {/* Career Projects */}
+          <button
+            onClick={() => navigate('/career-projects')}
+            className="group relative bg-gradient-to-br from-purple-500 via-violet-600 to-indigo-500 hover:from-purple-600 hover:via-violet-700 hover:to-indigo-600 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                  <Briefcase className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 Career Projects</h3>
+              <p className="text-white/90 text-center mb-4">
+                Build portfolio-worthy engineering projects
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Start Building</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
           {/* Explode View Mode */}
           <button
             onClick={() => navigate('/explode-view')}
