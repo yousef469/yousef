@@ -1,0 +1,29 @@
+{
+  "name": "Engineerium - Interactive Engineering Education",
+  "short_name": "Engineerium",
+  "description": "Learn aerospace and automotive engineering through interactive 3D models, AI tutoring, and gamified lessons",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#0088ff",
+  "background_color": "#0b0b0b",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
