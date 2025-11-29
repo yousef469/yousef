@@ -1096,7 +1096,6 @@ const HelpPage = lazy(() => import('./pages/HelpPage'));
 const HomeworkSolverPage = lazy(() => import('./pages/HomeworkSolverPage'));
 const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
-const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
 // Virtual Classroom (Modern State Sync - replaces old Collaborate)
 const ClassroomSetup = lazy(() => import('./pages/ClassroomSetup'));
 const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
@@ -1113,7 +1112,6 @@ const CarTransmissionProject = lazy(() => import('./pages/projects/CarTransmissi
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
 const ElectronicsPage = lazy(() => import('./pages/ElectronicsPage'));
-const BooksPage = lazy(() => import('./pages/BooksPage'));
 import Leaderboard from './components/Leaderboard';
 
 // Wrapper pages for routes
@@ -1157,7 +1155,6 @@ export default function App() {
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           <Route path="/learn" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
           <Route path="/learn/sections" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
-          <Route path="/learn/information" element={<ProtectedRoute><LearnInformationPage /></ProtectedRoute>} />
           <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
@@ -1166,7 +1163,6 @@ export default function App() {
           <Route path="/mechanics/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
 
           <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
-          <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
           {/* Virtual Classroom Routes */}
           <Route path="/classroom" element={<ProtectedRoute><ClassroomSetup /></ProtectedRoute>} />
