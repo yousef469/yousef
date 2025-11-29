@@ -1078,10 +1078,6 @@ const VehicleCard = ({ icon: Icon, title, description, gradient, onClick, delay 
 import IntroAnimation from './components/IntroAnimation';
 const AllInOnePage = lazy(() => import('./pages/AllInOnePage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
-import BookmarksNotes from './components/BookmarksNotes';
-// Removed old CollaborationMode - replaced with Virtual Classroom
-import ModelUpload from './components/ModelUpload';
-import GamificationSystem from './components/GamificationSystem';
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
@@ -1089,9 +1085,6 @@ const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const HelpPage = lazy(() => import('./pages/HelpPage'));
 const HomeworkSolverPage = lazy(() => import('./pages/HomeworkSolverPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
-// Virtual Classroom (Modern State Sync - replaces old Collaborate)
-const ClassroomSetup = lazy(() => import('./pages/ClassroomSetup'));
-const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
 // Explode View Mode
 const ExplodeViewPage = lazy(() => import('./pages/ExplodeViewPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
@@ -1156,9 +1149,6 @@ export default function App() {
           <Route path="/mechanics/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
 
           <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
-          {/* Virtual Classroom Routes */}
-          <Route path="/classroom" element={<ProtectedRoute><ClassroomSetup /></ProtectedRoute>} />
-          <Route path="/classroom/:roomId" element={<ProtectedRoute><VirtualClassroom /></ProtectedRoute>} />
           {/* Explode View Mode */}
           <Route path="/explode-view" element={<ProtectedRoute><ExplodeViewPage /></ProtectedRoute>} />
           <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
@@ -1195,9 +1185,6 @@ export default function App() {
           <Route path="/games/engine-builder" element={<ProtectedRoute><EngineBuilderGame /></ProtectedRoute>} />
           <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           
-          {/* New Features */}
-          <Route path="/bookmarks" element={<ProtectedRoute><BookmarksNotes /></ProtectedRoute>} />
-          <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
