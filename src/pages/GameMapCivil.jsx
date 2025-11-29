@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Building2, Star, Lock, CheckCircle, HardHat } from 'lucide-react';
 import { civilCurriculum, getAllLessons } from '../data/civil/comprehensive-curriculum.js';
 import { useProgress } from '../contexts/ProgressContext';
+import CourseIntro from '../components/CourseIntro';
 
 export default function GameMapCivil() {
   const navigate = useNavigate();
   const { isLessonCompleted, getSubjectProgress, userProfile } = useProgress();
+  const [showIntro, setShowIntro] = useState(true);
 
   const allLessons = getAllLessons();
   const totalLessons = allLessons.length;
@@ -60,7 +62,20 @@ export default function GameMapCivil() {
     };
   });
 
+  const totalQuizzes = totalLessons;
+
   return (
+    <>
+      {showIntro && (
+        <CourseIntro
+          subject="civil"
+          totalLessons={totalLessons}
+          totalQuizzes={totalQuizzes}
+          completedLessons={progress.completed}
+          onStart={() => setShowIntro(false)}
+        />
+      )}
+      
     <div className="min-h-screen bg-gradient-to-br from-amber-900 via-stone-900 to-gray-900 text-white">
       {/* Building Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -247,5 +262,6 @@ export default function GameMapCivil() {
         </div>
       </div>
     </div>
+    </>
   );
 }

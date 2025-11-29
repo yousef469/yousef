@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plane, Star, Lock, CheckCircle, Cloud } from 'lucide-react';
 import planesLessons, { planesSections, curriculumStats } from '../data/planes/planesLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
+import CourseIntro from '../components/CourseIntro';
 
 export default function GameMapPlanes() {
   const navigate = useNavigate();
   const { isLessonCompleted, getSubjectProgress, userProfile } = useProgress();
+  const [showIntro, setShowIntro] = useState(true);
 
   // Generate levels from the comprehensive curriculum
   const generateLevels = () => {
@@ -70,7 +73,20 @@ export default function GameMapPlanes() {
     };
   });
 
+  const totalQuizzes = levels.length;
+
   return (
+    <>
+      {showIntro && (
+        <CourseIntro
+          subject="planes"
+          totalLessons={levels.length}
+          totalQuizzes={totalQuizzes}
+          completedLessons={progress.completed}
+          onStart={() => setShowIntro(false)}
+        />
+      )}
+      
     <div className="min-h-screen bg-gradient-to-br from-sky-300 via-blue-400 to-indigo-600 text-white">
       {/* Clouds Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -256,5 +272,6 @@ export default function GameMapPlanes() {
         }
       `}</style>
     </div>
+    </>
   );
 }

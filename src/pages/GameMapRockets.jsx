@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Rocket, Star, Lock, CheckCircle } from 'lucide-react';
 import rocketsLessons, { rocketSections, curriculumStats } from '../data/rocketsLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
+import CourseIntro from '../components/CourseIntro';
 
 export default function GameMapRockets() {
   const navigate = useNavigate();
   const { isLessonCompleted, getSubjectProgress, userProfile } = useProgress();
+  const [showIntro, setShowIntro] = useState(true);
 
 
   // Generate levels from the comprehensive curriculum
@@ -89,7 +91,21 @@ export default function GameMapRockets() {
     };
   });
 
+  // Calculate quiz count (each lesson has a quiz)
+  const totalQuizzes = levels.filter(l => !l.comingSoon).length;
+
   return (
+    <>
+      {showIntro && (
+        <CourseIntro
+          subject="rockets"
+          totalLessons={availableLessons}
+          totalQuizzes={totalQuizzes}
+          completedLessons={progress.completed}
+          onStart={() => setShowIntro(false)}
+        />
+      )}
+      
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-black text-white">
       {/* Stars Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -308,5 +324,6 @@ export default function GameMapRockets() {
         }
       `}</style>
     </div>
+    </>
   );
 }

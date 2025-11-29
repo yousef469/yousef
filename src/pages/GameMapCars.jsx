@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Car, Star, Lock, CheckCircle, Building2 } from 'lucide-react';
 import { automotiveCurriculum, getAllLessons } from '../data/automotive/comprehensive-curriculum.js';
 import { useProgress } from '../contexts/ProgressContext';
+import CourseIntro from '../components/CourseIntro';
 
 export default function GameMapCars() {
   const navigate = useNavigate();
   const { isLessonCompleted, getSubjectProgress, userProfile } = useProgress();
+  const [showIntro, setShowIntro] = useState(true);
 
   // Get all lessons from curriculum
   const allLessons = getAllLessons();
@@ -63,7 +65,20 @@ export default function GameMapCars() {
     };
   });
 
+  const totalQuizzes = totalLessons;
+
   return (
+    <>
+      {showIntro && (
+        <CourseIntro
+          subject="cars"
+          totalLessons={totalLessons}
+          totalQuizzes={totalQuizzes}
+          completedLessons={progress.completed}
+          onStart={() => setShowIntro(false)}
+        />
+      )}
+      
     <div className="min-h-screen bg-gradient-to-br from-orange-900 via-gray-900 to-black text-white">
       {/* City Buildings Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -254,5 +269,6 @@ export default function GameMapCars() {
         </div>
       </div>
     </div>
+    </>
   );
 }

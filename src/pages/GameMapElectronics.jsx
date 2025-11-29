@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Zap, Star, Lock, CheckCircle, Cpu } from 'lucide-react';
 import { electronicsCurriculum, getAllLessons } from '../data/electronics/comprehensive-curriculum.js';
 import { useProgress } from '../contexts/ProgressContext';
+import CourseIntro from '../components/CourseIntro';
 
 export default function GameMapElectronics() {
   const navigate = useNavigate();
   const { isLessonCompleted, getSubjectProgress, userProfile } = useProgress();
+  const [showIntro, setShowIntro] = useState(true);
 
   // Get all lessons from curriculum
   const allLessons = getAllLessons();
@@ -63,7 +65,20 @@ export default function GameMapElectronics() {
     };
   });
 
+  const totalQuizzes = totalLessons;
+
   return (
+    <>
+      {showIntro && (
+        <CourseIntro
+          subject="electronics"
+          totalLessons={totalLessons}
+          totalQuizzes={totalQuizzes}
+          completedLessons={progress.completed}
+          onStart={() => setShowIntro(false)}
+        />
+      )}
+      
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white">
       {/* Circuit Board Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -253,5 +268,6 @@ export default function GameMapElectronics() {
         </div>
       </div>
     </div>
+    </>
   );
 }
