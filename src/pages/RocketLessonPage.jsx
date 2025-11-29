@@ -9,6 +9,7 @@ import CommunityQA from '../components/CommunityQA';
 import EnhancedLessonContent from '../components/EnhancedLessonContent';
 import LessonBreadcrumb from '../components/LessonBreadcrumb';
 import LessonNavigation from '../components/LessonNavigation';
+import LessonVoiceNarrator from '../components/LessonVoiceNarrator';
 import rocketsLessons from '../data/rocketsLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
 
@@ -322,6 +323,13 @@ export default function RocketLessonPage() {
         <div className="mb-8">
           <p className="text-lg text-gray-300">{lesson.description}</p>
         </div>
+
+        {/* Voice Narrator */}
+        {lessonData && (
+          <div className="mb-6">
+            <LessonVoiceNarrator lessonData={lessonData} />
+          </div>
+        )}
 
         {lesson.content}
 

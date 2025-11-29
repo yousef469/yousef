@@ -6,6 +6,7 @@ import { useProgress } from '../contexts/ProgressContext';
 import EnhancedLessonContent from '../components/EnhancedLessonContent';
 import LessonBreadcrumb from '../components/LessonBreadcrumb';
 import LessonNavigation from '../components/LessonNavigation';
+import LessonVoiceNarrator from '../components/LessonVoiceNarrator';
 
 export default function CivilLessonPage() {
   const { lessonId } = useParams();
@@ -157,6 +158,16 @@ export default function CivilLessonPage() {
           <div className="text-xs sm:text-sm text-white/60 mt-2 text-center">
             Section {currentSection + 1} of {totalSections}
           </div>
+        </div>
+
+        {/* Voice Narrator */}
+        <div className="mb-6">
+          <LessonVoiceNarrator lessonData={{
+            title: lesson.title,
+            introduction: lesson.content?.introduction,
+            sections: lesson.content?.sections,
+            keyTakeaways: lesson.content?.keyTakeaways
+          }} />
         </div>
 
         {/* Introduction */}

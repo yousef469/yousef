@@ -6,6 +6,7 @@ import { useProgress } from '../contexts/ProgressContext';
 import EnhancedLessonContent from '../components/EnhancedLessonContent';
 import LessonBreadcrumb from '../components/LessonBreadcrumb';
 import LessonNavigation from '../components/LessonNavigation';
+import LessonVoiceNarrator from '../components/LessonVoiceNarrator';
 
 export default function PlaneLessonPage() {
   const { lessonId } = useParams();
@@ -235,6 +236,14 @@ export default function PlaneLessonPage() {
         <div className="mb-8">
           <p className="text-lg text-gray-300">{lesson.description}</p>
         </div>
+
+        {/* Voice Narrator */}
+        {lessonData && (
+          <div className="mb-6">
+            <LessonVoiceNarrator lessonData={lessonData} />
+          </div>
+        )}
+
         {lesson.content}
         <LessonNavigation subject="planes" currentLessonId={id} allLessons={planesLessons} />
       </div>

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Minimize2, Maximize2, BookOpen, Brain, Lock, Crown } from 'lucide-react';
+import { Bot, X, Send, Minimize2, Maximize2, BookOpen, Brain, Lock, Crown, Mic, MicOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
 import { useUsageLimits } from '../contexts/UsageLimitsContext';
 import { useLocation, useNavigate } from 'react-router-dom';
+import speechRecognitionService, { requestMicrophonePermission } from '../services/speechRecognition';
 
 export default function FloatingAIHelper() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,12 +12,70 @@ export default function FloatingAIHelper() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [voiceError, setVoiceError] = useState('');
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
   const { userProgress } = useProgress();
   const { canUseAiChat, useAiChat, getRemainingAiChats, getTimeUntilReset, isPremium } = useUsageLimits();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Setup speech recognition
+  useEffect(() => {
+    if (!speechRecognitionService.getIsSupported()) return;
+
+    speechRecognitionService.setOnResult((result) => {
+      setInterimTranscript(result.interim);
+      if (result.isFinal && result.final.trim()) {
+        setInput(result.final.trim());
+        setInterimTranscript('');
+      }
+    });
+
+    speechRecognitionService.setOnStart(() => {
+      setIsListening(true);
+      setVoiceError('');
+    });
+
+    speechRecognitionService.setOnEnd(() => {
+      setIsListening(false);
+      setInterimTranscript('');
+    });
+
+    speechRecognitionService.setOnError((error) => {
+      setIsListening(false);
+      setVoiceError(error);
+      setInterimTranscript('');
+    });
+
+    return () => {
+      if (speechRecognitionService.getIsListening()) {
+        speechRecognitionService.stopListening();
+      }
+    };
+  }, []);
+
+  const toggleVoiceInput = async () => {
+    if (isListening) {
+      speechRecognitionService.stopListening();
+      return;
+    }
+
+    if (!speechRecognitionService.getIsSupported()) {
+      setVoiceError('Speech recognition not supported in this browser');
+      return;
+    }
+
+    const hasPermission = await requestMicrophonePermission();
+    if (!hasPermission) {
+      setVoiceError('Microphone permission denied');
+      return;
+    }
+
+    speechRecognitionService.startListening();
+  };
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -386,16 +445,42 @@ Start your response with "🎯 **Career Advisor Mode**" to indicate you're givin
 
           {/* Input */}
           <div className="p-4 border-t border-gray-700">
+            {voiceError && (
+              <div className="mb-2 p-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-xs">
+                {voiceError}
+              </div>
+            )}
+            {interimTranscript && (
+              <div className="mb-2 p-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 text-xs italic">
+                🎤 "{interimTranscript}"
+              </div>
+            )}
             <div className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask me anything..."
-                className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:border-blue-500 focus:outline-none text-sm"
-                disabled={isLoading}
+                placeholder={isListening ? "Listening..." : "Ask me anything..."}
+                className={`flex-1 bg-gray-800 text-white rounded-xl px-4 py-3 border focus:outline-none text-sm transition-colors ${
+                  isListening ? 'border-red-500 bg-red-900/20' : 'border-gray-700 focus:border-blue-500'
+                }`}
+                disabled={isLoading || isListening}
               />
+              {speechRecognitionService.getIsSupported() && (
+                <button
+                  onClick={toggleVoiceInput}
+                  disabled={isLoading}
+                  className={`rounded-xl px-4 py-3 transition-all ${
+                    isListening
+                      ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                  }`}
+                  title={isListening ? 'Stop listening' : 'Voice input'}
+                >
+                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+              )}
               <button
                 onClick={sendMessage}
                 disabled={isLoading || !input.trim()}
@@ -404,6 +489,11 @@ Start your response with "🎯 **Career Advisor Mode**" to indicate you're givin
                 <Send className="w-5 h-5" />
               </button>
             </div>
+            {speechRecognitionService.getIsSupported() && (
+              <p className="mt-2 text-xs text-gray-500 text-center">
+                💡 Click the mic to ask with your voice
+              </p>
+            )}
           </div>
         </>
       )}

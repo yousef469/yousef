@@ -87,6 +87,105 @@ app.post('/api/gemini/text', async (req, res) => {
 });
 
 // ============================================
+// TEXT-TO-SPEECH API - Using Microsoft Edge TTS directly
+// ============================================
+
+const WebSocket = require('ws');
+const crypto = require('crypto');
+
+// Edge TTS WebSocket implementation
+async function synthesizeSpeech(text, voice = 'en-US-JennyNeural') {
+  return new Promise((resolve, reject) => {
+    const requestId = crypto.randomUUID().replace(/-/g, '');
+    const timestamp = new Date().toISOString();
+    
+    const wsUrl = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=${requestId}`;
+    
+    const ws = new WebSocket(wsUrl, {
+      headers: {
+        'Origin': 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+
+    const audioChunks = [];
+    let audioStarted = false;
+
+    ws.on('open', () => {
+      // Send config
+      ws.send(`Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`);
+      
+      // Send SSML
+      const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='${voice}'>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</voice></speak>`;
+      ws.send(`X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n${ssml}`);
+    });
+
+    ws.on('message', (data) => {
+      if (typeof data === 'string') {
+        if (data.includes('Path:turn.end')) {
+          ws.close();
+          resolve(Buffer.concat(audioChunks));
+        }
+      } else {
+        // Binary audio data
+        const headerEnd = data.indexOf('Path:audio\r\n');
+        if (headerEnd !== -1) {
+          const audioData = data.slice(data.indexOf('\r\n\r\n', headerEnd) + 4);
+          if (audioData.length > 0) {
+            audioChunks.push(audioData);
+          }
+        }
+      }
+    });
+
+    ws.on('error', (err) => {
+      reject(err);
+    });
+
+    ws.on('close', () => {
+      if (audioChunks.length === 0) {
+        reject(new Error('No audio received'));
+      }
+    });
+
+    // Timeout after 30 seconds
+    setTimeout(() => {
+      ws.close();
+      if (audioChunks.length > 0) {
+        resolve(Buffer.concat(audioChunks));
+      } else {
+        reject(new Error('Timeout'));
+      }
+    }, 30000);
+  });
+}
+
+app.post('/api/tts', async (req, res) => {
+  try {
+    const { text, voice = 'en-US-JennyNeural' } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'Missing text' });
+    }
+
+    console.log(`🎤 TTS request: ${text.length} chars, voice: ${voice}`);
+
+    const audioBuffer = await synthesizeSpeech(text.slice(0, 5000), voice);
+
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.length,
+    });
+    res.send(audioBuffer);
+
+    console.log('✅ TTS audio sent');
+  } catch (error) {
+    console.error('❌ TTS Error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 
 const server = http.createServer(app);
 const io = new Server(server, {
