@@ -12,17 +12,18 @@ class TextToSpeechService {
     this.voices = [];
     this.browserVoice = null;
 
-    // Microsoft Edge TTS voices (high quality, human-like)
+    // TikTok TTS voices (free, human-like)
     this.edgeVoices = [
-      { id: 'en-US-JennyNeural', name: 'Jenny (US Female)' },
-      { id: 'en-US-GuyNeural', name: 'Guy (US Male)' },
-      { id: 'en-US-AriaNeural', name: 'Aria (US Female)' },
-      { id: 'en-US-DavisNeural', name: 'Davis (US Male)' },
-      { id: 'en-GB-SoniaNeural', name: 'Sonia (UK Female)' },
-      { id: 'en-GB-RyanNeural', name: 'Ryan (UK Male)' },
-      { id: 'en-AU-NatashaNeural', name: 'Natasha (AU Female)' },
+      { id: 'en_us_001', name: 'Jessie (US Female)' },
+      { id: 'en_us_006', name: 'Joey (US Male)' },
+      { id: 'en_us_007', name: 'Professor (US Male)' },
+      { id: 'en_us_009', name: 'Scientist (US Male)' },
+      { id: 'en_us_010', name: 'Confident (US Female)' },
+      { id: 'en_uk_001', name: 'UK Male' },
+      { id: 'en_au_001', name: 'Australian Female' },
+      { id: 'en_au_002', name: 'Australian Male' },
     ];
-    this.selectedVoice = 'en-US-JennyNeural';
+    this.selectedVoice = 'en_us_001';
     
     this.loadBrowserVoices();
   }
