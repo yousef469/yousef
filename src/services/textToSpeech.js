@@ -12,18 +12,18 @@ class TextToSpeechService {
     this.voices = [];
     this.browserVoice = null;
 
-    // Microsoft Edge Neural voices (high quality, human-like)
+    // TikTok TTS voices (free, good quality)
     this.edgeVoices = [
-      { id: 'jenny', name: 'Jenny (US Female) ⭐' },
-      { id: 'aria', name: 'Aria (US Female)' },
-      { id: 'guy', name: 'Guy (US Male)' },
-      { id: 'davis', name: 'Davis (US Male)' },
-      { id: 'sonia', name: 'Sonia (UK Female)' },
-      { id: 'ryan', name: 'Ryan (UK Male)' },
-      { id: 'natasha', name: 'Natasha (AU Female)' },
-      { id: 'william', name: 'William (AU Male)' },
+      { id: 'en_us_001', name: 'Jessie (US Female) ⭐' },
+      { id: 'en_us_006', name: 'Joey (US Male)' },
+      { id: 'en_us_007', name: 'Professor (US Male)' },
+      { id: 'en_us_009', name: 'Scientist (US Male)' },
+      { id: 'en_us_010', name: 'Confident (US Female)' },
+      { id: 'en_uk_001', name: 'UK Male' },
+      { id: 'en_au_001', name: 'Metro (AU Female)' },
+      { id: 'en_au_002', name: 'Smooth (AU Male)' },
     ];
-    this.selectedVoice = 'jenny';
+    this.selectedVoice = 'en_us_001';
     
     this.loadBrowserVoices();
   }
@@ -85,7 +85,7 @@ class TextToSpeechService {
   // Use backend Edge TTS (high quality)
   async speakWithEdgeTTS(text) {
     // Use TTS server URL (Python Edge TTS service)
-    const serverUrl = import.meta.env.VITE_TTS_SERVER_URL || 'https://engineerium-tts.onrender.com';
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 'https://engineeruim.onrender.com';
     
     const response = await fetch(`${serverUrl}/api/tts`, {
       method: 'POST',
