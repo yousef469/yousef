@@ -121,7 +121,7 @@ const HomePageLoggedIn = () => {
               </div>
             </div>
             
-            <h3 className="text-3xl font-bold mb-4 text-white text-center">Learn Mechanics</h3>
+            <h3 className="text-3xl font-bold mb-4 text-white text-center">Learn Engineering</h3>
             <p className="text-white/90 text-center text-lg mb-6">
               Choose from Rockets, Planes, or Cars to start learning
             </p>

@@ -533,4 +533,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for engineering education**
 
-*Last Updated: November 26, 2025*
+*Last Updated: November 29, 2025*
