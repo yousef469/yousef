@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Rocket, Car, Plane, Zap } from 'lucide-react';
+import { Search, X, Rocket, Car, Plane, Zap, HardHat } from 'lucide-react';
 import rocketsLessons from '../data/rocketsLessonsData';
 import carsLessons from '../data/carsLessonsData';
-import planesLessons from '../data/planesLessonsData';
+import planesLessons from '../data/planes/planesLessonsData.js';
 import electronicsLessons from '../data/electronicsLessonsData';
+import civilLessons from '../data/civilLessonsData';
 
 export default function GlobalSearch({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
@@ -18,7 +19,8 @@ export default function GlobalSearch({ isOpen, onClose }) {
     ...Object.values(rocketsLessons).map(lesson => ({ ...lesson, subject: 'rockets', icon: Rocket, emoji: '🚀' })),
     ...Object.values(carsLessons).map(lesson => ({ ...lesson, subject: 'cars', icon: Car, emoji: '🚗' })),
     ...Object.values(planesLessons).map(lesson => ({ ...lesson, subject: 'planes', icon: Plane, emoji: '✈️' })),
-    ...Object.values(electronicsLessons).map(lesson => ({ ...lesson, subject: 'electronics', icon: Zap, emoji: '⚡' }))
+    ...Object.values(electronicsLessons).map(lesson => ({ ...lesson, subject: 'electronics', icon: Zap, emoji: '⚡' })),
+    ...Object.values(civilLessons).map(lesson => ({ ...lesson, subject: 'civil', icon: HardHat, emoji: '🏗️' }))
   ];
 
   // Focus input when opened

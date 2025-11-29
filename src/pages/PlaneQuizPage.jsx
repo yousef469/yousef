@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Clock, Star, Trophy } from 'lucide-react';
-import planesLessons from '../data/planesLessonsData';
+import planesLessons from '../data/planes/planesLessonsData.js';
 import MultipleChoiceQuestion from '../components/quiz/MultipleChoiceQuestion';
 import DiagramLabelQuestion from '../components/quiz/DiagramLabelQuestion';
 import CalculationQuestion from '../components/quiz/CalculationQuestion';

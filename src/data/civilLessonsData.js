@@ -1,7 +1,7 @@
-// Complete Electronics & Robotics Engineering Curriculum
+// Complete Civil Engineering Curriculum
 // MIT-Quality Content with Real Engineering
 
-import { electronicsCurriculum, getAllLessons } from './electronics/comprehensive-curriculum.js';
+import { civilCurriculum, getAllLessons } from './civil/comprehensive-curriculum.js';
 
 // Get all lessons from the comprehensive curriculum
 const allLessonsArray = getAllLessons();
@@ -31,10 +31,10 @@ allLessonsArray.forEach((lesson, index) => {
   };
 });
 
-export const electronicsLessons = allLessons;
+export const civilLessons = allLessons;
 
 // Re-export curriculum utilities
-export { electronicsCurriculum, getAllLessons };
-export { getSectionById, getLessonById, getCurriculumStats } from './electronics/comprehensive-curriculum.js';
+export { civilCurriculum, getAllLessons };
+export { getSectionById, getLessonById, getCurriculumStats } from './civil/comprehensive-curriculum.js';
 
-export default electronicsLessons;
+export default civilLessons;

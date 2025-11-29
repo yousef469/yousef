@@ -1,7 +1,7 @@
-// Complete Electronics & Robotics Engineering Curriculum
+// Complete Automotive Engineering Curriculum
 // MIT-Quality Content with Real Engineering
 
-import { electronicsCurriculum, getAllLessons } from './electronics/comprehensive-curriculum.js';
+import { automotiveCurriculum, getAllLessons } from './automotive/comprehensive-curriculum.js';
 
 // Get all lessons from the comprehensive curriculum
 const allLessonsArray = getAllLessons();
@@ -31,10 +31,10 @@ allLessonsArray.forEach((lesson, index) => {
   };
 });
 
-export const electronicsLessons = allLessons;
+export const automotiveLessons = allLessons;
 
 // Re-export curriculum utilities
-export { electronicsCurriculum, getAllLessons };
-export { getSectionById, getLessonById, getCurriculumStats } from './electronics/comprehensive-curriculum.js';
+export { automotiveCurriculum, getAllLessons };
+export { getSectionById, getLessonById, getCurriculumStats } from './automotive/comprehensive-curriculum.js';
 
-export default electronicsLessons;
+export default automotiveLessons;

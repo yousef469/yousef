@@ -22,12 +22,14 @@ const GameMapRockets = lazy(() => import('./pages/GameMapRockets'));
 const GameMapCars = lazy(() => import('./pages/GameMapCars'));
 const GameMapPlanes = lazy(() => import('./pages/GameMapPlanes'));
 const GameMapElectronics = lazy(() => import('./pages/GameMapElectronics'));
+const GameMapCivil = lazy(() => import('./pages/GameMapCivil'));
 
 const LessonsDemoPage = lazy(() => import('./pages/LessonsDemoPage'));
 const RocketLessonPage = lazy(() => import('./pages/RocketLessonPage'));
 const PlaneLessonPage = lazy(() => import('./pages/PlaneLessonPage'));
 const CarLessonPage = lazy(() => import('./pages/CarLessonPage'));
 const ElectronicsLessonPage = lazy(() => import('./pages/ElectronicsLessonPage'));
+const CivilLessonPage = lazy(() => import('./pages/CivilLessonPage'));
 
 const PlaneQuizPage = lazy(() => import('./pages/PlaneQuizPage'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
@@ -1184,12 +1186,14 @@ export default function App() {
           <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
           <Route path="/games/map/planes" element={<ProtectedRoute><GameMapPlanes /></ProtectedRoute>} />
           <Route path="/games/map/electronics" element={<ProtectedRoute><GameMapElectronics /></ProtectedRoute>} />
+          <Route path="/games/map/civil" element={<ProtectedRoute><GameMapCivil /></ProtectedRoute>} />
           <Route path="/lessons/demo" element={<ProtectedRoute><LessonsDemoPage /></ProtectedRoute>} />
           <Route path="/lessons/rockets/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/planes/lesson/:lessonId" element={<ProtectedRoute><PlaneLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/planes/quiz/:lessonId" element={<ProtectedRoute><PlaneQuizPage /></ProtectedRoute>} />
           <Route path="/games/play/cars/lesson/:lessonId" element={<ProtectedRoute><CarLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/electronics/lesson/:lessonId" element={<ProtectedRoute><ElectronicsLessonPage /></ProtectedRoute>} />
+          <Route path="/games/play/civil/lesson/:lessonId" element={<ProtectedRoute><CivilLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
           <Route path="/test-curriculum" element={<TestCurriculumPage />} />

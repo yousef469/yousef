@@ -68,6 +68,12 @@ export default {
       backgroundSize: {
         'grid': '40px 40px',
       },
+      spacing: {
+        'safe': 'env(safe-area-inset-bottom)',
+      },
+      padding: {
+        'safe': 'env(safe-area-inset-bottom)',
+      },
     },
   },
   plugins: [],
