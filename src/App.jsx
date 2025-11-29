@@ -1151,6 +1151,7 @@ export default function App() {
         }>
           <Routes>
           <Route path="/" element={<HomeRouter />} />
+          <Route path="/home" element={<HomeRouter />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
