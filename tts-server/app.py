@@ -7,63 +7,73 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-# Available voices (Microsoft Neural voices - very human-like)
+# Available voices
 VOICES = {
-    'jenny': 'en-US-JennyNeural',      # US Female - friendly
-    'guy': 'en-US-GuyNeural',          # US Male - professional
-    'aria': 'en-US-AriaNeural',        # US Female - natural
-    'davis': 'en-US-DavisNeural',      # US Male - casual
-    'sonia': 'en-GB-SoniaNeural',      # UK Female
-    'ryan': 'en-GB-RyanNeural',        # UK Male
-    'natasha': 'en-AU-NatashaNeural',  # AU Female
-    'william': 'en-AU-WilliamNeural',  # AU Male
+    'jenny': 'en-US-JennyNeural',
+    'guy': 'en-US-GuyNeural',
+    'aria': 'en-US-AriaNeural',
+    'davis': 'en-US-DavisNeural',
+    'sonia': 'en-GB-SoniaNeural',
+    'ryan': 'en-GB-RyanNeural',
+    'natasha': 'en-AU-NatashaNeural',
+    'william': 'en-AU-WilliamNeural',
 }
 
-async def generate_speech(text, voice):
-    """Generate speech using Edge TTS"""
-    communicate = edge_tts.Communicate(text, voice)
-    audio_data = io.BytesIO()
+def generate_speech_sync(text, voice):
+    """Generate speech using Edge TTS (sync wrapper)"""
+    async def _generate():
+        communicate = edge_tts.Communicate(text, voice)
+        audio_data = b""
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_data += chunk["data"]
+        return audio_data
     
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_data.write(chunk["data"])
-    
-    audio_data.seek(0)
-    return audio_data.read()
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(_generate())
+        loop.close()
+        return result
+    except Exception as e:
+        print(f"Error in generate_speech: {e}")
+        raise
 
 @app.route('/')
 def health():
     return {'status': 'ok', 'service': 'Edge TTS Server', 'voices': list(VOICES.keys())}
 
-@app.route('/api/tts', methods=['POST'])
+@app.route('/api/tts', methods=['POST', 'OPTIONS'])
 def tts():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         text = data.get('text', '')
         voice_key = data.get('voice', 'jenny').lower()
         
         if not text:
             return {'error': 'Missing text'}, 400
         
-        # Get voice name
         voice = VOICES.get(voice_key, VOICES['jenny'])
-        
-        # Limit text length
-        text = text[:5000]
+        text = text[:3000]  # Limit text
         
         print(f"🎤 TTS: {len(text)} chars, voice: {voice}")
         
-        # Generate audio
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        audio_data = loop.run_until_complete(generate_speech(text, voice))
-        loop.close()
+        audio_data = generate_speech_sync(text, voice)
         
+        if not audio_data:
+            return {'error': 'No audio generated'}, 500
+        
+        print(f"✅ Generated {len(audio_data)} bytes")
         return Response(audio_data, mimetype='audio/mpeg')
     
     except Exception as e:
-        print(f"❌ TTS Error: {e}")
+        print(f"❌ TTS Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return {'error': str(e)}, 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
