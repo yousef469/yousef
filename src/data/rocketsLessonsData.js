@@ -1,48 +1,52 @@
 // Complete Rocket Engineering Curriculum
-// MIT-Quality Content: Units 0-5 with Enhanced Lessons!
+// MIT-Quality Content: 8 Sections, ~100 Lessons
+// Career-Ready Aerospace Engineering Education
 
-import { rocketUnit0Complete } from './rockets/unit0-complete.js';
-import { unit1Lessons } from './rockets/unit1-fundamentals.js';
-import { unit1AdvancedLessons } from './rockets/unit1-advanced.js';
-import { unit2Lessons12to15 } from './rockets/unit2-lessons-12-15.js';
-import { unit2EnhancedLessons } from './rockets/unit2-enhanced.js';
-import { unit2Lessons17to19 } from './rockets/unit2-lessons-17-19.js';
-import { unit2Lessons18to19Enhanced } from './rockets/unit2-lessons-18-19-enhanced.js';
-import { unit2AdvancedLessons } from './rockets/unit2-advanced.js';
-import { unit3Enhanced20to21 } from './rockets/unit3-enhanced-20-21.js';
-import { unit3Lessons } from './rockets/unit3-orbital-mechanics.js';
-import { unit3AdvancedLessons } from './rockets/unit3-advanced.js';
-import { unit4Lessons } from './rockets/unit4-structures.js';
-import { unit5Lessons } from './rockets/unit5-gnc.js';
+import { rocketCurriculum, getAllLessons, getCurriculumStats } from './rockets/comprehensive-curriculum.js';
 
-// Combine enhanced and existing lessons
-const rocketUnit1Complete = [...unit1Lessons, ...unit1AdvancedLessons];
-const rocketUnit2Complete = [
-  ...unit2Lessons12to15,            // Lessons 12-15 (basic propulsion)
-  unit2EnhancedLessons[0],          // Lesson 16 (enhanced)
-  unit2Lessons17to19[0],            // Lesson 17 (enhanced)
-  ...unit2Lessons18to19Enhanced     // Lessons 18-19 (enhanced)
-];
-const rocketUnit3Complete = [
-  unit3Enhanced20to21[0],           // Lesson 20 (enhanced)
-  ...unit3Lessons.slice(1),         // Lesson 21 (existing)
-  ...unit3AdvancedLessons           // Lessons 22-23
-];
-const rocketUnit4Complete = unit4Lessons;
-const rocketUnit5Complete = unit5Lessons;
-// MIT-Quality Rocket Engineering Curriculum
-// Total: 28 comprehensive lessons across 6 units
-
-// Create lessons object
+// Convert curriculum to lessons object format for compatibility
 export const rocketsLessons = {};
 
-// Add Unit 0 (Foundations) - Lessons 0-5
-rocketUnit0Complete.forEach((lesson, index) => {
+// Process all lessons from the comprehensive curriculum
+const allLessons = getAllLessons();
+
+allLessons.forEach((lesson, index) => {
+  // Skip coming soon lessons that don't have full content
+  if (lesson.comingSoon) {
+    rocketsLessons[lesson.id] = {
+      id: lesson.id,
+      title: lesson.title,
+      duration: lesson.duration,
+      xp: lesson.xp,
+      description: lesson.description || `Coming soon: ${lesson.title}`,
+      comingSoon: true,
+      sectionId: lesson.sectionId,
+      sectionTitle: lesson.sectionTitle,
+      unitId: lesson.unitId,
+      unitTitle: lesson.unitTitle,
+      emoji: getEmojiForSection(lesson.sectionId),
+      level: getLevelForSection(lesson.sectionIndex),
+      unitNumber: lesson.unitIndex,
+      lessonNumber: index + 1
+    };
+    return;
+  }
+
+  // Full lesson with content
   rocketsLessons[lesson.id] = {
-    ...lesson,
-    emoji: '🧮',
-    level: 'Beginner',
-    unitNumber: 0,
+    id: lesson.id,
+    title: lesson.title,
+    duration: lesson.duration,
+    xp: lesson.xp,
+    description: lesson.description,
+    introduction: lesson.introduction,
+    sectionId: lesson.sectionId,
+    sectionTitle: lesson.sectionTitle,
+    unitId: lesson.unitId,
+    unitTitle: lesson.unitTitle,
+    emoji: getEmojiForSection(lesson.sectionId),
+    level: getLevelForSection(lesson.sectionIndex),
+    unitNumber: lesson.unitIndex,
     lessonNumber: index + 1,
     content: {
       introduction: lesson.introduction,
@@ -54,96 +58,47 @@ rocketUnit0Complete.forEach((lesson, index) => {
   };
 });
 
-// Add Unit 1 (Rocket Fundamentals) - Lessons 6-11
-rocketUnit1Complete.forEach((lesson, index) => {
-  rocketsLessons[lesson.id] = {
-    ...lesson,
-    emoji: '🚀',
-    level: 'Beginner',
-    unitNumber: 1,
-    lessonNumber: index + 1,
-    content: {
-      introduction: lesson.introduction,
-      sections: lesson.sections,
-      keyTakeaways: lesson.keyTakeaways,
-      vocabulary: lesson.vocabulary
-    },
-    quiz: lesson.quiz
+// Helper functions
+function getEmojiForSection(sectionId) {
+  const emojis = {
+    'foundations': '🧮',
+    'propulsion': '🔥',
+    'structures': '🏗️',
+    'avionics': '🧠',
+    'rocket-design': '📐',
+    'testing-safety': '🔬',
+    'launch-operations': '🚀',
+    'capstone': '🏆'
   };
-});
+  return emojis[sectionId] || '🚀';
+}
 
-// Add Unit 2 (Propulsion Physics) - Lessons 12-19
-rocketUnit2Complete.forEach((lesson, index) => {
-  rocketsLessons[lesson.id] = {
-    ...lesson,
-    emoji: '🔥',
-    level: 'Intermediate',
-    unitNumber: 2,
-    lessonNumber: index + 1,
-    content: {
-      introduction: lesson.introduction,
-      sections: lesson.sections,
-      keyTakeaways: lesson.keyTakeaways,
-      vocabulary: lesson.vocabulary
-    },
-    quiz: lesson.quiz
-  };
-});
+function getLevelForSection(sectionIndex) {
+  if (sectionIndex <= 1) return 'Beginner';
+  if (sectionIndex <= 3) return 'Intermediate';
+  if (sectionIndex <= 5) return 'Advanced';
+  return 'Expert';
+}
 
-// Add Unit 3 (Orbital Mechanics) - Lessons 20-23
-rocketUnit3Complete.forEach((lesson, index) => {
-  rocketsLessons[lesson.id] = {
-    ...lesson,
-    emoji: '🪐',
-    level: 'Intermediate',
-    unitNumber: 3,
-    lessonNumber: index + 1,
-    content: {
-      introduction: lesson.introduction,
-      sections: lesson.sections,
-      keyTakeaways: lesson.keyTakeaways,
-      vocabulary: lesson.vocabulary
-    },
-    quiz: lesson.quiz
-  };
-});
+// Export curriculum structure for the game map
+export const rocketSections = rocketCurriculum.sections.map((section, index) => ({
+  id: section.id,
+  title: section.title,
+  description: section.description,
+  icon: section.icon,
+  color: section.color,
+  units: section.units.map(unit => ({
+    id: unit.id,
+    title: unit.title,
+    description: unit.description,
+    lessons: unit.lessons.map(l => l.id)
+  })),
+  totalLessons: section.units.reduce((sum, u) => sum + u.lessons.length, 0),
+  level: getLevelForSection(index)
+}));
 
-// Add Unit 4 (Structures & Materials) - Lessons 24-25
-rocketUnit4Complete.forEach((lesson, index) => {
-  rocketsLessons[lesson.id] = {
-    ...lesson,
-    emoji: '🏗️',
-    level: 'Advanced',
-    unitNumber: 4,
-    lessonNumber: index + 1,
-    content: {
-      introduction: lesson.introduction,
-      sections: lesson.sections,
-      keyTakeaways: lesson.keyTakeaways,
-      vocabulary: lesson.vocabulary
-    },
-    quiz: lesson.quiz
-  };
-});
+// Export stats
+export const curriculumStats = getCurriculumStats();
 
-// Add Unit 5 (GNC) - Lessons 26-27
-rocketUnit5Complete.forEach((lesson, index) => {
-  rocketsLessons[lesson.id] = {
-    ...lesson,
-    emoji: '🧠',
-    level: 'Advanced',
-    unitNumber: 5,
-    lessonNumber: index + 1,
-    content: {
-      introduction: lesson.introduction,
-      sections: lesson.sections,
-      keyTakeaways: lesson.keyTakeaways,
-      vocabulary: lesson.vocabulary
-    },
-    quiz: lesson.quiz
-  };
-});
-
-
-
+// Legacy support - export as default
 export default rocketsLessons;

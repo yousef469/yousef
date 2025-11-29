@@ -4,12 +4,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { 
   Menu, 
   X, 
-  LayoutDashboard, 
   Trophy,
   User,
   LogOut,
-  Settings,
-  Calculator
+  Settings
 } from 'lucide-react';
 
 export default function SidebarMenu() {
@@ -18,9 +16,7 @@ export default function SidebarMenu() {
   const navigate = useNavigate();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: User, label: 'Profile', path: '/profile' },
-    { icon: Calculator, label: 'Toolbox', path: '/toolbox' },
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   ];
 
@@ -43,13 +39,13 @@ export default function SidebarMenu() {
 
   return (
     <>
-      {/* Menu Button */}
+      {/* Menu Button - Positioned in header area */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-4 left-4 z-40 p-3 bg-background-light/90 backdrop-blur-sm border border-primary/20 rounded-xl hover:bg-background-light transition-all shadow-lg"
+        className="fixed top-3 md:top-5 left-4 z-50 p-2 md:p-3 bg-gray-800/90 backdrop-blur-sm border border-cyan-500/30 rounded-xl hover:bg-gray-700 transition-all shadow-lg"
         aria-label="Open menu"
       >
-        <Menu className="w-6 h-6 text-white" />
+        <Menu className="w-5 h-5 md:w-6 md:h-6 text-white" />
       </button>
 
       {/* Overlay */}

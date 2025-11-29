@@ -43,6 +43,25 @@
   box-sizing: border-box;
 }
 
+/* 🎨 UI POLISH - Global Smooth Animations */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Disable transitions for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -219,4 +238,827 @@ html {
 /* Don't flip certain icons */
 [dir="rtl"] .no-flip {
   transform: none;
+}
+
+
+/* ========================================
+   🎨 UI POLISH UTILITIES
+   ======================================== */
+
+/* 1. BUTTON POLISH - Premium hover effects */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 2. CARD POLISH - Lift effect on hover */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* 3. PROGRESS BAR POLISH - Smooth fill animation */
+.progress-bar {
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 4. LOADING SKELETON - Pulse animation */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* 5. FOCUS GLOW - Beautiful focus states */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+  border-color: rgb(6, 182, 212);
+}
+
+/* 6. NOTIFICATION SLIDE - Smooth entry */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-enter {
+  animation: slide-in-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 7. RANK ANIMATION - Number change effect */
+@keyframes rank-change {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+    color: rgb(34, 211, 238);
+  }
+}
+
+.rank-change {
+  animation: rank-change 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 8. PAGE TRANSITION - Smooth navigation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* BONUS: Glow effects for premium feel */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.glow-cyan:hover {
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+.glow-blue:hover {
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.5);
+}
+
+/* Ripple effect on click */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::after {
+  width: 200px;
+  height: 200px;
+  animation: ripple 0.6s ease-out;
+}
+
+/* Consistent border radius system */
+.radius-sm { border-radius: 8px; }
+.radius-md { border-radius: 16px; }
+.radius-lg { border-radius: 24px; }
+.radius-xl { border-radius: 32px; }
+
+/* Premium shadows */
+.shadow-premium {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.shadow-premium-lg {
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth gradient animation */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(45deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+.checkmark-animate {
+  animation: checkmark 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Floating animation for badges */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Shine effect for premium elements */
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.shine {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shine 2s infinite;
+}
+
+/* 3D Viewer Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* ========================================
+   📱 MOBILE UI OPTIMIZATION
+   ======================================== */
+
+/* Mobile-first touch targets - minimum 44px */
+@media (max-width: 768px) {
+  button, 
+  a, 
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Larger text on mobile for readability */
+  body {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Better spacing on mobile */
+  .container, .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  /* Stack grids on mobile */
+  .mobile-stack {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Full width buttons on mobile */
+  .mobile-full-width {
+    width: 100%;
+  }
+  
+  /* Hide on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  /* Smaller headings on mobile */
+  h1 {
+    font-size: 1.875rem !important;
+    line-height: 2.25rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container, .max-w-7xl, .max-w-6xl {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Show only on mobile */
+@media (min-width: 769px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Bottom navigation safe area */
+.bottom-nav {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Better mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Mobile card optimization */
+@media (max-width: 768px) {
+  .card-hover:hover {
+    transform: none;
+  }
+  
+  /* Disable hover effects on touch devices */
+  @media (hover: none) {
+    button:hover {
+      transform: none;
+    }
+    
+    .card-hover:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+/* ========================================
+   📱 MOBILE MICRO-INTERACTIONS
+   ======================================== */
+
+/* Tap feedback - scale down on press */
+@keyframes tap-feedback {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* Button press animation for mobile */
+.btn-tap,
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.btn-tap:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s ease-out !important;
+}
+
+@media (hover: none) {
+  button:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease-out !important;
+  }
+}
+
+/* Bounce effect on selection */
+@keyframes bounce-select {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.92); }
+  50% { transform: scale(1.02); }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.bounce-on-tap:active {
+  animation: bounce-select 0.3s ease-out;
+}
+
+/* Pulse effect for selected items */
+@keyframes pulse-select {
+  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(6, 182, 212, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+}
+
+.pulse-on-select {
+  animation: pulse-select 0.4s ease-out;
+}
+
+/* Success feedback animation */
+@keyframes success-pop {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.success-feedback {
+  animation: success-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.shake-error {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Smooth press effect for cards */
+.card-press:active {
+  transform: scale(0.98);
+  transition: transform 0.15s ease-out;
+}
+
+/* Tab selection animation */
+@keyframes tab-select {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.tab-indicator {
+  transform-origin: left;
+  animation: tab-select 0.2s ease-out;
+}
+
+/* Toggle switch animation */
+@keyframes toggle-on {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(110%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Checkbox tick animation */
+@keyframes tick-draw {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.checkbox-tick {
+  stroke-dasharray: 24;
+  animation: tick-draw 0.3s ease-out forwards;
+}
+
+/* Modal slide up animation for mobile */
+@keyframes slide-up {
+  0% { 
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Fade scale for modals */
+@keyframes fade-scale {
+  0% { 
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-fade-scale {
+  animation: fade-scale 0.2s ease-out;
+}
+
+/* List item stagger animation */
+@keyframes list-item-enter {
+  0% { 
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.list-item-animate {
+  animation: list-item-enter 0.3s ease-out backwards;
+}
+
+/* Number counter animation */
+@keyframes count-up {
+  0% { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.count-animate {
+  animation: count-up 0.4s ease-out;
+}
+
+/* Glow pulse for active states */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+}
+
+.glow-pulse-active {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Touch ripple effect */
+.touch-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.touch-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.touch-ripple:active::before {
+  width: 200%;
+  height: 200%;
+  opacity: 1;
+}
+
+/* Smooth icon rotation */
+.icon-rotate-on-tap:active {
+  transform: rotate(15deg);
+  transition: transform 0.15s ease-out;
+}
+
+/* Badge pop animation */
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.badge-animate {
+  animation: badge-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Progress fill animation */
+@keyframes progress-fill {
+  0% { width: 0%; }
+}
+
+.progress-animate {
+  animation: progress-fill 0.8s ease-out;
+}
+
+/* Subtle breathing animation for loading states */
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.breathe {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+/* Mobile-friendly form inputs */
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* Swipe-friendly horizontal scroll */
+.swipe-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.swipe-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.swipe-scroll > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Mobile bottom sheet style */
+.mobile-bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-background-light);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+/* Mobile floating action button */
+.mobile-fab {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 217, 255, 0.4);
+  z-index: 50;
+}
+
+/* Responsive text utilities */
+.text-responsive-sm {
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.text-responsive-3xl {
+  font-size: clamp(1.875rem, 6vw, 3rem);
+}
+
+/* ========================================
+   🌙 DARK MODE ENHANCEMENTS
+   ======================================== */
+
+/* System dark mode preference support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Dark mode specific optimizations */
+.dark-mode-optimized {
+  /* Reduce eye strain with slightly warmer blacks */
+  --color-background: #0D1117;
+  --color-background-light: #161B22;
+  --color-background-dark: #010409;
+}
+
+/* Better contrast for dark mode text */
+.dark-text-high-contrast {
+  color: #F0F6FC;
+}
+
+.dark-text-medium-contrast {
+  color: #C9D1D9;
+}
+
+.dark-text-low-contrast {
+  color: #8B949E;
+}
+
+/* Dark mode borders */
+.dark-border {
+  border-color: rgba(48, 54, 61, 0.8);
+}
+
+/* Dark mode shadows - more subtle */
+.dark-shadow-sm {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.dark-shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.dark-shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Dark mode input fields */
+.dark-input {
+  background-color: #0D1117;
+  border-color: #30363D;
+  color: #C9D1D9;
+}
+
+.dark-input:focus {
+  border-color: #58A6FF;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+}
+
+/* Dark mode cards with subtle glow */
+.dark-card {
+  background: linear-gradient(135deg, #161B22 0%, #0D1117 100%);
+  border: 1px solid rgba(48, 54, 61, 0.6);
+}
+
+.dark-card:hover {
+  border-color: rgba(88, 166, 255, 0.4);
+  box-shadow: 0 0 20px rgba(88, 166, 255, 0.1);
+}
+
+/* Improved dark mode scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D1117;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363D;
+  border-radius: 5px;
+  border: 2px solid #0D1117;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #484F58;
+}
+
+/* Dark mode selection */
+::selection {
+  background: rgba(88, 166, 255, 0.4);
+  color: #F0F6FC;
+}
+
+/* Dark mode placeholder text */
+::placeholder {
+  color: #6E7681;
+  opacity: 1;
 }

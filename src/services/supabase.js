@@ -225,6 +225,49 @@ export const addXP = async (userId, xpAmount, lessonId, subject) => {
   return { data, error, leveledUp: newLevel > profile.level };
 };
 
+// Award XP for various activities
+export const awardXP = async (userId, xpAmount, activityType = 'general', activityId = null) => {
+  const { data: profile, error: profileError } = await getUserProfile(userId);
+  
+  if (profileError || !profile) {
+    return { error: profileError || 'Profile not found' };
+  }
+  
+  const newXP = (profile.total_xp || 0) + xpAmount;
+  const oldLevel = profile.level || 1;
+  const newLevel = Math.floor(newXP / 1000) + 1; // 1000 XP per level
+  
+  const updateData = {
+    total_xp: newXP,
+    level: newLevel,
+    updated_at: new Date().toISOString()
+  };
+  
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update(updateData)
+    .eq('user_id', userId)
+    .select()
+    .single();
+  
+  console.log(`✅ Awarded ${xpAmount} XP for ${activityType}. Total: ${newXP} XP, Level: ${newLevel}`);
+  
+  return { 
+    data, 
+    error, 
+    leveledUp: newLevel > oldLevel,
+    xpAwarded: xpAmount,
+    newXP,
+    newLevel
+  };
+};
+
+// Specific XP award functions
+export const awardProjectXP = (userId, projectId) => awardXP(userId, 200, 'project', projectId);
+export const awardCommunityQuestionXP = (userId, questionId) => awardXP(userId, 10, 'question', questionId);
+export const awardCommunityAnswerXP = (userId, answerId) => awardXP(userId, 50, 'answer', answerId);
+export const awardDailyStreakXP = (userId) => awardXP(userId, 25, 'daily_streak');
+
 export const getCompletedLessons = async (userId, subject) => {
   try {
     const { data: profile } = await getUserProfile(userId);

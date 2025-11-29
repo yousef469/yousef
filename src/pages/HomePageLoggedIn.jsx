@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, LogIn, UserPlus, Globe, User, ChevronDown, Upload, Briefcase, Share2, Calculator, Maximize2 } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, Globe, Briefcase, Maximize2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
-import MixpanelTest from '../components/MixpanelTest';
 import SidebarMenu from '../components/SidebarMenu';
 import ContinueLearning from '../components/ContinueLearning';
-import CourseOverview from '../components/CourseOverview';
 import Logo from '../components/Logo';
+import OnboardingFlow from '../components/OnboardingFlow';
+import DailyChallenge from '../components/DailyChallenge';
+import WeeklyChallenge from '../components/WeeklyChallenge';
+import StreakCounter from '../components/StreakCounter';
 
 const HomePageLoggedIn = () => {
   const navigate = useNavigate();
@@ -21,6 +23,15 @@ const HomePageLoggedIn = () => {
   const [showLangModal, setShowLangModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check if user needs onboarding
+  useEffect(() => {
+    const completed = localStorage.getItem('onboarding_completed');
+    if (!completed && user) {
+      setTimeout(() => setShowOnboarding(true), 1000);
+    }
+  }, [user]);
   
   // Calculate overall progress
   const totalLessons = 88;
@@ -34,23 +45,30 @@ const HomePageLoggedIn = () => {
   }, [showLanguageSelector]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white page-enter pb-20 md:pb-0">
       <SidebarMenu />
       
-      <header className="border-b border-primary/20 bg-background/50 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Header - Mobile Optimized */}
+      <header className="border-b border-primary/20 bg-background/50 backdrop-blur sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4 md:gap-8">
+              {/* Spacer for menu button */}
+              <div className="w-10 md:w-14"></div>
               <Logo size="md" showText={true} />
               
               <nav className="hidden md:flex items-center gap-6">
                 <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">About</button>
+                <button onClick={() => navigate('/toolbox')} className="text-white hover:text-primary transition-colors font-medium">Toolbox</button>
                 <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">Pricing</button>
               </nav>
             </div>
             
-            <div className="flex items-center gap-3">
-              <button onClick={() => setShowLangModal(true)} className="flex items-center gap-2 px-4 py-2 bg-background-light hover:bg-background-light rounded-lg transition-colors text-sm font-medium">
+            <div className="flex items-center gap-2 md:gap-3">
+              {/* Streak Counter */}
+              <StreakCounter />
+              
+              <button onClick={() => setShowLangModal(true)} className="flex items-center gap-2 px-3 md:px-4 py-2 bg-background-light hover:bg-background-light rounded-lg transition-colors text-sm font-medium">
                 <Globe className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('nav.language')}</span>
               </button>
@@ -59,18 +77,18 @@ const HomePageLoggedIn = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
-      <div className="text-center mb-16">
-        <h2 className="text-5xl font-bold mb-4 text-white">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-16">
+      <div className="text-center mb-8 md:mb-16">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 md:mb-4 text-white">
           {t('home.hero.title')}
         </h2>
         
         {/* Welcome Message */}
-        <p className="text-2xl font-semibold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6">
+        <p className="text-lg md:text-2xl font-semibold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 md:mb-6">
           {t('home.hero.welcome')}
         </p>
         
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+        <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
           {t('home.hero.subtitle')}
         </p>
       </div>
@@ -86,7 +104,7 @@ const HomePageLoggedIn = () => {
       <div className="max-w-3xl mx-auto mb-12">
         <button
           onClick={() => navigate('/learn')}
-          className="w-full group relative bg-gradient-to-br from-secondary to-secondary-dark hover:from-secondary-light hover:to-secondary rounded-2xl p-12 border-2 border-secondary hover:border-secondary-light transition-all cursor-pointer hover:scale-105"
+          className="w-full group relative bg-gradient-to-br from-secondary to-secondary-dark hover:from-secondary-light hover:to-secondary rounded-2xl p-12 border-2 border-secondary hover:border-secondary-light transition-all cursor-pointer card-hover glow-cyan ripple shadow-premium-lg"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
           
@@ -130,7 +148,7 @@ const HomePageLoggedIn = () => {
           <div className="relative group">
             <button
               onClick={() => navigate('/pricing')}
-              className="w-full relative bg-gradient-to-br from-red-500 via-pink-600 to-purple-500 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 rounded-2xl p-8 border-2 border-red-400/50 hover:border-gray-500 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-red-500/30"
+              className="w-full relative bg-gradient-to-br from-red-500 via-pink-600 to-purple-500 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 rounded-2xl p-8 border-2 border-red-400/50 hover:border-gray-500 transition-all cursor-pointer card-hover ripple shadow-premium-lg"
             >
               <div className="absolute top-4 right-4 w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Lock className="w-6 h-6 text-white" />
@@ -156,37 +174,10 @@ const HomePageLoggedIn = () => {
             </button>
           </div>
 
-
-          {/* Career Projects */}
-          <button
-            onClick={() => navigate('/projects')}
-            className="group relative bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-500 hover:from-emerald-600 hover:via-teal-700 hover:to-cyan-600 rounded-2xl p-8 border-2 border-emerald-400/50 hover:border-emerald-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-emerald-500/30"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
-            
-            <div className="relative z-10">
-              <div className="flex justify-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                  <Briefcase className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">💼 Career Projects</h3>
-              <p className="text-white/90 text-center mb-4">
-                Build real-world engineering projects for your portfolio
-              </p>
-
-              <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Start Building</span>
-                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </button>
-
           {/* Community */}
           <button
             onClick={() => navigate('/community')}
-            className="group relative bg-gradient-to-br from-pink-500 via-rose-600 to-red-500 hover:from-pink-600 hover:via-rose-700 hover:to-red-600 rounded-2xl p-8 border-2 border-pink-400/50 hover:border-pink-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-pink-500/30"
+            className="group relative bg-gradient-to-br from-pink-500 via-rose-600 to-red-500 hover:from-pink-600 hover:via-rose-700 hover:to-red-600 rounded-2xl p-8 border-2 border-pink-400/50 hover:border-pink-300 transition-all cursor-pointer card-hover ripple shadow-premium-lg"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
             
@@ -235,27 +226,88 @@ const HomePageLoggedIn = () => {
             </div>
           </button>
 
-          {/* Explode View Mode */}
+          {/* Internship Simulator */}
           <button
-            onClick={() => navigate('/explode-view')}
-            className="group relative bg-gradient-to-br from-orange-500 via-amber-600 to-yellow-500 hover:from-orange-600 hover:via-amber-700 hover:to-yellow-600 rounded-2xl p-8 border-2 border-orange-400/50 hover:border-orange-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-orange-500/30"
+            onClick={() => navigate('/internship')}
+            className="group relative bg-gradient-to-br from-amber-500 via-orange-600 to-red-500 hover:from-amber-600 hover:via-orange-700 hover:to-red-600 rounded-2xl p-8 border-2 border-amber-400/50 hover:border-amber-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-amber-500/30"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
             
             <div className="relative z-10">
               <div className="flex justify-center gap-4 mb-6">
                 <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                  <Maximize2 className="w-8 h-8 text-white" />
+                  <Briefcase className="w-8 h-8 text-white" />
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">🔧 Explode View Mode</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">💼 Internship Simulator</h3>
               <p className="text-white/90 text-center mb-4">
-                Explore 3D models with interactive exploded views. Click parts to highlight and focus.
+                Real engineering tasks from SpaceX, Tesla & more
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Try Explode View</span>
+                <span>Start Internship</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* AI Homework Solver */}
+          <button
+            onClick={() => navigate('/homework-solver')}
+            className="group relative bg-gradient-to-br from-purple-500 via-violet-600 to-fuchsia-600 hover:from-purple-600 hover:via-violet-700 hover:to-fuchsia-700 rounded-2xl p-8 border-2 border-purple-400/50 hover:border-purple-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-purple-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-purple-400/20 rounded-xl flex items-center justify-center backdrop-blur border-2 border-purple-300/30 group-hover:border-purple-300/60 transition-all">
+                  <Sparkles className="w-8 h-8 text-purple-100 group-hover:text-white transition-colors" />
+                </div>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">✨ AI Homework Solver</h3>
+              <p className="text-white/90 text-center mb-4">
+                Get step-by-step solutions for any mechanical engineering problem
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Solve My Homework</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </button>
+
+          {/* JARVIS Mode - AI-Powered 3D Analysis */}
+          <button
+            onClick={() => navigate('/explode-view')}
+            className="group relative bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-600 hover:via-blue-700 hover:to-indigo-700 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer hover:scale-105 hover:shadow-xl shadow-cyan-500/30"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+            
+            {/* Animated tech corners */}
+            <div className="absolute top-2 left-2 w-8 h-8 border-l-2 border-t-2 border-cyan-300/50 rounded-tl-lg opacity-60 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-2 right-2 w-8 h-8 border-r-2 border-b-2 border-cyan-300/50 rounded-br-lg opacity-60 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-cyan-400/20 rounded-xl flex items-center justify-center backdrop-blur border-2 border-cyan-300/30 group-hover:border-cyan-300/60 transition-all">
+                  <Maximize2 className="w-8 h-8 text-cyan-100 group-hover:text-white transition-colors" />
+                </div>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-2 text-white text-center flex items-center justify-center gap-2">
+                <span className="text-cyan-300">J.A.R.V.I.S.</span> Mode
+              </h3>
+              <p className="text-xs text-cyan-200 text-center mb-3 font-mono tracking-wider">
+                Just A Rather Very Intelligent System
+              </p>
+              <p className="text-white/90 text-center mb-4">
+                AI-powered 3D analysis. Upload models, scan machines with camera, get instant explanations.
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>Enter JARVIS Mode</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -264,29 +316,38 @@ const HomePageLoggedIn = () => {
       </div>
       </div>
 
+      {/* Daily & Weekly Challenges - At Bottom */}
+      <div className="max-w-6xl mx-auto px-4 mt-12 space-y-6">
+        <h2 className="text-2xl font-bold text-white text-center mb-6">Daily & Weekly Challenges</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DailyChallenge />
+          <WeeklyChallenge />
+        </div>
+      </div>
+
       <footer className="border-t border-primary/20 mt-20 py-10 bg-gray-900/80">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="flex justify-center items-center gap-6 mb-6">
-            <a 
-              href="mailto:youseflovemessi@gmail.com" 
-              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+            <button 
+              onClick={() => navigate('/help')}
+              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline cursor-pointer"
             >
               Help
-            </a>
+            </button>
             <span className="text-gray-500 text-2xl">|</span>
-            <a 
-              href="/privacy" 
-              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+            <button 
+              onClick={() => navigate('/privacy')}
+              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline cursor-pointer"
             >
               Privacy
-            </a>
+            </button>
             <span className="text-gray-500 text-2xl">|</span>
-            <a 
-              href="/terms" 
-              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+            <button 
+              onClick={() => navigate('/terms')}
+              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline cursor-pointer"
             >
               Terms
-            </a>
+            </button>
           </div>
           <p className="text-gray-400">{t('home.footer.copyright')}</p>
           <p className="text-xs mt-2 text-gray-600">{t('home.footer.version')}</p>
@@ -296,7 +357,7 @@ const HomePageLoggedIn = () => {
       <ModelComparison isOpen={showComparison} onClose={() => setShowComparison(false)} />
       <LanguageSelector isOpen={showLangModal} onClose={() => { setShowLangModal(false); if (setShowLanguageSelector) { setShowLanguageSelector(false); }}} />
       {selectedCourse && <CourseOverview courseId={selectedCourse} onClose={() => setSelectedCourse(null)} />}
-      {import.meta.env.DEV && <MixpanelTest />}
+      {showOnboarding && <OnboardingFlow onComplete={() => setShowOnboarding(false)} />}
     </div>
   );
 };

@@ -27,13 +27,25 @@ export default function CareerProjectsPage() {
   const categories = ['all', ...new Set(careerProjects.map(p => p.category))];
   const difficulties = ['all', 'Easy', 'Medium', 'Hard', 'Advanced'];
 
-  const filteredProjects = careerProjects.filter(project => {
-    const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
-    const matchesDifficulty = selectedDifficulty === 'all' || project.difficulty === selectedDifficulty;
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesDifficulty && matchesSearch;
-  });
+  // Difficulty order for sorting (lower = easier = first)
+  const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3, 'Advanced': 4 };
+
+  const filteredProjects = careerProjects
+    .filter(project => {
+      const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
+      const matchesDifficulty = selectedDifficulty === 'all' || project.difficulty === selectedDifficulty;
+      const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           project.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesDifficulty && matchesSearch;
+    })
+    .sort((a, b) => {
+      // First sort by availability (coming soon at bottom)
+      if (a.comingSoon !== b.comingSoon) {
+        return a.comingSoon ? 1 : -1;
+      }
+      // Then sort by difficulty (Advanced at bottom)
+      return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+    });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -112,12 +124,13 @@ export default function CareerProjectsPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => {
             const CategoryIcon = categoryIcons[project.category] || Rocket;
+            const isLocked = project.comingSoon || project.difficulty === 'Advanced';
             
             return (
               <div
                 key={project.id}
-                className={`group relative bg-gradient-to-br ${project.color} rounded-2xl p-6 border-2 border-white/20 hover:border-white/40 transition-all cursor-pointer hover:scale-105 hover:shadow-2xl ${
-                  project.comingSoon ? 'opacity-60' : ''
+                className={`group relative bg-gradient-to-br ${project.color} rounded-2xl p-6 border-2 border-white/20 hover:border-white/40 cursor-pointer transform-gpu will-change-transform transition-[transform,border-color,box-shadow] duration-200 ease-out hover:scale-[1.02] hover:shadow-xl ${
+                  isLocked ? 'opacity-60' : ''
                 }`}
                 onClick={() => {
                   if (!project.comingSoon) {
@@ -126,12 +139,17 @@ export default function CareerProjectsPage() {
                 }}
               >
                 {project.comingSoon && (
-                  <div className="absolute top-4 right-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                  <div className="absolute top-4 right-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold z-20">
                     Coming Soon
                   </div>
                 )}
+                {project.difficulty === 'Advanced' && !project.comingSoon && (
+                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold z-20">
+                    🔒 Advanced
+                  </div>
+                )}
 
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity pointer-events-none" />
                 
                 <div className="relative z-10">
                   {/* Icon and Category */}

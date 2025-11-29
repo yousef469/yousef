@@ -83,36 +83,36 @@ const DashboardPage = () => {
   const lessonPercentage = (stats.lessonsCompleted / stats.totalLessons) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-      {/* Header */}
-      <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white pb-20 md:pb-0">
+      {/* Header - Mobile Optimized */}
+      <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">My Dashboard</h1>
-              <p className="text-gray-400 mt-1">Welcome back, {user?.email?.split('@')[0]}!</p>
+            <div className="min-w-0">
+              <h1 className="text-xl md:text-3xl font-bold truncate">My Dashboard</h1>
+              <p className="text-sm md:text-base text-gray-400 mt-1 truncate">Welcome back, {user?.email?.split('@')[0]}!</p>
             </div>
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="px-3 md:px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm md:text-base flex-shrink-0"
             >
-              Back to Home
+              <span className="hidden sm:inline">Back to </span>Home
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Level & XP Card */}
-        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-2xl p-6 mb-8">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
+        {/* Level & XP Card - Mobile Optimized */}
+        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-xl md:rounded-2xl p-4 md:p-6 mb-4 md:mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
-                <Crown className="w-10 h-10 text-white" />
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <Crown className="w-7 h-7 md:w-10 md:h-10 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">Level {stats.level}</h2>
-                <p className="text-gray-300">{stats.rank} Rank</p>
+                <h2 className="text-xl md:text-3xl font-bold">Level {stats.level}</h2>
+                <p className="text-sm md:text-base text-gray-300">{stats.rank} Rank</p>
               </div>
             </div>
             <button 

@@ -1,201 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { Zap, Trophy, Clock, CheckCircle, XCircle, Flame } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Trophy, Clock, Zap, CheckCircle } from 'lucide-react';
+import { useProgress } from '../contexts/ProgressContext';
 
-const DailyChallenge = () => {
+export default function DailyChallenge() {
+  const { awardXP } = useProgress();
   const [challenge, setChallenge] = useState(null);
+  const [completed, setCompleted] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [streak, setStreak] = useState(7);
-  const [timeLeft, setTimeLeft] = useState('23:45:12');
+  const [showResult, setShowResult] = useState(false);
 
   const challenges = [
     {
-      id: 1,
-      difficulty: 'Medium',
-      points: 75,
-      question: 'What is the specific impulse (Isp) of the SpaceX Raptor engine?',
-      options: ['330s', '350s', '380s', '420s'],
+      question: "What is the escape velocity from Earth?",
+      options: ["7.9 km/s", "11.2 km/s", "15.4 km/s", "20.1 km/s"],
+      correct: 1,
+      xp: 50
+    },
+    {
+      question: "Which force opposes motion through air?",
+      options: ["Lift", "Thrust", "Drag", "Weight"],
       correct: 2,
-      explanation: 'The Raptor engine has an Isp of approximately 380 seconds in vacuum, making it one of the most efficient rocket engines.',
-      category: 'Rockets'
+      xp: 50
     },
     {
-      id: 2,
-      difficulty: 'Hard',
-      points: 100,
-      question: 'At what angle of attack does a typical airfoil stall?',
-      options: ['10-12°', '15-18°', '20-22°', '25-28°'],
-      correct: 1,
-      explanation: 'Most airfoils stall between 15-18° angle of attack, though this varies by design.',
-      category: 'Planes'
+      question: "What does RPM stand for?",
+      options: ["Rotations Per Minute", "Rate Per Mile", "Revolutions Per Minute", "Ratio Per Motor"],
+      correct: 2,
+      xp: 50
     },
     {
-      id: 3,
-      difficulty: 'Easy',
-      points: 50,
-      question: 'What does a turbocharger use to compress air?',
-      options: ['Belt drive', 'Exhaust gases', 'Electric motor', 'Crankshaft'],
+      question: "What is Newton's Second Law?",
+      options: ["F = ma", "E = mc²", "V = IR", "P = IV"],
+      correct: 0,
+      xp: 50
+    },
+    {
+      question: "What powers a rocket in space?",
+      options: ["Air pressure", "Propellant combustion", "Solar panels", "Gravity"],
       correct: 1,
-      explanation: 'Turbochargers use exhaust gases to spin a turbine that compresses intake air.',
-      category: 'Cars'
+      xp: 50
     }
   ];
 
   useEffect(() => {
-    // Load today's challenge
     const today = new Date().toDateString();
-    const savedChallenge = localStorage.getItem('dailyChallenge');
-    const savedDate = localStorage.getItem('challengeDate');
+    const lastCompleted = localStorage.getItem('daily_challenge_date');
     
-    if (savedDate === today && savedChallenge) {
-      setIsCompleted(true);
+    if (lastCompleted === today) {
+      setCompleted(true);
     } else {
       // Pick random challenge
-      const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
-      setChallenge(randomChallenge);
+      const randomIndex = Math.floor(Math.random() * challenges.length);
+      setChallenge(challenges[randomIndex]);
     }
-
-    // Update countdown timer
-    const timer = setInterval(() => {
-      const now = new Date();
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(0, 0, 0, 0);
-      
-      const diff = tomorrow - now;
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, []);
 
-  const handleSubmit = () => {
-    if (selectedAnswer === null) return;
-
-    const isCorrect = selectedAnswer === challenge.correct;
+  const handleAnswer = (index) => {
+    if (showResult) return;
     
-    if (isCorrect) {
-      setStreak(streak + 1);
-      localStorage.setItem('dailyChallenge', 'completed');
-      localStorage.setItem('challengeDate', new Date().toDateString());
-      setIsCompleted(true);
+    setSelectedAnswer(index);
+    setShowResult(true);
+
+    if (index === challenge.correct) {
+      // Award XP
+      if (awardXP) {
+        awardXP(challenge.xp, 'daily_challenge');
+      }
+      
+      // Mark as completed
+      const today = new Date().toDateString();
+      localStorage.setItem('daily_challenge_date', today);
+      
+      setTimeout(() => {
+        setCompleted(true);
+      }, 2000);
     }
   };
 
-  if (!challenge) {
+  if (completed) {
     return (
-      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-8 text-center">
-        <Zap className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-        <p className="text-gray-400">Loading today's challenge...</p>
-      </div>
-    );
-  }
-
-  if (isCompleted) {
-    return (
-      <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-xl p-8">
-        <div className="text-center">
-          <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold mb-2">Challenge Complete! 🎉</h3>
-          <p className="text-gray-300 mb-4">You've earned {challenge.points} points today</p>
-          
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Flame className="w-6 h-6 text-orange-400" />
-            <span className="text-2xl font-bold">{streak} Day Streak!</span>
-          </div>
-
-          <div className="bg-gray-800/50 rounded-lg p-4">
-            <div className="flex items-center justify-center gap-2 text-gray-400 mb-2">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm">Next challenge in</span>
-            </div>
-            <p className="text-3xl font-bold text-cyan-400">{timeLeft}</p>
-          </div>
+      <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/30 border border-green-500/30 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <CheckCircle className="w-6 h-6 text-green-400" />
+          <h3 className="text-xl font-bold text-white">Daily Challenge Complete!</h3>
         </div>
+        <p className="text-gray-300">Come back tomorrow for a new challenge and more XP!</p>
       </div>
     );
   }
+
+  if (!challenge) return null;
 
   return (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border border-purple-500/30 radius-md p-6 shadow-premium-lg card-hover">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-            <Zap className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold">Daily Challenge</h3>
-            <p className="text-sm text-gray-400">{challenge.category} • {challenge.difficulty}</p>
-          </div>
+          <Trophy className="w-6 h-6 text-yellow-400" />
+          <h3 className="text-xl font-bold text-white">Daily Challenge</h3>
         </div>
-        <div className="text-right">
-          <div className="flex items-center gap-2 text-orange-400 mb-1">
-            <Flame className="w-5 h-5" />
-            <span className="font-bold">{streak} Day Streak</span>
-          </div>
-          <div className="flex items-center gap-2 text-yellow-400">
-            <Trophy className="w-4 h-4" />
-            <span className="text-sm font-semibold">+{challenge.points} Points</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Question */}
-      <div className="bg-gray-900/50 rounded-lg p-6 mb-6">
-        <p className="text-lg text-white mb-6">{challenge.question}</p>
-
-        {/* Options */}
-        <div className="space-y-3">
-          {challenge.options.map((option, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedAnswer(index)}
-              className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                selectedAnswer === index
-                  ? 'border-cyan-500 bg-cyan-500/20'
-                  : 'border-gray-600 bg-gray-800/50 hover:border-gray-500'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  selectedAnswer === index
-                    ? 'border-cyan-500 bg-cyan-500'
-                    : 'border-gray-500'
-                }`}>
-                  {selectedAnswer === index && (
-                    <div className="w-3 h-3 bg-white rounded-full" />
-                  )}
-                </div>
-                <span className="text-white">{option}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={selectedAnswer === null}
-        className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-700 disabled:to-gray-700 rounded-lg font-semibold transition-all disabled:cursor-not-allowed"
-      >
-        Submit Answer
-      </button>
-
-      {/* Timer */}
-      <div className="mt-4 text-center">
-        <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
+        <div className="flex items-center gap-2 text-sm text-gray-400">
           <Clock className="w-4 h-4" />
-          <span>New challenge in {timeLeft}</span>
+          <span>Resets in {24 - new Date().getHours()}h</span>
         </div>
       </div>
+
+      <p className="text-lg text-white mb-4">{challenge.question}</p>
+
+      <div className="space-y-2 mb-4">
+        {challenge.options.map((option, index) => (
+          <button
+            key={index}
+            onClick={() => handleAnswer(index)}
+            disabled={showResult}
+            className={`w-full p-3 radius-sm text-left transition-all ripple ${
+              showResult
+                ? index === challenge.correct
+                  ? 'bg-green-500/20 border-2 border-green-500 text-white'
+                  : index === selectedAnswer
+                  ? 'bg-red-500/20 border-2 border-red-500 text-white'
+                  : 'bg-gray-800 border border-gray-700 text-gray-400'
+                : 'bg-gray-800 border border-gray-700 hover:border-purple-500 text-white'
+            }`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+
+      {showResult && (
+        <div className={`flex items-center gap-2 p-3 rounded-lg ${
+          selectedAnswer === challenge.correct
+            ? 'bg-green-500/20 text-green-400'
+            : 'bg-red-500/20 text-red-400'
+        }`}>
+          <Zap className="w-5 h-5" />
+          <span className="font-semibold">
+            {selectedAnswer === challenge.correct
+              ? `Correct! +${challenge.xp} XP earned!`
+              : 'Incorrect. Try again tomorrow!'}
+          </span>
+        </div>
+      )}
     </div>
   );
-};
-
-export default DailyChallenge;
+}

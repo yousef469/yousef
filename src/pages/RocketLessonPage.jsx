@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Rocket, CheckCircle, Brain } from 'lucide-react';
 import ThrustSliderDemo from '../components/lessons/ThrustSliderDemo';
 import DragVisualization from '../components/lessons/DragVisualization';
@@ -9,14 +9,17 @@ import CommunityQA from '../components/CommunityQA';
 import EnhancedLessonContent from '../components/EnhancedLessonContent';
 import LessonBreadcrumb from '../components/LessonBreadcrumb';
 import LessonNavigation from '../components/LessonNavigation';
-import { rocketLessons } from '../data/rocketLessonsData';
+import rocketsLessons from '../data/rocketsLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
 
 export default function RocketLessonPage() {
   const { lessonId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { completeLesson: saveProgress } = useProgress();
   const id = parseInt(lessonId);
+  // Get the string lesson ID from query param for content lookup
+  const lessonKey = searchParams.get('lesson') || lessonId;
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
@@ -38,8 +41,14 @@ export default function RocketLessonPage() {
     };
   }, []);
 
-  // Get lesson data from curriculum
-  const lessonData = rocketLessons[id];
+  // Get lesson data from curriculum using string lessonKey
+  const lessonData = rocketsLessons[lessonKey];
+  
+  // Debug logging
+  console.log('lessonId from URL:', lessonId);
+  console.log('lessonKey:', lessonKey);
+  console.log('lessonData found:', !!lessonData);
+  console.log('Available keys:', Object.keys(rocketsLessons).slice(0, 5));
   
   // Save progress when quiz is completed
   useEffect(() => {
@@ -55,17 +64,24 @@ export default function RocketLessonPage() {
     }
   }, [quizCompleted, score, id, lessonData, saveProgress]);
 
-  // Quiz Component
+  // Quiz Component - handles both old format (q/a) and new format (question/correctAnswer)
   const QuizSection = ({ questions }) => {
     if (!questions || questions.length === 0) return null;
 
     const question = questions[currentQuestion];
     const isLastQuestion = currentQuestion === questions.length - 1;
+    
+    // Get question text (supports both formats)
+    const questionText = question.question || question.q;
+    // Get correct answer (supports both formats - new uses index, old uses text)
+    const correctAnswer = typeof question.correctAnswer === 'number' 
+      ? question.options[question.correctAnswer] 
+      : question.a;
 
     const handleAnswer = (answer) => {
       setSelectedAnswer(answer);
       setShowResult(true);
-      if (answer === question.a) {
+      if (answer === correctAnswer) {
         setScore(score + 1);
       }
     };
@@ -91,11 +107,11 @@ export default function RocketLessonPage() {
         </div>
 
         <div className="mb-6">
-          <h4 className="text-lg font-semibold mb-4">{question.q}</h4>
+          <h4 className="text-lg font-semibold mb-4">{questionText}</h4>
           <div className="space-y-3">
             {question.options.map((option, idx) => {
               const isSelected = selectedAnswer === option;
-              const isCorrect = option === question.a;
+              const isCorrect = option === correctAnswer;
               const showCorrect = showResult && isCorrect;
               const showWrong = showResult && isSelected && !isCorrect;
 
@@ -155,63 +171,97 @@ export default function RocketLessonPage() {
     );
   };
 
-  // Lesson content mapping with interactive demos
+  // Lesson content mapping with interactive demos (using string lesson IDs)
   const interactiveDemos = {
-    0: (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-8">
-          <h3 className="text-2xl font-bold mb-4">🚀 What You'll Learn</h3>
-          <div className="grid md:grid-cols-2 gap-6 text-gray-300">
-            <div>
-              <h4 className="font-semibold text-cyan-400 mb-2">Unit 1: Flight Dynamics</h4>
-              <p className="text-sm">Forces, thrust, mass, and the rocket equation</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-blue-400 mb-2">Unit 2: Aerodynamics</h4>
-              <p className="text-sm">Drag, streamlines, and nose cone design</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-purple-400 mb-2">Unit 3: Stability</h4>
-              <p className="text-sm">Balance, control, and keeping rockets straight</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-green-400 mb-2">Unit 4: Orbital Mechanics</h4>
-              <p className="text-sm">Getting to space and staying there</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    1: <ThrustSliderDemo />,
-    2: <ThrustSliderDemo />,
-    7: <DragVisualization />,
-    8: <DragVisualization />,
-    13: <StabilityDemo />,
-    14: <StabilityDemo />,
-    19: <OrbitalDemo />,
-    20: <OrbitalDemo />
+    'vectors-forces': <ThrustSliderDemo />,
+    'newtons-laws': <ThrustSliderDemo />,
+    'rocket-equation': <ThrustSliderDemo />,
+    'orbital-mechanics-intro': <OrbitalDemo />,
+    'thermodynamics-basics': <DragVisualization />,
+    'fluid-dynamics-basics': <DragVisualization />,
+    'materials-basics': <StabilityDemo />,
+    'rocket-basics-intro': <StabilityDemo />
   };
 
-  // Build lesson object from data
-  const lessons = {};
+  // Render lesson sections content
+  const LessonSections = ({ sections }) => {
+    if (!sections || sections.length === 0) return null;
+    
+    return (
+      <div className="space-y-8">
+        {sections.map((section, idx) => (
+          <div key={idx} className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">{section.title}</h3>
+            <div className="prose prose-invert max-w-none">
+              {section.content.split('\n').map((paragraph, pIdx) => (
+                <p key={pIdx} className="text-gray-300 mb-3 whitespace-pre-wrap">{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
-  // Build lesson from data
+  // Key takeaways component
+  const KeyTakeaways = ({ takeaways }) => {
+    if (!takeaways || takeaways.length === 0) return null;
+    
+    return (
+      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-green-400 mb-4">🎯 Key Takeaways</h3>
+        <ul className="space-y-2">
+          {takeaways.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-gray-300">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  // Build lesson from data (new curriculum structure)
   const lesson = lessonData ? {
-    unit: `Module ${lessonData.module}`,
+    unit: lessonData.sectionTitle || lessonData.unitTitle || 'Rocket Engineering',
     title: lessonData.title,
-    description: lessonData.concept,
+    description: lessonData.description || lessonData.introduction,
     content: (
       <div className="space-y-8">
-        {interactiveDemos[id]}
-        <EnhancedLessonContent lessonId={id} subject="rockets" />
-        <QuizSection questions={lessonData.questions} />
+        {/* Interactive Demo */}
+        {interactiveDemos[lessonKey]}
+        
+        {/* Lesson Introduction */}
+        {lessonData.introduction && (
+          <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-6">
+            <p className="text-lg text-gray-200">{lessonData.introduction}</p>
+          </div>
+        )}
+        
+        {/* Main Lesson Content Sections */}
+        <LessonSections sections={lessonData.sections || lessonData.content?.sections} />
+        
+        {/* Key Takeaways */}
+        <KeyTakeaways takeaways={lessonData.keyTakeaways || lessonData.content?.keyTakeaways} />
+        
+        {/* Enhanced Content (calculators, diagrams) */}
+        <EnhancedLessonContent lessonId={lessonKey} subject="rockets" />
+        
+        {/* Quiz */}
+        <QuizSection questions={lessonData.quiz?.questions || []} />
       </div>
     )
   } : {
     unit: 'Introduction',
     title: 'Welcome to Rocket Engineering',
     description: 'Start your journey into rocket science',
-    content: interactiveDemos[0]
+    content: (
+      <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-8">
+        <h3 className="text-2xl font-bold mb-4">🚀 Welcome to Rocket Engineering</h3>
+        <p className="text-gray-300">Select a lesson from the map to begin your journey.</p>
+      </div>
+    )
   };
 
   const completeLesson = () => {
@@ -239,13 +289,24 @@ export default function RocketLessonPage() {
                 <h1 className="text-xl font-bold">{lesson.title}</h1>
               </div>
             </div>
-            <button
-              onClick={completeLesson}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors"
-            >
-              <CheckCircle className="w-5 h-5" />
-              <span>Complete Lesson</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={completeLesson}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors"
+              >
+                <CheckCircle className="w-5 h-5" />
+                <span>Complete Lesson</span>
+              </button>
+              {id < Object.keys(rocketsLessons).length - 1 && (
+                <button
+                  onClick={() => navigate(`/games/play/rockets/lesson/${id + 1}`)}
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-semibold transition-colors"
+                >
+                  <span>Next Lesson</span>
+                  <ArrowLeft className="w-5 h-5 rotate-180" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -273,7 +334,7 @@ export default function RocketLessonPage() {
         <LessonNavigation 
           subject="rockets" 
           currentLessonId={id} 
-          allLessons={rocketLessons} 
+          allLessons={rocketsLessons} 
         />
       </div>
     </div>

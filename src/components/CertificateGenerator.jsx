@@ -1,183 +1,184 @@
-import { useState } from 'react';
-import { Download, Share2, X, Award } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import Logo from './Logo';
+import { useRef } from 'react';
+import { Download, Award, CheckCircle, Twitter, Facebook, Linkedin } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
-export default function CertificateGenerator({ subject, totalLessons, onClose }) {
-  const { user } = useAuth();
-  const [generating, setGenerating] = useState(false);
+export default function CertificateGenerator({ 
+  userName, 
+  courseName, 
+  completionDate, 
+  certificateId,
+  totalLessons,
+  score 
+}) {
+  const certificateRef = useRef(null);
 
-  const subjectNames = {
-    physics: 'Physics Engineering',
-    mathematics: 'Mathematics Engineering',
-    electronics: 'Electronics & Robotics',
-    rockets: 'Rocket Engineering',
-    cars: 'Automotive Engineering',
-    planes: 'Aircraft Engineering'
-  };
-
-  const generateCertificate = () => {
-    setGenerating(true);
+  const downloadPDF = async () => {
+    const element = certificateRef.current;
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff'
+    });
     
-    const canvas = document.createElement('canvas');
-    canvas.width = 1920;
-    canvas.height = 1080;
-    const ctx = canvas.getContext('2d');
-
-    // Background - elegant gradient
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#0f172a');
-    gradient.addColorStop(0.5, '#1e3a8a');
-    gradient.addColorStop(1, '#581c87');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Border
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 20;
-    ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
-
-    // Inner border
-    ctx.strokeStyle = '#06b6d4';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
-
-    // Certificate title
-    ctx.font = 'bold 80px Arial';
-    ctx.fillStyle = '#fbbf24';
-    ctx.textAlign = 'center';
-    ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 200);
-
-    // Subtitle
-    ctx.font = '40px Arial';
-    ctx.fillStyle = '#e2e8f0';
-    ctx.fillText('This certifies that', canvas.width / 2, 300);
-
-    // Student name
-    ctx.font = 'bold 72px Arial';
-    ctx.fillStyle = '#ffffff';
-    const studentName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student';
-    ctx.fillText(studentName, canvas.width / 2, 420);
-
-    // Achievement text
-    ctx.font = '40px Arial';
-    ctx.fillStyle = '#e2e8f0';
-    ctx.fillText('has successfully completed', canvas.width / 2, 520);
-
-    // Subject name
-    ctx.font = 'bold 64px Arial';
-    ctx.fillStyle = '#06b6d4';
-    ctx.fillText(subjectNames[subject] || subject, canvas.width / 2, 640);
-
-    // Lesson count
-    ctx.font = '36px Arial';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`${totalLessons} Lessons Completed`, canvas.width / 2, 720);
-
-    // Date
-    const date = new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
     });
-    ctx.font = '32px Arial';
-    ctx.fillStyle = '#cbd5e1';
-    ctx.fillText(`Issued on ${date}`, canvas.width / 2, 850);
-
-    // Engineerium branding
-    ctx.font = 'bold 48px Arial';
-    ctx.fillStyle = '#06b6d4';
-    ctx.fillText('Engineerium', canvas.width / 2, 950);
-
-    ctx.font = '28px Arial';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Interactive Engineering Education Platform', canvas.width / 2, 1000);
-
-    // Download
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Engineerium_${subject}_Certificate_${studentName.replace(/\s+/g, '_')}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-      setGenerating(false);
-    });
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save(`${courseName.replace(/\s+/g, '_')}_Certificate.pdf`);
   };
 
-  const handleShare = () => {
-    const shareText = `🎓 I just completed ${subjectNames[subject]} on Engineerium! ${totalLessons} lessons mastered! 🚀`;
-    const shareUrl = window.location.origin;
-
-    if (navigator.share) {
-      navigator.share({
-        title: 'Engineerium Certificate',
-        text: shareText,
-        url: shareUrl
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
-      alert('Link copied to clipboard!');
-    }
+  const downloadImage = async () => {
+    const element = certificateRef.current;
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff'
+    });
+    
+    const link = document.createElement('a');
+    link.download = `${courseName.replace(/\s+/g, '_')}_Certificate.png`;
+    link.href = canvas.toDataURL();
+    link.click();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 max-w-2xl w-full border border-cyan-500/30 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-        >
-          <X className="w-6 h-6" />
-        </button>
+    <div className="space-y-6">
+      {/* Certificate Preview */}
+      <div 
+        ref={certificateRef}
+        className="bg-white text-gray-900 p-12 rounded-lg shadow-2xl"
+        style={{ width: '1000px', height: '700px' }}
+      >
+        {/* Border */}
+        <div className="border-8 border-double border-cyan-600 h-full p-8 relative">
+          {/* Corner decorations */}
+          <div className="absolute top-4 left-4 w-16 h-16 border-l-4 border-t-4 border-cyan-500" />
+          <div className="absolute top-4 right-4 w-16 h-16 border-r-4 border-t-4 border-cyan-500" />
+          <div className="absolute bottom-4 left-4 w-16 h-16 border-l-4 border-b-4 border-cyan-500" />
+          <div className="absolute bottom-4 right-4 w-16 h-16 border-r-4 border-b-4 border-cyan-500" />
 
-        <div className="text-center mb-8">
-          <Award className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-2">Congratulations!</h2>
-          <p className="text-gray-300 text-lg">
-            You've completed all lessons in {subjectNames[subject]}
-          </p>
-        </div>
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            {/* Logo/Icon */}
+            <Award className="w-24 h-24 text-cyan-600 mb-6" />
 
-        {/* Certificate Preview */}
-        <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl p-8 border border-cyan-500/30 mb-6">
-          <div className="text-center">
-            <div className="mb-4">
-              <Logo size="md" showText={true} />
+            {/* Title */}
+            <h1 className="text-5xl font-bold text-gray-800 mb-4">
+              Certificate of Completion
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-xl text-gray-600 mb-8">
+              This certifies that
+            </p>
+
+            {/* Student Name */}
+            <h2 className="text-4xl font-bold text-cyan-700 mb-8 border-b-2 border-gray-300 pb-2 px-12">
+              {userName}
+            </h2>
+
+            {/* Achievement Text */}
+            <p className="text-xl text-gray-600 mb-4">
+              has successfully completed
+            </p>
+
+            {/* Course Name */}
+            <h3 className="text-3xl font-bold text-gray-800 mb-6">
+              {courseName}
+            </h3>
+
+            {/* Details */}
+            <div className="flex items-center gap-8 mb-8 text-gray-600">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span>{totalLessons} Lessons Completed</span>
+              </div>
+              {score && (
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-600" />
+                  <span>Score: {score}%</span>
+                </div>
+              )}
             </div>
-            <div className="text-2xl font-bold text-yellow-400 mb-2">CERTIFICATE OF COMPLETION</div>
-            <div className="text-gray-300 mb-2">This certifies that</div>
-            <div className="text-3xl font-bold text-white mb-2">
-              {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student'}
+
+            {/* Footer */}
+            <div className="flex justify-between items-end w-full mt-auto pt-8">
+              <div className="text-left">
+                <p className="text-sm text-gray-500 mb-1">Issue Date</p>
+                <p className="text-lg font-semibold text-gray-700">{completionDate}</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-48 border-t-2 border-gray-400 mb-2" />
+                <p className="text-sm text-gray-600 font-semibold">Engineerium Platform</p>
+                <p className="text-xs text-gray-500">Engineering Education</p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-sm text-gray-500 mb-1">Certificate ID</p>
+                <p className="text-xs font-mono text-gray-600">{certificateId}</p>
+              </div>
             </div>
-            <div className="text-gray-300 mb-2">has successfully completed</div>
-            <div className="text-2xl font-bold text-cyan-400 mb-2">{subjectNames[subject]}</div>
-            <div className="text-gray-400 text-sm">{totalLessons} Lessons Completed</div>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={generateCertificate}
-            disabled={generating}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-colors disabled:opacity-50"
-          >
-            <Download className="w-5 h-5" />
-            {generating ? 'Generating...' : 'Download Certificate'}
-          </button>
+      {/* Download Buttons */}
+      <div className="flex flex-wrap gap-4 justify-center">
+        <button
+          onClick={downloadPDF}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg font-semibold transition-all shadow-lg"
+        >
+          <Download className="w-5 h-5" />
+          Download PDF
+        </button>
+        <button
+          onClick={downloadImage}
+          className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all"
+        >
+          <Download className="w-5 h-5" />
+          Download Image
+        </button>
+      </div>
 
-          <button
-            onClick={handleShare}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 rounded-lg font-semibold transition-colors"
-          >
-            <Share2 className="w-5 h-5" />
-            Share Achievement
-          </button>
-        </div>
+      {/* Social Share Buttons */}
+      <div className="flex flex-wrap gap-3 justify-center">
+        <button
+          onClick={() => {
+            const text = `🎓 I just earned my ${courseName} certificate on Engineerium! ${totalLessons} lessons completed. #Engineering #Learning`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.origin)}`, '_blank');
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white rounded-lg font-medium transition-colors"
+        >
+          <Twitter className="w-5 h-5" />
+          Share on Twitter
+        </button>
+        <button
+          onClick={() => {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}&quote=${encodeURIComponent(`I just earned my ${courseName} certificate on Engineerium!`)}`, '_blank');
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-[#4267B2] hover:bg-[#365899] text-white rounded-lg font-medium transition-colors"
+        >
+          <Facebook className="w-5 h-5" />
+          Share on Facebook
+        </button>
+        <button
+          onClick={() => {
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin)}`, '_blank');
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-[#0077B5] hover:bg-[#006399] text-white rounded-lg font-medium transition-colors"
+        >
+          <Linkedin className="w-5 h-5" />
+          Share on LinkedIn
+        </button>
+      </div>
 
-        <p className="text-center text-sm text-gray-400 mt-4">
-          Your certificate will be downloaded as a high-quality image
-        </p>
+      {/* Share Info */}
+      <div className="text-center text-gray-400 text-sm">
+        <p>Share your achievement and inspire others!</p>
+        <p className="text-xs mt-1">Certificate ID: {certificateId} • Verify at engineerium.com/verify</p>
       </div>
     </div>
   );

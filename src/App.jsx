@@ -22,18 +22,13 @@ const GameMapRockets = lazy(() => import('./pages/GameMapRockets'));
 const GameMapCars = lazy(() => import('./pages/GameMapCars'));
 const GameMapPlanes = lazy(() => import('./pages/GameMapPlanes'));
 const GameMapElectronics = lazy(() => import('./pages/GameMapElectronics'));
-const GameMapMathematics = lazy(() => import('./pages/GameMapMathematics'));
-const GameMapPhysics = lazy(() => import('./pages/GameMapPhysics'));
+
 const LessonsDemoPage = lazy(() => import('./pages/LessonsDemoPage'));
 const RocketLessonPage = lazy(() => import('./pages/RocketLessonPage'));
-const RocketLessonPageNew = lazy(() => import('./pages/RocketLessonPageNew'));
 const PlaneLessonPage = lazy(() => import('./pages/PlaneLessonPage'));
 const CarLessonPage = lazy(() => import('./pages/CarLessonPage'));
 const ElectronicsLessonPage = lazy(() => import('./pages/ElectronicsLessonPage'));
-const MathematicsLessonPage = lazy(() => import('./pages/MathematicsLessonPage'));
-const MathematicsQuizPage = lazy(() => import('./pages/MathematicsQuizPage'));
-const PhysicsLessonPage = lazy(() => import('./pages/PhysicsLessonPage'));
-const PhysicsQuizPage = lazy(() => import('./pages/PhysicsQuizPage'));
+
 const PlaneQuizPage = lazy(() => import('./pages/PlaneQuizPage'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
 const UnitOverviewPage = lazy(() => import('./pages/UnitOverviewPage'));
@@ -1086,7 +1081,6 @@ import IntroAnimation from './components/IntroAnimation';
 const AllInOnePage = lazy(() => import('./pages/AllInOnePage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const ComparePage = lazy(() => import('./pages/ComparePage'));
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 import BookmarksNotes from './components/BookmarksNotes';
 // Removed old CollaborationMode - replaced with Virtual Classroom
 import ModelUpload from './components/ModelUpload';
@@ -1096,6 +1090,8 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProgressionPage = lazy(() => import('./pages/ProgressionPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+const HelpPage = lazy(() => import('./pages/HelpPage'));
+const HomeworkSolverPage = lazy(() => import('./pages/HomeworkSolverPage'));
 const LearnMechanicsPage = lazy(() => import('./pages/LearnMechanicsPage'));
 const LearnSectionsPage = lazy(() => import('./pages/LearnSectionsPage'));
 const LearnInformationPage = lazy(() => import('./pages/LearnInformationPage'));
@@ -1104,20 +1100,16 @@ const ClassroomSetup = lazy(() => import('./pages/ClassroomSetup'));
 const VirtualClassroom = lazy(() => import('./pages/VirtualClassroom'));
 // Explode View Mode
 const ExplodeViewPage = lazy(() => import('./pages/ExplodeViewPage'));
-const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
 const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const CareerProjectsPage = lazy(() => import('./pages/CareerProjectsPage'));
+const InternshipSimulatorPage = lazy(() => import('./pages/InternshipSimulatorPage'));
 const RocketNozzleProject = lazy(() => import('./pages/projects/RocketNozzleProject'));
 const SolarPanelProject = lazy(() => import('./pages/projects/SolarPanelProject'));
 const RoboticArmProject = lazy(() => import('./pages/projects/RoboticArmProject'));
 const CarTransmissionProject = lazy(() => import('./pages/projects/CarTransmissionProject'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const PhysicsPage = lazy(() => import('./pages/PhysicsPage'));
-const MathematicsPage = lazy(() => import('./pages/MathematicsPage'));
-const MathematicsEngineeringPage = lazy(() => import('./pages/MathematicsEngineeringPage'));
-const PhysicsEngineeringPage = lazy(() => import('./pages/PhysicsEngineeringPage'));
-const MathPhysicsEngineeringPage = lazy(() => import('./pages/MathPhysicsEngineeringPage'));
+
 const ElectronicsPage = lazy(() => import('./pages/ElectronicsPage'));
 const BooksPage = lazy(() => import('./pages/BooksPage'));
 import Leaderboard from './components/Leaderboard';
@@ -1132,6 +1124,8 @@ const LeaderboardPage = () => (
 import ProtectedRoute from './components/ProtectedRoute';
 import FloatingAIHelper from './components/FloatingAIHelper';
 import ScrollToTop from './components/ScrollToTop';
+import MobileBottomNav from './components/MobileBottomNav';
+import { ReferralCapture } from './components/ReferralSystem';
 import { useState as useAppState } from 'react';
 
 export default function App() {
@@ -1141,8 +1135,10 @@ export default function App() {
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
       <Router>
+        <ReferralCapture />
         <FloatingAIHelper />
         <ScrollToTop />
+        <MobileBottomNav />
         <React.Suspense fallback={
           <div className="min-h-screen flex items-center justify-center bg-black text-white">
             <div className="flex items-center gap-3">
@@ -1165,15 +1161,7 @@ export default function App() {
           <Route path="/mechanics/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
           <Route path="/mechanics/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
           <Route path="/mechanics/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
-          <Route path="/learn/mathphysics/engineering" element={<ProtectedRoute><MathPhysicsEngineeringPage /></ProtectedRoute>} />
-          <Route path="/learn/mathematics/engineering" element={<ProtectedRoute><MathematicsEngineeringPage /></ProtectedRoute>} />
-          <Route path="/learn/mathematics/engineering/map" element={<ProtectedRoute><GameMapMathematics /></ProtectedRoute>} />
-          <Route path="/learn/mathematics/engineering/lesson/:lessonId" element={<ProtectedRoute><MathematicsLessonPage /></ProtectedRoute>} />
-          <Route path="/learn/mathematics/engineering/quiz/:lessonId" element={<ProtectedRoute><MathematicsQuizPage /></ProtectedRoute>} />
-          <Route path="/learn/physics/engineering" element={<ProtectedRoute><PhysicsEngineeringPage /></ProtectedRoute>} />
-          <Route path="/learn/physics/engineering/map" element={<ProtectedRoute><GameMapPhysics /></ProtectedRoute>} />
-          <Route path="/learn/physics/engineering/lesson/:lessonId" element={<ProtectedRoute><PhysicsLessonPage /></ProtectedRoute>} />
-          <Route path="/learn/physics/engineering/quiz/:lessonId" element={<ProtectedRoute><PhysicsQuizPage /></ProtectedRoute>} />
+
           <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
           <Route path="/learn/books" element={<ProtectedRoute><BooksPage /></ProtectedRoute>} />
           <Route path="/compare" element={<ComparePage />} />
@@ -1182,10 +1170,10 @@ export default function App() {
           <Route path="/classroom/:roomId" element={<ProtectedRoute><VirtualClassroom /></ProtectedRoute>} />
           {/* Explode View Mode */}
           <Route path="/explode-view" element={<ProtectedRoute><ExplodeViewPage /></ProtectedRoute>} />
-          <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
           <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
           <Route path="/career-projects" element={<ProtectedRoute><CareerProjectsPage /></ProtectedRoute>} />
+          <Route path="/internship" element={<ProtectedRoute><InternshipSimulatorPage /></ProtectedRoute>} />
           <Route path="/projects/rocket-nozzle" element={<ProtectedRoute><RocketNozzleProject /></ProtectedRoute>} />
           <Route path="/projects/solar-panel-system" element={<ProtectedRoute><SolarPanelProject /></ProtectedRoute>} />
           <Route path="/projects/robotic-arm" element={<ProtectedRoute><RoboticArmProject /></ProtectedRoute>} />
@@ -1202,7 +1190,7 @@ export default function App() {
           <Route path="/games/play/planes/quiz/:lessonId" element={<ProtectedRoute><PlaneQuizPage /></ProtectedRoute>} />
           <Route path="/games/play/cars/lesson/:lessonId" element={<ProtectedRoute><CarLessonPage /></ProtectedRoute>} />
           <Route path="/games/play/electronics/lesson/:lessonId" element={<ProtectedRoute><ElectronicsLessonPage /></ProtectedRoute>} />
-          <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPageNew /></ProtectedRoute>} />
+          <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
           <Route path="/test-curriculum" element={<TestCurriculumPage />} />
           <Route path="/learn/hub" element={<ProtectedRoute><LearningHubPage /></ProtectedRoute>} />
@@ -1218,13 +1206,14 @@ export default function App() {
           <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
           
           {/* New Features */}
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/bookmarks" element={<ProtectedRoute><BookmarksNotes /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><ModelUpload /></ProtectedRoute>} />
           <Route path="/progression" element={<ProtectedRoute><ProgressionPage /></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/help" element={<HelpPage />} />
+          <Route path="/homework-solver" element={<ProtectedRoute><HomeworkSolverPage /></ProtectedRoute>} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsOfServicePage />} />
           </Routes>

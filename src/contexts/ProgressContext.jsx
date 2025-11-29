@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { getUserProfile, addXP, getCompletedLessons, isLessonUnlocked as checkLessonUnlocked } from '../services/supabase';
+import { getUserProfile, addXP, getCompletedLessons, isLessonUnlocked as checkLessonUnlocked, awardXP, awardProjectXP, awardCommunityQuestionXP, awardCommunityAnswerXP, awardDailyStreakXP } from '../services/supabase';
 
 const ProgressContext = createContext();
 
@@ -98,6 +98,11 @@ export function ProgressProvider({ children }) {
           });
         }
       }
+    }
+    
+    // Record learning activity for streak
+    if (typeof window !== 'undefined' && window.recordLearningActivity) {
+      window.recordLearningActivity();
     }
     
     // ALWAYS update localStorage progress (this is the fallback)
@@ -327,6 +332,24 @@ export function ProgressProvider({ children }) {
     }
   };
 
+  // Wrapper for awarding XP with profile update
+  const awardUserXP = async (xpAmount, activityType, activityId) => {
+    if (!user) return;
+    const result = await awardXP(user.id, xpAmount, activityType, activityId);
+    if (result.data) {
+      setUserProfile(result.data);
+      if (result.leveledUp) {
+        setNewAchievement({
+          id: 'level_up',
+          title: `Level ${result.newLevel} Reached!`,
+          description: `You've earned ${result.xpAwarded} XP and leveled up!`,
+          icon: '⭐'
+        });
+      }
+    }
+    return result;
+  };
+
   const value = {
     progress,
     userProfile,
@@ -340,7 +363,13 @@ export function ProgressProvider({ children }) {
     resetProgress,
     getAchievementInfo,
     newAchievement,
-    clearNewAchievement: () => setNewAchievement(null)
+    clearNewAchievement: () => setNewAchievement(null),
+    // XP award functions
+    awardXP: awardUserXP,
+    awardProjectXP: (projectId) => awardProjectXP(user?.id, projectId),
+    awardCommunityQuestionXP: (questionId) => awardCommunityQuestionXP(user?.id, questionId),
+    awardCommunityAnswerXP: (answerId) => awardCommunityAnswerXP(user?.id, answerId),
+    awardDailyStreakXP: () => awardDailyStreakXP(user?.id)
   };
 
   return (

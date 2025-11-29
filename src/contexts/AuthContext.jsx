@@ -134,6 +134,27 @@ export const AuthProvider = ({ children }) => {
         }
       }
       
+      // Register user for follow system if not already registered
+      if (data.user) {
+        const registeredUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+        const existingUser = registeredUsers.find(u => u.id === data.user.id);
+        
+        if (!existingUser) {
+          const newUser = {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.email.split('@')[0],
+            avatar: '👤',
+            level: 1,
+            xp: 0,
+            streak: 0,
+            joinedAt: new Date().toISOString()
+          };
+          registeredUsers.push(newUser);
+          localStorage.setItem('registered_users', JSON.stringify(registeredUsers));
+        }
+      }
+      
       setUser(data.user);
       trackSignIn('email');
       return data;
@@ -172,6 +193,74 @@ export const AuthProvider = ({ children }) => {
           link_type: 'device',
           confidence: fraudCheck.confidence
         });
+      }
+      
+      // Register user for follow system
+      if (data.user) {
+        const registeredUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+        const newUser = {
+          id: data.user.id,
+          email: data.user.email,
+          name: fullName || data.user.email.split('@')[0],
+          avatar: '👤',
+          level: 1,
+          xp: 0,
+          streak: 0,
+          joinedAt: new Date().toISOString()
+        };
+        
+        // Add if not already exists
+        if (!registeredUsers.find(u => u.id === newUser.id)) {
+          registeredUsers.push(newUser);
+          localStorage.setItem('registered_users', JSON.stringify(registeredUsers));
+        }
+
+        // Process referral if exists
+        const pendingReferral = localStorage.getItem('pending_referral');
+        if (pendingReferral) {
+          const referralCodes = JSON.parse(localStorage.getItem('referral_codes') || '{}');
+          const referrerId = referralCodes[pendingReferral];
+          
+          if (referrerId && referrerId !== data.user.id) {
+            // Update referrer's stats
+            const referrerStats = JSON.parse(localStorage.getItem(`referral_stats_${referrerId}`) || JSON.stringify({
+              totalReferrals: 0,
+              pendingReferrals: 0,
+              totalXPEarned: 0,
+              referredUsers: []
+            }));
+
+            referrerStats.totalReferrals += 1;
+            referrerStats.totalXPEarned += 500; // REFERRAL_REWARDS.PER_REFERRAL
+            referrerStats.referredUsers.unshift({
+              id: data.user.id,
+              name: fullName || data.user.email.split('@')[0],
+              date: new Date().toISOString()
+            });
+
+            // Check for milestone bonuses
+            let milestoneBonus = 0;
+            if (referrerStats.totalReferrals === 5) milestoneBonus = 1000;
+            if (referrerStats.totalReferrals === 10) milestoneBonus = 2500;
+            if (referrerStats.totalReferrals === 25) milestoneBonus = 5000;
+            
+            if (milestoneBonus > 0) {
+              referrerStats.totalXPEarned += milestoneBonus;
+            }
+
+            localStorage.setItem(`referral_stats_${referrerId}`, JSON.stringify(referrerStats));
+            
+            // Store XP to be awarded to referrer
+            const pendingXP = parseInt(localStorage.getItem(`pending_referral_xp_${referrerId}`) || '0');
+            localStorage.setItem(`pending_referral_xp_${referrerId}`, String(pendingXP + 500 + milestoneBonus));
+
+            // Store bonus XP for new user (will be claimed on first lesson)
+            localStorage.setItem(`referral_bonus_${data.user.id}`, '200');
+            
+            localStorage.removeItem('pending_referral');
+            console.log('✅ Referral processed! Referrer will receive XP.');
+          }
+        }
       }
       
       setUser(data.user);

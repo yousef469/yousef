@@ -10,7 +10,7 @@ import gsap from 'gsap';
 import { generateResponse } from '../services/gemini';
 
 // --- HUD Overlay (Visuals) ---
-const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing }) => (
+const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing, hoveredPartName, mousePosition }) => (
   <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
     {/* Tech Corners */}
     <div className="absolute top-6 left-6 w-32 h-32 border-l-2 border-t-2 border-cyan-500/40 rounded-tl-3xl opacity-80" />
@@ -21,6 +21,32 @@ const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing }) => (
     <div className="absolute top-1/2 right-0 w-12 h-[1px] bg-cyan-500/50" />
     <div className="absolute top-0 left-1/2 w-[1px] h-12 bg-cyan-500/50" />
     <div className="absolute bottom-0 left-1/2 w-[1px] h-12 bg-cyan-500/50" />
+    
+    {/* Floating Hover Label */}
+    {hoveredPartName && !selectedPartName && mousePosition && (
+      <div 
+        className="absolute pointer-events-none animate-fade-in"
+        style={{
+          left: `${mousePosition.x + 20}px`,
+          top: `${mousePosition.y - 10}px`,
+          transform: 'translateY(-100%)'
+        }}
+      >
+        <div className="bg-gradient-to-r from-cyan-500/90 to-blue-500/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-[0_0_30px_rgba(0,255,255,0.5)] border border-cyan-300/50">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-cyan-300 rounded-full animate-pulse" />
+            <span className="text-white font-bold text-sm tracking-wide">
+              {hoveredPartName}
+            </span>
+          </div>
+          <div className="text-xs text-cyan-100 mt-1 opacity-80">
+            Click to inspect
+          </div>
+        </div>
+        {/* Arrow pointing to part */}
+        <div className="absolute left-4 bottom-0 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-cyan-500/90 transform translate-y-full" />
+      </div>
+    )}
     
     {/* Center Status */}
     {(selectedPartName || isAnalyzing) && (
@@ -83,6 +109,11 @@ export default function ExplodeViewPage() {
   const [modelInfo, setModelInfo] = useState(null);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
   const imageInputRef = useRef(null);
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [userInteracting, setUserInteracting] = useState(false);
+  const interactionTimeoutRef = useRef(null);
+  const [mousePosition, setMousePosition] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
 
   // --- 1. Setup Scene ---
   useEffect(() => {
@@ -124,12 +155,37 @@ export default function ExplodeViewPage() {
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Controls
+    // Controls with auto-rotate
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = true;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.0; // Slow, cinematic rotation
     controlsRef.current = controls;
+    
+    // Detect user interaction to pause auto-rotate
+    const handleInteractionStart = () => {
+      setUserInteracting(true);
+      controls.autoRotate = false;
+      
+      // Clear existing timeout
+      if (interactionTimeoutRef.current) {
+        clearTimeout(interactionTimeoutRef.current);
+      }
+      
+      // Resume auto-rotate after 3 seconds of inactivity
+      interactionTimeoutRef.current = setTimeout(() => {
+        setUserInteracting(false);
+        if (autoRotate) {
+          controls.autoRotate = true;
+        }
+      }, 3000);
+    };
+    
+    renderer.domElement.addEventListener('mousedown', handleInteractionStart);
+    renderer.domElement.addEventListener('touchstart', handleInteractionStart);
+    renderer.domElement.addEventListener('wheel', handleInteractionStart);
 
     // Lighting (BRIGHT for visibility)
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Increased brightness
@@ -237,6 +293,9 @@ export default function ExplodeViewPage() {
     const rect = containerRef.current.getBoundingClientRect();
     mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    // Update mouse position for floating label
+    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
 
     raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
     
@@ -1451,16 +1510,103 @@ Rules:
       const reader = new FileReader();
       reader.readAsDataURL(file);
       
+      // Store the image for display
+      const imageReader = new FileReader();
+      imageReader.onload = (e) => {
+        setUploadedImage(e.target.result);
+      };
+      imageReader.readAsDataURL(file);
+      
       await new Promise((resolve) => {
         reader.onload = async () => {
           const base64 = reader.result.split(',')[1];
           
-          const prompt = `Identify this vehicle/aircraft/rocket. Provide:
-- Exact model name (e.g., "BMW M4", "Falcon 9", "F-22 Raptor")
-- Type (Car/Rocket/Aircraft)
-- Key specifications
+          const prompt = `Analyze this vehicle/machine/aircraft and provide COMPLETE technical specifications.
 
-Format as: MODEL_NAME | TYPE | SPECS`;
+YOU MUST respond with ONLY valid JSON. Adapt fields based on vehicle type.
+
+ALWAYS INCLUDE THESE FIELDS:
+{
+  "modelName": "Full official name",
+  "type": "Car/Rocket/Aircraft/Boat/Tank/Train/Motorcycle/Robot/Machine",
+  "transportation": "Primary purpose/role",
+  "history": "Historical context: when used, wars participated in, famous missions, production years, why discontinued",
+  "notableFacts": "Interesting facts: racing victories, records, famous uses, cultural impact"
+}
+
+FOR CARS/MOTORCYCLES ADD:
+{
+  "engine": "Engine spec (e.g., V8 5.0L Twin-Turbo)",
+  "hp": "Horsepower (e.g., 450 hp)",
+  "torque": "Torque (e.g., 500 lb-ft)",
+  "topSpeed": "Top speed (e.g., 180 mph)",
+  "acceleration": "0-60 time (e.g., 3.5 seconds)",
+  "transmission": "Transmission type",
+  "drivetrain": "AWD/RWD/FWD",
+  "fuelType": "Gasoline/Diesel/Electric/Hybrid",
+  "fuelCapacity": "Tank size",
+  "weight": "Curb weight",
+  "cost": "Original/current price (e.g., $85,000 MSRP)",
+  "productionYears": "Years produced (e.g., 2015-2023)"
+}
+
+FOR ROCKETS ADD:
+{
+  "engine": "Engine configuration (e.g., 9x Merlin 1D)",
+  "thrust": "Thrust (e.g., 7.6 million lbf)",
+  "fuel": "Propellant type (e.g., RP-1/LOX)",
+  "payload": "Payload capacity (e.g., 22,800 kg to LEO)",
+  "height": "Height (e.g., 70m)",
+  "diameter": "Diameter (e.g., 3.7m)",
+  "missions": "Notable missions and dates",
+  "reusable": "Reusability details",
+  "cost": "Cost per launch (e.g., $62 million)",
+  "firstFlight": "First flight date"
+}
+
+FOR AIRCRAFT ADD:
+{
+  "engine": "Engine type (e.g., 2x Pratt & Whitney F119)",
+  "maxSpeed": "Max speed (e.g., Mach 2.25)",
+  "range": "Range (e.g., 1,840 miles)",
+  "ceiling": "Service ceiling (e.g., 65,000 ft)",
+  "wingspan": "Wingspan",
+  "length": "Length",
+  "purpose": "Passenger/Cargo/Military/Fighter",
+  "armament": "Weapons if military",
+  "capacity": "Passenger/cargo capacity",
+  "cost": "Unit cost (e.g., $150 million)",
+  "productionYears": "Years produced"
+}
+
+FOR BOATS ADD:
+{
+  "boatType": "Fishing/Cargo/Passenger/Military/Yacht",
+  "engine": "Engine type and power",
+  "topSpeed": "Top speed in knots",
+  "range": "Range in nautical miles",
+  "length": "Length",
+  "capacity": "Passenger/cargo capacity",
+  "cost": "Purchase price"
+}
+
+FOR MACHINES/INDUSTRIAL ADD:
+{
+  "machineType": "Type of machine",
+  "manufacturer": "Company",
+  "power": "Power rating",
+  "capacity": "Production capacity",
+  "weight": "Operating weight",
+  "cost": "Purchase/rental price",
+  "applications": "Common uses"
+}
+
+CRITICAL RULES:
+- Return ONLY JSON, no markdown, no code blocks
+- Omit fields that don't apply
+- Provide REAL data with units
+- Include rich historical context
+- Be specific with numbers and dates`;
 
           const result = await model.generateContent([
             prompt,
@@ -1470,27 +1616,41 @@ Format as: MODEL_NAME | TYPE | SPECS`;
           const response = await result.response;
           const text = response.text();
           
-          // Parse response
-          const lines = text.split('\n');
-          const modelName = lines[0]?.split('|')[0]?.trim() || 'Unknown Model';
+          console.log('🤖 AI Vision Response:', text);
           
-          setModelType(modelName);
-          setModelInput(modelName);
-          
-          // 🔥 AUTO-LOOKUP: Check if model exists in database
-          const lookupKey = modelName.toLowerCase().trim();
-          const dbInfo = vehicleDatabase[lookupKey];
-          
-          if (dbInfo) {
-            // Found in database - show detailed specs!
-            console.log('✅ Found detailed specs in database:', lookupKey);
-            setModelInfo(dbInfo);
-          } else {
-            // Not in database - show AI analysis
-            console.log('⚠️ Model not in database, showing AI analysis');
+          // Try to parse JSON response
+          try {
+            // Extract JSON from response (might be wrapped in markdown)
+            let jsonText = text;
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              jsonText = jsonMatch[0];
+            }
+            
+            const specs = JSON.parse(jsonText);
+            
+            console.log('✅ Parsed specs:', specs);
+            
+            // Set model name and structured info
+            setModelType(specs.modelName || specs.type || 'Machine Identified');
+            setModelInput(specs.modelName || '');
+            setModelInfo(specs); // Set the full structured data
+            
+          } catch (parseError) {
+            console.warn('⚠️ Failed to parse JSON, using fallback:', parseError);
+            
+            // Fallback: Extract model name and show raw text
+            const modelMatch = text.match(/(?:appears to be|identified as|this is|modelName["\s:]+)([^".,\n]+)/i);
+            const modelName = modelMatch ? modelMatch[1].trim() : 'Machine Identified';
+            
+            setModelType(modelName);
+            setModelInput(modelName);
+            
+            // Show as JARVIS explanation if JSON parsing failed
             setModelInfo({ 
               type: 'AI Identified',
-              analysis: text 
+              jarvisExplanation: text,
+              timestamp: new Date().toLocaleTimeString()
             });
           }
           
@@ -1539,6 +1699,25 @@ Format as: MODEL_NAME | TYPE | SPECS`;
             </>
           )}
           <button 
+            onClick={() => {
+              const newAutoRotate = !autoRotate;
+              setAutoRotate(newAutoRotate);
+              if (controlsRef.current) {
+                controlsRef.current.autoRotate = newAutoRotate && !userInteracting;
+              }
+            }}
+            disabled={!modelLoaded}
+            className={`flex items-center gap-2 px-4 py-2 rounded border font-bold tracking-widest transition-all text-xs ${
+              autoRotate 
+                ? 'border-cyan-500 text-cyan-500 hover:bg-cyan-950' 
+                : 'border-gray-500 text-gray-500 hover:bg-gray-800'
+            } disabled:opacity-30`}
+            title={autoRotate ? 'Auto-rotate ON' : 'Auto-rotate OFF'}
+          >
+            <RotateCcw className={`w-4 h-4 ${autoRotate ? 'animate-spin-slow' : ''}`} />
+            AUTO
+          </button>
+          <button 
             onClick={handleExplode}
             disabled={!modelLoaded}
             className={`flex items-center gap-2 px-6 py-2 rounded border font-bold tracking-widest transition-all text-xs ${
@@ -1550,8 +1729,27 @@ Format as: MODEL_NAME | TYPE | SPECS`;
             {isExploded ? <RotateCcw className="w-4 h-4" /> : <Scan className="w-4 h-4" />}
             {isExploded ? 'REASSEMBLE' : 'INITIATE EXPLODE'}
           </button>
+          {uploadedImage && !modelLoaded && (
+            <button 
+              onClick={() => {
+                setUploadedImage(null);
+                setModelInfo(null);
+                setModelType('');
+              }}
+              className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-2 rounded text-xs flex items-center gap-2"
+            >
+              <RotateCcw className="w-4 h-4" /> CLEAR IMAGE
+            </button>
+          )}
+          <button 
+            onClick={() => imageInputRef.current?.click()} 
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold px-6 py-2 rounded text-xs flex items-center gap-2 shadow-lg shadow-purple-500/50 border border-purple-400/50"
+          >
+            {isAnalyzingImage ? <Loader2 className="animate-spin w-4 h-4" /> : <Scan className="w-4 h-4" />} 
+            SCAN WITH PHOTO
+          </button>
           <button onClick={() => fileInputRef.current?.click()} className="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-6 py-2 rounded text-xs flex items-center gap-2">
-            {isLoading ? <Loader2 className="animate-spin w-4 h-4" /> : <Upload className="w-4 h-4" />} UPLOAD GLB/FBX
+            {isLoading ? <Loader2 className="animate-spin w-4 h-4" /> : <Upload className="w-4 h-4" />} UPLOAD 3D MODEL
           </button>
         </div>
       </div>
@@ -1559,35 +1757,108 @@ Format as: MODEL_NAME | TYPE | SPECS`;
       {/* Main Content */}
       <div className="flex-1 relative flex overflow-hidden">
         
-        {modelLoaded && <HUDOverlay selectedPartName={selectedPart?.userData?.partName} modelType={modelType} isAnalyzing={analyzingModel} />}
+        {modelLoaded && <HUDOverlay 
+          selectedPartName={selectedPart?.userData?.partName} 
+          modelType={modelType} 
+          isAnalyzing={analyzingModel}
+          hoveredPartName={hoveredPart?.userData?.partName}
+          mousePosition={mousePosition}
+        />}
+        
+        {/* Image Display - Show when image is uploaded but no 3D model */}
+        {uploadedImage && !modelLoaded && (
+          <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-8">
+            <div className="relative max-w-4xl w-full">
+              {/* Tech corners */}
+              <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-cyan-500/40 rounded-tl-2xl" />
+              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-cyan-500/40 rounded-br-2xl" />
+              
+              {/* Image container */}
+              <div className="relative border-2 border-cyan-500/30 rounded-2xl overflow-hidden shadow-2xl shadow-cyan-500/20">
+                <img 
+                  src={uploadedImage} 
+                  alt="Scanned machine" 
+                  className="w-full h-auto max-h-[70vh] object-contain bg-black"
+                  style={{
+                    imageRendering: 'high-quality',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale'
+                  }}
+                />
+                
+                {/* Scanning overlay effect */}
+                {isAnalyzingImage && (
+                  <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/20 via-transparent to-cyan-500/20 animate-pulse">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-black/80 backdrop-blur-md px-8 py-4 rounded-lg border border-cyan-400/50">
+                        <div className="flex items-center gap-3">
+                          <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+                          <span className="text-cyan-400 font-mono font-bold tracking-wider">
+                            ANALYZING IMAGE...
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Model name overlay */}
+                {modelType && !isAnalyzingImage && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-6">
+                    <h2 className="text-2xl font-bold text-cyan-400 mb-1">{modelType}</h2>
+                    <p className="text-sm text-cyan-300/60 font-mono">IDENTIFIED BY J.A.R.V.I.S.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         
         <div 
           ref={containerRef}
-          className="flex-1 cursor-default outline-none"
+          className={`flex-1 cursor-default outline-none ${uploadedImage && !modelLoaded ? 'hidden' : ''}`}
           onMouseMove={handleMouseMove}
           onClick={handleClick}
         />
 
         {/* Sidebar */}
         <div 
-          className={`w-96 border-l border-cyan-900/30 bg-black/80 backdrop-blur absolute right-0 top-0 bottom-0 z-30 transition-transform duration-500 flex flex-col ${modelLoaded ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`w-96 border-l border-cyan-900/30 bg-black/80 backdrop-blur absolute right-0 top-0 bottom-0 z-30 transition-transform duration-500 flex flex-col ${modelLoaded || modelInfo ? 'translate-x-0' : 'translate-x-full'}`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-4 border-b border-cyan-900/30 max-h-[400px] overflow-y-auto custom-scrollbar">
-            <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-3">
-              {analyzingModel ? "Scanning Systems..." : `Critical Components (${partsList.length})`}
-            </h3>
-            <div className="space-y-[1px]">
-              {partsList.map(p => (
-                <div 
-                  key={p.id}
-                  className="w-full text-left px-4 py-2 text-xs font-medium border-l-2 border-transparent text-gray-400"
-                >
-                  {p.name.toUpperCase()}
-                </div>
-              ))}
+          {/* Sidebar Header */}
+          <div className="p-4 border-b border-cyan-900/30 bg-gradient-to-r from-cyan-950/50 to-blue-950/50">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <h2 className="text-cyan-400 text-sm font-bold tracking-wider">
+                {modelLoaded ? '3D MODEL ANALYSIS' : 'IMAGE SCAN ANALYSIS'}
+              </h2>
             </div>
+            {modelType && (
+              <p className="text-xs text-cyan-300/60 mt-1 font-mono">
+                {modelType.toUpperCase()}
+              </p>
+            )}
           </div>
+
+          {/* Only show parts list if 3D model is loaded */}
+          {modelLoaded && (
+            <div className="p-4 border-b border-cyan-900/30 max-h-[400px] overflow-y-auto custom-scrollbar">
+              <h3 className="text-cyan-600 text-[10px] font-bold uppercase tracking-widest mb-3">
+                {analyzingModel ? "Scanning Systems..." : `Critical Components (${partsList.length})`}
+              </h3>
+              <div className="space-y-[1px]">
+                {partsList.map(p => (
+                  <div 
+                    key={p.id}
+                    className="w-full text-left px-4 py-2 text-xs font-medium border-l-2 border-transparent text-gray-400"
+                  >
+                    {p.name.toUpperCase()}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Model Info Display */}
           <div className="p-4 border-b border-cyan-900/30 bg-black/50">{isAnalyzingImage && (
@@ -1600,6 +1871,22 @@ Format as: MODEL_NAME | TYPE | SPECS`;
               <div className="mt-3 p-4 bg-black/60 border border-purple-500/30 rounded-lg text-xs max-h-[500px] overflow-y-auto custom-scrollbar">
                 {modelInfo.error ? (
                   <p className="text-red-400">{modelInfo.error}</p>
+                ) : modelInfo.jarvisExplanation ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 border-b border-cyan-500/30 pb-2">
+                      <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
+                      <div className="text-cyan-400 font-bold">J.A.R.V.I.S. ANALYSIS</div>
+                      <div className="text-xs text-cyan-400/60 ml-auto">{modelInfo.timestamp}</div>
+                    </div>
+                    <div className="bg-gradient-to-br from-cyan-950/30 to-blue-950/30 p-4 rounded-lg border border-cyan-500/20">
+                      <p className="text-gray-200 leading-relaxed whitespace-pre-wrap font-mono text-sm">
+                        {modelInfo.jarvisExplanation}
+                      </p>
+                    </div>
+                    <div className="text-xs text-cyan-400/60 italic">
+                      💡 Tip: Upload a 3D model for interactive exploded view analysis
+                    </div>
+                  </div>
                 ) : modelInfo.analysis ? (
                   <div className="space-y-2 text-gray-300">
                     <div className="text-purple-400 font-bold">🤖 AI Vision Analysis:</div>
@@ -1740,6 +2027,7 @@ Format as: MODEL_NAME | TYPE | SPECS`;
       </div>
       
       <input ref={fileInputRef} type="file" accept=".glb,.gltf,.fbx" onChange={handleFileUpload} className="hidden" />
+      <input ref={imageInputRef} type="file" accept="image/*" capture="environment" onChange={handleImageAnalysis} className="hidden" />
     </div>
   );
 }

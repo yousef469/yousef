@@ -6,7 +6,7 @@ import { useProgress } from '../contexts/ProgressContext';
 
 export default function GameMapCars() {
   const navigate = useNavigate();
-  const { isLessonCompleted, getSubjectProgress } = useProgress();
+  const { isLessonCompleted, getSubjectProgress, userProfile } = useProgress();
   const [completedLevels, setCompletedLevels] = useState([0]);
 
   // Generate 20 MIT-quality lessons (matching aircraft curriculum)
@@ -39,11 +39,25 @@ export default function GameMapCars() {
   };
 
   const levels = generateLevels();
-  const isLevelUnlocked = (levelId) => true; // All lessons unlocked
+  const isLevelUnlocked = (levelId) => {
+    if (levelId === 0) return true; // First lesson always unlocked
+    return isLessonCompleted('cars', levelId - 1); // Must complete previous
+  };
   const isLevelCompleted = (levelId) => isLessonCompleted('cars', levelId);
   
   // Get progress for display
   const progress = getSubjectProgress('cars', 20);
+  
+  // Find next lesson to complete
+  const nextLesson = levels.find(level => isLevelUnlocked(level.id) && !isLevelCompleted(level.id));
+  
+  // Calculate XP to next level
+  const currentLevel = userProfile.level || 1;
+  const currentXP = userProfile.total_xp || 0;
+  const xpForCurrentLevel = (currentLevel - 1) * 1000;
+  const xpForNextLevel = currentLevel * 1000;
+  const xpProgress = currentXP - xpForCurrentLevel;
+  const xpNeeded = xpForNextLevel - currentXP;
 
   const handleLevelClick = (level) => {
     if (isLevelUnlocked(level.id)) {
@@ -110,10 +124,42 @@ export default function GameMapCars() {
               <div className="text-sm text-orange-200">
                 {progress.percentage.toFixed(0)}% Complete
               </div>
+              {/* XP Progress */}
+              <div className="bg-white/10 px-4 py-2 rounded-lg">
+                <div className="text-xs text-orange-200 mb-1">Level {currentLevel}</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-500"
+                      style={{ width: `${(xpProgress / 1000) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-white font-bold">{xpNeeded} XP</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Next Lesson CTA */}
+      {nextLesson && (
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-8">
+          <button
+            onClick={() => handleLevelClick(nextLesson)}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-400 hover:to-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3">
+              <Car className="w-6 h-6" />
+              <div className="text-left">
+                <div className="text-sm opacity-90">Continue Learning</div>
+                <div className="text-lg">{nextLesson.lesson}: {carsLessons[nextLesson.id]?.title || 'Next Lesson'}</div>
+              </div>
+            </div>
+            <div className="text-2xl group-hover:translate-x-1 transition-transform">→</div>
+          </button>
+        </div>
+      )}
 
       {/* Grid Layout */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
@@ -143,17 +189,29 @@ export default function GameMapCars() {
                   </div>
                 )}
 
-                {/* Unit Header */}
+                {/* Unit Header with Progress */}
                 <div className="mb-20 text-center">
-                  <div className={`inline-block px-8 py-3 rounded-2xl border-2 ${unit.level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
-                    unit.level === 'Intermediate' ? 'bg-blue-500/20 border-blue-400' :
-                      unit.level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :
-                        unit.level === 'Expert' ? 'bg-orange-500/20 border-orange-400' :
+                  <div className={`inline-block px-8 py-3 rounded-2xl border-2 ${unit.lessons[0].level === 'Beginner' ? 'bg-green-500/20 border-green-400' :
+                    unit.lessons[0].level === 'Intermediate' ? 'bg-blue-500/20 border-blue-400' :
+                      unit.lessons[0].level === 'Advanced' ? 'bg-purple-500/20 border-purple-400' :
+                        unit.lessons[0].level === 'Expert' ? 'bg-orange-500/20 border-orange-400' :
                           'bg-yellow-500/20 border-yellow-400'
                     }`}>
                     <div className="font-bold text-2xl mb-1">{unit.lessons[0].unit}</div>
-                    <div className="text-sm opacity-80">
+                    <div className="text-sm opacity-80 mb-2">
                       {unit.lessons[0].level} • Unit {unitIndex + 1} • {unit.lessons.length} Lessons
+                    </div>
+                    {/* Unit Progress Bar */}
+                    <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden mx-auto">
+                      <div 
+                        className="h-full bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-500"
+                        style={{ 
+                          width: `${(unit.lessons.filter(l => isLevelCompleted(l.id)).length / unit.lessons.length) * 100}%` 
+                        }}
+                      />
+                    </div>
+                    <div className="text-xs text-orange-200 mt-1">
+                      {unit.lessons.filter(l => isLevelCompleted(l.id)).length}/{unit.lessons.length} Complete
                     </div>
                   </div>
                 </div>

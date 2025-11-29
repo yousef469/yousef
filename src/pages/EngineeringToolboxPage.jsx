@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Lock, Zap, Star, Filter } from 'lucide-react';
+import { ArrowLeft, Search, Lock, Zap, Star, Filter, BookOpen, Calculator, Box, Sparkles } from 'lucide-react';
 import { engineeringTools, getAllTools, getFreeTools, getPremiumTools } from '../data/engineeringTools';
+import FormulaLibrary from '../components/FormulaLibrary';
+import MiniQuiz from '../components/MiniQuiz';
+import ProjectTemplates from '../components/ProjectTemplates';
+import EngineeringCalculators from '../components/EngineeringCalculators';
 
 const difficultyColors = {
   Easy: 'bg-green-100 text-green-800 border-green-300',
@@ -14,6 +18,10 @@ export default function EngineeringToolboxPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showPremiumOnly, setShowPremiumOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFormulas, setShowFormulas] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [showCalculators, setShowCalculators] = useState(false);
 
   const categories = ['all', ...Object.keys(engineeringTools)];
   
@@ -118,6 +126,48 @@ export default function EngineeringToolboxPage() {
               Premium Only
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Quick Access Tools */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <h2 className="text-xl font-bold mb-4 text-white">Quick Access</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <button
+            onClick={() => setShowCalculators(true)}
+            className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 hover:border-green-400 rounded-xl transition-all active:scale-95 text-left"
+          >
+            <Calculator className="w-8 h-8 text-green-400 mb-2" />
+            <h3 className="font-semibold text-white">Calculators</h3>
+            <p className="text-xs text-gray-400">Stress, force, gear ratio...</p>
+          </button>
+          
+          <button
+            onClick={() => setShowFormulas(true)}
+            className="p-4 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 hover:border-cyan-400 rounded-xl transition-all active:scale-95 text-left"
+          >
+            <BookOpen className="w-8 h-8 text-cyan-400 mb-2" />
+            <h3 className="font-semibold text-white">Formula Library</h3>
+            <p className="text-xs text-gray-400">Essential engineering formulas</p>
+          </button>
+          
+          <button
+            onClick={() => setShowQuiz(true)}
+            className="p-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 hover:border-purple-400 rounded-xl transition-all active:scale-95 text-left"
+          >
+            <Sparkles className="w-8 h-8 text-purple-400 mb-2" />
+            <h3 className="font-semibold text-white">Mini Quizzes</h3>
+            <p className="text-xs text-gray-400">Test your knowledge</p>
+          </button>
+          
+          <button
+            onClick={() => setShowTemplates(true)}
+            className="p-4 bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/30 hover:border-orange-400 rounded-xl transition-all active:scale-95 text-left"
+          >
+            <Box className="w-8 h-8 text-orange-400 mb-2" />
+            <h3 className="font-semibold text-white">Project Templates</h3>
+            <p className="text-xs text-gray-400">CAD, robotics, circuits</p>
+          </button>
         </div>
       </div>
 
@@ -275,6 +325,12 @@ export default function EngineeringToolboxPage() {
           })}
         </div>
       </div>
+
+      {/* Modals */}
+      <FormulaLibrary isOpen={showFormulas} onClose={() => setShowFormulas(false)} />
+      <MiniQuiz isOpen={showQuiz} onClose={() => setShowQuiz(false)} />
+      <ProjectTemplates isOpen={showTemplates} onClose={() => setShowTemplates(false)} />
+      <EngineeringCalculators isOpen={showCalculators} onClose={() => setShowCalculators(false)} />
     </div>
   );
 }

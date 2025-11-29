@@ -43,10 +43,11 @@ Each project includes:
 
 ### 🤖 AI-Powered Features
 - **EnGo AI Tutor**: Context-aware tutoring powered by Google Gemini 2.0 Flash
-  - Detects current lesson and subject
-  - Provides context-specific explanations
-  - Quick help buttons for common questions
-  - Real-time feedback on your work
+  - Floating chat bot accessible from any page
+  - Detects current lesson and subject automatically
+  - Quick help buttons: Explain Concept, Help with Math, Draw Diagram, Real Examples
+  - Type any question or press Enter to send
+  - Real-time AI responses with engineering context
 - **JARVIS 3D Viewer**: AI-powered model identification with detailed specs
   - Supports: Cars, Rockets, Aircraft, Boats, Tanks, Trains, Motorcycles, Robots
   - Auto-generates technical specifications
@@ -63,10 +64,15 @@ Each project includes:
 ### 🎮 Gamification System
 - XP and leveling system
 - Achievement badges (20+ achievements)
-- Progress tracking across all modules
-- Streak tracking
-- Leaderboards
-- Game-style lesson maps with unlockable content
+- **XP & Leveling System**: Earn real XP stored in Supabase
+  - Complete lessons: 100-150 XP (based on quiz score)
+  - Career projects: 200 XP
+  - Community help: 10-50 XP
+  - 1000 XP = 1 Level
+- **Progress Tracking**: Real-time across all modules
+- **Streak Tracking**: Daily learning streaks
+- **Live Leaderboards**: Compete with real users globally
+- **Game-Style Maps**: Unlockable content and progression
 
 ### 🔧 Interactive Tools
 - **Rocket Equation Calculator**: Tsiolkovsky equation with real-time calculations
@@ -97,11 +103,16 @@ Each project includes:
 **Total: 11 high-quality GLB models** optimized for web performance
 
 ### 👥 User Features
-- Supabase authentication (Email/Password + Google OAuth)
-- Personal progress dashboard
-- Bookmarks and notes system
-- Achievement tracking
-- Profile customization
+- **Authentication**: Supabase (Email/Password + Google OAuth)
+- **Enhanced Profile Page**: All-in-one user hub with:
+  - Real-time XP and level tracking (1000 XP = 1 Level)
+  - Progress overview with subject breakdowns
+  - Recent activity feed
+  - Achievement badges
+  - Integrated leaderboard
+  - Profile customization (avatar, username)
+- **Real Leaderboard**: Live rankings by XP from Supabase
+- **Bookmarks & Notes**: Save and organize your learning
 
 ---
 

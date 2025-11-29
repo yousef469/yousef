@@ -88,6 +88,46 @@ export default function FloatingAIHelper() {
     return text;
   };
 
+  const sendPredefinedMessage = async (message) => {
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    setIsLoading(true);
+
+    try {
+      const context = getCurrentContext();
+      const systemPrompt = `You are EnGo, a friendly AI engineering tutor. Context: ${JSON.stringify(context)}. Keep responses concise (2-3 paragraphs max). Use simple language and examples.`;
+      const fullPrompt = `${systemPrompt}\n\nUser: ${message}`;
+      
+      const response = await callGeminiAPI(fullPrompt);
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: '❌ Sorry, I encountered an error. Please check your API key and try again.' 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Detect if message is career-related
+  const isCareerQuestion = (message) => {
+    const careerKeywords = [
+      'career', 'job', 'internship', 'interview', 'resume', 'cv', 'salary',
+      'work', 'company', 'hire', 'employment', 'profession', 'industry',
+      'spacex', 'tesla', 'boeing', 'nasa', 'google', 'apple', 'microsoft',
+      'engineer job', 'engineering career', 'what should i study', 'degree',
+      'masters', 'phd', 'graduate', 'undergraduate', 'college', 'university',
+      'skills', 'portfolio', 'experience', 'entry level', 'junior', 'senior',
+      'mechanical engineer', 'aerospace engineer', 'electrical engineer',
+      'software engineer', 'civil engineer', 'robotics engineer',
+      'advice', 'path', 'roadmap', 'future', 'opportunities', 'field'
+    ];
+    const lowerMessage = message.toLowerCase();
+    return careerKeywords.some(keyword => lowerMessage.includes(keyword));
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -98,11 +138,36 @@ export default function FloatingAIHelper() {
 
     try {
       const context = getCurrentContext();
+      const isCareer = isCareerQuestion(userMessage);
       
       // Build context-aware system prompt
       let systemPrompt = `You are EnGo, an AI engineering tutor for Engineerium. `;
       
-      if (context.page === 'lesson') {
+      // Career Advisor Mode
+      if (isCareer) {
+        systemPrompt = `You are EnGo, acting as an **AI Career Advisor** for engineering students and aspiring engineers. 
+
+Your expertise includes:
+- Engineering career paths (Mechanical, Aerospace, Electrical, Civil, Software, Robotics)
+- Top companies hiring engineers (SpaceX, Tesla, Boeing, NASA, Google, Apple, etc.)
+- Skills needed for different engineering roles
+- Resume and portfolio tips for engineers
+- Interview preparation for technical roles
+- Salary expectations and career progression
+- Graduate school advice (Masters, PhD)
+- Internship strategies and how to land them
+- Industry trends and emerging fields
+
+Guidelines:
+- Be encouraging and supportive
+- Give specific, actionable advice
+- Mention real companies and realistic expectations
+- Suggest concrete next steps
+- Reference the user's learning progress when relevant (Level ${context.userLevel}, ${context.totalXP} XP)
+- Recommend relevant Engineerium features (Internship Simulator, Career Projects)
+
+Start your response with "🎯 **Career Advisor Mode**" to indicate you're giving career advice.`;
+      } else if (context.page === 'lesson') {
         systemPrompt += `The user is currently studying a ${context.subject} lesson (ID: ${context.lessonId}). They are at level ${context.userLevel} with ${context.totalXP} XP and have completed ${context.completedLessons.length} lessons. Provide educational assistance specific to ${context.subject} engineering. Use step-by-step explanations, relate concepts to real-world applications, and encourage learning. `;
       } else if (context.page === '3d-viewer') {
         systemPrompt += `The user is using the 3D model viewer. Help them understand engineering specifications, technical details, and the engineering principles behind what they're viewing. `;
@@ -112,7 +177,9 @@ export default function FloatingAIHelper() {
         systemPrompt += `The user is at level ${context.userLevel} with ${context.totalXP} XP. Help them with engineering concepts across rockets, cars, planes, electronics, and mathematics. `;
       }
       
-      systemPrompt += `Be concise, clear, and educational. Use emojis occasionally to make learning fun.`;
+      if (!isCareer) {
+        systemPrompt += `Be concise, clear, and educational. Use emojis occasionally to make learning fun.`;
+      }
 
       const conversationHistory = messages
         .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
@@ -154,18 +221,18 @@ export default function FloatingAIHelper() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 animate-pulse"
+        className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 animate-pulse"
         title="EnGo - AI Companion"
       >
-        <Bot className="w-8 h-8 text-white" />
+        <Bot className="w-7 h-7 md:w-8 md:h-8 text-white" />
       </button>
     );
   }
 
   return (
     <div 
-      className={`fixed bottom-6 right-6 z-50 bg-gray-900 border-2 border-blue-500/50 rounded-2xl shadow-2xl transition-all ${
-        isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
+      className={`fixed bottom-20 md:bottom-6 right-2 md:right-6 z-50 bg-gray-900 border-2 border-blue-500/50 rounded-2xl shadow-2xl transition-all flex flex-col ${
+        isMinimized ? 'w-72 md:w-80 h-16' : 'w-[calc(100vw-16px)] md:w-96 h-[70vh] md:h-[600px] max-h-[600px]'
       }`}
     >
       {/* Header */}
@@ -216,26 +283,30 @@ export default function FloatingAIHelper() {
             <div className="p-4 border-b border-gray-700">
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <button 
-                  onClick={() => setInput('Explain this concept step by step')}
+                  onClick={() => sendPredefinedMessage('Explain this concept step by step')}
                   className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                  disabled={isLoading}
                 >
                   📚 Explain Concept
                 </button>
                 <button 
-                  onClick={() => setInput('Help me with this calculation')}
+                  onClick={() => sendPredefinedMessage('Help me with this calculation')}
                   className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                  disabled={isLoading}
                 >
                   🧮 Help with Math
                 </button>
                 <button 
-                  onClick={() => setInput('Draw a diagram to show how this works')}
-                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                  onClick={() => sendPredefinedMessage('Give me career advice for engineering')}
+                  className="p-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 hover:border-amber-400 rounded text-left transition-colors"
+                  disabled={isLoading}
                 >
-                  📊 Draw Diagram
+                  🎯 Career Advice
                 </button>
                 <button 
-                  onClick={() => setInput('What are real-world applications?')}
+                  onClick={() => sendPredefinedMessage('What are real-world applications?')}
                   className="p-2 bg-gray-800 hover:bg-gray-700 rounded text-left transition-colors"
+                  disabled={isLoading}
                 >
                   🌍 Real Examples
                 </button>
@@ -244,7 +315,7 @@ export default function FloatingAIHelper() {
           )}
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(600px-140px)]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 && (
               <div className="text-center text-gray-500 mt-20">
                 <Bot className="w-16 h-16 mx-auto mb-4 text-blue-500" />

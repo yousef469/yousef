@@ -10,10 +10,10 @@ import AircraftDiagram from './diagrams/AircraftDiagram';
 import CarDiagram from './diagrams/CarDiagram';
 
 export default function EnhancedLessonContent({ lessonId, subject }) {
-  // Rocket lessons with calculators/diagrams
+  // Rocket lessons with calculators/diagrams (supports both string and numeric IDs)
   if (subject === 'rockets') {
-    if (lessonId === 0 || lessonId === 7) {
-      // Rocket Equation lessons
+    // Rocket Equation lessons
+    if (lessonId === 'rocket-equation' || lessonId === 0 || lessonId === 7) {
       return (
         <div>
           <RocketEquationCalculator />
@@ -21,18 +21,20 @@ export default function EnhancedLessonContent({ lessonId, subject }) {
         </div>
       );
     }
-    if (lessonId === 6) {
-      // Forces lesson
+    // Forces/vectors lessons
+    if (lessonId === 'vectors-forces' || lessonId === 'newtons-laws' || lessonId === 6) {
       return <RocketDiagram type="forces" />;
     }
+    // Staging lesson
     if (lessonId === 9) {
-      // Staging lesson
       return <RocketDiagram type="staging" />;
     }
-    if (lessonId === 20 || lessonId === 21) {
-      // Orbital mechanics lessons
+    // Orbital mechanics lessons
+    if (lessonId === 'orbital-mechanics-intro' || lessonId === 20 || lessonId === 21) {
       return <OrbitalTransferCalculator />;
     }
+    // Default for other rocket lessons - show basic diagram
+    return <RocketDiagram type="basic" />;
   }
 
   // Car lessons with calculators/diagrams

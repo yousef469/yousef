@@ -1,60 +1,147 @@
 import { useState, useEffect } from 'react';
-import { Trophy, Medal, Star, TrendingUp, Award, Zap } from 'lucide-react';
+import { Trophy, Medal, Star, TrendingUp, Award, Zap, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/supabase';
 
 export default function Leaderboard() {
   const { user } = useAuth();
-  const [timeframe, setTimeframe] = useState('week'); // week, month, alltime
+  const [timeframe, setTimeframe] = useState('alltime'); // week, month, alltime
   const [category, setCategory] = useState('all'); // all, rockets, planes, cars
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentUserRank, setCurrentUserRank] = useState(null);
 
-  // Mock leaderboard data - replace with Supabase queries
-  const leaderboardData = [
-    {
-      rank: 1,
-      user: { name: 'Alex Chen', avatar: '👨‍🚀', id: '1' },
-      points: 12450,
-      lessonsCompleted: 45,
-      questionsAsked: 23,
-      helpfulAnswers: 67,
-      streak: 15
-    },
-    {
-      rank: 2,
-      user: { name: 'Sarah Johnson', avatar: '👩‍🔬', id: '2' },
-      points: 11230,
-      lessonsCompleted: 42,
-      questionsAsked: 31,
-      helpfulAnswers: 54,
-      streak: 12
-    },
-    {
-      rank: 3,
-      user: { name: 'Mike Rodriguez', avatar: '🧑‍💻', id: '3' },
-      points: 10890,
-      lessonsCompleted: 38,
-      questionsAsked: 19,
-      helpfulAnswers: 71,
-      streak: 21
-    },
-    {
-      rank: 4,
-      user: { name: 'Emma Wilson', avatar: '👩‍✈️', id: '4' },
-      points: 9560,
-      lessonsCompleted: 35,
-      questionsAsked: 28,
-      helpfulAnswers: 45,
-      streak: 8
-    },
-    {
-      rank: 5,
-      user: { name: 'David Kim', avatar: '🧑‍🎓', id: '5' },
-      points: 8920,
-      lessonsCompleted: 33,
-      questionsAsked: 25,
-      helpfulAnswers: 38,
-      streak: 10
+  // Fetch real leaderboard data from Supabase
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [timeframe, category]);
+
+  const fetchLeaderboard = async () => {
+    setLoading(true);
+    try {
+      let query = supabase
+        .from('user_profiles')
+        .select('user_id, total_xp, level, completed_lessons, created_at')
+        .order('total_xp', { ascending: false })
+        .limit(50);
+
+      // Apply timeframe filter
+      if (timeframe === 'week') {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        query = query.gte('updated_at', weekAgo.toISOString());
+      } else if (timeframe === 'month') {
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        query = query.gte('updated_at', monthAgo.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Leaderboard fetch error:', error);
+        throw error;
+      }
+
+      console.log('Leaderboard data fetched:', data);
+
+      // Transform data to match component format
+      const transformedData = data.map((profile, index) => {
+        // Generate username from user_id (first 8 chars)
+        const email = `User_${profile.user_id.substring(0, 8)}`;
+        const username = email.split('@')[0];
+        const completedLessons = profile.completed_lessons?.length || 0;
+        
+        // Filter by category if needed
+        let categoryLessons = completedLessons;
+        if (category !== 'all' && profile.completed_lessons) {
+          categoryLessons = profile.completed_lessons.filter(lesson => 
+            lesson.toLowerCase().includes(category)
+          ).length;
+        }
+
+        return {
+          rank: index + 1,
+          user: {
+            name: username.charAt(0).toUpperCase() + username.slice(1),
+            avatar: getRandomAvatar(profile.user_id),
+            id: profile.user_id,
+            email: email
+          },
+          points: profile.total_xp || 0,
+          level: profile.level || 1,
+          lessonsCompleted: categoryLessons,
+          questionsAsked: 0, // TODO: Add when community features are ready
+          helpfulAnswers: 0, // TODO: Add when community features are ready
+          streak: profile.streak || 0
+        };
+      });
+
+      // Filter by category if needed
+      let filteredData = transformedData;
+      if (category !== 'all') {
+        filteredData = transformedData.filter(entry => entry.lessonsCompleted > 0);
+        // Re-rank after filtering
+        filteredData = filteredData.map((entry, index) => ({
+          ...entry,
+          rank: index + 1
+        }));
+      }
+
+      setLeaderboardData(filteredData);
+      console.log('Leaderboard set with', filteredData.length, 'entries');
+
+      // Find current user's rank
+      if (user) {
+        const userEntry = filteredData.find(entry => entry.user.id === user.id);
+        if (userEntry) {
+          setCurrentUserRank(userEntry);
+        } else {
+          // User not in top 50, fetch their actual rank
+          const { count } = await supabase
+            .from('user_profiles')
+            .select('*', { count: 'exact', head: true })
+            .gt('total_xp', transformedData.find(e => e.user.id === user.id)?.points || 0);
+          
+          const userProfile = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          if (userProfile.data) {
+            setCurrentUserRank({
+              rank: (count || 0) + 1,
+              user: {
+                name: user.email?.split('@')[0] || 'You',
+                avatar: '👤',
+                id: user.id
+              },
+              points: userProfile.data.total_xp || 0,
+              level: userProfile.data.level || 1,
+              lessonsCompleted: userProfile.data.completed_lessons?.length || 0,
+              streak: userProfile.data.streak || 0
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      // Set empty array on error so we show "no users yet" message
+      setLeaderboardData([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Generate consistent avatar based on user ID
+  const getRandomAvatar = (userId) => {
+    const avatars = ['👨‍🚀', '👩‍🔬', '🧑‍💻', '👩‍✈️', '🧑‍🎓', '👨‍🔧', '👩‍🏫', '🧑‍🚒', '👨‍⚕️', '👩‍💼'];
+    const hash = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return avatars[hash % avatars.length];
+  };
+
+
 
   const getRankIcon = (rank) => {
     if (rank === 1) return <Trophy className="w-6 h-6 text-yellow-400" />;
@@ -70,8 +157,39 @@ export default function Leaderboard() {
     return 'bg-gray-700';
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
+          <span className="ml-3 text-gray-400">Loading leaderboard...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no data
+  if (leaderboardData.length === 0) {
+    return (
+      <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Trophy className="w-7 h-7 text-yellow-400" />
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            Leaderboard
+          </h2>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Trophy className="w-16 h-16 text-gray-600 mb-4" />
+          <h3 className="text-xl font-bold text-gray-400 mb-2">No Rankings Yet</h3>
+          <p className="text-gray-500">Complete lessons to appear on the leaderboard!</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
+    <div className="bg-gray-800/50 backdrop-blur border border-gray-700 radius-md p-6 shadow-premium-lg">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -105,28 +223,30 @@ export default function Leaderboard() {
         </div>
       </div>
 
-      {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        {leaderboardData.slice(0, 3).map((entry, idx) => {
-          const order = idx === 0 ? 1 : idx === 1 ? 0 : 2; // 2nd, 1st, 3rd
-          const heights = ['h-32', 'h-40', 'h-28'];
-          const actualEntry = idx === 0 ? leaderboardData[1] : idx === 1 ? leaderboardData[0] : leaderboardData[2];
-          
-          return (
-            <div key={actualEntry.rank} className={`flex flex-col items-center ${order === 1 ? 'order-2' : order === 0 ? 'order-1' : 'order-3'}`}>
-              <div className="text-4xl mb-2">{actualEntry.user.avatar}</div>
-              <div className="text-center mb-2">
-                <div className="font-bold text-white">{actualEntry.user.name}</div>
-                <div className="text-sm text-gray-400">{actualEntry.points.toLocaleString()} pts</div>
+      {/* Top 3 Podium - Only show if we have at least 3 users */}
+      {leaderboardData.length >= 3 && (
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {leaderboardData.slice(0, 3).map((entry, idx) => {
+            const order = idx === 0 ? 1 : idx === 1 ? 0 : 2; // 2nd, 1st, 3rd
+            const heights = ['h-32', 'h-40', 'h-28'];
+            const actualEntry = idx === 0 ? leaderboardData[1] : idx === 1 ? leaderboardData[0] : leaderboardData[2];
+            
+            return (
+              <div key={actualEntry.rank} className={`flex flex-col items-center ${order === 1 ? 'order-2' : order === 0 ? 'order-1' : 'order-3'}`}>
+                <div className="text-4xl mb-2">{actualEntry.user.avatar}</div>
+                <div className="text-center mb-2">
+                  <div className="font-bold text-white">{actualEntry.user.name}</div>
+                  <div className="text-sm text-gray-400">{actualEntry.points.toLocaleString()} pts</div>
+                </div>
+                <div className={`${getRankBadge(actualEntry.rank)} ${heights[order]} w-full rounded-t-lg flex flex-col items-center justify-center border-t-4 ${actualEntry.rank === 1 ? 'border-yellow-400' : actualEntry.rank === 2 ? 'border-gray-400' : 'border-amber-600'}`}>
+                  {getRankIcon(actualEntry.rank)}
+                  <div className="text-2xl font-bold text-white mt-2">#{actualEntry.rank}</div>
+                </div>
               </div>
-              <div className={`${getRankBadge(actualEntry.rank)} ${heights[order]} w-full rounded-t-lg flex flex-col items-center justify-center border-t-4 ${actualEntry.rank === 1 ? 'border-yellow-400' : actualEntry.rank === 2 ? 'border-gray-400' : 'border-amber-600'}`}>
-                {getRankIcon(actualEntry.rank)}
-                <div className="text-2xl font-bold text-white mt-2">#{actualEntry.rank}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Full Leaderboard List */}
       <div className="space-y-2">
@@ -136,9 +256,9 @@ export default function Leaderboard() {
           return (
             <div
               key={entry.rank}
-              className={`flex items-center gap-4 p-4 rounded-lg transition-all ${
+              className={`flex items-center gap-4 p-4 radius-sm transition-all card-hover ${
                 isCurrentUser
-                  ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-2 border-cyan-500'
+                  ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-2 border-cyan-500 glow-cyan'
                   : 'bg-gray-900/50 border border-gray-700 hover:bg-gray-800/50'
               }`}
             >
@@ -188,26 +308,34 @@ export default function Leaderboard() {
         })}
       </div>
 
-      {/* Your Rank (if not in top 5) */}
-      {user && !leaderboardData.find(e => e.user.id === user.id) && (
+      {/* Your Rank (if not in top 50) */}
+      {user && currentUserRank && !leaderboardData.find(e => e.user.id === user.id) && (
         <div className="mt-6 pt-6 border-t border-gray-700">
           <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-2 border-cyan-500 rounded-lg">
             <div className="flex items-center justify-center w-12">
-              <span className="text-lg font-bold text-gray-400">#47</span>
+              <span className="text-lg font-bold text-gray-400">#{currentUserRank.rank}</span>
             </div>
             <div className="flex items-center gap-3 flex-1">
-              <div className="text-3xl">👤</div>
+              <div className="text-3xl">{currentUserRank.user.avatar}</div>
               <div>
                 <div className="font-semibold text-white flex items-center gap-2">
-                  {user.email?.split('@')[0]}
+                  {currentUserRank.user.name}
                   <span className="px-2 py-0.5 bg-cyan-500 text-white text-xs rounded-full">You</span>
                 </div>
-                <div className="text-sm text-gray-400">Keep learning to climb the ranks!</div>
+                <div className="text-sm text-gray-400">
+                  {currentUserRank.lessonsCompleted} lessons • Level {currentUserRank.level}
+                </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-yellow-400">1,250</div>
-              <div className="text-xs text-gray-500">points</div>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-1">
+                <Zap className="w-4 h-4 text-orange-400" />
+                <span className="text-sm font-semibold text-orange-400">{currentUserRank.streak} day streak</span>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-yellow-400">{currentUserRank.points.toLocaleString()}</div>
+                <div className="text-xs text-gray-500">points</div>
+              </div>
             </div>
           </div>
         </div>

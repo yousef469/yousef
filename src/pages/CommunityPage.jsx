@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Plus, TrendingUp, MessageCircle, Share2, Loader2, Briefcase } from 'lucide-react';
+import { ArrowLeft, Search, Plus, TrendingUp, MessageCircle, Share2, Loader2, Briefcase, Users, Image } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createPost, getPosts, votePost } from '../services/community';
+import ProjectGallery from '../components/ProjectGallery';
+import { DiscoverUsers, FollowingFeed } from '../components/FollowSystem';
+import CommentSystem from '../components/CommentSystem';
 
 export default function CommunityPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('help'); // 'help' or 'projects'
+  const [activeTab, setActiveTab] = useState('help'); // 'help', 'projects', 'gallery', 'people'
   const [searchQuery, setSearchQuery] = useState('');
   const [followedGroups, setFollowedGroups] = useState(new Set(['rockets', 'physics']));
   const [posts, setPosts] = useState([]);
@@ -177,34 +180,71 @@ export default function CommunityPage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2">
             <button
               onClick={() => setActiveTab('help')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
+              className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap ${
                 activeTab === 'help'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
               <MessageCircle className="w-5 h-5" />
-              Community Help
+              Help
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
+              className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap ${
                 activeTab === 'projects'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
               <Briefcase className="w-5 h-5" />
-              Community Projects
+              Projects
+            </button>
+            <button
+              onClick={() => setActiveTab('gallery')}
+              className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap ${
+                activeTab === 'gallery'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              <Image className="w-5 h-5" />
+              Gallery
+            </button>
+            <button
+              onClick={() => setActiveTab('people')}
+              className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap ${
+                activeTab === 'people'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              <Users className="w-5 h-5" />
+              People
             </button>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Gallery Tab - Full Width */}
+        {activeTab === 'gallery' && (
+          <ProjectGallery />
+        )}
+
+        {/* People Tab - Full Width */}
+        {activeTab === 'people' && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <DiscoverUsers />
+            <FollowingFeed />
+          </div>
+        )}
+
+        {/* Help & Projects Tabs */}
+        {(activeTab === 'help' || activeTab === 'projects') && (
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Feed */}
           <div className="lg:col-span-2 space-y-4">
@@ -325,6 +365,7 @@ export default function CommunityPage() {
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* Create Post Modal */}
