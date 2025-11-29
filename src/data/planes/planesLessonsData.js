@@ -1,7 +1,7 @@
 // Complete Aircraft Engineering Curriculum
 // MIT-Quality Content: 6 Sections, 31 Lessons
 
-import { planesCurriculum, getAllLessons, getCurriculumStats } from './planes/comprehensive-curriculum.js';
+import { planesCurriculum, getAllLessons, getCurriculumStats } from './comprehensive-curriculum.js';
 
 // Convert curriculum to lessons object format for compatibility
 export const planesLessons = {};

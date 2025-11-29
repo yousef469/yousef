@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plane, Star, Lock, CheckCircle, Cloud } from 'lucide-react';
-import planesLessons, { planesSections, curriculumStats } from '../data/planesLessonsData.js';
+import planesLessons, { planesSections, curriculumStats } from '../data/planes/planesLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
 
 export default function GameMapPlanes() {

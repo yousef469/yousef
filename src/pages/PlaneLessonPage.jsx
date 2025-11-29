@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Plane, CheckCircle, Brain } from 'lucide-react';
-import planesLessons from '../data/planesLessonsData';
+import planesLessons from '../data/planes/planesLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
 import EnhancedLessonContent from '../components/EnhancedLessonContent';
 import LessonBreadcrumb from '../components/LessonBreadcrumb';
