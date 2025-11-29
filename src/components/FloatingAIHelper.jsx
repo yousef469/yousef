@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Minimize2, Maximize2, BookOpen, Brain } from 'lucide-react';
+import { Bot, X, Send, Minimize2, Maximize2, BookOpen, Brain, Lock, Crown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
-import { useLocation } from 'react-router-dom';
+import { useUsageLimits } from '../contexts/UsageLimitsContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function FloatingAIHelper() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,9 @@ export default function FloatingAIHelper() {
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
   const { userProgress } = useProgress();
+  const { canUseAiChat, useAiChat, getRemainingAiChats, getTimeUntilReset, isPremium } = useUsageLimits();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -89,9 +92,22 @@ export default function FloatingAIHelper() {
   };
 
   const sendPredefinedMessage = async (message) => {
+    // Check usage limits
+    if (!canUseAiChat()) {
+      const resetTime = getTimeUntilReset('aiChat');
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: `🔒 **Daily Limit Reached**\n\nYou've used all ${20} free AI chats for today.\n\n⏱️ Resets in: ${resetTime}\n\n💎 **Upgrade to Pro** for unlimited AI assistance!` 
+      }]);
+      return;
+    }
+
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     setIsLoading(true);
+
+    // Consume one usage
+    useAiChat();
 
     try {
       const context = getCurrentContext();
@@ -131,10 +147,23 @@ export default function FloatingAIHelper() {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Check usage limits
+    if (!canUseAiChat()) {
+      const resetTime = getTimeUntilReset('aiChat');
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: `🔒 **Daily Limit Reached**\n\nYou've used all ${20} free AI chats for today.\n\n⏱️ Resets in: ${resetTime}\n\n💎 **Upgrade to Pro** for unlimited AI assistance!\n\n[Click here to upgrade](/pricing)` 
+      }]);
+      return;
+    }
+
     const userMessage = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+
+    // Consume one usage
+    useAiChat();
 
     try {
       const context = getCurrentContext();
@@ -242,20 +271,15 @@ Start your response with "🎯 **Career Advisor Mode**" to indicate you're givin
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-white font-bold">EnGo</h3>
+            <h3 className="text-white font-bold flex items-center gap-2">
+              EnGo
+              {isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+            </h3>
             <p className="text-xs text-gray-400">
-              {getCurrentContext().page === 'lesson' ? (
-                <span className="flex items-center gap-1">
-                  <BookOpen className="w-3 h-3" />
-                  {getCurrentContext().subject} lesson
-                </span>
-              ) : getCurrentContext().page === '3d-viewer' ? (
-                <span className="flex items-center gap-1">
-                  <Brain className="w-3 h-3" />
-                  3D model analysis
-                </span>
+              {isPremium ? (
+                <span className="text-yellow-400">Unlimited • Pro</span>
               ) : (
-                `Level ${getCurrentContext().userLevel} • ${getCurrentContext().totalXP} XP`
+                <span>{getRemainingAiChats()}/20 chats left today</span>
               )}
             </p>
           </div>

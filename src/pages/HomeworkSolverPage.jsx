@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, BookOpen, Upload, Sparkles, CheckCircle, Calculator, Lightbulb, Target, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2, BookOpen, Upload, Sparkles, CheckCircle, Calculator, Lightbulb, Target, AlertTriangle, Lock, Crown } from 'lucide-react';
+import { useUsageLimits } from '../contexts/UsageLimitsContext';
 
 export default function HomeworkSolverPage() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function HomeworkSolverPage() {
   const [solution, setSolution] = useState(null);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState('');
+  const { canUseHomeworkSolver, useHomeworkSolver, getRemainingHomeworkSolves, getTimeUntilReset, isPremium } = useUsageLimits();
 
   const categories = [
     { id: 'math', name: 'Mathematics', icon: '📐', color: 'from-blue-500 to-cyan-500' },
@@ -41,8 +43,21 @@ export default function HomeworkSolverPage() {
 
   const solveProblem = async () => {
     if (!question.trim() && !image) return;
+
+    // Check usage limits
+    if (!canUseHomeworkSolver()) {
+      const resetTime = getTimeUntilReset('homeworkSolver');
+      setSolution({ 
+        error: `🔒 Daily Limit Reached\n\nYou've used all 3 free homework solves for today.\n\n⏱️ Resets in: ${resetTime}\n\n💎 Upgrade to Pro for unlimited homework help!` 
+      });
+      return;
+    }
+
     setLoading(true);
     setSolution(null);
+
+    // Consume one usage
+    useHomeworkSolver();
 
     try {
       const prompt = `You are an expert mechanical engineering tutor. Solve this problem and return ONLY valid JSON.
@@ -125,8 +140,15 @@ CRITICAL: Return ONLY valid JSON, no markdown, no code blocks.`;
               <h1 className="text-lg md:text-2xl font-bold flex items-center gap-2 truncate">
                 <Sparkles className="w-5 h-5 md:w-7 md:h-7 text-purple-400 flex-shrink-0" />
                 <span className="truncate">AI Homework Solver</span>
+                {isPremium && <Crown className="w-5 h-5 text-yellow-400" />}
               </h1>
-              <p className="text-xs md:text-sm text-gray-400 hidden sm:block">Step-by-step solutions for mechanical engineering</p>
+              <p className="text-xs md:text-sm text-gray-400">
+                {isPremium ? (
+                  <span className="text-yellow-400">Unlimited • Pro</span>
+                ) : (
+                  <span>{getRemainingHomeworkSolves()}/3 solves left today</span>
+                )}
+              </p>
             </div>
           </div>
         </div>

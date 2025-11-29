@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, Globe, Briefcase, Maximize2 } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, Globe, Briefcase, Maximize2, Crown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
+import { useUsageLimits } from '../contexts/UsageLimitsContext';
 import ModelComparison from '../components/ModelComparison';
 import LanguageSelector from '../components/LanguageSelector';
 import SidebarMenu from '../components/SidebarMenu';
@@ -19,11 +20,13 @@ const HomePageLoggedIn = () => {
   const { t } = useTranslation();
   const { user, signOut, showLanguageSelector, setShowLanguageSelector } = useAuth();
   const { progress } = useProgress();
+  const { canUseModelComparison, useModelComparison, getRemainingComparisons, getTimeUntilReset, isPremium } = useUsageLimits();
   const [showComparison, setShowComparison] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
 
   // Check if user needs onboarding
   useEffect(() => {
@@ -144,17 +147,37 @@ const HomePageLoggedIn = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {/* Compare Models - Locked */}
+          {/* Compare Models - Limited Free Access */}
           <div className="relative group">
             <button
-              onClick={() => navigate('/pricing')}
-              className="w-full relative bg-gradient-to-br from-red-500 via-pink-600 to-purple-500 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 rounded-2xl p-8 border-2 border-red-400/50 hover:border-gray-500 transition-all cursor-pointer card-hover ripple shadow-premium-lg"
+              onClick={() => {
+                if (canUseModelComparison()) {
+                  useModelComparison();
+                  setShowComparison(true);
+                } else {
+                  navigate('/pricing');
+                }
+              }}
+              className={`w-full relative rounded-2xl p-8 border-2 transition-all cursor-pointer card-hover ripple shadow-premium-lg ${
+                canUseModelComparison()
+                  ? 'bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-500 border-cyan-400/50 hover:border-cyan-300'
+                  : 'bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-gray-500'
+              }`}
             >
-              <div className="absolute top-4 right-4 w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Lock className="w-6 h-6 text-white" />
+              <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur rounded-full flex items-center gap-2 group-hover:scale-110 transition-transform">
+                {canUseModelComparison() ? (
+                  <>
+                    <span className="text-xs text-white">{getRemainingComparisons()}/week</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4 text-white" />
+                    <span className="text-xs text-white">{getTimeUntilReset('modelComparison')}</span>
+                  </>
+                )}
               </div>
               
-              <div className="relative z-10 opacity-75 group-hover:opacity-100 transition-opacity">
+              <div className="relative z-10">
                 <div className="flex justify-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
                     <ArrowLeftRight className="w-8 h-8 text-white" />
@@ -167,8 +190,17 @@ const HomePageLoggedIn = () => {
                 </p>
 
                 <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  <Lock className="w-4 h-4" />
-                  <span>Upgrade to Unlock</span>
+                  {canUseModelComparison() ? (
+                    <>
+                      <span>Compare Models</span>
+                      <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      <span>Upgrade for More</span>
+                    </>
+                  )}
                 </div>
               </div>
             </button>

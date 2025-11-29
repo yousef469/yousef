@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calculator, RotateCcw, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Calculator, RotateCcw, Search, Lock, Crown } from 'lucide-react';
 import { calculators } from '../data/calculatorsData';
+import { useUsageLimits } from '../contexts/UsageLimitsContext';
 
 const categories = [
   { id: 'all', name: 'All', icon: '📊' },
@@ -20,8 +22,20 @@ export default function EngineeringCalculators({ isOpen, onClose }) {
   const [results, setResults] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const { isCalculatorFree, isPremium } = useUsageLimits();
+  const navigate = useNavigate();
 
-  const selectCalculator = (calc) => {
+  // Calculate which calculators are free (first 25%)
+  const freeCalculatorCount = Math.ceil(calculators.length * 0.25);
+
+  const selectCalculator = (calc, index) => {
+    // Check if calculator is free
+    const isFree = isCalculatorFree(index, calculators.length);
+    if (!isFree) {
+      // Show upgrade prompt
+      return;
+    }
+    
     setSelectedCalc(calc);
     const defaultInputs = {};
     calc.inputs.forEach(input => {
@@ -75,8 +89,17 @@ export default function EngineeringCalculators({ isOpen, onClose }) {
                 <Calculator className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Engineering Calculators</h2>
-                <p className="text-gray-400 text-sm">{calculators.length} calculators available</p>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  Engineering Calculators
+                  {isPremium && <Crown className="w-5 h-5 text-yellow-400" />}
+                </h2>
+                <p className="text-gray-400 text-sm">
+                  {isPremium ? (
+                    <span className="text-yellow-400">{calculators.length} calculators • Unlimited Access</span>
+                  ) : (
+                    <span>{freeCalculatorCount} free • {calculators.length - freeCalculatorCount} Pro</span>
+                  )}
+                </p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg">
@@ -123,17 +146,35 @@ export default function EngineeringCalculators({ isOpen, onClose }) {
         <div className="flex-1 overflow-y-auto p-6">
           {!selectedCalc ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {filteredCalculators.map(calc => (
-                <button
-                  key={calc.id}
-                  onClick={() => selectCalculator(calc)}
-                  className={`p-4 rounded-xl border border-gray-700 hover:border-green-500/50 bg-gradient-to-br ${calc.color} bg-opacity-10 transition-all hover:scale-[1.02] active:scale-[0.98] text-left`}
-                >
-                  <span className="text-3xl block mb-2">{calc.icon}</span>
-                  <span className="text-white font-medium text-sm block">{calc.name}</span>
-                  <span className="text-gray-500 text-xs">{calc.category}</span>
-                </button>
-              ))}
+              {filteredCalculators.map((calc, index) => {
+                const originalIndex = calculators.findIndex(c => c.id === calc.id);
+                const isFree = isCalculatorFree(originalIndex, calculators.length);
+                const isLocked = !isFree;
+                
+                return (
+                  <button
+                    key={calc.id}
+                    onClick={() => isLocked ? navigate('/pricing') : selectCalculator(calc, originalIndex)}
+                    className={`p-4 rounded-xl border transition-all hover:scale-[1.02] active:scale-[0.98] text-left relative ${
+                      isLocked 
+                        ? 'border-gray-600 bg-gray-800/50 opacity-75' 
+                        : `border-gray-700 hover:border-green-500/50 bg-gradient-to-br ${calc.color} bg-opacity-10`
+                    }`}
+                  >
+                    {isLocked && (
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <Lock className="w-3 h-3 text-black" />
+                      </div>
+                    )}
+                    <span className={`text-3xl block mb-2 ${isLocked ? 'opacity-50' : ''}`}>{calc.icon}</span>
+                    <span className={`font-medium text-sm block ${isLocked ? 'text-gray-400' : 'text-white'}`}>{calc.name}</span>
+                    <span className="text-gray-500 text-xs">{calc.category}</span>
+                    {isLocked && (
+                      <span className="text-yellow-500 text-xs block mt-1">Pro Only</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <div>

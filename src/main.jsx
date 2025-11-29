@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { LivesProvider } from './contexts/LivesContext'
 import { GenerationsProvider } from './contexts/GenerationsContext'
 import { ProgressProvider } from './contexts/ProgressContext'
+import { UsageLimitsProvider } from './contexts/UsageLimitsContext'
 import App from './App.jsx'
 
 // Defer heavy, non-critical widget until after initial render
@@ -32,15 +33,17 @@ function DeferredTawk() {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <LivesProvider>
-        <GenerationsProvider>
-          <ProgressProvider>
-            <App />
-            <Analytics />
-            <DeferredTawk />
-          </ProgressProvider>
-        </GenerationsProvider>
-      </LivesProvider>
+      <UsageLimitsProvider>
+        <LivesProvider>
+          <GenerationsProvider>
+            <ProgressProvider>
+              <App />
+              <Analytics />
+              <DeferredTawk />
+            </ProgressProvider>
+          </GenerationsProvider>
+        </LivesProvider>
+      </UsageLimitsProvider>
     </AuthProvider>
   </React.StrictMode>,
 )
