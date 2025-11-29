@@ -97,7 +97,7 @@ export default function FloatingAIHelper() {
       const resetTime = getTimeUntilReset('aiChat');
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: `🔒 **Daily Limit Reached**\n\nYou've used all ${20} free AI chats for today.\n\n⏱️ Resets in: ${resetTime}\n\n💎 **Upgrade to Pro** for unlimited AI assistance!` 
+        content: `🔒 **Monthly Limit Reached**\n\nYou've used all your free AI chats for this month.\n\n⏱️ Resets in: ${resetTime}\n\n💎 **Upgrade to Starter** for 50 chats/month or **Pro** for unlimited!` 
       }]);
       return;
     }
@@ -152,7 +152,7 @@ export default function FloatingAIHelper() {
       const resetTime = getTimeUntilReset('aiChat');
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: `🔒 **Daily Limit Reached**\n\nYou've used all ${20} free AI chats for today.\n\n⏱️ Resets in: ${resetTime}\n\n💎 **Upgrade to Pro** for unlimited AI assistance!\n\n[Click here to upgrade](/pricing)` 
+        content: `🔒 **Monthly Limit Reached**\n\nYou've used all your free AI chats for this month.\n\n⏱️ Resets in: ${resetTime}\n\n💎 **Upgrade to Starter** for 50 chats/month or **Pro** for unlimited!` 
       }]);
       return;
     }
@@ -277,9 +277,9 @@ Start your response with "🎯 **Career Advisor Mode**" to indicate you're givin
             </h3>
             <p className="text-xs text-gray-400">
               {isPremium ? (
-                <span className="text-yellow-400">Unlimited • Pro</span>
+                <span className="text-yellow-400">Unlimited • Premium</span>
               ) : (
-                <span>{getRemainingAiChats()}/20 chats left today</span>
+                <span>{getRemainingAiChats()} chats left this month</span>
               )}
             </p>
           </div>

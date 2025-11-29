@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, ArrowLeft, Loader2, Crosshair, RotateCcw, Scan, Cpu, Maximize } from 'lucide-react';
+import { Upload, ArrowLeft, Loader2, Crosshair, RotateCcw, Scan, Cpu, Maximize, Lock, Crown } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
@@ -8,6 +8,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import { generateResponse } from '../services/gemini';
+import { useUsageLimits } from '../contexts/UsageLimitsContext';
 
 // --- HUD Overlay (Visuals) ---
 const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing, hoveredPartName, mousePosition }) => (
@@ -77,6 +78,7 @@ const HUDOverlay = ({ selectedPartName, modelType, isAnalyzing, hoveredPartName,
 
 export default function ExplodeViewPage() {
   const navigate = useNavigate();
+  const { canUseExplodeMode, useExplodeMode, getRemainingExplodes, getTimeUntilReset, isPremium, userTier } = useUsageLimits();
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);

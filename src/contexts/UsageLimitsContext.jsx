@@ -3,11 +3,60 @@ import { useAuth } from './AuthContext';
 
 const UsageLimitsContext = createContext();
 
-// Free tier limits
-const FREE_LIMITS = {
-  aiChatPerDay: 20,
-  homeworkSolverPerDay: 3,
-  modelComparisonPerWeek: 1,
+// Tier definitions with all limits
+export const TIER_LIMITS = {
+  free: {
+    name: 'Free',
+    aiChatPerMonth: 20,
+    homeworkSolverPerMonth: 3,
+    modelComparisonPerWeek: 1,
+    explodeModePerWeek: 3,
+    calculatorPercent: 25, // 25% of calculators
+    lessonsAccess: 'beginner', // beginner only
+    careerProjects: false,
+    certificates: false,
+    vrSupport: false,
+    earlyAccess: false,
+  },
+  starter: {
+    name: 'Starter',
+    aiChatPerMonth: 50,
+    homeworkSolverPerMonth: 50,
+    modelComparisonPerWeek: 10,
+    explodeModePerWeek: 10,
+    calculatorPercent: 60, // 60% of calculators
+    lessonsAccess: 'advanced', // beginner + intermediate + some advanced
+    careerProjects: false,
+    certificates: true,
+    vrSupport: false,
+    earlyAccess: false,
+  },
+  pro: {
+    name: 'Pro',
+    aiChatPerMonth: -1, // unlimited
+    homeworkSolverPerMonth: -1, // unlimited
+    modelComparisonPerWeek: 50,
+    explodeModePerMonth: 150,
+    calculatorPercent: 100, // all calculators
+    lessonsAccess: 'all', // all lessons
+    careerProjects: true,
+    certificates: true,
+    vrSupport: false,
+    earlyAccess: false,
+  },
+  master: {
+    name: 'Master',
+    aiChatPerMonth: -1, // unlimited
+    homeworkSolverPerMonth: -1, // unlimited
+    modelComparisonPerWeek: -1, // unlimited
+    explodeModePerMonth: -1, // unlimited
+    calculatorPercent: 100, // all calculators
+    lessonsAccess: 'all', // all lessons
+    careerProjects: true,
+    certificates: true,
+    vrSupport: true,
+    earlyAccess: true,
+  },
 };
 
 // Storage keys
@@ -15,35 +64,44 @@ const STORAGE_KEYS = {
   aiChat: 'engineerium_ai_chat_usage',
   homeworkSolver: 'engineerium_homework_usage',
   modelComparison: 'engineerium_comparison_usage',
+  explodeMode: 'engineerium_explode_usage',
+  userTier: 'engineerium_user_tier',
 };
 
 export function UsageLimitsProvider({ children }) {
   const { user } = useAuth();
+  const [userTier, setUserTier] = useState('free');
   const [usage, setUsage] = useState({
     aiChat: { count: 0, resetTime: null },
     homeworkSolver: { count: 0, resetTime: null },
     modelComparison: { count: 0, resetTime: null },
+    explodeMode: { count: 0, resetTime: null },
   });
-  const [isPremium, setIsPremium] = useState(false);
 
   // Load usage from localStorage on mount
   useEffect(() => {
     loadUsage();
+    loadTier();
   }, [user]);
+
+  const loadTier = () => {
+    const savedTier = localStorage.getItem(STORAGE_KEYS.userTier) || 'free';
+    setUserTier(savedTier);
+  };
 
   const loadUsage = () => {
     const now = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
-    const weekMs = 7 * dayMs;
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const monthMs = 30 * 24 * 60 * 60 * 1000;
 
-    // Load AI chat usage
+    // Load AI chat usage (monthly)
     const aiChatData = JSON.parse(localStorage.getItem(STORAGE_KEYS.aiChat) || '{}');
-    const aiChatReset = aiChatData.resetTime || now + dayMs;
+    const aiChatReset = aiChatData.resetTime || now + monthMs;
     const aiChatCount = aiChatReset > now ? (aiChatData.count || 0) : 0;
 
-    // Load homework solver usage
+    // Load homework solver usage (monthly)
     const homeworkData = JSON.parse(localStorage.getItem(STORAGE_KEYS.homeworkSolver) || '{}');
-    const homeworkReset = homeworkData.resetTime || now + dayMs;
+    const homeworkReset = homeworkData.resetTime || now + monthMs;
     const homeworkCount = homeworkReset > now ? (homeworkData.count || 0) : 0;
 
     // Load model comparison usage (weekly)
@@ -51,84 +109,90 @@ export function UsageLimitsProvider({ children }) {
     const comparisonReset = comparisonData.resetTime || now + weekMs;
     const comparisonCount = comparisonReset > now ? (comparisonData.count || 0) : 0;
 
-    setUsage({
-      aiChat: { 
-        count: aiChatCount, 
-        resetTime: aiChatCount === 0 ? now + dayMs : aiChatReset 
-      },
-      homeworkSolver: { 
-        count: homeworkCount, 
-        resetTime: homeworkCount === 0 ? now + dayMs : homeworkReset 
-      },
-      modelComparison: { 
-        count: comparisonCount, 
-        resetTime: comparisonCount === 0 ? now + weekMs : comparisonReset 
-      },
-    });
+    // Load explode mode usage (weekly for free/starter, monthly for pro)
+    const explodeData = JSON.parse(localStorage.getItem(STORAGE_KEYS.explodeMode) || '{}');
+    const explodeReset = explodeData.resetTime || now + weekMs;
+    const explodeCount = explodeReset > now ? (explodeData.count || 0) : 0;
 
-    // Check premium status from user metadata or subscription
-    // For now, check localStorage (would be from Stripe in production)
-    const premiumStatus = localStorage.getItem('engineerium_premium') === 'true';
-    setIsPremium(premiumStatus);
+    setUsage({
+      aiChat: { count: aiChatCount, resetTime: aiChatCount === 0 ? now + monthMs : aiChatReset },
+      homeworkSolver: { count: homeworkCount, resetTime: homeworkCount === 0 ? now + monthMs : homeworkReset },
+      modelComparison: { count: comparisonCount, resetTime: comparisonCount === 0 ? now + weekMs : comparisonReset },
+      explodeMode: { count: explodeCount, resetTime: explodeCount === 0 ? now + weekMs : explodeReset },
+    });
   };
 
   const saveUsage = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data));
   };
 
-  // Check if user can use AI chat
-  const canUseAiChat = () => {
-    if (isPremium) return true;
-    return usage.aiChat.count < FREE_LIMITS.aiChatPerDay;
+  const getCurrentLimits = () => TIER_LIMITS[userTier] || TIER_LIMITS.free;
+
+  // Upgrade tier (called after successful payment)
+  const upgradeTier = (newTier) => {
+    setUserTier(newTier);
+    localStorage.setItem(STORAGE_KEYS.userTier, newTier);
   };
 
-  // Use AI chat (increment counter)
+  // Check if user can use AI chat
+  const canUseAiChat = () => {
+    const limits = getCurrentLimits();
+    if (limits.aiChatPerMonth === -1) return true;
+    return usage.aiChat.count < limits.aiChatPerMonth;
+  };
+
+  // Use AI chat
   const useAiChat = () => {
-    if (isPremium) return true;
+    const limits = getCurrentLimits();
+    if (limits.aiChatPerMonth === -1) return true;
     if (!canUseAiChat()) return false;
 
     const now = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
+    const monthMs = 30 * 24 * 60 * 60 * 1000;
     const newCount = usage.aiChat.count + 1;
-    const resetTime = usage.aiChat.resetTime || now + dayMs;
+    const resetTime = usage.aiChat.resetTime || now + monthMs;
 
     const newData = { count: newCount, resetTime };
-    setUsage(prev => ({ ...prev, aiChat: newData }));
+    setUsage((prev) => ({ ...prev, aiChat: newData }));
     saveUsage(STORAGE_KEYS.aiChat, newData);
     return true;
   };
 
   // Check if user can use homework solver
   const canUseHomeworkSolver = () => {
-    if (isPremium) return true;
-    return usage.homeworkSolver.count < FREE_LIMITS.homeworkSolverPerDay;
+    const limits = getCurrentLimits();
+    if (limits.homeworkSolverPerMonth === -1) return true;
+    return usage.homeworkSolver.count < limits.homeworkSolverPerMonth;
   };
 
   // Use homework solver
   const useHomeworkSolver = () => {
-    if (isPremium) return true;
+    const limits = getCurrentLimits();
+    if (limits.homeworkSolverPerMonth === -1) return true;
     if (!canUseHomeworkSolver()) return false;
 
     const now = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
+    const monthMs = 30 * 24 * 60 * 60 * 1000;
     const newCount = usage.homeworkSolver.count + 1;
-    const resetTime = usage.homeworkSolver.resetTime || now + dayMs;
+    const resetTime = usage.homeworkSolver.resetTime || now + monthMs;
 
     const newData = { count: newCount, resetTime };
-    setUsage(prev => ({ ...prev, homeworkSolver: newData }));
+    setUsage((prev) => ({ ...prev, homeworkSolver: newData }));
     saveUsage(STORAGE_KEYS.homeworkSolver, newData);
     return true;
   };
 
   // Check if user can use model comparison
   const canUseModelComparison = () => {
-    if (isPremium) return true;
-    return usage.modelComparison.count < FREE_LIMITS.modelComparisonPerWeek;
+    const limits = getCurrentLimits();
+    if (limits.modelComparisonPerWeek === -1) return true;
+    return usage.modelComparison.count < limits.modelComparisonPerWeek;
   };
 
   // Use model comparison
   const useModelComparison = () => {
-    if (isPremium) return true;
+    const limits = getCurrentLimits();
+    if (limits.modelComparisonPerWeek === -1) return true;
     if (!canUseModelComparison()) return false;
 
     const now = Date.now();
@@ -137,39 +201,77 @@ export function UsageLimitsProvider({ children }) {
     const resetTime = usage.modelComparison.resetTime || now + weekMs;
 
     const newData = { count: newCount, resetTime };
-    setUsage(prev => ({ ...prev, modelComparison: newData }));
+    setUsage((prev) => ({ ...prev, modelComparison: newData }));
     saveUsage(STORAGE_KEYS.modelComparison, newData);
+    return true;
+  };
+
+  // Check if user can use explode mode (JARVIS)
+  const canUseExplodeMode = () => {
+    const limits = getCurrentLimits();
+    const limit = userTier === 'pro' ? limits.explodeModePerMonth : limits.explodeModePerWeek;
+    if (limit === -1) return true;
+    return usage.explodeMode.count < limit;
+  };
+
+  // Use explode mode
+  const useExplodeMode = () => {
+    const limits = getCurrentLimits();
+    const limit = userTier === 'pro' ? limits.explodeModePerMonth : limits.explodeModePerWeek;
+    if (limit === -1) return true;
+    if (!canUseExplodeMode()) return false;
+
+    const now = Date.now();
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const monthMs = 30 * 24 * 60 * 60 * 1000;
+    const resetPeriod = userTier === 'pro' ? monthMs : weekMs;
+    const newCount = usage.explodeMode.count + 1;
+    const resetTime = usage.explodeMode.resetTime || now + resetPeriod;
+
+    const newData = { count: newCount, resetTime };
+    setUsage((prev) => ({ ...prev, explodeMode: newData }));
+    saveUsage(STORAGE_KEYS.explodeMode, newData);
     return true;
   };
 
   // Get remaining uses
   const getRemainingAiChats = () => {
-    if (isPremium) return Infinity;
-    return Math.max(0, FREE_LIMITS.aiChatPerDay - usage.aiChat.count);
+    const limits = getCurrentLimits();
+    if (limits.aiChatPerMonth === -1) return Infinity;
+    return Math.max(0, limits.aiChatPerMonth - usage.aiChat.count);
   };
 
   const getRemainingHomeworkSolves = () => {
-    if (isPremium) return Infinity;
-    return Math.max(0, FREE_LIMITS.homeworkSolverPerDay - usage.homeworkSolver.count);
+    const limits = getCurrentLimits();
+    if (limits.homeworkSolverPerMonth === -1) return Infinity;
+    return Math.max(0, limits.homeworkSolverPerMonth - usage.homeworkSolver.count);
   };
 
   const getRemainingComparisons = () => {
-    if (isPremium) return Infinity;
-    return Math.max(0, FREE_LIMITS.modelComparisonPerWeek - usage.modelComparison.count);
+    const limits = getCurrentLimits();
+    if (limits.modelComparisonPerWeek === -1) return Infinity;
+    return Math.max(0, limits.modelComparisonPerWeek - usage.modelComparison.count);
+  };
+
+  const getRemainingExplodes = () => {
+    const limits = getCurrentLimits();
+    const limit = userTier === 'pro' ? limits.explodeModePerMonth : limits.explodeModePerWeek;
+    if (limit === -1) return Infinity;
+    return Math.max(0, limit - usage.explodeMode.count);
   };
 
   // Get time until reset
   const getTimeUntilReset = (type) => {
     const resetTime = usage[type]?.resetTime;
     if (!resetTime) return null;
-    
+
     const now = Date.now();
     const diff = resetTime - now;
     if (diff <= 0) return null;
 
     const hours = Math.floor(diff / (60 * 60 * 1000));
     const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
-    
+
     if (hours > 24) {
       const days = Math.floor(hours / 24);
       return `${days}d ${hours % 24}h`;
@@ -177,25 +279,57 @@ export function UsageLimitsProvider({ children }) {
     return `${hours}h ${minutes}m`;
   };
 
-  // Check if lesson is free (beginner/intermediate = free, advanced/expert = paid)
-  const isLessonFree = (lessonLevel) => {
-    if (isPremium) return true;
-    const freelevels = ['beginner', 'intermediate', 'Beginner', 'Intermediate'];
-    return freelevels.includes(lessonLevel);
+  // Check if lesson is accessible based on tier
+  const isLessonAccessible = (lessonLevel) => {
+    const limits = getCurrentLimits();
+    const level = lessonLevel?.toLowerCase() || 'beginner';
+
+    if (limits.lessonsAccess === 'all') return true;
+    if (limits.lessonsAccess === 'advanced') {
+      return ['beginner', 'intermediate', 'advanced'].includes(level);
+    }
+    if (limits.lessonsAccess === 'beginner') {
+      return level === 'beginner';
+    }
+    return false;
   };
 
-  // Check if calculator is free (first 25% are free)
+  // Check if calculator is accessible (based on percentage)
   const isCalculatorFree = (calculatorIndex, totalCalculators) => {
-    if (isPremium) return true;
-    const freeCount = Math.ceil(totalCalculators * 0.25);
+    const limits = getCurrentLimits();
+    const freeCount = Math.ceil(totalCalculators * (limits.calculatorPercent / 100));
     return calculatorIndex < freeCount;
   };
 
+  // Check if career projects are accessible
+  const canAccessCareerProjects = () => {
+    return getCurrentLimits().careerProjects;
+  };
+
+  // Check if certificates are accessible
+  const canGenerateCertificates = () => {
+    return getCurrentLimits().certificates;
+  };
+
+  // Check VR support
+  const hasVRSupport = () => {
+    return getCurrentLimits().vrSupport;
+  };
+
+  // Check early access
+  const hasEarlyAccess = () => {
+    return getCurrentLimits().earlyAccess;
+  };
+
+  const isPremium = userTier !== 'free';
+
   const value = {
+    userTier,
     isPremium,
-    setIsPremium,
+    upgradeTier,
     usage,
-    limits: FREE_LIMITS,
+    limits: getCurrentLimits(),
+    tierLimits: TIER_LIMITS,
     // AI Chat
     canUseAiChat,
     useAiChat,
@@ -208,18 +342,22 @@ export function UsageLimitsProvider({ children }) {
     canUseModelComparison,
     useModelComparison,
     getRemainingComparisons,
+    // Explode Mode
+    canUseExplodeMode,
+    useExplodeMode,
+    getRemainingExplodes,
     // Time until reset
     getTimeUntilReset,
     // Content access
-    isLessonFree,
+    isLessonAccessible,
     isCalculatorFree,
+    canAccessCareerProjects,
+    canGenerateCertificates,
+    hasVRSupport,
+    hasEarlyAccess,
   };
 
-  return (
-    <UsageLimitsContext.Provider value={value}>
-      {children}
-    </UsageLimitsContext.Provider>
-  );
+  return <UsageLimitsContext.Provider value={value}>{children}</UsageLimitsContext.Provider>;
 }
 
 export function useUsageLimits() {

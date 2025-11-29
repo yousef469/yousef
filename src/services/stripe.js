@@ -16,16 +16,16 @@ export const PRICING_PLANS = {
     name: 'Free',
     price: 0,
     features: [
-      '📚 Beginner & Intermediate lessons',
-      '🤖 20 AI tutor chats per day',
-      '📝 3 homework solves per day',
-      '⚖️ 1 model comparison per week',
-      '🧮 25% of calculators (basic)',
+      '📚 Beginner lessons only',
+      '🤖 20 AI tutor chats/month',
+      '📝 3 homework solves/month',
+      '⚖️ 1 model comparison/week',
+      '🔍 3 JARVIS explode uses/week',
+      '🧮 25% of calculators',
       '🏆 XP & achievements',
       '👥 Community access',
-      '📊 Progress tracking',
-      'Basic support'
-    ]
+      'Basic support',
+    ],
   },
   starter: {
     id: 'starter',
@@ -34,15 +34,15 @@ export const PRICING_PLANS = {
     price: 9.99,
     features: [
       '✨ Everything in Free, plus:',
-      '📚 All lessons (including Advanced)',
-      '🤖 100 AI tutor chats per day',
-      '📝 20 homework solves per day',
-      '⚖️ 5 model comparisons per week',
-      '🧮 All calculators unlocked',
+      '📚 Advanced lessons unlocked',
+      '🤖 50 AI tutor chats/month',
+      '📝 50 homework solves/month',
+      '⚖️ 10 model comparisons/week',
+      '🔍 10 JARVIS explode uses/week',
+      '🧮 60% of calculators',
       '🎓 Certificate generation',
       'Priority support',
-      'Ad-free experience'
-    ]
+    ],
   },
   pro: {
     id: 'pro',
@@ -51,15 +51,15 @@ export const PRICING_PLANS = {
     price: 19.99,
     features: [
       '⭐ Everything in Starter, plus:',
-      '🤖 Unlimited AI tutor chats',
-      '📝 Unlimited homework solves',
-      '⚖️ Unlimited model comparisons',
+      '📚 ALL lessons (Expert included)',
+      '🤖 Unlimited AI tutor',
+      '📝 Unlimited homework solver',
+      '⚖️ 50 model comparisons/week',
+      '🔍 150 JARVIS explode/month',
+      '🧮 100% of calculators',
       '🚀 All career projects',
-      '💼 Internship simulator',
-      '🎯 Priority AI responses',
       'Dedicated support',
-      'Early access to new features'
-    ]
+    ],
   },
   master: {
     id: 'master',
@@ -67,17 +67,17 @@ export const PRICING_PLANS = {
     name: 'Master',
     price: 49.99,
     features: [
-      '👑 Everything in Pro, plus:',
-      '🏢 Team/classroom features',
-      '📊 Analytics dashboard',
-      '🎨 Custom branding',
-      '📱 API access',
-      '🤝 1-on-1 mentorship sessions',
-      'White-label option',
+      '👑 Everything UNLIMITED:',
+      '📚 All lessons & projects',
+      '🤖 Unlimited AI tutor',
+      '📝 Unlimited homework solver',
+      '⚖️ Unlimited comparisons',
+      '🔍 Unlimited JARVIS explode',
+      '🥽 VR Support',
+      '🚀 Early access to new features',
       'Enterprise support',
-      'Custom integrations'
-    ]
-  }
+    ],
+  },
 };
 
 /**

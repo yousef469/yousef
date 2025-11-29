@@ -48,7 +48,7 @@ export default function HomeworkSolverPage() {
     if (!canUseHomeworkSolver()) {
       const resetTime = getTimeUntilReset('homeworkSolver');
       setSolution({ 
-        error: `🔒 Daily Limit Reached\n\nYou've used all 3 free homework solves for today.\n\n⏱️ Resets in: ${resetTime}\n\n💎 Upgrade to Pro for unlimited homework help!` 
+        error: `🔒 Monthly Limit Reached\n\nYou've used all your free homework solves for this month.\n\n⏱️ Resets in: ${resetTime}\n\n💎 Upgrade to Starter for 50/month or Pro for unlimited!` 
       });
       return;
     }
@@ -144,9 +144,9 @@ CRITICAL: Return ONLY valid JSON, no markdown, no code blocks.`;
               </h1>
               <p className="text-xs md:text-sm text-gray-400">
                 {isPremium ? (
-                  <span className="text-yellow-400">Unlimited • Pro</span>
+                  <span className="text-yellow-400">Unlimited • Premium</span>
                 ) : (
-                  <span>{getRemainingHomeworkSolves()}/3 solves left today</span>
+                  <span>{getRemainingHomeworkSolves()} solves left this month</span>
                 )}
               </p>
             </div>
