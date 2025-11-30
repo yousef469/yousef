@@ -72,14 +72,24 @@
           "Dynamique de vol et analyse de stabilité"
         ]
       },
-      "robotics": {
-        "title": "Ingénierie Robotique",
-        "desc": "Construisez des systèmes intelligents et comprenez la robotique moderne.",
+      "civil": {
+        "title": "Génie Civil",
+        "desc": "Maîtrisez la conception structurelle, la science des matériaux et les systèmes d'infrastructure.",
         "features": [
-          "Apprenez la cinématique, la dynamique et les systèmes de contrôle",
-          "Explorez les capteurs, actionneurs et la programmation de robots",
-          "Étudiez l'IA et l'apprentissage automatique pour la robotique",
-          "Simulations pratiques et laboratoires virtuels"
+          "Analyse structurelle de ponts et gratte-ciel",
+          "Calculs de charges structurelles et tests de contrainte",
+          "Tests de matériaux et conception de béton",
+          "Conception de fondations et principes géotechniques"
+        ]
+      },
+      "electronics": {
+        "title": "Ingénierie Électronique",
+        "desc": "Comprenez les circuits, microcontrôleurs et systèmes électroniques.",
+        "features": [
+          "Analyse de circuits et fondamentaux de conception PCB",
+          "Programmation de microcontrôleurs et systèmes embarqués",
+          "Capteurs, actionneurs et traitement du signal",
+          "Électronique de puissance et systèmes de communication"
         ]
       }
     },

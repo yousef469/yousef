@@ -77,14 +77,24 @@
           "Flight dynamics and stability analysis"
         ]
       },
-      "robotics": {
-        "title": "Robotics Engineering",
-        "desc": "Build intelligent systems and understand modern robotics.",
+      "civil": {
+        "title": "Civil Engineering",
+        "desc": "Master structural design, materials science, and infrastructure systems.",
         "features": [
-          "Learn kinematics, dynamics, and control systems",
-          "Explore sensors, actuators, and robot programming",
-          "Study AI and machine learning for robotics",
-          "Hands-on simulations and virtual labs"
+          "Bridge & skyscraper structural analysis",
+          "Structural load calculations and stress testing",
+          "Materials testing and concrete design",
+          "Foundation design and geotechnical principles"
+        ]
+      },
+      "electronics": {
+        "title": "Electronics Engineering",
+        "desc": "Understand circuits, microcontrollers, and electronic systems.",
+        "features": [
+          "Circuit analysis and PCB design fundamentals",
+          "Microcontroller programming and embedded systems",
+          "Sensors, actuators, and signal processing",
+          "Power electronics and communication systems"
         ]
       }
     },

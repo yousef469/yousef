@@ -68,14 +68,24 @@
           "Flugdynamik und Stabilitätsanalyse"
         ]
       },
-      "robotics": {
-        "title": "Robotik",
-        "desc": "Bauen Sie intelligente Systeme und verstehen Sie moderne Robotik.",
+      "civil": {
+        "title": "Bauingenieurwesen",
+        "desc": "Meistern Sie Strukturdesign, Materialwissenschaft und Infrastruktursysteme.",
         "features": [
-          "Lernen Sie Kinematik, Dynamik und Steuerungssysteme",
-          "Erkunden Sie Sensoren, Aktoren und Roboterprogrammierung",
-          "Studieren Sie KI und maschinelles Lernen für Robotik",
-          "Praktische Simulationen und virtuelle Labore"
+          "Strukturanalyse von Brücken und Wolkenkratzern",
+          "Strukturlastberechnungen und Belastungstests",
+          "Materialtests und Betondesign",
+          "Fundamentdesign und geotechnische Prinzipien"
+        ]
+      },
+      "electronics": {
+        "title": "Elektronik",
+        "desc": "Verstehen Sie Schaltkreise, Mikrocontroller und elektronische Systeme.",
+        "features": [
+          "Schaltungsanalyse und PCB-Design-Grundlagen",
+          "Mikrocontroller-Programmierung und eingebettete Systeme",
+          "Sensoren, Aktoren und Signalverarbeitung",
+          "Leistungselektronik und Kommunikationssysteme"
         ]
       }
     },

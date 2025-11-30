@@ -72,14 +72,24 @@
           "Dinámica de vuelo y análisis de estabilidad"
         ]
       },
-      "robotics": {
-        "title": "Ingeniería Robótica",
-        "desc": "Construye sistemas inteligentes y comprende la robótica moderna.",
+      "civil": {
+        "title": "Ingeniería Civil",
+        "desc": "Domina el diseño estructural, ciencia de materiales y sistemas de infraestructura.",
         "features": [
-          "Aprende cinemática, dinámica y sistemas de control",
-          "Explora sensores, actuadores y programación de robots",
-          "Estudia IA y aprendizaje automático para robótica",
-          "Simulaciones prácticas y laboratorios virtuales"
+          "Análisis estructural de puentes y rascacielos",
+          "Cálculos de cargas estructurales y pruebas de esfuerzo",
+          "Pruebas de materiales y diseño de concreto",
+          "Diseño de cimentaciones y principios geotécnicos"
+        ]
+      },
+      "electronics": {
+        "title": "Ingeniería Electrónica",
+        "desc": "Comprende circuitos, microcontroladores y sistemas electrónicos.",
+        "features": [
+          "Análisis de circuitos y fundamentos de diseño PCB",
+          "Programación de microcontroladores y sistemas embebidos",
+          "Sensores, actuadores y procesamiento de señales",
+          "Electrónica de potencia y sistemas de comunicación"
         ]
       }
     },

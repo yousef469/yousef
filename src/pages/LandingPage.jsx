@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, UserPlus, Brain, Sparkles, LogIn, Globe, User, ChevronDown, Users as UsersIcon, Upload } from 'lucide-react';
+import { Rocket, Plane, Car, Building, Cpu, UserPlus, Sparkles, Globe, User, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
@@ -229,23 +229,47 @@ const LandingPage = () => {
           </div>
         </section>
 
-        <section className="py-20">
+        {/* Civil Engineering Section */}
+        <section className="py-12 md:py-20">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="h-96 bg-background-light rounded-2xl border-2 border-accent/30 overflow-hidden flex items-center justify-center">
-                <Brain className="w-48 h-48 text-accent animate-spin" style={{ animationDuration: '3s' }} />
+            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="h-48 md:h-96 bg-background-light rounded-2xl border-2 border-amber-500/30 overflow-hidden flex items-center justify-center">
+                <Building className="w-24 h-24 md:w-48 md:h-48 text-amber-500 animate-pulse" />
               </div>
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <Brain className="w-12 h-12 text-accent" />
-                  <h2 className="text-4xl font-bold text-accent">{t('landing.sections.robotics.title')}</h2>
+                  <Building className="w-8 h-8 md:w-12 md:h-12 text-amber-500" />
+                  <h2 className="text-2xl md:text-4xl font-bold text-amber-500">{t('landing.sections.civil.title')}</h2>
                 </div>
-                <p className="text-xl text-text mb-6">{t('landing.sections.robotics.desc')}</p>
-                <ul className="space-y-4 text-lg text-text-secondary">
-                  {t('landing.sections.robotics.features', { returnObjects: true }).map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3"><span className="text-accent text-2xl">✓</span><span>{feature}</span></li>
+                <p className="text-base md:text-xl text-text mb-4 md:mb-6">{t('landing.sections.civil.desc')}</p>
+                <ul className="space-y-3 md:space-y-4 text-sm md:text-lg text-text-secondary">
+                  {t('landing.sections.civil.features', { returnObjects: true }).map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 md:gap-3"><span className="text-amber-500 text-lg md:text-2xl">✓</span><span>{feature}</span></li>
                   ))}
                 </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Electronics Section */}
+        <section className="bg-background-light py-12 md:py-20">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="order-2 md:order-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <Cpu className="w-8 h-8 md:w-12 md:h-12 text-green-500" />
+                  <h2 className="text-2xl md:text-4xl font-bold text-green-500">{t('landing.sections.electronics.title')}</h2>
+                </div>
+                <p className="text-base md:text-xl text-text mb-4 md:mb-6">{t('landing.sections.electronics.desc')}</p>
+                <ul className="space-y-3 md:space-y-4 text-sm md:text-lg text-text-secondary">
+                  {t('landing.sections.electronics.features', { returnObjects: true }).map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 md:gap-3"><span className="text-green-500 text-lg md:text-2xl">✓</span><span>{feature}</span></li>
+                  ))}
+                </ul>
+              </div>
+              <div className="order-1 md:order-2 h-48 md:h-96 bg-background rounded-2xl border-2 border-green-500/30 overflow-hidden flex items-center justify-center">
+                <Cpu className="w-24 h-24 md:w-48 md:h-48 text-green-500 animate-pulse" />
               </div>
             </div>
           </div>
