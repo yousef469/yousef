@@ -1,191 +1,209 @@
 {
-    "app": {
-        "title": "Engineerium",
-        "subtitle": "インタラクティブな3Dエンジニアリングモデル"
+  "app": {
+    "title": "Engineerium",
+    "subtitle": "インタラクティブ3Dエンジニアリングモデル"
+  },
+  "nav": {
+    "language": "言語",
+    "login": "ログイン",
+    "signUp": "登録",
+    "signOut": "ログアウト",
+    "welcome": "ようこそ",
+    "about": "概要",
+    "toolbox": "ツールボックス",
+    "pricing": "料金",
+    "help": "ヘルプ",
+    "privacy": "プライバシー",
+    "terms": "利用規約"
+  },
+  "landing": {
+    "hero": {
+      "title": "エンジニアリングを学ぶ",
+      "titleHighlight": "3Dモデル、シミュレーション、AI",
+      "subtitle": "インタラクティブな3D分解図、リアルタイムシミュレーション、AI分析を通じて、ロケット、車、航空機、電子工学をマスターしましょう。",
+      "cta": "無料で始める",
+      "stats": {
+        "lessons": "MIT品質のレッスン",
+        "models": "3Dモデル",
+        "ai": "AI分析"
+      }
     },
-    "nav": {
-        "language": "言語",
-        "login": "ログイン",
-        "signUp": "サインアップ",
-        "signOut": "サインアウト",
-        "welcome": "ようこそ"
+    "preview": {
+      "title": "インタラクティブ3D分解図",
+      "subtitle": "すべてのコンポーネントを詳細に探索",
+      "autoRotate": "自動回転",
+      "partLabels": "パーツラベル",
+      "aiAnalysis": "AI分析",
+      "jarvisMode": "J.A.R.V.I.S.モード",
+      "clickToExplore": "クリックして探索 →"
     },
-    "viewer": {
-        "title": "3Dビューア",
-        "subtitle": "インタラクティブエンジニアリングモデル",
-        "models": "モデル",
-        "lessons": "レッスン",
-        "signOut": "サインアウト",
-        "signedInAs": "サインイン中",
-        "specifications": "仕様",
-        "engineeringLessons": "エンジニアリングレッスン",
-        "keyConcepts": "主要概念：",
-        "interactiveExercise": "インタラクティブ演習：",
-        "nozzlePlayground": "ノズルプレイグラウンド",
-        "expansionRatio": "膨張比",
-        "ambientPressure": "周囲圧力",
-        "throttle": "スロットル",
-        "specificImpulse": "比推力",
-        "thrust": "推力",
-        "keyInsights": "重要な洞察",
-        "searchPlaceholder": "モデルを検索..."
+    "testimonial": {
+      "quote": "ついにロケットの仕組みが分かりました！3Dモデルですべてが理解できました。",
+      "author": "工学部学生"
     },
-    "auth": {
-        "welcomeBack": "おかえりなさい！",
-        "startJourney": "エンジニアリングの旅を始めましょう",
-        "fullName": "フルネーム",
-        "email": "メールアドレス",
-        "password": "パスワード",
-        "createAccount": "アカウントを作成",
-        "continueWith": "または続行",
-        "continueGoogle": "Googleで続行",
-        "dontHaveAccount": "アカウントをお持ちでないですか？",
-        "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
-        "pleaseWait": "お待ちください...",
-        "whySignUp": "なぜアカウントを作成するのですか？",
-        "benefit1": "リアルな炎の効果を持つすべての3Dモデルにアクセス",
-        "benefit2": "Gemini搭載のインタラクティブAIチューター",
-        "benefit3": "お気に入りのモデルと進捗を保存",
-        "benefit4": "エンジニアリングのレッスンとチュートリアル",
-        "features": {
-            "models": "100+",
-            "modelsLabel": "3Dモデル",
-            "ai": "AI",
-            "aiLabel": "チューター",
-            "free": "無料",
-            "freeLabel": "永久"
-        },
-        "errors": {
-            "nameRequired": "フルネームを入力してください",
-            "general": "エラーが発生しました"
-        }
+    "sections": {
+      "rockets": {
+        "title": "ロケット力学",
+        "desc": "インタラクティブなロケット力学モジュールで航空宇宙工学の基礎をマスターしましょう。",
+        "features": [
+          "3Dシミュレーションで推力、抗力、軌道力学を学ぶ",
+          "NASAレベルのロケットモデルをリアルタイム3Dで探索",
+          "推進システムと飛行力学を理解",
+          "インタラクティブなクイズとチャレンジで練習"
+        ]
+      },
+      "cars": {
+        "title": "自動車工学",
+        "desc": "自動車システムを深く理解し、現代の車両がどのように機能するかを学びましょう。",
+        "features": [
+          "エンジン力学、トランスミッションシステム、パワートレインを学ぶ",
+          "サスペンション、ブレーキ、ステアリングシステムを3Dで探索",
+          "空気力学と車両ダイナミクスを学ぶ",
+          "実世界シナリオのインタラクティブシミュレーション"
+        ]
+      },
+      "planes": {
+        "title": "航空力学",
+        "desc": "飛行の原理と航空機工学を理解しましょう。",
+        "features": [
+          "揚力、抗力、推力、重量の原理をマスター",
+          "航空機構造と操縦面を探索",
+          "ジェットエンジンと推進システムを学ぶ",
+          "飛行力学と安定性分析"
+        ]
+      },
+      "robotics": {
+        "title": "ロボット工学",
+        "desc": "インテリジェントシステムを構築し、現代のロボット工学を理解しましょう。",
+        "features": [
+          "運動学、動力学、制御システムを学ぶ",
+          "センサー、アクチュエーター、ロボットプログラミングを探索",
+          "ロボット工学のためのAIと機械学習を学ぶ",
+          "実践的なシミュレーションと仮想ラボ"
+        ]
+      }
     },
-    "home": {
-        "hero": {
-            "title": "3Dでエンジニアリングを探索",
-            "subtitle": "カテゴリを選択して、インタラクティブなコントロール付きの詳細な3Dモデルを表示",
-            "new": "新機能：音声AI • モデル比較 • リーダーボード • PWAサポート",
-            "getStarted": "無料で始める",
-            "readyToExplore": "探索する準備はできましたか？",
-            "signUpNow": "今すぐサインアップして、すべての3DモデルとAI駆動の学習にアクセス"
-        },
-        "features": {
-            "dashboard": {
-                "title": "ダッシュボード",
-                "desc": "進捗を追跡"
-            },
-            "bookmarks": {
-                "title": "ブックマーク",
-                "desc": "レッスンを保存"
-            },
-            "collaborate": {
-                "title": "コラボレーション",
-                "desc": "一緒に学習"
-            },
-            "upload": {
-                "title": "アップロード",
-                "desc": "モデルを共有"
-            },
-            "progression": {
-                "title": "進行状況",
-                "desc": "レベルと報酬"
-            }
-        },
-        "viewer": {
-            "title": "3Dモデルビューア",
-            "desc": "インタラクティブな3Dですべてのモデルを探索",
-            "button": "ビューアを起動"
-        },
-        "learn": {
-            "rockets": "ロケット力学を学ぶ",
-            "rocketsDesc": "推進、軌道力学、ステージング、打ち上げシステムをマスター",
-            "planes": "飛行機力学を学ぶ",
-            "planesDesc": "空気力学、飛行制御、エンジン、航空システムを理解",
-            "cars": "自動車力学を学ぶ",
-            "carsDesc": "エンジン、トランスミッション、サスペンション、自動車工学を探索",
-            "button": "学習を始める"
-        },
-        "interactive": {
-            "title": "インタラクティブ学習",
-            "subtitle": "ゲームと比較を通じてエンジニアリングをマスター"
-        },
-        "journey": {
-            "title": "エンジニアリングの旅",
-            "desc": "チャレンジを完了して、ロケットが宇宙に飛ぶのを見よう！",
-            "quiz": "クイズ",
-            "matching": "マッチング",
-            "simulation": "シミュレーション",
-            "building": "構築",
-            "button": "旅を始める"
-        },
-        "compare": {
-            "title": "モデルを比較",
-            "desc": "モデルを並べて表示し、違いを学ぼう！",
-            "rocket": "ロケット",
-            "plane": "飛行機",
-            "car": "自動車",
-            "button": "比較を始める"
-        },
-        "ai": {
-            "title": "クイックAIアシスタント",
-            "subtitle": "エンジニアリングの質問に即座に回答",
-            "placeholder": "ロケット、飛行機、自動車について何でも質問してください...",
-            "ask": "質問する",
-            "thinking": "考え中...",
-            "response": "AI応答",
-            "examples": "試しに質問してみてください：\"ロケットエンジンはどのように機能しますか？\"または\"飛行機の翼の揚力を説明してください\""
-        },
-        "community": {
-            "title": "コミュニティQ&A",
-            "subtitle": "質問をして、他の人の学習を助ける"
-        },
-        "pricing": {
-            "title": "学習パスを選択",
-            "subtitle": "無料で始めて、準備ができたらアップグレード",
-            "popular": "最も人気",
-            "or": "または",
-            "note": "すべてのプランには、コミュニティへのアクセスと定期的なコンテンツ更新が含まれます",
-            "free": {
-                "name": "無料",
-                "cta": "始める",
-                "features": [
-                    "限定レッスン",
-                    "AIチャット割り当て",
-                    "比較ツールなし",
-                    "基本的な3Dモデル"
-                ]
-            },
-            "pro": {
-                "name": "プロ",
-                "period": "/月",
-                "altPrice": "$99/年",
-                "cta": "プロにアップグレード",
-                "features": [
-                    "完全なレッスン",
-                    "無制限のAI指導",
-                    "オフラインモード",
-                    "すべての3Dモデル",
-                    "モデル比較ツール",
-                    "優先サポート"
-                ]
-            },
-            "master": {
-                "name": "マスター",
-                "period": "/年",
-                "cta": "マスターになる",
-                "features": [
-                    "プロのすべて",
-                    "VR/ARサポート（準備完了時）",
-                    "修了証明書",
-                    "高度なシミュレーション",
-                    "独占コンテンツ",
-                    "メンターへの直接アクセス"
-                ]
-            }
-        },
-        "footer": {
-            "copyright": "© 2025 Engineerium - インタラクティブエンジニアリング教育",
-            "version": "v2.0 - 音声AI • モデル比較 • リーダーボード • PWA"
-        }
+    "testimonials": {
+      "title": "学生の声",
+      "subtitle": "インタラクティブな方法でエンジニアリングを学ぶ数千人に参加",
+      "stats": {
+        "students": "アクティブ学生",
+        "lessons": "MIT品質のレッスン",
+        "rating": "平均評価",
+        "completion": "完了率"
+      }
+    },
+    "cta": {
+      "title": "エンジニアリングの旅を始める準備はできましたか？",
+      "subtitle": "インタラクティブな学習でエンジニアリングをマスターする数千人の学生に参加",
+      "button": "無料で始める"
     }
+  },
+  "home": {
+    "hero": {
+      "title": "3Dでエンジニアリングを探索",
+      "subtitle": "カテゴリを選択して、インタラクティブなコントロール付きの詳細な3Dモデルを表示",
+      "welcome": "エンジニアリングキャリアの第一歩へようこそ",
+      "new": "新機能：音声AI • モデル比較 • リーダーボード • PWAサポート",
+      "getStarted": "無料で始める",
+      "readyToExplore": "探索する準備はできましたか？",
+      "signUpNow": "今すぐ登録して、すべての3DモデルとAI学習にアクセス"
+    },
+    "learn": {
+      "title": "エンジニアリングを学ぶ",
+      "subtitle": "ロケット、飛行機、車から選んで学習を始めましょう",
+      "explore": "カテゴリを探索",
+      "rockets": "ロケット力学を学ぶ",
+      "rocketsDesc": "推進、軌道力学、ステージング、打ち上げシステムをマスター",
+      "planes": "飛行機力学を学ぶ",
+      "planesDesc": "空気力学、飛行制御、エンジン、航空システムを理解",
+      "cars": "車の力学を学ぶ",
+      "carsDesc": "エンジン、トランスミッション、サスペンション、自動車工学を探索",
+      "button": "学習を始める"
+    },
+    "interactive": {
+      "title": "インタラクティブ学習",
+      "subtitle": "ゲームと比較でエンジニアリングをマスター"
+    },
+    "features": {
+      "compare": {
+        "title": "モデルを比較",
+        "desc": "モデルを並べて表示し、違いを学びましょう！",
+        "button": "モデルを比較",
+        "upgrade": "アップグレードで更に"
+      },
+      "community": {
+        "title": "コミュニティ",
+        "desc": "質問し、プロジェクトを共有し、一緒に学ぶ",
+        "button": "コミュニティに参加"
+      },
+      "career": {
+        "title": "キャリアプロジェクト",
+        "desc": "ポートフォリオに値するエンジニアリングプロジェクトを構築",
+        "button": "構築を始める"
+      },
+      "internship": {
+        "title": "インターンシップシミュレーター",
+        "desc": "SpaceX、Teslaなどからの実際のエンジニアリングタスク",
+        "button": "インターンシップを始める"
+      },
+      "homework": {
+        "title": "AI宿題ソルバー",
+        "desc": "機械工学の問題のステップバイステップの解答を取得",
+        "button": "宿題を解く"
+      },
+      "jarvis": {
+        "title": "J.A.R.V.I.S.モード",
+        "fullName": "超知能システム",
+        "desc": "AI搭載の3D分析。モデルをアップロード、カメラで機械をスキャン、即座に説明を取得。",
+        "button": "JARVISモードに入る"
+      }
+    },
+    "challenges": {
+      "title": "デイリー＆ウィークリーチャレンジ"
+    },
+    "compare": {
+      "title": "モデルを比較",
+      "desc": "モデルを並べて表示し、違いを学びましょう！",
+      "rocket": "ロケット",
+      "plane": "飛行機",
+      "car": "車",
+      "button": "比較を始める"
+    },
+    "footer": {
+      "copyright": "© 2025 Engineerium - インタラクティブエンジニアリング教育",
+      "version": "v2.0 - 音声AI • モデル比較 • リーダーボード • PWA"
+    }
+  },
+  "viewer": {
+    "title": "3Dビューアー",
+    "subtitle": "インタラクティブエンジニアリングモデル",
+    "models": "モデル",
+    "lessons": "レッスン",
+    "signOut": "ログアウト",
+    "signedInAs": "ログイン中",
+    "specifications": "仕様",
+    "engineeringLessons": "エンジニアリングレッスン",
+    "keyConcepts": "主要概念：",
+    "interactiveExercise": "インタラクティブ演習：",
+    "searchPlaceholder": "モデルを検索..."
+  },
+  "auth": {
+    "welcomeBack": "おかえりなさい！",
+    "startJourney": "エンジニアリングの旅を始めましょう",
+    "fullName": "氏名",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "createAccount": "アカウント作成",
+    "continueWith": "または続行",
+    "continueGoogle": "Googleで続行",
+    "dontHaveAccount": "アカウントをお持ちでないですか？",
+    "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+    "pleaseWait": "お待ちください...",
+    "whySignUp": "なぜアカウントを作成するのですか？",
+    "benefit1": "リアルな炎エフェクト付きのすべての3Dモデルにアクセス",
+    "benefit2": "Gemini搭載のインタラクティブAIチューター",
+    "benefit3": "お気に入りのモデルと進捗を保存",
+    "benefit4": "エンジニアリングレッスンとチュートリアル"
+  }
 }

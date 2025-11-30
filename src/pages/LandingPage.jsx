@@ -35,9 +35,9 @@ const LandingPage = () => {
               <Logo size="md" showText={true} />
               
               <nav className="hidden md:flex items-center gap-6">
-                <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">About</button>
-                <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">Pricing</button>
-                <button onClick={() => navigate('/help')} className="text-white hover:text-primary transition-colors font-medium">Help</button>
+                <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">{t('nav.about')}</button>
+                <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">{t('nav.pricing')}</button>
+                <button onClick={() => navigate('/help')} className="text-white hover:text-primary transition-colors font-medium">{t('nav.help')}</button>
               </nav>
             </div>
             
@@ -65,15 +65,14 @@ const LandingPage = () => {
               {/* Left: Content */}
               <div className="text-center lg:text-left">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
-                  Learn Engineering With{' '}
+                  {t('landing.hero.title')}{' '}
                   <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-                    3D Models, Simulations & AI
+                    {t('landing.hero.titleHighlight')}
                   </span>
                 </h1>
                 
                 <p className="text-base md:text-xl text-gray-300 mb-6 md:mb-8 leading-relaxed">
-                  Master rockets, cars, aircraft & electronics through interactive 3D exploded views, 
-                  real-time simulations, and AI-powered analysis.
+                  {t('landing.hero.subtitle')}
                 </p>
 
                 {/* CTA Button - Full width on mobile */}
@@ -82,22 +81,22 @@ const LandingPage = () => {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 md:px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl transition-all font-bold text-base md:text-lg shadow-lg shadow-cyan-500/50 active:scale-95 md:hover:scale-105 mb-6 md:mb-8"
                 >
                   <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
-                  <span>Start Learning Free</span>
+                  <span>{t('landing.hero.cta')}</span>
                 </button>
 
                 {/* Stats - Responsive grid */}
                 <div className="grid grid-cols-3 gap-3 md:gap-6 pt-6 md:pt-8 border-t border-gray-700">
                   <div>
                     <div className="text-xl md:text-3xl font-bold text-cyan-400 mb-1">150+</div>
-                    <div className="text-xs md:text-sm text-gray-400">MIT-Quality Lessons</div>
+                    <div className="text-xs md:text-sm text-gray-400">{t('landing.hero.stats.lessons')}</div>
                   </div>
                   <div>
                     <div className="text-xl md:text-3xl font-bold text-blue-400 mb-1">50+</div>
-                    <div className="text-xs md:text-sm text-gray-400">3D Models</div>
+                    <div className="text-xs md:text-sm text-gray-400">{t('landing.hero.stats.models')}</div>
                   </div>
                   <div>
                     <div className="text-xl md:text-3xl font-bold text-purple-400 mb-1">AI</div>
-                    <div className="text-xs md:text-sm text-gray-400">Powered Analysis</div>
+                    <div className="text-xs md:text-sm text-gray-400">{t('landing.hero.stats.ai')}</div>
                   </div>
                 </div>
               </div>
@@ -117,21 +116,21 @@ const LandingPage = () => {
                       <div className="absolute inset-0 bg-cyan-400 blur-2xl opacity-30 animate-pulse" />
                     </div>
                     
-                    <h3 className="text-base md:text-xl font-bold text-white mb-2 text-center">Interactive 3D Exploded Views</h3>
+                    <h3 className="text-base md:text-xl font-bold text-white mb-2 text-center">{t('landing.preview.title')}</h3>
                     <p className="text-gray-400 text-center mb-4 text-sm md:text-base">
-                      Explore every component in stunning detail
+                      {t('landing.preview.subtitle')}
                     </p>
                     
                     {/* Feature badges */}
                     <div className="flex flex-wrap gap-2 justify-center">
                       <span className="px-2 md:px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-xs text-cyan-300">
-                        Auto-Rotate
+                        {t('landing.preview.autoRotate')}
                       </span>
                       <span className="px-2 md:px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-xs text-blue-300">
-                        Part Labels
+                        {t('landing.preview.partLabels')}
                       </span>
                       <span className="px-2 md:px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-xs text-purple-300">
-                        AI Analysis
+                        {t('landing.preview.aiAnalysis')}
                       </span>
                     </div>
                   </div>
@@ -139,8 +138,8 @@ const LandingPage = () => {
                   {/* Bottom bar */}
                   <div className="bg-black/50 backdrop-blur px-4 md:px-6 py-2 md:py-3 border-t border-cyan-500/20">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-cyan-400 font-mono">J.A.R.V.I.S. MODE</span>
-                      <span className="text-gray-400 hidden md:inline">Click to explore →</span>
+                      <span className="text-cyan-400 font-mono">{t('landing.preview.jarvisMode')}</span>
+                      <span className="text-gray-400 hidden md:inline">{t('landing.preview.clickToExplore')}</span>
                     </div>
                   </div>
                 </div>
@@ -153,9 +152,9 @@ const LandingPage = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-300 mb-2">
-                        "Finally understand how rockets work! The 3D models make everything click."
+                        "{t('landing.testimonial.quote')}"
                       </p>
-                      <p className="text-xs text-gray-500">- Engineering Student</p>
+                      <p className="text-xs text-gray-500">- {t('landing.testimonial.author')}</p>
                     </div>
                   </div>
                 </div>
@@ -170,14 +169,13 @@ const LandingPage = () => {
               <div className="order-2 md:order-1">
                 <div className="flex items-center gap-3 mb-4">
                   <Rocket className="w-8 h-8 md:w-12 md:h-12 text-primary" />
-                  <h2 className="text-2xl md:text-4xl font-bold text-primary">Rocket Mechanics</h2>
+                  <h2 className="text-2xl md:text-4xl font-bold text-primary">{t('landing.sections.rockets.title')}</h2>
                 </div>
-                <p className="text-base md:text-xl text-text mb-4 md:mb-6">Master the fundamentals of aerospace engineering with our interactive rocket mechanics module.</p>
+                <p className="text-base md:text-xl text-text mb-4 md:mb-6">{t('landing.sections.rockets.desc')}</p>
                 <ul className="space-y-3 md:space-y-4 text-sm md:text-lg text-text-secondary">
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-primary text-lg md:text-2xl">✓</span><span>Learn thrust, drag, and orbital mechanics through 3D simulations</span></li>
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-primary text-lg md:text-2xl">✓</span><span>Explore NASA-grade rocket models in real-time 3D</span></li>
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-primary text-lg md:text-2xl">✓</span><span>Understand propulsion systems and flight dynamics</span></li>
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-primary text-lg md:text-2xl">✓</span><span>Practice with interactive quizzes and challenges</span></li>
+                  {t('landing.sections.rockets.features', { returnObjects: true }).map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 md:gap-3"><span className="text-primary text-lg md:text-2xl">✓</span><span>{feature}</span></li>
+                  ))}
                 </ul>
               </div>
               <div className="order-1 md:order-2 h-48 md:h-96 bg-background rounded-2xl border-2 border-primary/30 overflow-hidden flex items-center justify-center">
@@ -196,14 +194,13 @@ const LandingPage = () => {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Car className="w-8 h-8 md:w-12 md:h-12 text-secondary" />
-                  <h2 className="text-2xl md:text-4xl font-bold text-secondary">Automotive Engineering</h2>
+                  <h2 className="text-2xl md:text-4xl font-bold text-secondary">{t('landing.sections.cars.title')}</h2>
                 </div>
-                <p className="text-base md:text-xl text-text mb-4 md:mb-6">Dive deep into automotive systems and understand how modern vehicles work.</p>
+                <p className="text-base md:text-xl text-text mb-4 md:mb-6">{t('landing.sections.cars.desc')}</p>
                 <ul className="space-y-3 md:space-y-4 text-sm md:text-lg text-text-secondary">
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-secondary text-lg md:text-2xl">✓</span><span>Study engine mechanics, transmission systems, and powertrains</span></li>
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-secondary text-lg md:text-2xl">✓</span><span>Explore suspension, braking, and steering systems in 3D</span></li>
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-secondary text-lg md:text-2xl">✓</span><span>Learn aerodynamics and vehicle dynamics</span></li>
-                  <li className="flex items-start gap-2 md:gap-3"><span className="text-secondary text-lg md:text-2xl">✓</span><span>Interactive simulations of real-world scenarios</span></li>
+                  {t('landing.sections.cars.features', { returnObjects: true }).map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 md:gap-3"><span className="text-secondary text-lg md:text-2xl">✓</span><span>{feature}</span></li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -216,14 +213,13 @@ const LandingPage = () => {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Plane className="w-12 h-12 text-primary" />
-                  <h2 className="text-4xl font-bold text-primary">Aviation Mechanics</h2>
+                  <h2 className="text-4xl font-bold text-primary">{t('landing.sections.planes.title')}</h2>
                 </div>
-                <p className="text-xl text-text mb-6">Understand the principles of flight and aircraft engineering.</p>
+                <p className="text-xl text-text mb-6">{t('landing.sections.planes.desc')}</p>
                 <ul className="space-y-4 text-lg text-text-secondary">
-                  <li className="flex items-start gap-3"><span className="text-primary text-2xl">✓</span><span>Master lift, drag, thrust, and weight principles</span></li>
-                  <li className="flex items-start gap-3"><span className="text-primary text-2xl">✓</span><span>Explore aircraft structures and control surfaces</span></li>
-                  <li className="flex items-start gap-3"><span className="text-primary text-2xl">✓</span><span>Study jet engines and propulsion systems</span></li>
-                  <li className="flex items-start gap-3"><span className="text-primary text-2xl">✓</span><span>Flight dynamics and stability analysis</span></li>
+                  {t('landing.sections.planes.features', { returnObjects: true }).map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3"><span className="text-primary text-2xl">✓</span><span>{feature}</span></li>
+                  ))}
                 </ul>
               </div>
               <div className="h-96 bg-background rounded-2xl border-2 border-primary/30 overflow-hidden flex items-center justify-center">
@@ -242,14 +238,13 @@ const LandingPage = () => {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Brain className="w-12 h-12 text-accent" />
-                  <h2 className="text-4xl font-bold text-accent">Robotics Engineering</h2>
+                  <h2 className="text-4xl font-bold text-accent">{t('landing.sections.robotics.title')}</h2>
                 </div>
-                <p className="text-xl text-text mb-6">Build intelligent systems and understand modern robotics.</p>
+                <p className="text-xl text-text mb-6">{t('landing.sections.robotics.desc')}</p>
                 <ul className="space-y-4 text-lg text-text-secondary">
-                  <li className="flex items-start gap-3"><span className="text-accent text-2xl">✓</span><span>Learn kinematics, dynamics, and control systems</span></li>
-                  <li className="flex items-start gap-3"><span className="text-accent text-2xl">✓</span><span>Explore sensors, actuators, and robot programming</span></li>
-                  <li className="flex items-start gap-3"><span className="text-accent text-2xl">✓</span><span>Study AI and machine learning for robotics</span></li>
-                  <li className="flex items-start gap-3"><span className="text-accent text-2xl">✓</span><span>Hands-on simulations and virtual labs</span></li>
+                  {t('landing.sections.robotics.features', { returnObjects: true }).map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3"><span className="text-accent text-2xl">✓</span><span>{feature}</span></li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -260,8 +255,8 @@ const LandingPage = () => {
         <section className="py-12 md:py-20 bg-gradient-to-br from-gray-900 to-black">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-8 md:mb-16">
-              <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-white">What Students Say</h2>
-              <p className="text-base md:text-xl text-gray-400">Join thousands learning engineering the interactive way</p>
+              <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-white">{t('landing.testimonials.title')}</h2>
+              <p className="text-base md:text-xl text-gray-400">{t('landing.testimonials.subtitle')}</p>
             </div>
 
             {/* Mobile: Horizontal scroll, Desktop: Grid */}
@@ -397,19 +392,19 @@ const LandingPage = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-8 md:mt-16 text-center">
               <div className="bg-gray-800/50 rounded-xl p-4 md:p-0 md:bg-transparent">
                 <div className="text-2xl md:text-4xl font-bold text-cyan-400 mb-1 md:mb-2">10,000+</div>
-                <div className="text-xs md:text-base text-gray-400">Active Students</div>
+                <div className="text-xs md:text-base text-gray-400">{t('landing.testimonials.stats.students')}</div>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 md:p-0 md:bg-transparent">
                 <div className="text-2xl md:text-4xl font-bold text-blue-400 mb-1 md:mb-2">150+</div>
-                <div className="text-xs md:text-base text-gray-400">MIT-Quality Lessons</div>
+                <div className="text-xs md:text-base text-gray-400">{t('landing.testimonials.stats.lessons')}</div>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 md:p-0 md:bg-transparent">
                 <div className="text-2xl md:text-4xl font-bold text-purple-400 mb-1 md:mb-2">4.9/5</div>
-                <div className="text-xs md:text-base text-gray-400">Average Rating</div>
+                <div className="text-xs md:text-base text-gray-400">{t('landing.testimonials.stats.rating')}</div>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 md:p-0 md:bg-transparent">
                 <div className="text-2xl md:text-4xl font-bold text-green-400 mb-1 md:mb-2">95%</div>
-                <div className="text-xs md:text-base text-gray-400">Completion Rate</div>
+                <div className="text-xs md:text-base text-gray-400">{t('landing.testimonials.stats.completion')}</div>
               </div>
             </div>
           </div>
@@ -417,11 +412,11 @@ const LandingPage = () => {
 
         <section className="py-20 bg-background-light">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-5xl font-bold mb-6 text-primary">Ready to Start Your Engineering Journey?</h2>
-            <p className="text-2xl text-text-secondary mb-12">Join thousands of students mastering engineering through interactive learning</p>
+            <h2 className="text-5xl font-bold mb-6 text-primary">{t('landing.cta.title')}</h2>
+            <p className="text-2xl text-text-secondary mb-12">{t('landing.cta.subtitle')}</p>
             <button onClick={() => navigate('/auth')} className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 text-white rounded-xl transition-all font-bold text-xl shadow-2xl hover:scale-105">
               <UserPlus className="w-7 h-7" />
-              <span>Get Started Free</span>
+              <span>{t('landing.cta.button')}</span>
             </button>
           </div>
         </section>
@@ -434,21 +429,21 @@ const LandingPage = () => {
               href="mailto:youseflovemessi@gmail.com" 
               className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
             >
-              Help
+              {t('nav.help')}
             </a>
             <span className="text-gray-500 text-2xl">|</span>
             <a 
               href="/privacy" 
               className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
             >
-              Privacy
+              {t('nav.privacy')}
             </a>
             <span className="text-gray-500 text-2xl">|</span>
             <a 
               href="/terms" 
               className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
             >
-              Terms
+              {t('nav.terms')}
             </a>
           </div>
           <p className="text-gray-400">{t('home.footer.copyright')}</p>

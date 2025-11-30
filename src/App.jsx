@@ -1112,6 +1112,8 @@ import FloatingAIHelper from './components/FloatingAIHelper';
 import ScrollToTop from './components/ScrollToTop';
 import MobileBottomNav from './components/MobileBottomNav';
 import { ReferralCapture } from './components/ReferralSystem';
+import BetaBanner from './components/BetaBanner';
+import FeedbackWidget from './components/FeedbackWidget';
 import { useState as useAppState } from 'react';
 
 export default function App() {
@@ -1121,8 +1123,10 @@ export default function App() {
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
       <Router>
+        <BetaBanner />
         <ReferralCapture />
         <FloatingAIHelper />
+        <FeedbackWidget />
         <ScrollToTop />
         <MobileBottomNav />
         <React.Suspense fallback={

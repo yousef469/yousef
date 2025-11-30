@@ -1,191 +1,209 @@
 {
-    "app": {
-        "title": "Engineerium",
-        "subtitle": "交互式3D工程模型"
+  "app": {
+    "title": "Engineerium",
+    "subtitle": "交互式3D工程模型"
+  },
+  "nav": {
+    "language": "语言",
+    "login": "登录",
+    "signUp": "注册",
+    "signOut": "退出",
+    "welcome": "欢迎",
+    "about": "关于",
+    "toolbox": "工具箱",
+    "pricing": "价格",
+    "help": "帮助",
+    "privacy": "隐私",
+    "terms": "条款"
+  },
+  "landing": {
+    "hero": {
+      "title": "通过以下方式学习工程",
+      "titleHighlight": "3D模型、模拟和AI",
+      "subtitle": "通过交互式3D爆炸视图、实时模拟和AI驱动的分析，掌握火箭、汽车、飞机和电子技术。",
+      "cta": "免费开始学习",
+      "stats": {
+        "lessons": "MIT级别课程",
+        "models": "3D模型",
+        "ai": "AI驱动分析"
+      }
     },
-    "nav": {
-        "language": "语言",
-        "login": "登录",
-        "signUp": "注册",
-        "signOut": "退出",
-        "welcome": "欢迎"
+    "preview": {
+      "title": "交互式3D爆炸视图",
+      "subtitle": "以惊人的细节探索每个组件",
+      "autoRotate": "自动旋转",
+      "partLabels": "零件标签",
+      "aiAnalysis": "AI分析",
+      "jarvisMode": "J.A.R.V.I.S. 模式",
+      "clickToExplore": "点击探索 →"
     },
-    "viewer": {
-        "title": "3D查看器",
-        "subtitle": "交互式工程模型",
-        "models": "模型",
-        "lessons": "课程",
-        "signOut": "退出",
-        "signedInAs": "登录为",
-        "specifications": "规格",
-        "engineeringLessons": "工程课程",
-        "keyConcepts": "关键概念：",
-        "interactiveExercise": "互动练习：",
-        "nozzlePlayground": "喷嘴游乐场",
-        "expansionRatio": "膨胀比",
-        "ambientPressure": "环境压力",
-        "throttle": "节流阀",
-        "specificImpulse": "比冲",
-        "thrust": "推力",
-        "keyInsights": "关键见解",
-        "searchPlaceholder": "搜索模型..."
+    "testimonial": {
+      "quote": "终于明白火箭是怎么工作的了！3D模型让一切都变得清晰。",
+      "author": "工程专业学生"
     },
-    "auth": {
-        "welcomeBack": "欢迎回来！",
-        "startJourney": "开始您的工程之旅",
-        "fullName": "全名",
-        "email": "电子邮件",
-        "password": "密码",
-        "createAccount": "创建账户",
-        "continueWith": "或继续使用",
-        "continueGoogle": "使用Google继续",
-        "dontHaveAccount": "还没有账户？",
-        "alreadyHaveAccount": "已有账户？",
-        "pleaseWait": "请稍候...",
-        "whySignUp": "为什么要创建账户？",
-        "benefit1": "访问所有带有逼真火焰效果的3D模型",
-        "benefit2": "由Gemini驱动的交互式AI导师",
-        "benefit3": "保存您喜欢的模型和进度",
-        "benefit4": "工程课程和教程",
-        "features": {
-            "models": "100+",
-            "modelsLabel": "3D模型",
-            "ai": "AI",
-            "aiLabel": "导师",
-            "free": "免费",
-            "freeLabel": "永久"
-        },
-        "errors": {
-            "nameRequired": "请输入您的全名",
-            "general": "发生错误"
-        }
+    "sections": {
+      "rockets": {
+        "title": "火箭力学",
+        "desc": "通过我们的交互式火箭力学模块掌握航空航天工程基础。",
+        "features": [
+          "通过3D模拟学习推力、阻力和轨道力学",
+          "实时探索NASA级别的火箭模型",
+          "了解推进系统和飞行动力学",
+          "通过交互式测验和挑战进行练习"
+        ]
+      },
+      "cars": {
+        "title": "汽车工程",
+        "desc": "深入了解汽车系统，理解现代车辆的工作原理。",
+        "features": [
+          "学习发动机力学、变速系统和动力总成",
+          "以3D方式探索悬挂、制动和转向系统",
+          "学习空气动力学和车辆动力学",
+          "真实场景的交互式模拟"
+        ]
+      },
+      "planes": {
+        "title": "航空力学",
+        "desc": "理解飞行原理和飞机工程。",
+        "features": [
+          "掌握升力、阻力、推力和重量原理",
+          "探索飞机结构和控制面",
+          "学习喷气发动机和推进系统",
+          "飞行动力学和稳定性分析"
+        ]
+      },
+      "robotics": {
+        "title": "机器人工程",
+        "desc": "构建智能系统，了解现代机器人技术。",
+        "features": [
+          "学习运动学、动力学和控制系统",
+          "探索传感器、执行器和机器人编程",
+          "学习机器人AI和机器学习",
+          "实践模拟和虚拟实验室"
+        ]
+      }
     },
-    "home": {
-        "hero": {
-            "title": "探索3D工程",
-            "subtitle": "选择一个类别查看带有交互控制的详细3D模型",
-            "new": "新功能：语音AI • 模型比较 • 排行榜 • PWA支持",
-            "getStarted": "免费开始",
-            "readyToExplore": "准备好探索了吗？",
-            "signUpNow": "立即注册以访问所有3D模型和AI驱动的学习"
-        },
-        "features": {
-            "dashboard": {
-                "title": "仪表板",
-                "desc": "跟踪进度"
-            },
-            "bookmarks": {
-                "title": "书签",
-                "desc": "保存课程"
-            },
-            "collaborate": {
-                "title": "协作",
-                "desc": "一起学习"
-            },
-            "upload": {
-                "title": "上传",
-                "desc": "分享模型"
-            },
-            "progression": {
-                "title": "进度",
-                "desc": "等级和奖励"
-            }
-        },
-        "viewer": {
-            "title": "3D模型查看器",
-            "desc": "在交互式3D中探索所有模型",
-            "button": "启动查看器"
-        },
-        "learn": {
-            "rockets": "学习火箭力学",
-            "rocketsDesc": "掌握推进、轨道力学、分级和发射系统",
-            "planes": "学习飞机力学",
-            "planesDesc": "了解空气动力学、飞行控制、发动机和航空系统",
-            "cars": "学习汽车力学",
-            "carsDesc": "探索发动机、变速器、悬架和汽车工程",
-            "button": "开始学习"
-        },
-        "interactive": {
-            "title": "互动学习",
-            "subtitle": "通过游戏和比较掌握工程"
-        },
-        "journey": {
-            "title": "工程之旅",
-            "desc": "完成挑战，看着你的火箭飞向太空！",
-            "quiz": "测验",
-            "matching": "配对",
-            "simulation": "模拟",
-            "building": "建造",
-            "button": "开始旅程"
-        },
-        "compare": {
-            "title": "比较模型",
-            "desc": "并排查看模型并了解差异！",
-            "rocket": "火箭",
-            "plane": "飞机",
-            "car": "汽车",
-            "button": "开始比较"
-        },
-        "ai": {
-            "title": "快速AI助手",
-            "subtitle": "立即获得工程问题的答案",
-            "placeholder": "询问有关火箭、飞机或汽车的任何问题...",
-            "ask": "询问",
-            "thinking": "思考中...",
-            "response": "AI回复",
-            "examples": "尝试询问：\"火箭发动机如何工作？\"或\"解释飞机机翼上的升力\""
-        },
-        "community": {
-            "title": "社区问答",
-            "subtitle": "提问并帮助他人学习"
-        },
-        "pricing": {
-            "title": "选择您的学习路径",
-            "subtitle": "免费开始，准备好加速时升级",
-            "popular": "最受欢迎",
-            "or": "或",
-            "note": "所有计划都包括访问我们的社区和定期内容更新",
-            "free": {
-                "name": "免费",
-                "cta": "开始",
-                "features": [
-                    "有限课程",
-                    "AI聊天配额",
-                    "无比较工具",
-                    "基础3D模型"
-                ]
-            },
-            "pro": {
-                "name": "专业版",
-                "period": "/月",
-                "altPrice": "$99/年",
-                "cta": "升级到专业版",
-                "features": [
-                    "完整课程",
-                    "无限AI辅导",
-                    "离线模式",
-                    "所有3D模型",
-                    "模型比较工具",
-                    "优先支持"
-                ]
-            },
-            "master": {
-                "name": "大师版",
-                "period": "/年",
-                "cta": "成为大师",
-                "features": [
-                    "专业版的所有功能",
-                    "VR/AR支持（准备就绪时）",
-                    "完成证书",
-                    "高级模拟",
-                    "独家内容",
-                    "直接导师访问"
-                ]
-            }
-        },
-        "footer": {
-            "copyright": "© 2025 Engineerium - 互动工程教育",
-            "version": "v2.0 - 语音AI • 模型比较 • 排行榜 • PWA"
-        }
+    "testimonials": {
+      "title": "学生评价",
+      "subtitle": "加入数千名以交互方式学习工程的学生",
+      "stats": {
+        "students": "活跃学生",
+        "lessons": "MIT级别课程",
+        "rating": "平均评分",
+        "completion": "完成率"
+      }
+    },
+    "cta": {
+      "title": "准备好开始你的工程之旅了吗？",
+      "subtitle": "加入数千名通过交互式学习掌握工程的学生",
+      "button": "免费开始"
     }
+  },
+  "home": {
+    "hero": {
+      "title": "以3D方式探索工程",
+      "subtitle": "选择一个类别，查看带有交互控制的详细3D模型",
+      "welcome": "欢迎迈出你工程职业生涯的第一步",
+      "new": "新功能：语音AI • 模型比较 • 排行榜 • PWA支持",
+      "getStarted": "免费开始",
+      "readyToExplore": "准备好探索了吗？",
+      "signUpNow": "立即注册，访问所有3D模型和AI驱动的学习"
+    },
+    "learn": {
+      "title": "学习工程",
+      "subtitle": "从火箭、飞机或汽车中选择开始学习",
+      "explore": "探索类别",
+      "rockets": "学习火箭力学",
+      "rocketsDesc": "掌握推进、轨道力学、分级和发射系统",
+      "planes": "学习飞机力学",
+      "planesDesc": "了解空气动力学、飞行控制、发动机和航空系统",
+      "cars": "学习汽车力学",
+      "carsDesc": "探索发动机、变速箱、悬挂和汽车工程",
+      "button": "开始学习"
+    },
+    "interactive": {
+      "title": "交互式学习",
+      "subtitle": "通过游戏和比较掌握工程"
+    },
+    "features": {
+      "compare": {
+        "title": "比较模型",
+        "desc": "并排查看模型，学习差异！",
+        "button": "比较模型",
+        "upgrade": "升级获取更多"
+      },
+      "community": {
+        "title": "社区",
+        "desc": "提问、分享项目、一起学习",
+        "button": "加入社区"
+      },
+      "career": {
+        "title": "职业项目",
+        "desc": "构建值得放入作品集的工程项目",
+        "button": "开始构建"
+      },
+      "internship": {
+        "title": "实习模拟器",
+        "desc": "来自SpaceX、特斯拉等公司的真实工程任务",
+        "button": "开始实习"
+      },
+      "homework": {
+        "title": "AI作业解答器",
+        "desc": "获取任何机械工程问题的逐步解答",
+        "button": "解决我的作业"
+      },
+      "jarvis": {
+        "title": "J.A.R.V.I.S. 模式",
+        "fullName": "超级智能系统",
+        "desc": "AI驱动的3D分析。上传模型，用相机扫描机器，获得即时解释。",
+        "button": "进入JARVIS模式"
+      }
+    },
+    "challenges": {
+      "title": "每日和每周挑战"
+    },
+    "compare": {
+      "title": "比较模型",
+      "desc": "并排查看模型，学习差异！",
+      "rocket": "火箭",
+      "plane": "飞机",
+      "car": "汽车",
+      "button": "开始比较"
+    },
+    "footer": {
+      "copyright": "© 2025 Engineerium - 交互式工程教育",
+      "version": "v2.0 - 语音AI • 模型比较 • 排行榜 • PWA"
+    }
+  },
+  "viewer": {
+    "title": "3D查看器",
+    "subtitle": "交互式工程模型",
+    "models": "模型",
+    "lessons": "课程",
+    "signOut": "退出",
+    "signedInAs": "登录为",
+    "specifications": "规格",
+    "engineeringLessons": "工程课程",
+    "keyConcepts": "关键概念：",
+    "interactiveExercise": "交互练习：",
+    "searchPlaceholder": "搜索模型..."
+  },
+  "auth": {
+    "welcomeBack": "欢迎回来！",
+    "startJourney": "开始你的工程之旅",
+    "fullName": "全名",
+    "email": "邮箱",
+    "password": "密码",
+    "createAccount": "创建账户",
+    "continueWith": "或继续使用",
+    "continueGoogle": "使用Google继续",
+    "dontHaveAccount": "没有账户？",
+    "alreadyHaveAccount": "已有账户？",
+    "pleaseWait": "请稍候...",
+    "whySignUp": "为什么要创建账户？",
+    "benefit1": "访问所有带有逼真火焰效果的3D模型",
+    "benefit2": "由Gemini驱动的交互式AI导师",
+    "benefit3": "保存你喜欢的模型和进度",
+    "benefit4": "工程课程和教程"
+  }
 }

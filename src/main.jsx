@@ -7,14 +7,16 @@ import { GenerationsProvider } from './contexts/GenerationsContext'
 import { ProgressProvider } from './contexts/ProgressContext'
 import { UsageLimitsProvider } from './contexts/UsageLimitsContext'
 import App from './App.jsx'
+import { initErrorTracking } from './services/errorTracking'
 
 // Defer heavy, non-critical widget until after initial render
 const LazyTawkToChat = React.lazy(() => import('./components/TawkToChat'))
 import './index.css'
 import './i18n/config'
 
-// Analytics disabled - was causing crashes
-console.log('ℹ️ Analytics disabled (optional feature)');
+// Initialize error tracking for production
+initErrorTracking();
+console.log('✅ Vercel Analytics + Error Tracking enabled');
 
 // Deferred mount for TawkToChat
 function DeferredTawk() {

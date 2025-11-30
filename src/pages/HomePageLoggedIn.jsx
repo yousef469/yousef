@@ -61,9 +61,9 @@ const HomePageLoggedIn = () => {
               <Logo size="md" showText={true} />
               
               <nav className="hidden md:flex items-center gap-6">
-                <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">About</button>
-                <button onClick={() => navigate('/toolbox')} className="text-white hover:text-primary transition-colors font-medium">Toolbox</button>
-                <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">Pricing</button>
+                <button onClick={() => navigate('/about')} className="text-white hover:text-primary transition-colors font-medium">{t('nav.about')}</button>
+                <button onClick={() => navigate('/toolbox')} className="text-white hover:text-primary transition-colors font-medium">{t('nav.toolbox')}</button>
+                <button onClick={() => navigate('/pricing')} className="text-white hover:text-primary transition-colors font-medium">{t('nav.pricing')}</button>
               </nav>
             </div>
             
@@ -124,13 +124,13 @@ const HomePageLoggedIn = () => {
               </div>
             </div>
             
-            <h3 className="text-3xl font-bold mb-4 text-white text-center">Learn Engineering</h3>
+            <h3 className="text-3xl font-bold mb-4 text-white text-center">{t('home.learn.title')}</h3>
             <p className="text-white/90 text-center text-lg mb-6">
-              Choose from Rockets, Planes, or Cars to start learning
+              {t('home.learn.subtitle')}
             </p>
             
             <div className="flex items-center justify-center text-white font-semibold group-hover:gap-3 gap-2 transition-all text-lg">
-              <span>Explore Categories</span>
+              <span>{t('home.learn.explore')}</span>
               <span className="text-2xl group-hover:translate-x-1 transition-transform">→</span>
             </div>
           </div>
@@ -220,13 +220,13 @@ const HomePageLoggedIn = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">🌍 Community</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🌍 {t('home.features.community.title')}</h3>
               <p className="text-white/90 text-center mb-4">
-                Ask questions, share projects, and learn together
+                {t('home.features.community.desc')}
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Join Community</span>
+                <span>{t('home.features.community.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -246,13 +246,13 @@ const HomePageLoggedIn = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 Career Projects</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">🚀 {t('home.features.career.title')}</h3>
               <p className="text-white/90 text-center mb-4">
-                Build portfolio-worthy engineering projects
+                {t('home.features.career.desc')}
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Start Building</span>
+                <span>{t('home.features.career.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -272,13 +272,13 @@ const HomePageLoggedIn = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">💼 Internship Simulator</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">💼 {t('home.features.internship.title')}</h3>
               <p className="text-white/90 text-center mb-4">
-                Real engineering tasks from SpaceX, Tesla & more
+                {t('home.features.internship.desc')}
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Start Internship</span>
+                <span>{t('home.features.internship.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -298,13 +298,13 @@ const HomePageLoggedIn = () => {
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 text-white text-center">✨ AI Homework Solver</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">✨ {t('home.features.homework.title')}</h3>
               <p className="text-white/90 text-center mb-4">
-                Get step-by-step solutions for any mechanical engineering problem
+                {t('home.features.homework.desc')}
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Solve My Homework</span>
+                <span>{t('home.features.homework.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -329,17 +329,17 @@ const HomePageLoggedIn = () => {
               </div>
               
               <h3 className="text-2xl font-bold mb-2 text-white text-center flex items-center justify-center gap-2">
-                <span className="text-cyan-300">J.A.R.V.I.S.</span> Mode
+                <span className="text-cyan-300">{t('home.features.jarvis.title')}</span>
               </h3>
               <p className="text-xs text-cyan-200 text-center mb-3 font-mono tracking-wider">
-                Just A Rather Very Intelligent System
+                {t('home.features.jarvis.fullName')}
               </p>
               <p className="text-white/90 text-center mb-4">
-                AI-powered 3D analysis. Upload models, scan machines with camera, get instant explanations.
+                {t('home.features.jarvis.desc')}
               </p>
 
               <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                <span>Enter JARVIS Mode</span>
+                <span>{t('home.features.jarvis.button')}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
@@ -350,7 +350,7 @@ const HomePageLoggedIn = () => {
 
       {/* Daily & Weekly Challenges - At Bottom */}
       <div className="max-w-6xl mx-auto px-4 mt-12 space-y-6">
-        <h2 className="text-2xl font-bold text-white text-center mb-6">Daily & Weekly Challenges</h2>
+        <h2 className="text-2xl font-bold text-white text-center mb-6">{t('home.challenges.title')}</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DailyChallenge />
           <WeeklyChallenge />
@@ -364,21 +364,21 @@ const HomePageLoggedIn = () => {
               onClick={() => navigate('/help')}
               className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline cursor-pointer"
             >
-              Help
+              {t('nav.help')}
             </button>
             <span className="text-gray-500 text-2xl">|</span>
             <button 
               onClick={() => navigate('/privacy')}
               className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline cursor-pointer"
             >
-              Privacy
+              {t('nav.privacy')}
             </button>
             <span className="text-gray-500 text-2xl">|</span>
             <button 
               onClick={() => navigate('/terms')}
               className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline cursor-pointer"
             >
-              Terms
+              {t('nav.terms')}
             </button>
           </div>
           <p className="text-gray-400">{t('home.footer.copyright')}</p>

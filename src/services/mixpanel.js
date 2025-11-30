@@ -1,7 +1,23 @@
-// Mixpanel disabled - was causing crashes
-// All functions are no-ops until re-enabled
-const MIXPANEL_ENABLED = false;
+// Mixpanel Analytics - ENABLED for production
+import mixpanel from 'mixpanel-browser';
+
 const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN || null;
+const MIXPANEL_ENABLED = !!MIXPANEL_TOKEN;
+
+// Initialize Mixpanel
+if (MIXPANEL_ENABLED) {
+  try {
+    mixpanel.init(MIXPANEL_TOKEN, {
+      debug: import.meta.env.DEV,
+      track_pageview: true,
+      persistence: 'localStorage',
+      ignore_dnt: false,
+    });
+    console.log('✅ Mixpanel analytics initialized');
+  } catch (error) {
+    console.warn('Mixpanel init failed:', error.message);
+  }
+}
 
 // Helper to safely call mixpanel methods (currently disabled)
 const safeMixpanel = (fn) => {

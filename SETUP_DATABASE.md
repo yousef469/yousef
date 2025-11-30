@@ -69,3 +69,32 @@ The community will work perfectly:
 - ✅ Real-time updates
 
 **You only need to do this once!**
+
+
+## Feedback Table (for user feedback widget)
+
+```sql
+-- Create feedback table
+CREATE TABLE IF NOT EXISTS feedback (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  type VARCHAR(50) NOT NULL DEFAULT 'general',
+  message TEXT NOT NULL,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  user_id UUID REFERENCES auth.users(id),
+  user_email VARCHAR(255),
+  page_url TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
+
+-- Allow anyone to insert feedback (even anonymous)
+CREATE POLICY "Anyone can submit feedback" ON feedback
+  FOR INSERT WITH CHECK (true);
+
+-- Only admins can read feedback
+CREATE POLICY "Admins can read feedback" ON feedback
+  FOR SELECT USING (auth.jwt() ->> 'role' = 'admin');
+```

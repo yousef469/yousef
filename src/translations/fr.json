@@ -1,191 +1,209 @@
 {
-    "app": {
-        "title": "Engineerium",
-        "subtitle": "Modèles d'ingénierie 3D interactifs"
+  "app": {
+    "title": "Engineerium",
+    "subtitle": "Modèles d'Ingénierie 3D Interactifs"
+  },
+  "nav": {
+    "language": "Langue",
+    "login": "Connexion",
+    "signUp": "S'inscrire",
+    "signOut": "Déconnexion",
+    "welcome": "Bienvenue",
+    "about": "À propos",
+    "toolbox": "Outils",
+    "pricing": "Tarifs",
+    "help": "Aide",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "landing": {
+    "hero": {
+      "title": "Apprenez l'Ingénierie Avec",
+      "titleHighlight": "Modèles 3D, Simulations et IA",
+      "subtitle": "Maîtrisez les fusées, voitures, avions et l'électronique grâce à des vues 3D interactives, des simulations en temps réel et une analyse alimentée par l'IA.",
+      "cta": "Commencer Gratuitement",
+      "stats": {
+        "lessons": "Leçons Qualité MIT",
+        "models": "Modèles 3D",
+        "ai": "Analyse Alimentée"
+      }
     },
-    "nav": {
-        "language": "Langue",
-        "login": "Connexion",
-        "signUp": "Inscription",
-        "signOut": "Déconnexion",
-        "welcome": "Bienvenue"
+    "preview": {
+      "title": "Vues 3D Éclatées Interactives",
+      "subtitle": "Explorez chaque composant en détail époustouflant",
+      "autoRotate": "Rotation Auto",
+      "partLabels": "Étiquettes des Pièces",
+      "aiAnalysis": "Analyse IA",
+      "jarvisMode": "MODE J.A.R.V.I.S.",
+      "clickToExplore": "Cliquez pour explorer →"
     },
-    "viewer": {
-        "title": "Visionneuse 3D",
-        "subtitle": "Modèles d'ingénierie interactifs",
-        "models": "MODÈLES",
-        "lessons": "Leçons",
-        "signOut": "Déconnexion",
-        "signedInAs": "Connecté en tant que",
-        "specifications": "Spécifications",
-        "engineeringLessons": "Leçons d'ingénierie",
-        "keyConcepts": "Concepts clés :",
-        "interactiveExercise": "Exercice interactif :",
-        "nozzlePlayground": "Terrain de jeu de buse",
-        "expansionRatio": "Rapport d'expansion",
-        "ambientPressure": "Pression ambiante",
-        "throttle": "Accélérateur",
-        "specificImpulse": "Impulsion spécifique",
-        "thrust": "Poussée",
-        "keyInsights": "Informations clés",
-        "searchPlaceholder": "Rechercher des modèles..."
+    "testimonial": {
+      "quote": "J'ai enfin compris comment fonctionnent les fusées ! Les modèles 3D rendent tout clair.",
+      "author": "Étudiant en Ingénierie"
     },
-    "auth": {
-        "welcomeBack": "Bon retour !",
-        "startJourney": "Commencez votre parcours en ingénierie",
-        "fullName": "Nom complet",
-        "email": "Email",
-        "password": "Mot de passe",
-        "createAccount": "Créer un compte",
-        "continueWith": "Ou continuer avec",
-        "continueGoogle": "Continuer avec Google",
-        "dontHaveAccount": "Vous n'avez pas de compte ?",
-        "alreadyHaveAccount": "Vous avez déjà un compte ?",
-        "pleaseWait": "Veuillez patienter...",
-        "whySignUp": "Pourquoi créer un compte ?",
-        "benefit1": "Accédez à tous les modèles 3D avec des effets de feu réalistes",
-        "benefit2": "Tuteur IA interactif propulsé par Gemini",
-        "benefit3": "Enregistrez vos modèles préférés et votre progression",
-        "benefit4": "Leçons et tutoriels d'ingénierie",
-        "features": {
-            "models": "100+",
-            "modelsLabel": "Modèles 3D",
-            "ai": "IA",
-            "aiLabel": "Tuteur",
-            "free": "Gratuit",
-            "freeLabel": "Pour toujours"
-        },
-        "errors": {
-            "nameRequired": "Veuillez entrer votre nom complet",
-            "general": "Une erreur s'est produite"
-        }
+    "sections": {
+      "rockets": {
+        "title": "Mécanique des Fusées",
+        "desc": "Maîtrisez les fondamentaux de l'ingénierie aérospatiale avec notre module interactif de mécanique des fusées.",
+        "features": [
+          "Apprenez la poussée, la traînée et la mécanique orbitale grâce aux simulations 3D",
+          "Explorez des modèles de fusées de niveau NASA en 3D en temps réel",
+          "Comprenez les systèmes de propulsion et la dynamique de vol",
+          "Pratiquez avec des quiz et défis interactifs"
+        ]
+      },
+      "cars": {
+        "title": "Ingénierie Automobile",
+        "desc": "Plongez dans les systèmes automobiles et comprenez comment fonctionnent les véhicules modernes.",
+        "features": [
+          "Étudiez la mécanique des moteurs, les systèmes de transmission et les groupes motopropulseurs",
+          "Explorez les systèmes de suspension, freinage et direction en 3D",
+          "Apprenez l'aérodynamique et la dynamique des véhicules",
+          "Simulations interactives de scénarios réels"
+        ]
+      },
+      "planes": {
+        "title": "Mécanique Aéronautique",
+        "desc": "Comprenez les principes du vol et l'ingénierie aéronautique.",
+        "features": [
+          "Maîtrisez les principes de portance, traînée, poussée et poids",
+          "Explorez les structures d'aéronefs et les surfaces de contrôle",
+          "Étudiez les moteurs à réaction et les systèmes de propulsion",
+          "Dynamique de vol et analyse de stabilité"
+        ]
+      },
+      "robotics": {
+        "title": "Ingénierie Robotique",
+        "desc": "Construisez des systèmes intelligents et comprenez la robotique moderne.",
+        "features": [
+          "Apprenez la cinématique, la dynamique et les systèmes de contrôle",
+          "Explorez les capteurs, actionneurs et la programmation de robots",
+          "Étudiez l'IA et l'apprentissage automatique pour la robotique",
+          "Simulations pratiques et laboratoires virtuels"
+        ]
+      }
     },
-    "home": {
-        "hero": {
-            "title": "Explorez l'ingénierie en 3D",
-            "subtitle": "Choisissez une catégorie pour visualiser des modèles 3D détaillés avec commandes interactives",
-            "new": "NOUVEAU : IA vocale • Comparaison de modèles • Classements • Support PWA",
-            "getStarted": "Commencez gratuitement",
-            "readyToExplore": "Prêt à explorer ?",
-            "signUpNow": "Inscrivez-vous maintenant pour accéder à tous les modèles 3D et à l'apprentissage assisté par IA"
-        },
-        "features": {
-            "dashboard": {
-                "title": "Tableau de bord",
-                "desc": "Suivre la progression"
-            },
-            "bookmarks": {
-                "title": "Favoris",
-                "desc": "Sauvegarder leçons"
-            },
-            "collaborate": {
-                "title": "Collaborer",
-                "desc": "Étudier ensemble"
-            },
-            "upload": {
-                "title": "Téléverser",
-                "desc": "Partager modèles"
-            },
-            "progression": {
-                "title": "Progression",
-                "desc": "Niveaux & récompenses"
-            }
-        },
-        "viewer": {
-            "title": "Visionneuse de modèles 3D",
-            "desc": "Explorez tous les modèles en 3D interactive",
-            "button": "Lancer la visionneuse"
-        },
-        "learn": {
-            "rockets": "Apprendre la mécanique des fusées",
-            "rocketsDesc": "Maîtrisez la propulsion, la mécanique orbitale, le staging et les systèmes de lancement",
-            "planes": "Apprendre la mécanique des avions",
-            "planesDesc": "Comprendre l'aérodynamique, les commandes de vol, les moteurs et les systèmes aéronautiques",
-            "cars": "Apprendre la mécanique automobile",
-            "carsDesc": "Explorez les moteurs, transmissions, suspensions et l'ingénierie automobile",
-            "button": "Commencer à apprendre"
-        },
-        "interactive": {
-            "title": "Apprentissage interactif",
-            "subtitle": "Maîtrisez l'ingénierie grâce aux jeux et comparaisons"
-        },
-        "journey": {
-            "title": "Parcours d'ingénierie",
-            "desc": "Relevez des défis et regardez votre fusée s'envoler dans l'espace !",
-            "quiz": "Quiz",
-            "matching": "Association",
-            "simulation": "Simulation",
-            "building": "Construction",
-            "button": "Commencer le parcours"
-        },
-        "compare": {
-            "title": "Comparer les modèles",
-            "desc": "Visualisez les modèles côte à côte et découvrez les différences !",
-            "rocket": "Fusée",
-            "plane": "Avion",
-            "car": "Voiture",
-            "button": "Commencer la comparaison"
-        },
-        "ai": {
-            "title": "Assistant IA rapide",
-            "subtitle": "Obtenez des réponses instantanées à vos questions d'ingénierie",
-            "placeholder": "Posez n'importe quelle question sur les fusées, avions ou voitures...",
-            "ask": "Demander",
-            "thinking": "Réflexion...",
-            "response": "Réponse IA",
-            "examples": "Essayez de demander : \"Comment fonctionne un moteur de fusée ?\" ou \"Expliquez la force de portance sur les ailes d'avion\""
-        },
-        "community": {
-            "title": "Questions & Réponses Communautaires",
-            "subtitle": "Posez des questions et aidez les autres à apprendre"
-        },
-        "pricing": {
-            "title": "Choisissez votre parcours d'apprentissage",
-            "subtitle": "Commencez gratuitement, passez à la version supérieure quand vous êtes prêt à accélérer",
-            "popular": "Le plus populaire",
-            "or": "ou",
-            "note": "Tous les forfaits incluent l'accès à notre communauté et des mises à jour régulières du contenu",
-            "free": {
-                "name": "Gratuit",
-                "cta": "Commencer",
-                "features": [
-                    "Leçons limitées",
-                    "Quota de chat IA",
-                    "Pas d'outil de comparaison",
-                    "Modèles 3D de base"
-                ]
-            },
-            "pro": {
-                "name": "Pro",
-                "period": "/mois",
-                "altPrice": "99$/an",
-                "cta": "Passer à Pro",
-                "features": [
-                    "Leçons complètes",
-                    "Tutorat IA illimité",
-                    "Mode hors ligne",
-                    "Tous les modèles 3D",
-                    "Outil de comparaison de modèles",
-                    "Support prioritaire"
-                ]
-            },
-            "master": {
-                "name": "Master",
-                "period": "/an",
-                "cta": "Devenir Master",
-                "features": [
-                    "Tout ce qui est dans Pro",
-                    "Support VR/AR (quand disponible)",
-                    "Certificat d'achèvement",
-                    "Simulations avancées",
-                    "Contenu exclusif",
-                    "Accès direct au mentor"
-                ]
-            }
-        },
-        "footer": {
-            "copyright": "© 2025 Engineerium - Éducation interactive en ingénierie",
-            "version": "v2.0 - IA vocale • Comparaison de modèles • Classements • PWA"
-        }
+    "testimonials": {
+      "title": "Ce Que Disent les Étudiants",
+      "subtitle": "Rejoignez des milliers d'apprenants en ingénierie de manière interactive",
+      "stats": {
+        "students": "Étudiants Actifs",
+        "lessons": "Leçons Qualité MIT",
+        "rating": "Note Moyenne",
+        "completion": "Taux de Complétion"
+      }
+    },
+    "cta": {
+      "title": "Prêt à Commencer Votre Parcours en Ingénierie ?",
+      "subtitle": "Rejoignez des milliers d'étudiants maîtrisant l'ingénierie grâce à l'apprentissage interactif",
+      "button": "Commencer Gratuitement"
     }
+  },
+  "home": {
+    "hero": {
+      "title": "Explorez l'Ingénierie en 3D",
+      "subtitle": "Choisissez une catégorie pour voir des modèles 3D détaillés avec des contrôles interactifs",
+      "welcome": "Bienvenue dans vos premiers pas vers votre carrière d'ingénieur",
+      "new": "NOUVEAU : Voix IA • Comparaison de Modèles • Classements • Support PWA",
+      "getStarted": "Commencer Gratuitement",
+      "readyToExplore": "Prêt à explorer ?",
+      "signUpNow": "Inscrivez-vous maintenant pour accéder à tous les modèles 3D et à l'apprentissage alimenté par l'IA"
+    },
+    "learn": {
+      "title": "Apprendre l'Ingénierie",
+      "subtitle": "Choisissez parmi Fusées, Avions ou Voitures pour commencer à apprendre",
+      "explore": "Explorer les Catégories",
+      "rockets": "Apprendre la Mécanique des Fusées",
+      "rocketsDesc": "Maîtrisez la propulsion, la mécanique orbitale, les étages et les systèmes de lancement",
+      "planes": "Apprendre la Mécanique des Avions",
+      "planesDesc": "Comprenez l'aérodynamique, les commandes de vol, les moteurs et les systèmes aéronautiques",
+      "cars": "Apprendre la Mécanique Auto",
+      "carsDesc": "Explorez les moteurs, transmissions, suspensions et l'ingénierie automobile",
+      "button": "Commencer à Apprendre"
+    },
+    "interactive": {
+      "title": "Apprentissage Interactif",
+      "subtitle": "Maîtrisez l'ingénierie grâce aux jeux et comparaisons"
+    },
+    "features": {
+      "compare": {
+        "title": "Comparer les Modèles",
+        "desc": "Voyez les modèles côte à côte et apprenez les différences !",
+        "button": "Comparer les Modèles",
+        "upgrade": "Passer à la Version Supérieure"
+      },
+      "community": {
+        "title": "Communauté",
+        "desc": "Posez des questions, partagez des projets et apprenez ensemble",
+        "button": "Rejoindre la Communauté"
+      },
+      "career": {
+        "title": "Projets de Carrière",
+        "desc": "Construisez des projets dignes de votre portfolio",
+        "button": "Commencer à Construire"
+      },
+      "internship": {
+        "title": "Simulateur de Stage",
+        "desc": "Tâches d'ingénierie réelles de SpaceX, Tesla et plus",
+        "button": "Commencer le Stage"
+      },
+      "homework": {
+        "title": "Solveur de Devoirs IA",
+        "desc": "Obtenez des solutions étape par étape pour tout problème d'ingénierie mécanique",
+        "button": "Résoudre Mon Devoir"
+      },
+      "jarvis": {
+        "title": "Mode J.A.R.V.I.S.",
+        "fullName": "Système Très Intelligent",
+        "desc": "Analyse 3D alimentée par l'IA. Téléchargez des modèles, scannez des machines avec la caméra, obtenez des explications instantanées.",
+        "button": "Entrer en Mode JARVIS"
+      }
+    },
+    "challenges": {
+      "title": "Défis Quotidiens et Hebdomadaires"
+    },
+    "compare": {
+      "title": "Comparer les Modèles",
+      "desc": "Voyez les modèles côte à côte et apprenez les différences !",
+      "rocket": "Fusée",
+      "plane": "Avion",
+      "car": "Voiture",
+      "button": "Commencer à Comparer"
+    },
+    "footer": {
+      "copyright": "© 2025 Engineerium - Éducation en Ingénierie Interactive",
+      "version": "v2.0 - Voix IA • Comparaison de Modèles • Classements • PWA"
+    }
+  },
+  "viewer": {
+    "title": "Visionneuse 3D",
+    "subtitle": "Modèles d'Ingénierie Interactifs",
+    "models": "MODÈLES",
+    "lessons": "Leçons",
+    "signOut": "Déconnexion",
+    "signedInAs": "Connecté en tant que",
+    "specifications": "Spécifications",
+    "engineeringLessons": "Leçons d'Ingénierie",
+    "keyConcepts": "Concepts Clés :",
+    "interactiveExercise": "Exercice Interactif :",
+    "searchPlaceholder": "Rechercher des modèles..."
+  },
+  "auth": {
+    "welcomeBack": "Bon retour !",
+    "startJourney": "Commencez votre parcours en ingénierie",
+    "fullName": "Nom Complet",
+    "email": "Email",
+    "password": "Mot de passe",
+    "createAccount": "Créer un Compte",
+    "continueWith": "Ou continuez avec",
+    "continueGoogle": "Continuer avec Google",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "pleaseWait": "Veuillez patienter...",
+    "whySignUp": "Pourquoi créer un compte ?",
+    "benefit1": "Accédez à tous les modèles 3D avec des effets de feu réalistes",
+    "benefit2": "Tuteur IA interactif alimenté par Gemini",
+    "benefit3": "Sauvegardez vos modèles favoris et votre progression",
+    "benefit4": "Leçons et tutoriels d'ingénierie"
+  }
 }
