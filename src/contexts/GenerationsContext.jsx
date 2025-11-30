@@ -40,7 +40,6 @@ export function GenerationsProvider({ children }) {
         .single();
 
       if (error && error.code !== 'PGRST116' && error.code !== '42P01') {
-        console.warn('Generations table not ready:', error.message);
         setLoading(false);
         return;
       }
@@ -64,7 +63,7 @@ export function GenerationsProvider({ children }) {
         await createUserGenerations();
       }
     } catch (error) {
-      console.error('Error loading generations:', error);
+      // Error loading generations
     } finally {
       setLoading(false);
     }
@@ -100,7 +99,7 @@ export function GenerationsProvider({ children }) {
       setTrialEndDate(trialEnd.toISOString());
       setIsTrialActive(true);
     } catch (error) {
-      console.error('Error creating generations:', error);
+      // Error creating generations
     }
   }
 
@@ -132,7 +131,6 @@ export function GenerationsProvider({ children }) {
       
       return { success: true };
     } catch (error) {
-      console.error('Error using generation:', error);
       return { success: false, error: error.message };
     }
   }
@@ -213,7 +211,7 @@ export function GenerationsProvider({ children }) {
       
       await loadUserGenerations();
     } catch (error) {
-      console.error('Error upgrading tier:', error);
+      // Error upgrading tier
     }
   }
 

@@ -120,7 +120,6 @@ export async function createCheckoutSession(priceId, userId) {
       }
     }
   } catch (error) {
-    console.error('Stripe checkout error:', error);
     throw error;
   }
 }
@@ -138,7 +137,6 @@ export async function getSubscriptionStatus(userId) {
 
     return await response.json();
   } catch (error) {
-    console.error('Get subscription error:', error);
     return { plan: 'free', credits: 5 };
   }
 }
@@ -162,7 +160,6 @@ export async function cancelSubscription(userId) {
 
     return await response.json();
   } catch (error) {
-    console.error('Cancel subscription error:', error);
     throw error;
   }
 }
@@ -194,7 +191,6 @@ export async function deductCredit(userId) {
 
     return await response.json();
   } catch (error) {
-    console.error('Deduct credit error:', error);
     throw error;
   }
 }

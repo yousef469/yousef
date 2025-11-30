@@ -16,7 +16,9 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1600,
+    // SECURITY: No source maps in production
     sourcemap: false,
+    // Use esbuild for minification (built-in, fast)
     minify: 'esbuild',
     target: 'esnext',
     commonjsOptions: {

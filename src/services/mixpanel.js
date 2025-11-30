@@ -8,24 +8,23 @@ const MIXPANEL_ENABLED = !!MIXPANEL_TOKEN;
 if (MIXPANEL_ENABLED) {
   try {
     mixpanel.init(MIXPANEL_TOKEN, {
-      debug: import.meta.env.DEV,
+      debug: false,
       track_pageview: true,
       persistence: 'localStorage',
       ignore_dnt: false,
     });
-    console.log('✅ Mixpanel analytics initialized');
   } catch (error) {
-    console.warn('Mixpanel init failed:', error.message);
+    // Silently fail
   }
 }
 
-// Helper to safely call mixpanel methods (currently disabled)
+// Helper to safely call mixpanel methods
 const safeMixpanel = (fn) => {
   if (!MIXPANEL_ENABLED || !MIXPANEL_TOKEN) return;
   try {
     fn();
   } catch (error) {
-    console.warn('Mixpanel error (non-critical):', error.message);
+    // Silently fail
   }
 };
 

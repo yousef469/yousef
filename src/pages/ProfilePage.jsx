@@ -44,7 +44,6 @@ export default function ProfilePage() {
         setUsername(user.email?.split('@')[0] || 'User');
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
       setUsername(user.email?.split('@')[0] || 'User');
     } finally {
       setLoadingProfile(false);
@@ -59,19 +58,9 @@ export default function ProfilePage() {
   const xpInCurrentLevel = totalXP % 1000;
   const achievementsCount = progress.achievements?.length || 0;
 
-  // Debug logging
-  console.log('Profile Debug:', {
-    totalXP,
-    level,
-    completedLessons,
-    userProfile,
-    progressData: progress
-  });
-
-  // TEMPORARY: Clear fake data if user has 0 completed lessons but shows XP
+  // Clear fake data if user has 0 completed lessons but shows XP
   useEffect(() => {
     if (completedLessons === 0 && totalXP > 0 && user) {
-      console.warn('⚠️ Detected fake XP data! Clearing...');
       // Clear fake data from Supabase
       supabase
         .from('user_profiles')
@@ -82,8 +71,7 @@ export default function ProfilePage() {
         })
         .eq('user_id', user.id)
         .then(() => {
-          console.log('✅ Fake data cleared! Please refresh the page.');
-          alert('Fake data detected and cleared! Please refresh the page (Ctrl+R)');
+          alert('Data synced! Please refresh the page (Ctrl+R)');
         });
     }
   }, [completedLessons, totalXP, user]);
@@ -181,7 +169,6 @@ export default function ProfilePage() {
       setIsEditing(false);
       alert('✅ Profile updated successfully!');
     } catch (error) {
-      console.error('Error saving profile:', error);
       alert('❌ Error saving profile. Please try again.');
     } finally {
       setSaving(false);

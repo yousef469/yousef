@@ -32,7 +32,6 @@ export default function PricingPage() {
       await createCheckoutSession(priceId, user.id);
       
     } catch (error) {
-      console.error('Payment error:', error);
       alert(`Payment Error: ${error.message}\n\nPlease try again or contact support.`);
     } finally {
       setLoading(null);

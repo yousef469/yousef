@@ -619,11 +619,8 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
           scene.add(model);
           meshRef.current = model;
         },
-        (progress) => {
-          console.log('Loading:', (progress.loaded / progress.total * 100) + '%');
-        },
+        () => {},
         (error) => {
-          console.error('Error loading model:', error);
           // Fallback to procedural model
           const fallbackModel = modelType === 'plane' ? createPlane() : createCar();
           scene.add(fallbackModel);

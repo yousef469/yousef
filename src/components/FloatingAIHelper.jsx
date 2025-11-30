@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Minimize2, Maximize2, BookOpen, Brain, Lock, Crown, Mic, MicOff } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { Bot, X, Send, Minimize2, Maximize2, Crown, Mic, MicOff } from 'lucide-react';
 import { useProgress } from '../contexts/ProgressContext';
 import { useUsageLimits } from '../contexts/UsageLimitsContext';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import speechRecognitionService, { requestMicrophonePermission } from '../services/speechRecognition';
 
 export default function FloatingAIHelper() {
@@ -176,7 +175,6 @@ export default function FloatingAIHelper() {
       const response = await callGeminiAPI(fullPrompt);
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (error) {
-      console.error('Error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: '❌ Sorry, I encountered an error. Please check your API key and try again.' 
@@ -279,8 +277,6 @@ Start your response with "🎯 **Career Advisor Mode**" to indicate you're givin
 
       setMessages(prev => [...prev, { role: 'assistant', content: text, context: context.page }]);
     } catch (error) {
-      console.error('AI Error:', error);
-      
       let errorMessage = '❌ Sorry, I encountered an error. Please try again.';
       
       if (error.message?.includes('429') || error.message?.includes('quota')) {

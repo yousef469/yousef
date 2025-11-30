@@ -8,15 +8,18 @@ import { ProgressProvider } from './contexts/ProgressContext'
 import { UsageLimitsProvider } from './contexts/UsageLimitsContext'
 import App from './App.jsx'
 import { initErrorTracking } from './services/errorTracking'
+import { initSecurity } from './services/security'
 
 // Defer heavy, non-critical widget until after initial render
 const LazyTawkToChat = React.lazy(() => import('./components/TawkToChat'))
 import './index.css'
 import './i18n/config'
 
+// Initialize security measures (disables console, dev tools in production)
+initSecurity();
+
 // Initialize error tracking for production
 initErrorTracking();
-console.log('✅ Vercel Analytics + Error Tracking enabled');
 
 // Deferred mount for TawkToChat
 function DeferredTawk() {

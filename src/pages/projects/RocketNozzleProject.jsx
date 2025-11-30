@@ -123,7 +123,6 @@ This design ${efficiency > 85 ? 'shows excellent optimization' : 'has room for i
     `.trim();
     
     alert(report);
-    console.log(report);
   };
 
   const controls = (

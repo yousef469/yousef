@@ -250,8 +250,6 @@ export const awardXP = async (userId, xpAmount, activityType = 'general', activi
     .select()
     .single();
   
-  console.log(`✅ Awarded ${xpAmount} XP for ${activityType}. Total: ${newXP} XP, Level: ${newLevel}`);
-  
   return { 
     data, 
     error, 
@@ -281,7 +279,6 @@ export const getCompletedLessons = async (userId, subject) => {
     
     return { data: subjectLessons, error: null };
   } catch (error) {
-    console.error('Error getting completed lessons:', error);
     return { data: [], error };
   }
 };
@@ -301,7 +298,6 @@ export const isLessonUnlocked = async (userId, subject, lessonId) => {
     
     return { unlocked: previousLessonCompleted };
   } catch (error) {
-    console.error('Error checking lesson unlock:', error);
     // On error, only unlock lesson 1
     return { unlocked: lessonNum === 1 };
   }

@@ -154,7 +154,6 @@ class TextToSpeechService {
     try {
       await this.speakWithEdgeTTS(text);
     } catch (error) {
-      console.warn('Edge TTS failed, using browser:', error.message);
       await this.speakWithBrowser(text);
     }
   }

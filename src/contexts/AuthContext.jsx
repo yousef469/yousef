@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }) => {
       try {
         // Get the current user from stored session
         const { user } = await getCurrentUser();
-        console.log('👤 Current user:', user?.email || 'none');
         
         setUser(user);
         if (user) {
@@ -35,7 +34,7 @@ export const AuthProvider = ({ children }) => {
           });
         }
       } catch (error) {
-        console.error('Auth init error:', error);
+        // Auth init failed silently
       } finally {
         setLoading(false);
       }
@@ -45,7 +44,6 @@ export const AuthProvider = ({ children }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = onAuthStateChange((event, session) => {
-      console.log('🔔 Auth state change:', event, session?.user?.email);
       const newUser = session?.user ?? null;
       setUser(newUser);
       
@@ -56,17 +54,8 @@ export const AuthProvider = ({ children }) => {
           createdAt: newUser.created_at,
         });
         
-        // Handle successful sign in
-        if (event === 'SIGNED_IN') {
-          console.log('✅ User signed in successfully');
-        }
       } else {
         resetUser();
-        
-        // Handle sign out
-        if (event === 'SIGNED_OUT') {
-          console.log('👋 User signed out');
-        }
       }
       
       setLoading(false);
@@ -129,8 +118,7 @@ export const AuthProvider = ({ children }) => {
           });
         
         if (links && links.length > 0) {
-          console.warn('Multi-accounting detected:', links);
-          // You can add additional logic here (e.g., flag account, send alert)
+          // Multi-accounting detected - flag account silently
         }
       }
       
@@ -258,7 +246,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem(`referral_bonus_${data.user.id}`, '200');
             
             localStorage.removeItem('pending_referral');
-            console.log('✅ Referral processed! Referrer will receive XP.');
           }
         }
       }

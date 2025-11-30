@@ -38,7 +38,7 @@ export function ProgressProvider({ children }) {
       try {
         setProgress(JSON.parse(savedProgress));
       } catch (error) {
-        console.error('Error loading progress:', error);
+        // Error loading progress
       }
     }
 
@@ -325,7 +325,6 @@ export function ProgressProvider({ children }) {
       // Fallback to localStorage check
       return !!progress.completedLessons[previousLessonKey];
     } catch (error) {
-      console.error('Error checking lesson unlock:', error);
       // On error, check localStorage
       const previousLessonKey = `${subject}-${lessonNum - 1}`;
       return !!progress.completedLessons[previousLessonKey] || lessonNum === 1;

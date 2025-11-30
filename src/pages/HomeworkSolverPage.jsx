@@ -119,7 +119,6 @@ CRITICAL: Return ONLY valid JSON, no markdown, no code blocks.`;
         setSolution({ rawText: text });
       }
     } catch (error) {
-      console.error('Error:', error);
       setSolution({ error: 'Failed to solve. Please try again.' });
     } finally {
       setLoading(false);

@@ -49,7 +49,6 @@ class SpeechRecognitionService {
         this.isListening = false;
         // If network error, fall back to Gemini-based recognition
         if (event.error === 'network' || event.error === 'service-not-allowed') {
-          console.log('Native speech recognition failed, using Gemini fallback');
           this.useNative = false;
         }
         if (this.onError) {
@@ -94,7 +93,6 @@ class SpeechRecognitionService {
         this.nativeRecognition.start();
         return;
       } catch (e) {
-        console.log('Native recognition failed, using fallback');
         this.useNative = false;
       }
     }
@@ -176,7 +174,6 @@ class SpeechRecognitionService {
         }
       }
     } catch (error) {
-      console.error('Transcription error:', error);
       if (this.onError) this.onError('Failed to transcribe. Try again.');
     } finally {
       if (this.onEnd) this.onEnd();

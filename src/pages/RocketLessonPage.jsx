@@ -45,12 +45,6 @@ export default function RocketLessonPage() {
   // Get lesson data from curriculum using string lessonKey
   const lessonData = rocketsLessons[lessonKey];
   
-  // Debug logging
-  console.log('lessonId from URL:', lessonId);
-  console.log('lessonKey:', lessonKey);
-  console.log('lessonData found:', !!lessonData);
-  console.log('Available keys:', Object.keys(rocketsLessons).slice(0, 5));
-  
   // Save progress when quiz is completed
   useEffect(() => {
     if (quizCompleted && lessonData?.questions) {

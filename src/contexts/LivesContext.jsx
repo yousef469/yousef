@@ -62,7 +62,6 @@ export function LivesProvider({ children }) {
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error loading lives:', error);
         return;
       }
 
@@ -76,7 +75,7 @@ export function LivesProvider({ children }) {
         await createUserLives();
       }
     } catch (error) {
-      console.error('Error loading lives:', error);
+      // Error loading lives
     }
   }
 
@@ -98,7 +97,7 @@ export function LivesProvider({ children }) {
       setMaxLives(5);
       setUserTier('free');
     } catch (error) {
-      console.error('Error creating lives:', error);
+      // Error creating lives
     }
   }
 
@@ -130,7 +129,6 @@ export function LivesProvider({ children }) {
       setLastLifeLost(now);
       return true;
     } catch (error) {
-      console.error('Error losing life:', error);
       return false;
     }
   }
@@ -156,7 +154,7 @@ export function LivesProvider({ children }) {
         setLastLifeLost(null);
       }
     } catch (error) {
-      console.error('Error regenerating life:', error);
+      // Error regenerating life
     }
   }
 
@@ -186,7 +184,7 @@ export function LivesProvider({ children }) {
       setMaxLives(newMaxLives);
       setLives(newMaxLives === -1 ? 999 : newMaxLives);
     } catch (error) {
-      console.error('Error upgrading tier:', error);
+      // Error upgrading tier
     }
   }
 

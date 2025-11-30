@@ -68,7 +68,7 @@ const ModelViewerPage = () => {
           setSelectedModel(filteredModels[0]);
         }
       } catch (error) {
-        console.error('Error loading models:', error);
+        // Error loading models
       } finally {
         setIsLoading(false);
       }

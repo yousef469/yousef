@@ -27,8 +27,6 @@ export const initErrorTracking = () => {
       stack: event.reason?.stack,
     });
   };
-
-  console.log('🛡️ Error tracking initialized');
 };
 
 // Log an error
@@ -53,15 +51,10 @@ export const logError = (errorData) => {
 
     localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(errors));
     
-    // Log to console in development
-    if (import.meta.env.DEV) {
-      console.error('🚨 Error logged:', errorEntry);
-    }
-
     // Send to backend if available
     sendErrorToBackend(errorEntry);
   } catch (e) {
-    console.error('Failed to log error:', e);
+    // Silently fail
   }
 };
 
@@ -115,10 +108,7 @@ export const trackComponentError = (componentName, error) => {
 };
 
 export const trackUserAction = (action, details = {}) => {
-  // For debugging user flows
-  if (import.meta.env.DEV) {
-    console.log(`📊 User action: ${action}`, details);
-  }
+  // Track user actions silently
 };
 
 export default {

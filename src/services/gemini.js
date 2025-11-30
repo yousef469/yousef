@@ -2,12 +2,8 @@
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
 const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 
-console.log('🚀 Gemini API: Using backend server');
-console.log('📡 Backend URL:', BACKEND_URL || '❌ NOT SET');
-
 // Backend API call
 const callGeminiAPI = async (prompt, retries = 4) => {
-  console.log(`💬 Calling backend at: ${API_BASE}/text`);
   
   try {
     const response = await fetch(`${API_BASE}/text`, {
@@ -32,11 +28,9 @@ const callGeminiAPI = async (prompt, retries = 4) => {
       throw new Error('No text in response');
     }
 
-    console.log('✅ Backend response received');
     return text;
 
   } catch (error) {
-    console.error('❌ Backend error:', error);
     throw error;
   }
 };
@@ -61,7 +55,6 @@ export const generateResponse = async (prompt, options = {}) => {
     const response = await callGeminiAPI(fullPrompt);
     return response;
   } catch (error) {
-    console.error('❌ Generate Response Error:', error);
     
     if (error.message?.includes('404')) {
       return `**API Configuration Issue**
@@ -123,7 +116,6 @@ export const askGemini = async (userMessage, conversationHistory = []) => {
 
     return { success: true, response: text };
   } catch (error) {
-    console.error('Gemini API Error:', error);
     return {
       success: false,
       error: error.message,
@@ -144,7 +136,6 @@ Provide a detailed but concise technical explanation focusing on engineering pri
 
     return { success: true, response: text };
   } catch (error) {
-    console.error('Gemini API Error:', error);
     return {
       success: false,
       error: error.message,
@@ -167,7 +158,6 @@ Keep it concise (2-3 paragraphs).`;
 
     return { success: true, explanation: text };
   } catch (error) {
-    console.error('Gemini API Error:', error);
     return {
       success: false,
       error: error.message
@@ -216,12 +206,10 @@ Use specific examples and data.`;
 };
 
 export const testAPI = async () => {
-  console.log('🧪 Testing Gemini API through backend...');
   try {
     const response = await callGeminiAPI('Say "Hello! API test successful!"');
     return { success: true, message: response };
   } catch (error) {
-    console.error('❌ API Test Failed:', error);
     return { success: false, error: error.message };
   }
 };

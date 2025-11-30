@@ -65,7 +65,6 @@ export default function CommunityPage() {
       
       setPosts(filteredData);
     } catch (error) {
-      console.error('Error fetching posts:', error);
       // If tables don't exist, show empty state
       setPosts([]);
     } finally {
@@ -85,7 +84,6 @@ export default function CommunityPage() {
         user_id: user.id
       };
       
-      console.log('Creating post:', postData);
       await createPost(postData);
       
       setShowCreateModal(false);
@@ -96,8 +94,6 @@ export default function CommunityPage() {
       
       alert('Post created successfully!');
     } catch (error) {
-      console.error('Error creating post:', error);
-      
       // Check if it's a database error
       if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
         alert('Database tables not set up yet. Please run the SQL schema in Supabase first. Check COMMUNITY_SCHEMA.sql file.');
@@ -112,7 +108,7 @@ export default function CommunityPage() {
       await votePost(user.id, postId, voteType);
       fetchPosts();
     } catch (error) {
-      console.error('Error voting:', error);
+      // Vote failed silently
     }
   };
 
