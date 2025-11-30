@@ -43,7 +43,7 @@ export default function Leaderboard() {
         throw error;
       }
 
-      console.log('Leaderboard data fetched:', data);
+
 
       // Transform data to match component format
       const transformedData = data.map((profile, index) => {
@@ -89,7 +89,7 @@ export default function Leaderboard() {
       }
 
       setLeaderboardData(filteredData);
-      console.log('Leaderboard set with', filteredData.length, 'entries');
+
 
       // Find current user's rank
       if (user) {

@@ -38,17 +38,17 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://yousef.vercel.app/" />
+    <meta property="og:url" content="https://engineeruim-eight.vercel.app/" />
     <meta property="og:title" content="Engineerium - Interactive Engineering Education Platform" />
     <meta property="og:description" content="Master engineering with interactive 3D models, AI tutoring, and comprehensive courses. Learn physics, math, electronics, and more!" />
-    <meta property="og:image" content="https://yousef.vercel.app/logo.png" />
+    <meta property="og:image" content="https://engineeruim-eight.vercel.app/logo.png" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://yousef.vercel.app/" />
+    <meta property="twitter:url" content="https://engineeruim-eight.vercel.app/" />
     <meta property="twitter:title" content="Engineerium - Interactive Engineering Education" />
     <meta property="twitter:description" content="Explore rockets, fighter jets, and supercars in 3D. Learn with AI-powered tutoring." />
-    <meta property="twitter:image" content="https://yousef.vercel.app/logo.png" />
+    <meta property="twitter:image" content="https://engineeruim-eight.vercel.app/logo.png" />
     
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
@@ -57,7 +57,7 @@
       "@type": "EducationalOrganization",
       "name": "Engineerium",
       "description": "Interactive 3D engineering education platform with AI tutoring",
-      "url": "https://yousef.vercel.app",
+      "url": "https://engineeruim-eight.vercel.app",
       "sameAs": [],
       "offers": {
         "@type": "Offer",
@@ -263,9 +263,7 @@
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
           for(let registration of registrations) {
-            registration.unregister().then(function() {
-              console.log('🗑️ Service Worker unregistered');
-            });
+            registration.unregister();
           }
         });
       }
@@ -275,20 +273,17 @@
         caches.keys().then(function(names) {
           for (let name of names) {
             caches.delete(name);
-            console.log('🗑️ Cache deleted:', name);
           }
         });
       }
       
       // Force reload from server (bypass cache)
       if (performance.navigation.type !== 1) {
-        // Not a refresh, check if we need to force reload
         const lastVersion = localStorage.getItem('app-version');
-        const currentVersion = '2.0.6';
+        const currentVersion = '2.0.7';
         
         if (lastVersion !== currentVersion) {
           localStorage.setItem('app-version', currentVersion);
-          console.log('🔄 New version detected, reloading...');
           window.location.reload(true);
         }
       }
