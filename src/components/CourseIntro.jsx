@@ -1,5 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen, Trophy, Clock, Target, Award, ChevronRight, Sparkles, CheckCircle } from 'lucide-react';
+
+// Check if intro was already shown for this subject
+const hasSeenIntro = (subject) => {
+  return localStorage.getItem(`course_intro_seen_${subject}`) === 'true';
+};
+
+// Mark intro as seen for this subject
+const markIntroSeen = (subject) => {
+  localStorage.setItem(`course_intro_seen_${subject}`, 'true');
+};
 
 const courseData = {
   rockets: {
@@ -105,9 +115,11 @@ const courseData = {
 };
 
 export default function CourseIntro({ subject, totalLessons, totalQuizzes, completedLessons, onStart }) {
-  const [isVisible, setIsVisible] = useState(true);
+  // Only show if user hasn't seen this intro before
+  const [isVisible, setIsVisible] = useState(() => !hasSeenIntro(subject));
   const course = courseData[subject];
 
+  // If already seen, don't render at all
   if (!course || !isVisible) return null;
 
   const progressPercent = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
@@ -115,6 +127,8 @@ export default function CourseIntro({ subject, totalLessons, totalQuizzes, compl
   const isCompleted = completedLessons >= totalLessons;
 
   const handleStart = () => {
+    // Mark as seen so it never shows again for this track
+    markIntroSeen(subject);
     setIsVisible(false);
     if (onStart) onStart();
   };
