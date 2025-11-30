@@ -1072,7 +1072,7 @@ const VehicleCard = ({ icon: Icon, title, description, gradient, onClick, delay 
 };
 
 // ==================== MAIN APP COMPONENT ====================
-import IntroAnimation from './components/IntroAnimation';
+
 const AllInOnePage = lazy(() => import('./pages/AllInOnePage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
@@ -1111,14 +1111,11 @@ import MobileBottomNav from './components/MobileBottomNav';
 import { ReferralCapture } from './components/ReferralSystem';
 import BetaBanner from './components/BetaBanner';
 import FeedbackWidget from './components/FeedbackWidget';
-import { useState as useAppState } from 'react';
+
 
 export default function App() {
-  const [showIntro, setShowIntro] = useAppState(true);
-
   return (
     <>
-      {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
       <Router>
         <BetaBanner />
         <ReferralCapture />
@@ -1126,14 +1123,7 @@ export default function App() {
         <FeedbackWidget />
         <ScrollToTop />
         <MobileBottomNav />
-        <React.Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-black text-white">
-            <div className="flex items-center gap-3">
-              <Loader2 className="animate-spin" />
-              <span>Loading...</span>
-            </div>
-          </div>
-        }>
+        <React.Suspense fallback={null}>
           <Routes>
           <Route path="/" element={<HomeRouter />} />
           <Route path="/home" element={<HomeRouter />} />
