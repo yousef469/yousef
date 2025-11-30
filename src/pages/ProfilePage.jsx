@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import Leaderboard from '../components/Leaderboard';
 import ReferralSystem, { ReferralButton } from '../components/ReferralSystem';
 import LanguageSelector from '../components/LanguageSelector';
+import ShareProgress, { ShareButton } from '../components/ShareProgress';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export default function ProfilePage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [showReferral, setShowReferral] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   const avatarOptions = ['👤', '🚀', '✈️', '🚗', '🤖', '⚡', '🔬', '🎓', '💻', '🛠️', '🌟', '🔥'];
 
@@ -268,7 +270,7 @@ export default function ProfilePage() {
                     Invite
                   </button>
                   <button
-                    onClick={shareProgress}
+                    onClick={() => setShowShare(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg transition-all"
                   >
                     <Share2 className="w-4 h-4" />
@@ -548,6 +550,9 @@ export default function ProfilePage() {
 
       {/* Referral System Modal */}
       <ReferralSystem isOpen={showReferral} onClose={() => setShowReferral(false)} />
+      
+      {/* Share Progress Modal */}
+      <ShareProgress isOpen={showShare} onClose={() => setShowShare(false)} />
       
       {/* Language Selector Modal */}
       <LanguageSelector isOpen={showLangModal} onClose={() => setShowLangModal(false)} />
