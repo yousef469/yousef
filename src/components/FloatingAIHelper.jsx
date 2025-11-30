@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Minimize2, Maximize2, Crown, Mic, MicOff } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
 import { useUsageLimits } from '../contexts/UsageLimitsContext';
 import { useLocation } from 'react-router-dom';
