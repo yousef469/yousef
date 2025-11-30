@@ -3,55 +3,60 @@ import { useAuth } from './AuthContext';
 
 const UsageLimitsContext = createContext();
 
+// BETA MODE: All features unlocked for free until 500+ daily users
+// TODO: Re-enable paid tiers after reaching user milestone
+const BETA_MODE = true;
+
 // Tier definitions with all limits
 export const TIER_LIMITS = {
   free: {
     name: 'Free',
-    aiChatPerMonth: 20,
-    homeworkSolverPerMonth: 3,
-    modelComparisonPerWeek: 1,
-    explodeModePerWeek: 3,
-    calculatorPercent: 25, // 25% of calculators
-    lessonsAccess: 'beginner', // beginner only
-    careerProjects: false,
-    certificates: false,
-    vrSupport: false,
-    earlyAccess: false,
+    // BETA: Everything unlimited for now
+    aiChatPerMonth: BETA_MODE ? -1 : 20,
+    homeworkSolverPerMonth: BETA_MODE ? -1 : 3,
+    modelComparisonPerWeek: BETA_MODE ? -1 : 1,
+    explodeModePerWeek: BETA_MODE ? -1 : 3,
+    calculatorPercent: BETA_MODE ? 100 : 25,
+    lessonsAccess: BETA_MODE ? 'all' : 'beginner',
+    careerProjects: BETA_MODE ? true : false,
+    certificates: BETA_MODE ? true : false,
+    vrSupport: BETA_MODE ? true : false,
+    earlyAccess: BETA_MODE ? true : false,
   },
   starter: {
     name: 'Starter',
-    aiChatPerMonth: 50,
-    homeworkSolverPerMonth: 50,
-    modelComparisonPerWeek: 10,
-    explodeModePerWeek: 10,
-    calculatorPercent: 60, // 60% of calculators
-    lessonsAccess: 'advanced', // beginner + intermediate + some advanced
-    careerProjects: false,
+    aiChatPerMonth: -1,
+    homeworkSolverPerMonth: -1,
+    modelComparisonPerWeek: -1,
+    explodeModePerWeek: -1,
+    calculatorPercent: 100,
+    lessonsAccess: 'all',
+    careerProjects: true,
     certificates: true,
     vrSupport: false,
     earlyAccess: false,
   },
   pro: {
     name: 'Pro',
-    aiChatPerMonth: -1, // unlimited
-    homeworkSolverPerMonth: -1, // unlimited
-    modelComparisonPerWeek: 50,
-    explodeModePerMonth: 150,
-    calculatorPercent: 100, // all calculators
-    lessonsAccess: 'all', // all lessons
+    aiChatPerMonth: -1,
+    homeworkSolverPerMonth: -1,
+    modelComparisonPerWeek: -1,
+    explodeModePerMonth: -1,
+    calculatorPercent: 100,
+    lessonsAccess: 'all',
     careerProjects: true,
     certificates: true,
-    vrSupport: false,
+    vrSupport: true,
     earlyAccess: false,
   },
   master: {
     name: 'Master',
-    aiChatPerMonth: -1, // unlimited
-    homeworkSolverPerMonth: -1, // unlimited
-    modelComparisonPerWeek: -1, // unlimited
-    explodeModePerMonth: -1, // unlimited
-    calculatorPercent: 100, // all calculators
-    lessonsAccess: 'all', // all lessons
+    aiChatPerMonth: -1,
+    homeworkSolverPerMonth: -1,
+    modelComparisonPerWeek: -1,
+    explodeModePerMonth: -1,
+    calculatorPercent: 100,
+    lessonsAccess: 'all',
     careerProjects: true,
     certificates: true,
     vrSupport: true,

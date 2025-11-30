@@ -104,20 +104,36 @@ export default function PricingPage() {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full mb-6">
-            <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-sm text-purple-300">Special Launch Pricing</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full mb-6">
+            <Sparkles className="w-4 h-4 text-green-400" />
+            <span className="text-sm text-green-300">🎉 BETA: Everything Free!</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Choose Your{' '}
-            <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
-              Learning Path
+            <span className="bg-gradient-to-r from-green-400 via-cyan-500 to-blue-400 bg-clip-text text-transparent">
+              100% Free During Beta
             </span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Start free and upgrade as you grow. All plans include access to our community and basic features.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-6">
+            All premium features are unlocked for free during our beta period. Help us improve by sharing your feedback!
           </p>
+          
+          {/* Beta Banner */}
+          <div className="max-w-2xl mx-auto bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-500/30 rounded-2xl p-6 mb-8">
+            <h3 className="text-xl font-bold text-green-400 mb-2">🚀 What You Get For Free:</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> Unlimited AI Chats</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> All 150+ Lessons</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> Homework Solver</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> Model Comparison</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> JARVIS Mode</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> All Calculators</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> Career Projects</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> Certificates</div>
+              <div className="flex items-center gap-2"><Check className="w-4 h-4 text-green-400" /> Community Access</div>
+            </div>
+            <p className="text-xs text-gray-400 mt-4">* Paid tiers will be introduced after we reach 500+ daily active users</p>
+          </div>
         </div>
 
         {/* Billing Toggle */}

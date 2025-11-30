@@ -147,64 +147,34 @@ const HomePageLoggedIn = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {/* Compare Models - Limited Free Access */}
-          <div className="relative group">
-            <button
-              onClick={() => {
-                if (canUseModelComparison()) {
-                  useModelComparison();
-                  setShowComparison(true);
-                } else {
-                  navigate('/pricing');
-                }
-              }}
-              className={`w-full relative rounded-2xl p-8 border-2 transition-all cursor-pointer card-hover ripple shadow-premium-lg ${
-                canUseModelComparison()
-                  ? 'bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-500 border-cyan-400/50 hover:border-cyan-300'
-                  : 'bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-gray-500'
-              }`}
-            >
-              <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur rounded-full flex items-center gap-2 group-hover:scale-110 transition-transform">
-                {canUseModelComparison() ? (
-                  <>
-                    <span className="text-xs text-white">{getRemainingComparisons()}/week</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-4 h-4 text-white" />
-                    <span className="text-xs text-white">{getTimeUntilReset('modelComparison')}</span>
-                  </>
-                )}
+          {/* Compare Models - Free during Beta */}
+          <button
+            onClick={() => setShowComparison(true)}
+            className="group relative bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-500 hover:from-cyan-600 hover:via-blue-700 hover:to-purple-600 rounded-2xl p-8 border-2 border-cyan-400/50 hover:border-cyan-300 transition-all cursor-pointer card-hover ripple shadow-premium-lg"
+          >
+            <div className="absolute top-4 right-4 px-3 py-1 bg-green-500/80 backdrop-blur rounded-full flex items-center gap-1 text-xs text-white font-medium">
+              <Sparkles className="w-3 h-3" />
+              Free
+            </div>
+            
+            <div className="relative z-10">
+              <div className="flex justify-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                  <ArrowLeftRight className="w-8 h-8 text-white" />
+                </div>
               </div>
               
-              <div className="relative z-10">
-                <div className="flex justify-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                    <ArrowLeftRight className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ {t('home.compare.title')}</h3>
-                <p className="text-white/90 text-center mb-4">
-                  {t('home.compare.desc')}
-                </p>
+              <h3 className="text-2xl font-bold mb-3 text-white text-center">⚖️ {t('home.compare.title')}</h3>
+              <p className="text-white/90 text-center mb-4">
+                {t('home.compare.desc')}
+              </p>
 
-                <div className="flex items-center justify-center gap-2 text-white font-semibold">
-                  {canUseModelComparison() ? (
-                    <>
-                      <span>Compare Models</span>
-                      <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      <span>Upgrade for More</span>
-                    </>
-                  )}
-                </div>
+              <div className="flex items-center justify-center gap-2 text-white font-semibold">
+                <span>{t('home.features.compare.button')}</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
               </div>
-            </button>
-          </div>
+            </div>
+          </button>
 
           {/* Community */}
           <button
