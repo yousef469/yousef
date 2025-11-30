@@ -49,9 +49,9 @@ export default function EngineeringToolboxPage() {
   const premiumToolsCount = getPremiumTools().length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-x-hidden">
       {/* Header */}
-      <div className="border-b border-gray-700 bg-gray-900 sticky top-0 z-10 shadow-lg">
+      <div className="border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <button
             onClick={() => navigate('/')}
@@ -214,7 +214,7 @@ export default function EngineeringToolboxPage() {
           {filteredTools.map((tool) => (
             <div
               key={tool.id}
-              className={`group relative bg-gradient-to-br ${tool.categoryColor} rounded-xl p-6 border-2 border-white/20 hover:border-white/40 transition-all cursor-pointer hover:scale-105 ${
+              className={`group relative bg-gradient-to-br ${tool.categoryColor} rounded-xl p-6 border-2 border-white/20 hover:border-white/40 transition-colors cursor-pointer ${
                 tool.premium ? 'opacity-90' : ''
               }`}
               onClick={() => {
@@ -303,7 +303,7 @@ export default function EngineeringToolboxPage() {
             return (
               <div
                 key={catKey}
-                className={`bg-gradient-to-br ${category.color} rounded-xl p-6 border border-white/20 cursor-pointer hover:scale-105 transition-all`}
+                className={`bg-gradient-to-br ${category.color} rounded-xl p-6 border border-white/20 cursor-pointer hover:border-white/40 transition-colors`}
                 onClick={() => setSelectedCategory(catKey)}
               >
                 <div className="text-5xl mb-3">{category.icon}</div>
