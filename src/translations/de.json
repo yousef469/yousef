@@ -1,0 +1,181 @@
+{
+  "app": {
+    "title": "Engineerium",
+    "subtitle": "Interaktive 3D-Ingenieurmodelle"
+  },
+  "nav": {
+    "language": "Sprache",
+    "login": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden",
+    "welcome": "Willkommen",
+    "about": "Über uns",
+    "toolbox": "Werkzeuge",
+    "pricing": "Preise",
+    "help": "Hilfe",
+    "privacy": "Datenschutz",
+    "terms": "AGB"
+  },
+  "landing": {
+    "hero": {
+      "title": "Ingenieurwesen lernen mit",
+      "titleHighlight": "3D-Modellen, Simulationen & KI",
+      "subtitle": "Meistern Sie Raketen, Autos, Flugzeuge und Elektronik durch interaktive 3D-Explosionsansichten, Echtzeit-Simulationen und KI-gestützte Analysen.",
+      "cta": "Kostenlos starten",
+      "stats": {
+        "lessons": "MIT-Qualität Lektionen",
+        "models": "3D-Modelle",
+        "ai": "KI-Analyse"
+      }
+    },
+    "preview": {
+      "title": "Interaktive 3D-Explosionsansichten",
+      "subtitle": "Erkunden Sie jede Komponente im Detail",
+      "autoRotate": "Auto-Rotation",
+      "partLabels": "Teilebeschriftung",
+      "aiAnalysis": "KI-Analyse",
+      "jarvisMode": "J.A.R.V.I.S. MODUS",
+      "clickToExplore": "Klicken zum Erkunden →"
+    },
+    "sections": {
+      "rockets": {
+        "title": "Raketenmechanik",
+        "desc": "Meistern Sie die Grundlagen der Luft- und Raumfahrttechnik mit unserem interaktiven Raketenmechanik-Modul.",
+        "features": [
+          "Lernen Sie Schub, Widerstand und Orbitalmechanik durch 3D-Simulationen",
+          "Erkunden Sie NASA-Raketenmodelle in Echtzeit-3D",
+          "Verstehen Sie Antriebssysteme und Flugdynamik",
+          "Üben Sie mit interaktiven Quiz und Herausforderungen"
+        ]
+      },
+      "cars": {
+        "title": "Fahrzeugtechnik",
+        "desc": "Tauchen Sie tief in Fahrzeugsysteme ein und verstehen Sie, wie moderne Fahrzeuge funktionieren.",
+        "features": [
+          "Studieren Sie Motormechanik, Getriebesysteme und Antriebsstränge",
+          "Erkunden Sie Federung, Bremsen und Lenksysteme in 3D",
+          "Lernen Sie Aerodynamik und Fahrzeugdynamik",
+          "Interaktive Simulationen realer Szenarien"
+        ]
+      },
+      "planes": {
+        "title": "Luftfahrtmechanik",
+        "desc": "Verstehen Sie die Prinzipien des Fliegens und der Flugzeugtechnik.",
+        "features": [
+          "Meistern Sie Auftrieb, Widerstand, Schub und Gewicht",
+          "Erkunden Sie Flugzeugstrukturen und Steuerflächen",
+          "Studieren Sie Düsentriebwerke und Antriebssysteme",
+          "Flugdynamik und Stabilitätsanalyse"
+        ]
+      },
+      "robotics": {
+        "title": "Robotik",
+        "desc": "Bauen Sie intelligente Systeme und verstehen Sie moderne Robotik.",
+        "features": [
+          "Lernen Sie Kinematik, Dynamik und Steuerungssysteme",
+          "Erkunden Sie Sensoren, Aktoren und Roboterprogrammierung",
+          "Studieren Sie KI und maschinelles Lernen für Robotik",
+          "Praktische Simulationen und virtuelle Labore"
+        ]
+      }
+    },
+    "testimonials": {
+      "title": "Was Studenten sagen",
+      "subtitle": "Schließen Sie sich Tausenden an, die Ingenieurwesen interaktiv lernen",
+      "stats": {
+        "students": "Aktive Studenten",
+        "lessons": "MIT-Qualität Lektionen",
+        "rating": "Durchschnittsbewertung",
+        "completion": "Abschlussrate"
+      }
+    },
+    "cta": {
+      "title": "Bereit für Ihre Ingenieur-Reise?",
+      "subtitle": "Schließen Sie sich Tausenden von Studenten an, die Ingenieurwesen durch interaktives Lernen meistern",
+      "button": "Kostenlos starten"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Ingenieurwesen in 3D erkunden",
+      "subtitle": "Wählen Sie eine Kategorie, um detaillierte 3D-Modelle mit interaktiven Steuerungen anzuzeigen",
+      "welcome": "Willkommen zu Ihren ersten Schritten in Ihrer Ingenieurkarriere",
+      "new": "NEU: Sprach-KI • Modellvergleich • Bestenlisten • PWA-Unterstützung"
+    },
+    "learn": {
+      "title": "Ingenieurwesen lernen",
+      "subtitle": "Wählen Sie zwischen Raketen, Flugzeugen oder Autos",
+      "explore": "Kategorien erkunden"
+    },
+    "interactive": {
+      "title": "Interaktives Lernen",
+      "subtitle": "Meistern Sie Ingenieurwesen durch Spiele und Vergleiche"
+    },
+    "features": {
+      "compare": {
+        "title": "Modelle vergleichen",
+        "desc": "Sehen Sie Modelle nebeneinander und lernen Sie die Unterschiede!",
+        "button": "Modelle vergleichen"
+      },
+      "community": {
+        "title": "Community",
+        "desc": "Stellen Sie Fragen, teilen Sie Projekte und lernen Sie gemeinsam",
+        "button": "Community beitreten"
+      },
+      "career": {
+        "title": "Karriereprojekte",
+        "desc": "Erstellen Sie portfoliowürdige Ingenieurprojekte",
+        "button": "Bauen starten"
+      },
+      "internship": {
+        "title": "Praktikum-Simulator",
+        "desc": "Echte Ingenieuraufgaben von SpaceX, Tesla & mehr",
+        "button": "Praktikum starten"
+      },
+      "homework": {
+        "title": "KI-Hausaufgabenlöser",
+        "desc": "Erhalten Sie Schritt-für-Schritt-Lösungen für jedes Maschinenbau-Problem",
+        "button": "Hausaufgaben lösen"
+      },
+      "jarvis": {
+        "title": "J.A.R.V.I.S. Modus",
+        "fullName": "Super Intelligentes System",
+        "desc": "KI-gestützte 3D-Analyse. Laden Sie Modelle hoch, scannen Sie Maschinen mit der Kamera, erhalten Sie sofortige Erklärungen.",
+        "button": "JARVIS-Modus betreten"
+      }
+    },
+    "challenges": {
+      "title": "Tägliche & Wöchentliche Herausforderungen"
+    },
+    "footer": {
+      "copyright": "© 2025 Engineerium - Interaktive Ingenieurausbildung",
+      "version": "v2.0 - Sprach-KI • Modellvergleich • Bestenlisten • PWA"
+    }
+  },
+  "auth": {
+    "welcomeBack": "Willkommen zurück!",
+    "startJourney": "Starten Sie Ihre Ingenieur-Reise",
+    "fullName": "Vollständiger Name",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "createAccount": "Konto erstellen",
+    "continueWith": "Oder fortfahren mit",
+    "continueGoogle": "Mit Google fortfahren",
+    "dontHaveAccount": "Kein Konto?",
+    "alreadyHaveAccount": "Bereits ein Konto?",
+    "pleaseWait": "Bitte warten...",
+    "whySignUp": "Warum ein Konto erstellen?",
+    "benefit1": "Zugriff auf alle 3D-Modelle mit realistischen Feuereffekten",
+    "benefit2": "Interaktiver KI-Tutor powered by Gemini",
+    "benefit3": "Speichern Sie Ihre Lieblingsmodelle und Fortschritte",
+    "benefit4": "Ingenieurlektionen und Tutorials",
+    "features": {
+      "models": "100+",
+      "modelsLabel": "3D-Modelle",
+      "ai": "KI",
+      "aiLabel": "Tutor",
+      "free": "Kostenlos",
+      "freeLabel": "Für immer"
+    }
+  }
+}

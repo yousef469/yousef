@@ -14,7 +14,12 @@
     "pricing": "Pricing",
     "help": "Help",
     "privacy": "Privacy",
-    "terms": "Terms"
+    "terms": "Terms",
+    "home": "Home",
+    "learn": "Learn",
+    "projects": "Projects",
+    "community": "Community",
+    "profile": "Profile"
   },
   "landing": {
     "hero": {

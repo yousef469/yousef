@@ -1,18 +1,20 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Trophy, User, Compass } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function MobileBottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   
   const navItems = [
-    { path: '/home', icon: Home, label: 'Home' },
-    { path: '/learn', icon: Compass, label: 'Learn' },
-    { path: '/career-projects', icon: BookOpen, label: 'Projects' },
-    { path: '/community', icon: Trophy, label: 'Community' },
-    { path: '/profile', icon: User, label: 'Profile' },
+    { path: '/home', icon: Home, labelKey: 'nav.home', fallback: 'Home' },
+    { path: '/learn', icon: Compass, labelKey: 'nav.learn', fallback: 'Learn' },
+    { path: '/career-projects', icon: BookOpen, labelKey: 'nav.projects', fallback: 'Projects' },
+    { path: '/community', icon: Trophy, labelKey: 'nav.community', fallback: 'Community' },
+    { path: '/profile', icon: User, labelKey: 'nav.profile', fallback: 'Profile' },
   ];
   
   // Don't show on landing page, auth page, or if not logged in
@@ -76,7 +78,7 @@ export default function MobileBottomNav() {
               <span className={`relative z-10 text-[10px] mt-1.5 font-medium transition-all duration-200 ${
                 active ? 'text-cyan-400' : 'text-gray-500'
               }`}>
-                {item.label}
+                {t(item.labelKey, item.fallback)}
               </span>
               
               {/* Active indicator dot */}

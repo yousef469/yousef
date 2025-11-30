@@ -10,6 +10,8 @@ import zh from '../translations/zh.json';
 import ja from '../translations/ja.json';
 import ar from '../translations/ar.json';
 import hi from '../translations/hi.json';
+import pt from '../translations/pt.json';
+import de from '../translations/de.json';
 
 // Translation resources
 const resources = {
@@ -19,7 +21,9 @@ const resources = {
   zh: { translation: zh },
   ja: { translation: ja },
   ar: { translation: ar },
-  hi: { translation: hi }
+  hi: { translation: hi },
+  pt: { translation: pt },
+  de: { translation: de }
 };
 
 i18n

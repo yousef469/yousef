@@ -5,15 +5,18 @@ import { useProgress } from '../contexts/ProgressContext';
 import { supabase } from '../services/supabase';
 import { 
   ArrowLeft, Edit2, Save, X, Trophy, Flame, BookMarked, Award, TrendingUp,
-  Zap, Crown, Share2, Gift
+  Zap, Crown, Share2, Gift, Globe, LogOut
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Leaderboard from '../components/Leaderboard';
 import ReferralSystem, { ReferralButton } from '../components/ReferralSystem';
+import LanguageSelector from '../components/LanguageSelector';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { progress, userProfile } = useProgress();
+  const { t } = useTranslation();
   
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState('');
@@ -22,6 +25,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [showReferral, setShowReferral] = useState(false);
+  const [showLangModal, setShowLangModal] = useState(false);
 
   const avatarOptions = ['👤', '🚀', '✈️', '🚗', '🤖', '⚡', '🔬', '🎓', '💻', '🛠️', '🌟', '🔥'];
 
@@ -524,8 +528,42 @@ export default function ProfilePage() {
         )}
       </div>
 
+      {/* Settings Section */}
+      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 mt-6">
+        <h3 className="text-xl font-bold mb-4">Settings</h3>
+        <div className="space-y-3">
+          <button
+            onClick={() => setShowLangModal(true)}
+            className="w-full flex items-center justify-between p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Globe className="w-5 h-5 text-cyan-400" />
+              <span>{t('nav.language')}</span>
+            </div>
+            <span className="text-gray-400">→</span>
+          </button>
+          
+          <button
+            onClick={async () => {
+              await signOut();
+              navigate('/');
+            }}
+            className="w-full flex items-center justify-between p-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg transition-colors text-red-400"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut className="w-5 h-5" />
+              <span>{t('nav.signOut')}</span>
+            </div>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
       {/* Referral System Modal */}
       <ReferralSystem isOpen={showReferral} onClose={() => setShowReferral(false)} />
+      
+      {/* Language Selector Modal */}
+      <LanguageSelector isOpen={showLangModal} onClose={() => setShowLangModal(false)} />
     </div>
   );
 }
