@@ -1,10 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageSquare, X, Send, Star, ThumbsUp, Bug, Lightbulb } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
 const FeedbackWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Listen for custom event to open feedback widget
+  useEffect(() => {
+    const handleOpenFeedback = () => setIsOpen(true);
+    window.addEventListener('openFeedbackWidget', handleOpenFeedback);
+    return () => window.removeEventListener('openFeedbackWidget', handleOpenFeedback);
+  }, []);
   const [feedbackType, setFeedbackType] = useState('general');
   const [message, setMessage] = useState('');
   const [rating, setRating] = useState(0);

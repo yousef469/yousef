@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkles, MessageSquare } from 'lucide-react';
 
-const BetaBanner = () => {
+const BetaBanner = ({ onFeedbackClick }) => {
   const [dismissed, setDismissed] = useState(() => {
     return localStorage.getItem('beta-banner-dismissed') === 'true';
   });
@@ -13,17 +13,24 @@ const BetaBanner = () => {
     setDismissed(true);
   };
 
+  const handleShareThoughts = (e) => {
+    e.preventDefault();
+    // Dispatch custom event to open feedback widget
+    window.dispatchEvent(new CustomEvent('openFeedbackWidget'));
+  };
+
   return (
     <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 text-white py-2 px-4 text-center relative">
       <div className="flex items-center justify-center gap-2 text-sm font-medium">
         <Sparkles className="w-4 h-4 animate-pulse" />
         <span>🚀 Welcome to Engineerium Beta! We'd love your feedback.</span>
-        <a 
-          href="mailto:youseflovemessi@gmail.com?subject=Engineerium%20Feedback" 
-          className="underline hover:text-cyan-200 transition-colors ml-1"
+        <button 
+          onClick={handleShareThoughts}
+          className="underline hover:text-cyan-200 transition-colors ml-1 flex items-center gap-1"
         >
+          <MessageSquare className="w-3 h-3" />
           Share thoughts
-        </a>
+        </button>
       </div>
       <button 
         onClick={handleDismiss}
