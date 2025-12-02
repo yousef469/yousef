@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Rocket, Plane, Car, X, Loader2, MousePointer, ZoomIn, Info, Send, Sparkles, RotateCw } from 'lucide-react';
 const HomeRouter = lazy(() => import('./pages/HomeRouter'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
 const RocketsPage = lazy(() => import('./pages/RocketsPage'));
 const PlanesPage = lazy(() => import('./pages/PlanesPage'));
 const CarsPage = lazy(() => import('./pages/CarsPage'));
@@ -1127,6 +1128,7 @@ export default function App() {
           <Routes>
           <Route path="/" element={<HomeRouter />} />
           <Route path="/home" element={<HomeRouter />} />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
