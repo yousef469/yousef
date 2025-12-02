@@ -2,9 +2,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { Sparkles } from 'lucide-react';
 import HomePageLoggedIn from './HomePageLoggedIn';
 import LandingPage from './LandingPage';
+import { useLocation } from 'react-router-dom';
 
 const HomeRouter = () => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -17,7 +19,16 @@ const HomeRouter = () => {
     );
   }
 
-  return user ? <HomePageLoggedIn /> : <LandingPage />;
+  // AUTH DISABLED FOR BETA:
+  // - "/" shows landing page (for new visitors)
+  // - "/home" shows the main app (logged-in experience)
+  // When auth is re-enabled, change back to: return user ? <HomePageLoggedIn /> : <LandingPage />;
+  
+  if (location.pathname === '/home') {
+    return <HomePageLoggedIn />;
+  }
+  
+  return <LandingPage />;
 };
 
 export default HomeRouter;

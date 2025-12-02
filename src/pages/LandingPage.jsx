@@ -76,7 +76,7 @@ const LandingPage = () => {
 
                 {/* CTA Button - Full width on mobile */}
                 <button 
-                  onClick={() => navigate('/learn')} 
+                  onClick={() => navigate('/home')} 
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 md:px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl transition-all font-bold text-base md:text-lg shadow-lg shadow-cyan-500/50 active:scale-95 md:hover:scale-105 mb-6 md:mb-8"
                 >
                   <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
@@ -437,7 +437,7 @@ const LandingPage = () => {
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 text-primary">{t('landing.cta.title')}</h2>
             <p className="text-lg md:text-2xl text-text-secondary mb-8 md:mb-12">{t('landing.cta.subtitle')}</p>
-            <button onClick={() => navigate('/learn')} className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 md:px-12 py-4 md:py-5 bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 text-white rounded-xl transition-all font-bold text-lg md:text-xl shadow-2xl active:scale-95 md:hover:scale-105">
+            <button onClick={() => navigate('/home')} className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 md:px-12 py-4 md:py-5 bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 text-white rounded-xl transition-all font-bold text-lg md:text-xl shadow-2xl active:scale-95 md:hover:scale-105">
               <Sparkles className="w-6 h-6 md:w-7 md:h-7" />
               <span>Start Learning Free</span>
             </button>
