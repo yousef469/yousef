@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Building, Cpu, UserPlus, Sparkles, Globe, User, Users as UsersIcon } from 'lucide-react';
+import { Rocket, Plane, Car, Building, Cpu, Sparkles, Globe, User, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
@@ -10,11 +10,10 @@ import Logo from '../components/Logo';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user, signOut, showLanguageSelector, setShowLanguageSelector } = useAuth();
+  const { showLanguageSelector, setShowLanguageSelector } = useAuth();
   const { t } = useTranslation();
   const [showComparison, setShowComparison] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   useEffect(() => {
     if (showLanguageSelector) {
@@ -77,7 +76,7 @@ const LandingPage = () => {
 
                 {/* CTA Button - Full width on mobile */}
                 <button 
-                  onClick={() => navigate('/auth')} 
+                  onClick={() => navigate('/learn')} 
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 md:px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl transition-all font-bold text-base md:text-lg shadow-lg shadow-cyan-500/50 active:scale-95 md:hover:scale-105 mb-6 md:mb-8"
                 >
                   <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
@@ -207,23 +206,23 @@ const LandingPage = () => {
           </div>
         </section>
 
-        <section className="bg-background-light py-20">
+        <section className="bg-background-light py-12 md:py-20">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
+            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="order-2 md:order-1">
                 <div className="flex items-center gap-3 mb-4">
-                  <Plane className="w-12 h-12 text-primary" />
-                  <h2 className="text-4xl font-bold text-primary">{t('landing.sections.planes.title')}</h2>
+                  <Plane className="w-8 h-8 md:w-12 md:h-12 text-primary" />
+                  <h2 className="text-2xl md:text-4xl font-bold text-primary">{t('landing.sections.planes.title')}</h2>
                 </div>
-                <p className="text-xl text-text mb-6">{t('landing.sections.planes.desc')}</p>
-                <ul className="space-y-4 text-lg text-text-secondary">
+                <p className="text-base md:text-xl text-text mb-4 md:mb-6">{t('landing.sections.planes.desc')}</p>
+                <ul className="space-y-3 md:space-y-4 text-sm md:text-lg text-text-secondary">
                   {t('landing.sections.planes.features', { returnObjects: true }).map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3"><span className="text-primary text-2xl">✓</span><span>{feature}</span></li>
+                    <li key={i} className="flex items-start gap-2 md:gap-3"><span className="text-primary text-lg md:text-2xl">✓</span><span>{feature}</span></li>
                   ))}
                 </ul>
               </div>
-              <div className="h-96 bg-background rounded-2xl border-2 border-primary/30 overflow-hidden flex items-center justify-center">
-                <Plane className="w-48 h-48 text-primary animate-pulse" />
+              <div className="order-1 md:order-2 h-48 md:h-96 bg-background rounded-2xl border-2 border-primary/30 overflow-hidden flex items-center justify-center">
+                <Plane className="w-24 h-24 md:w-48 md:h-48 text-primary animate-pulse" />
               </div>
             </div>
           </div>
@@ -434,38 +433,38 @@ const LandingPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-background-light">
+        <section className="py-12 md:py-20 bg-background-light">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-5xl font-bold mb-6 text-primary">{t('landing.cta.title')}</h2>
-            <p className="text-2xl text-text-secondary mb-12">{t('landing.cta.subtitle')}</p>
-            <button onClick={() => navigate('/auth')} className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 text-white rounded-xl transition-all font-bold text-xl shadow-2xl hover:scale-105">
-              <UserPlus className="w-7 h-7" />
-              <span>{t('landing.cta.button')}</span>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 text-primary">{t('landing.cta.title')}</h2>
+            <p className="text-lg md:text-2xl text-text-secondary mb-8 md:mb-12">{t('landing.cta.subtitle')}</p>
+            <button onClick={() => navigate('/learn')} className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 md:px-12 py-4 md:py-5 bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 text-white rounded-xl transition-all font-bold text-lg md:text-xl shadow-2xl active:scale-95 md:hover:scale-105">
+              <Sparkles className="w-6 h-6 md:w-7 md:h-7" />
+              <span>Start Learning Free</span>
             </button>
           </div>
         </section>
       </div>
 
-      <footer className="border-t border-primary/20 mt-20 py-10 bg-gray-900/80">
+      <footer className="border-t border-primary/20 mt-12 md:mt-20 py-8 md:py-10 bg-gray-900/80">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="flex justify-center items-center gap-6 mb-6">
+          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-6">
             <a 
               href="mailto:youseflovemessi@gmail.com" 
-              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+              className="text-white hover:text-cyan-400 transition-colors text-sm md:text-lg font-semibold underline"
             >
               {t('nav.help')}
             </a>
-            <span className="text-gray-500 text-2xl">|</span>
+            <span className="text-gray-500 text-xl md:text-2xl hidden sm:inline">|</span>
             <a 
               href="/privacy" 
-              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+              className="text-white hover:text-cyan-400 transition-colors text-sm md:text-lg font-semibold underline"
             >
               {t('nav.privacy')}
             </a>
-            <span className="text-gray-500 text-2xl">|</span>
+            <span className="text-gray-500 text-xl md:text-2xl hidden sm:inline">|</span>
             <a 
               href="/terms" 
-              className="text-white hover:text-cyan-400 transition-colors text-lg font-semibold underline"
+              className="text-white hover:text-cyan-400 transition-colors text-sm md:text-lg font-semibold underline"
             >
               {t('nav.terms')}
             </a>

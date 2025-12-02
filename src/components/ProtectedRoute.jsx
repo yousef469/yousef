@@ -1,9 +1,12 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
 
+// AUTH DISABLED FOR BETA - Just pass through all routes
+// To re-enable auth, uncomment the code below and remove the simple return
 export default function ProtectedRoute({ children }) {
+  // AUTH DISABLED - Allow everyone access
+  return children;
+  
+  /* ORIGINAL AUTH CODE - Uncomment to re-enable
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -22,4 +25,5 @@ export default function ProtectedRoute({ children }) {
   }
 
   return children;
+  */
 }
