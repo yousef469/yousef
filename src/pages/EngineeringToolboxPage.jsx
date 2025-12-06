@@ -49,7 +49,7 @@ export default function EngineeringToolboxPage() {
   const premiumToolsCount = getPremiumTools().length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-x-hidden pb-20 md:pb-0">
       {/* Header */}
       <div className="border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">

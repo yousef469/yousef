@@ -76,7 +76,7 @@ export default function GameMapCivil() {
         />
       )}
       
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-stone-900 to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-stone-900 to-gray-900 text-white pb-20 md:pb-0">
       {/* Building Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(12)].map((_, i) => (

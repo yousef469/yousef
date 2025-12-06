@@ -79,7 +79,7 @@ export default function GameMapElectronics() {
         />
       )}
       
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white pb-20 md:pb-0">
       {/* Circuit Board Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (

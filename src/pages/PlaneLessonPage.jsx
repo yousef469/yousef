@@ -66,19 +66,19 @@ export default function PlaneLessonPage() {
     };
 
     return (
-      <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-6">
           <div className="flex items-center gap-2">
-            <Brain className="w-6 h-6 text-purple-400" />
-            <h3 className="text-xl font-bold">Knowledge Check</h3>
+            <Brain className="w-5 sm:w-6 h-5 sm:h-6 text-purple-400" />
+            <h3 className="text-lg sm:text-xl font-bold">Knowledge Check</h3>
           </div>
-          <div className="text-sm text-gray-400">
+          <div className="text-xs sm:text-sm text-gray-400">
             Question {currentQuestion + 1}/{questions.length} • Score: {score}/{questions.length}
           </div>
         </div>
-        <div className="mb-6">
-          <h4 className="text-lg font-semibold mb-4">{questionText}</h4>
-          <div className="space-y-3">
+        <div className="mb-4 sm:mb-6">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{questionText}</h4>
+          <div className="space-y-2 sm:space-y-3">
             {question.options.map((option, idx) => {
               const isSelected = selectedAnswer === option;
               const isCorrect = option === correctAnswer;
@@ -89,7 +89,7 @@ export default function PlaneLessonPage() {
                   key={idx}
                   onClick={() => !showResult && handleAnswer(option)}
                   disabled={showResult}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  className={`w-full p-3 sm:p-4 rounded-lg border-2 text-left transition-all text-sm sm:text-base ${
                     showCorrect ? 'border-green-500 bg-green-500/20'
                     : showWrong ? 'border-red-500 bg-red-500/20'
                     : isSelected ? 'border-purple-500 bg-purple-500/20'
@@ -106,19 +106,19 @@ export default function PlaneLessonPage() {
           <div className="flex justify-end">
             {isLastQuestion ? (
               <div className="text-center w-full">
-                <div className="text-2xl font-bold mb-2">Quiz Complete! Score: {score}/{questions.length}</div>
-                <div className="text-gray-400 mb-4">
+                <div className="text-xl sm:text-2xl font-bold mb-2">Quiz Complete! Score: {score}/{questions.length}</div>
+                <div className="text-sm sm:text-base text-gray-400 mb-4">
                   {score === questions.length ? '🎉 Perfect!' : score >= questions.length * 0.7 ? '👍 Good job!' : '💪 Keep learning!'}
                 </div>
                 <button
                   onClick={() => { setQuizCompleted(true); setTimeout(() => navigate('/games/map/planes'), 1000); }}
-                  className="px-6 py-3 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors"
+                  className="px-5 sm:px-6 py-2 sm:py-3 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors text-sm sm:text-base"
                 >
                   Continue to Map →
                 </button>
               </div>
             ) : (
-              <button onClick={nextQuestion} className="px-6 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold transition-colors">
+              <button onClick={nextQuestion} className="px-5 sm:px-6 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold transition-colors text-sm sm:text-base">
                 Next Question →
               </button>
             )}
@@ -198,32 +198,36 @@ export default function PlaneLessonPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white pb-20 md:pb-0">
       <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button onClick={() => navigate('/games/map/planes')} className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          {/* Mobile: Stack layout */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            {/* Title row */}
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <button onClick={() => navigate('/games/map/planes')} className="p-2 hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0">
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <Plane className="w-8 h-8 text-cyan-400" />
-              <div>
-                <div className="text-sm text-cyan-400 font-semibold">{lesson.unit}</div>
-                <h1 className="text-xl font-bold">{lesson.title}</h1>
+              <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="text-xs sm:text-sm text-cyan-400 font-semibold truncate">{lesson.unit}</div>
+                <h1 className="text-base sm:text-xl font-bold truncate">{lesson.title}</h1>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button onClick={completeLesson} className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors">
-                <CheckCircle className="w-5 h-5" />
-                <span>Complete Lesson</span>
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:overflow-visible">
+              <button onClick={completeLesson} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors text-sm sm:text-base whitespace-nowrap flex-shrink-0">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden xs:inline">Complete</span>
+                <span className="xs:hidden">✓</span>
               </button>
               {id < Object.keys(planesLessons).length - 1 && (
                 <button
                   onClick={() => navigate(`/games/play/planes/lesson/${id + 1}`)}
-                  className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-semibold transition-colors"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-semibold transition-colors text-sm sm:text-base whitespace-nowrap flex-shrink-0"
                 >
-                  <span>Next Lesson</span>
-                  <ArrowLeft className="w-5 h-5 rotate-180" />
+                  <span>Next</span>
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 rotate-180" />
                 </button>
               )}
             </div>
@@ -231,7 +235,7 @@ export default function PlaneLessonPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <LessonBreadcrumb subject="planes" lessonId={id} lessonTitle={lesson.title} />
         <div className="mb-8">
           <p className="text-lg text-gray-300">{lesson.description}</p>

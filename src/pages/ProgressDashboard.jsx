@@ -55,7 +55,7 @@ export default function ProgressDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white pb-20 md:pb-0">
       {/* Header */}
       <div className="border-b border-gray-700 bg-gray-900/50 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">

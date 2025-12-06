@@ -106,7 +106,7 @@ export default function GameMapRockets() {
         />
       )}
       
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-black text-white pb-20 md:pb-0">
       {/* Stars Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(100)].map((_, i) => (

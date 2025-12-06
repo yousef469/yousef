@@ -79,7 +79,7 @@ export default function GameMapCars() {
         />
       )}
       
-    <div className="min-h-screen bg-gradient-to-br from-orange-900 via-gray-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-orange-900 via-gray-900 to-black text-white pb-20 md:pb-0">
       {/* City Buildings Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(15)].map((_, i) => (
