@@ -41,31 +41,6 @@ export default function BeginnerLessonPage() {
     );
   }
 
-  const totalSections = lesson.content.sections.length;
-  const isLastSection = currentSection === totalSections - 1;
-
-  const handleNext = async () => {
-    if (isLastSection) {
-      // Record lesson completion before going to quiz
-      if (!lessonCompleted) {
-        await completeLesson(parseInt(lessonId), 3, 0);
-        setLessonCompleted(true);
-      }
-      // Go to quiz
-      navigate(`/learn/beginner/quiz/${lessonId}`);
-    } else {
-      setCurrentSection(currentSection + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentSection > 0) {
-      setCurrentSection(currentSection - 1);
-    }
-  };
-
-  const currentContent = lesson.content.sections[currentSection];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white">
       {/* Header */}
@@ -102,17 +77,6 @@ export default function BeginnerLessonPage() {
               <div className="text-lg text-white/80 mt-2">{lesson.unit}</div>
             </div>
           </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-white/20 rounded-full h-2 mt-6">
-            <div
-              className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentSection + 1) / totalSections) * 100}%` }}
-            />
-          </div>
-          <div className="text-sm text-white/60 mt-2 text-center">
-            Section {currentSection + 1} of {totalSections}
-          </div>
         </div>
 
         {/* Micro-Lesson Player */}
@@ -124,43 +88,6 @@ export default function BeginnerLessonPage() {
             navigate(`/learn/unit/${lesson.unitNumber}`);
           }}
         />
-
-        {/* Key Takeaways (only on last section) */}
-        {isLastSection && (
-          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-green-400/30">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h3 className="font-bold text-lg mb-3">Key Takeaways</h3>
-                <ul className="space-y-2">
-                  {lesson.content.keyTakeaways.map((takeaway, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-green-300 mt-1">•</span>
-                      <span className="text-white/90">{takeaway}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Vocabulary (only on last section) */}
-        {isLastSection && lesson.content.vocabulary.length > 0 && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
-            <h3 className="font-bold text-xl mb-4">Vocabulary</h3>
-            <div className="grid gap-4">
-              {lesson.content.vocabulary.map((item, index) => (
-                <div key={index} className="border-l-4 border-cyan-400 pl-4">
-                  <div className="font-bold text-cyan-300">{item.term}</div>
-                  <div className="text-white/80 text-sm mt-1">{item.definition}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Navigation is now handled by MicroLessonPlayer */}
       </div>
     </div>
   );

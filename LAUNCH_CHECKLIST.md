@@ -31,7 +31,7 @@
 ### 3. Add Env Variables to Vercel (5 min)
 Go to Vercel → Settings → Environment Variables and add:
 ```
-VITE_SUPABASE_URL=https://ptwjvfuwwjpfcivlqjxo.supabase.co
+VITE_SUPABASE_URL=https://xycziqvkjkqivewsfzhu.supabase.co
 VITE_SUPABASE_ANON_KEY=your-key
 VITE_GEMINI_API_KEY=your-key
 VITE_MIXPANEL_TOKEN=your-token

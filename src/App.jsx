@@ -35,6 +35,7 @@ const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
 const UnitOverviewPage = lazy(() => import('./pages/UnitOverviewPage'));
 const BeginnerLessonPage = lazy(() => import('./pages/BeginnerLessonPage'));
 const BeginnerQuizPage = lazy(() => import('./pages/BeginnerQuizPage'));
+const BeginnerLessonsPage = lazy(() => import('./pages/BeginnerLessonsPage'));
 const AuthCallback = lazy(() => import('./pages/auth/callback'));
 
 // ==================== 3D VIEWER COMPONENT ====================
@@ -53,10 +54,10 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
 
     // Scene setup
     const scene = new THREE.Scene();
-    
+
     // Transparent background
     scene.background = null;
-    
+
     sceneRef.current = scene;
 
     // Camera setup
@@ -71,8 +72,8 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
     cameraRef.current = camera;
 
     // Renderer setup with enhanced quality
-    const renderer = new THREE.WebGLRenderer({ 
-      antialias: true, 
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
       alpha: true,
       powerPreference: 'high-performance'
     });
@@ -127,7 +128,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
     // Create model based on type - Enhanced Falcon 9 Rocket
     const createRocket = () => {
       const group = new THREE.Group();
-      
+
       // Enhanced Materials with better visual properties
       const whitePaint = new THREE.MeshStandardMaterial({
         color: 0xfafafa,
@@ -155,7 +156,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         roughness: 0.15,
         envMapIntensity: 1.5
       });
-      
+
       // Payload Fairing (cylindrical section under nose)
       const fairing = new THREE.Mesh(
         new THREE.CylinderGeometry(0.45, 0.45, 1.5, 64),
@@ -164,7 +165,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       fairing.position.y = 6.25;
       fairing.castShadow = true;
       group.add(fairing);
-      
+
       // Nose Cone - Clean cone on top of fairing
       const noseCone = new THREE.Mesh(
         new THREE.ConeGeometry(0.45, 1.5, 64),
@@ -174,7 +175,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       noseCone.castShadow = true;
       noseCone.receiveShadow = true;
       group.add(noseCone);
-      
+
       // Second Stage (body)
       const secondStage = new THREE.Mesh(
         new THREE.CylinderGeometry(0.45, 0.45, 3.5, 64),
@@ -183,7 +184,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       secondStage.position.y = 3.75;
       secondStage.castShadow = true;
       group.add(secondStage);
-      
+
       // Interstage (black band)
       const interstage = new THREE.Mesh(
         new THREE.CylinderGeometry(0.475, 0.475, 1.2, 64),
@@ -192,7 +193,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       interstage.position.y = 1.6;
       interstage.castShadow = true;
       group.add(interstage);
-      
+
       // Grid fins structure lines
       for (let i = 0; i < 8; i++) {
         const angle = (i * Math.PI * 2) / 8;
@@ -208,7 +209,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         gridLine.lookAt(0, 1.6, 0);
         group.add(gridLine);
       }
-      
+
       // First Stage
       const firstStage = new THREE.Mesh(
         new THREE.CylinderGeometry(0.475, 0.475, 5, 64),
@@ -217,7 +218,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       firstStage.position.y = -1;
       firstStage.castShadow = true;
       group.add(firstStage);
-      
+
       // Tank dome
       const tankDome = new THREE.Mesh(
         new THREE.SphereGeometry(0.475, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
@@ -226,7 +227,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       tankDome.position.y = 1.5;
       tankDome.rotation.x = Math.PI;
       group.add(tankDome);
-      
+
       // Raceway (external pipe)
       const raceway = new THREE.Mesh(
         new THREE.BoxGeometry(0.04, 8, 0.04),
@@ -234,27 +235,27 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       );
       raceway.position.set(0.49, 1.5, 0);
       group.add(raceway);
-      
+
       // Landing Legs (4 legs)
       for (let i = 0; i < 4; i++) {
         const legAssembly = new THREE.Group();
-        
+
         const leg = new THREE.Mesh(
           new THREE.CylinderGeometry(0.06, 0.075, 2.5, 8),
           carbonFiber
         );
         leg.position.y = -1;
         leg.castShadow = true;
-        
+
         const pad = new THREE.Mesh(
           new THREE.CylinderGeometry(0.225, 0.25, 0.075, 16),
           carbonFiber
         );
         pad.position.y = -2.25;
         pad.castShadow = true;
-        
+
         legAssembly.add(leg, pad);
-        
+
         const angle = (i * Math.PI * 2) / 4 + Math.PI / 4;
         legAssembly.position.x = Math.cos(angle) * 0.8;
         legAssembly.position.z = Math.sin(angle) * 0.8;
@@ -263,11 +264,11 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         legAssembly.rotation.y = angle;
         group.add(legAssembly);
       }
-      
+
       // Grid Fins (4 fins)
       for (let i = 0; i < 4; i++) {
         const finAssembly = new THREE.Group();
-        
+
         const frame = new THREE.Mesh(
           new THREE.BoxGeometry(1.1, 1.1, 0.04),
           new THREE.MeshStandardMaterial({
@@ -278,7 +279,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         );
         frame.castShadow = true;
         finAssembly.add(frame);
-        
+
         // Grid pattern
         for (let j = -4; j <= 4; j++) {
           const bar = new THREE.Mesh(
@@ -292,7 +293,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
           bar.position.y = j * 0.12;
           finAssembly.add(bar);
         }
-        
+
         const angle = (i * Math.PI * 2) / 4;
         finAssembly.position.x = Math.cos(angle) * 0.775;
         finAssembly.position.z = Math.sin(angle) * 0.775;
@@ -300,7 +301,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         finAssembly.rotation.y = angle;
         group.add(finAssembly);
       }
-      
+
       // Engine Section (Octaweb)
       const octaweb = new THREE.Mesh(
         new THREE.CylinderGeometry(0.675, 0.725, 0.9, 8),
@@ -309,7 +310,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       octaweb.position.y = -3.75;
       octaweb.castShadow = true;
       group.add(octaweb);
-      
+
       // Heat Shield Base
       const heatShield = new THREE.Mesh(
         new THREE.CylinderGeometry(0.7, 0.7, 0.125, 32),
@@ -321,7 +322,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       );
       heatShield.position.y = -3.375;
       group.add(heatShield);
-      
+
       // Merlin Engines (9 engines in octaweb pattern) - Enhanced
       const engineMaterial = new THREE.MeshStandardMaterial({
         color: 0x3a3a3a,
@@ -336,11 +337,11 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         emissive: 0x221100,
         emissiveIntensity: 0.1
       });
-      
+
       // Center engine
       const createEngine = (x, z) => {
         const engineGroup = new THREE.Group();
-        
+
         // Turbopump housing
         const turbopump = new THREE.Mesh(
           new THREE.BoxGeometry(0.15, 0.2, 0.12),
@@ -348,7 +349,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         );
         turbopump.position.y = 0.5;
         engineGroup.add(turbopump);
-        
+
         // Combustion chamber
         const chamber = new THREE.Mesh(
           new THREE.CylinderGeometry(0.14, 0.16, 0.9, 24),
@@ -356,7 +357,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         );
         chamber.castShadow = true;
         engineGroup.add(chamber);
-        
+
         // Injector plate
         const injector = new THREE.Mesh(
           new THREE.CylinderGeometry(0.135, 0.135, 0.03, 24),
@@ -368,13 +369,13 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         );
         injector.position.y = 0.45;
         engineGroup.add(injector);
-        
+
         // Bell nozzle with better shape
         const nozzlePoints = [];
         for (let i = 0; i <= 15; i++) {
           const t = i / 15;
           let radius;
-          
+
           if (t < 0.2) {
             // Throat (narrowest part)
             radius = 0.16 - t * 0.2;
@@ -383,11 +384,11 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
             const expansionT = (t - 0.2) / 0.8;
             radius = 0.12 + Math.pow(expansionT, 0.6) * 0.15;
           }
-          
+
           const height = -t * 0.9;
           nozzlePoints.push(new THREE.Vector2(radius, height));
         }
-        
+
         const nozzle = new THREE.Mesh(
           new THREE.LatheGeometry(nozzlePoints, 32),
           nozzleMaterial
@@ -395,7 +396,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         nozzle.position.y = -0.45;
         nozzle.castShadow = true;
         engineGroup.add(nozzle);
-        
+
         // Nozzle extension (darker)
         const nozzleExt = new THREE.Mesh(
           new THREE.CylinderGeometry(0.26, 0.28, 0.15, 32),
@@ -407,13 +408,13 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         );
         nozzleExt.position.y = -1.3;
         engineGroup.add(nozzleExt);
-        
+
         engineGroup.position.set(x, -4, z);
         return engineGroup;
       };
-      
+
       group.add(createEngine(0, 0));
-      
+
       // Outer 8 engines
       const outerRadius = 0.425;
       for (let i = 0; i < 8; i++) {
@@ -422,13 +423,13 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         const z = Math.sin(angle) * outerRadius;
         group.add(createEngine(x, z));
       }
-      
+
       return group;
     };
-    
+
     const createPlane = () => {
       const group = new THREE.Group();
-      
+
       // Fuselage (main body)
       const fuselageGeometry = new THREE.CylinderGeometry(0.4, 0.3, 5, 32);
       const fuselageMaterial = new THREE.MeshStandardMaterial({
@@ -439,14 +440,14 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       const fuselage = new THREE.Mesh(fuselageGeometry, fuselageMaterial);
       fuselage.rotation.z = Math.PI / 2;
       group.add(fuselage);
-      
+
       // Nose cone
       const noseGeometry = new THREE.SphereGeometry(0.4, 32, 32, 0, Math.PI);
       const nose = new THREE.Mesh(noseGeometry, fuselageMaterial);
       nose.rotation.z = -Math.PI / 2;
       nose.position.x = 2.5;
       group.add(nose);
-      
+
       // Wings (main)
       const wingGeometry = new THREE.BoxGeometry(0.2, 4, 1.5);
       const wingMaterial = new THREE.MeshStandardMaterial({
@@ -457,7 +458,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       const wings = new THREE.Mesh(wingGeometry, wingMaterial);
       wings.position.x = -0.5;
       group.add(wings);
-      
+
       // Tail wing (vertical stabilizer)
       const tailGeometry = new THREE.BoxGeometry(0.2, 0.8, 1.2);
       const tail = new THREE.Mesh(tailGeometry, wingMaterial);
@@ -465,13 +466,13 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       tail.position.x = -2.2;
       tail.position.y = 0.6;
       group.add(tail);
-      
+
       // Horizontal stabilizers
       const hStabGeometry = new THREE.BoxGeometry(0.15, 1.5, 0.6);
       const hStab = new THREE.Mesh(hStabGeometry, wingMaterial);
       hStab.position.x = -2.2;
       group.add(hStab);
-      
+
       // Engines (2 engines under wings)
       const engineGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.8, 32);
       const engineMaterial = new THREE.MeshStandardMaterial({
@@ -479,23 +480,23 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         metalness: 0.9,
         roughness: 0.1
       });
-      
+
       const engine1 = new THREE.Mesh(engineGeometry, engineMaterial);
       engine1.rotation.z = Math.PI / 2;
       engine1.position.set(-0.5, 1.2, 0);
       group.add(engine1);
-      
+
       const engine2 = new THREE.Mesh(engineGeometry, engineMaterial);
       engine2.rotation.z = Math.PI / 2;
       engine2.position.set(-0.5, -1.2, 0);
       group.add(engine2);
-      
+
       return group;
     };
-    
+
     const createCar = () => {
       const group = new THREE.Group();
-      
+
       // Car body (lower part)
       const bodyGeometry = new THREE.BoxGeometry(4, 0.6, 1.8);
       const bodyMaterial = new THREE.MeshStandardMaterial({
@@ -506,21 +507,21 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
       body.position.y = 0.5;
       group.add(body);
-      
+
       // Car cabin (upper part)
       const cabinGeometry = new THREE.BoxGeometry(2, 0.8, 1.6);
       const cabin = new THREE.Mesh(cabinGeometry, bodyMaterial);
       cabin.position.y = 1.1;
       cabin.position.x = -0.3;
       group.add(cabin);
-      
+
       // Hood (front slope)
       const hoodGeometry = new THREE.BoxGeometry(1.2, 0.3, 1.8);
       const hood = new THREE.Mesh(hoodGeometry, bodyMaterial);
       hood.position.set(1.6, 0.65, 0);
       hood.rotation.z = -0.2;
       group.add(hood);
-      
+
       // Wheels
       const wheelGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 32);
       const wheelMaterial = new THREE.MeshStandardMaterial({
@@ -528,20 +529,20 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         metalness: 0.5,
         roughness: 0.7
       });
-      
+
       const wheelPositions = [
         { x: 1.2, y: 0.35, z: 1.0 },
         { x: 1.2, y: 0.35, z: -1.0 },
         { x: -1.2, y: 0.35, z: 1.0 },
         { x: -1.2, y: 0.35, z: -1.0 }
       ];
-      
+
       wheelPositions.forEach(pos => {
         const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
         wheel.rotation.z = Math.PI / 2;
         wheel.position.set(pos.x, pos.y, pos.z);
         group.add(wheel);
-        
+
         // Rim
         const rimGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.32, 32);
         const rimMaterial = new THREE.MeshStandardMaterial({
@@ -554,7 +555,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         rim.position.set(pos.x, pos.y, pos.z);
         group.add(rim);
       });
-      
+
       // Spoiler
       const spoilerGeometry = new THREE.BoxGeometry(0.2, 1.6, 0.6);
       const spoilerMaterial = new THREE.MeshStandardMaterial({
@@ -565,7 +566,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       const spoiler = new THREE.Mesh(spoilerGeometry, spoilerMaterial);
       spoiler.position.set(-2, 1.2, 0);
       group.add(spoiler);
-      
+
       // Windows (darker material)
       const windowMaterial = new THREE.MeshStandardMaterial({
         color: 0x111111,
@@ -574,18 +575,18 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         transparent: true,
         opacity: 0.3
       });
-      
+
       const windowGeometry = new THREE.BoxGeometry(1.8, 0.7, 1.62);
       const windows = new THREE.Mesh(windowGeometry, windowMaterial);
       windows.position.set(-0.3, 1.15, 0);
       group.add(windows);
-      
+
       return group;
     };
-    
+
     // Create the appropriate model
     const loader = new GLTFLoader();
-    
+
     if (modelType === 'rocket') {
       // Use procedural rocket model
       const model = createRocket();
@@ -594,12 +595,12 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
     } else if (modelType === 'plane' || modelType === 'car') {
       // Load GLB models for plane and car
       const modelPath = modelType === 'plane' ? '/plane.glb' : '/porsche.glb';
-      
+
       loader.load(
         modelPath,
         (gltf) => {
           const model = gltf.scene;
-          
+
           // Scale and position adjustments
           if (modelType === 'car') {
             model.scale.set(2, 2, 2);
@@ -608,7 +609,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
             model.scale.set(0.5, 0.5, 0.5);
             model.position.y = 0;
           }
-          
+
           // Enable shadows
           model.traverse((child) => {
             if (child.isMesh) {
@@ -616,11 +617,11 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
               child.receiveShadow = true;
             }
           });
-          
+
           scene.add(model);
           meshRef.current = model;
         },
-        () => {},
+        () => { },
         (error) => {
           // Fallback to procedural model
           const fallbackModel = modelType === 'plane' ? createPlane() : createCar();
@@ -656,7 +657,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       ground.position.y = modelType === 'rocket' ? -4.5 : -0.5;
       ground.receiveShadow = true;
       scene.add(ground);
-      
+
       // Add grid lines on ground for better depth
       const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
       gridHelper.position.y = modelType === 'rocket' ? -4.49 : -0.49;
@@ -664,33 +665,33 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       gridHelper.material.opacity = 0.2;
       scene.add(gridHelper);
     }
-    
+
     // Add stars for rocket background
     if (modelType === 'rocket') {
       const starsGeometry = new THREE.BufferGeometry();
       const starCount = 1000;
       const positions = new Float32Array(starCount * 3);
       const colors = new Float32Array(starCount * 3);
-      
+
       for (let i = 0; i < starCount; i++) {
         const i3 = i * 3;
         const radius = 40 + Math.random() * 60;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.random() * Math.PI;
-        
+
         positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
         positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
         positions[i3 + 2] = radius * Math.cos(phi);
-        
+
         const brightness = 0.5 + Math.random() * 0.5;
         colors[i3] = brightness;
         colors[i3 + 1] = brightness;
         colors[i3 + 2] = brightness;
       }
-      
+
       starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       starsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      
+
       const starsMaterial = new THREE.PointsMaterial({
         size: 0.1,
         vertexColors: true,
@@ -698,7 +699,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
         opacity: 0.8,
         sizeAttenuation: true
       });
-      
+
       const stars = new THREE.Points(starsGeometry, starsMaterial);
       scene.add(stars);
     }
@@ -706,11 +707,11 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
     // Animation loop
     const animate = () => {
       animationFrameRef.current = requestAnimationFrame(animate);
-      
+
       if (meshRef.current) {
         meshRef.current.rotation.x = rotationRef.current.x;
         meshRef.current.rotation.y = rotationRef.current.y;
-        
+
         // Always rotate (even when dragging)
         rotationRef.current.y += 0.005;
       }
@@ -730,10 +731,10 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       if (mouseRef.current.isDragging) {
         const deltaX = e.clientX - mouseRef.current.lastX;
         const deltaY = e.clientY - mouseRef.current.lastY;
-        
+
         rotationRef.current.y += deltaX * 0.01;
         rotationRef.current.x += deltaY * 0.01;
-        
+
         mouseRef.current.lastX = e.clientX;
         mouseRef.current.lastY = e.clientY;
       }
@@ -749,12 +750,12 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       const zoomSpeed = 0.5; // Increased from 0.1 for easier zooming
       const direction = new THREE.Vector3();
       camera.getWorldDirection(direction);
-      
+
       // Zoom in/out with limits
       const minDistance = 3;
       const maxDistance = 25;
       const currentDistance = camera.position.length();
-      
+
       if (e.deltaY < 0 && currentDistance > minDistance) {
         camera.position.addScaledVector(direction, zoomSpeed);
       } else if (e.deltaY > 0 && currentDistance < maxDistance) {
@@ -783,14 +784,14 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
       renderer.domElement.removeEventListener('mousemove', handleMouseMove);
       renderer.domElement.removeEventListener('mouseup', handleMouseUp);
       renderer.domElement.removeEventListener('wheel', handleWheel);
-      
+
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
-      
+
       // Dispose of all geometries and materials in the scene
       scene.traverse((object) => {
         if (object.geometry) {
@@ -804,7 +805,7 @@ const ThreeJSViewer = ({ modelType, hotspots = [] }) => {
           }
         }
       });
-      
+
       renderer.dispose();
     };
   }, [modelType]);
@@ -848,7 +849,7 @@ const Model3DViewer = ({ isOpen, onClose, modelType, modelInfo }) => {
         <div className="w-2/5 bg-background p-8 overflow-y-auto border-r border-primary/20">
           <h3 className="text-2xl font-bold text-white mb-4">{modelInfo.title}</h3>
           <p className="text-text mb-8 text-lg">{modelInfo.description}</p>
-          
+
           <div className="space-y-6">
             <div>
               <h4 className="text-lg font-semibold text-primary mb-4">Key Components</h4>
@@ -946,7 +947,7 @@ const AITutorPanel = ({ isOpen, onClose }) => {
       setTimeout(() => {
         const lowerInput = inputValue.toLowerCase();
         let response = simulatedResponses.default;
-        
+
         if (lowerInput.includes('rocket')) response = simulatedResponses.rocket;
         else if (lowerInput.includes('plane')) response = simulatedResponses.plane;
         else if (lowerInput.includes('car')) response = simulatedResponses.car;
@@ -985,14 +986,13 @@ const AITutorPanel = ({ isOpen, onClose }) => {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}` }
+            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] p-3 rounded-2xl ${
-                message.type === 'user'
+              className={`max-w-[80%] p-3 rounded-2xl ${message.type === 'user'
                   ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
                   : 'bg-background-light text-text border border-primary/20'
-              }`}
+                }`}
             >
               {message.type === 'bot' && (
                 <Bot className="w-4 h-4 inline mr-2 text-primary" />
@@ -1001,7 +1001,7 @@ const AITutorPanel = ({ isOpen, onClose }) => {
             </div>
           </div>
         ))}
-        
+
         {isTyping && (
           <div className="flex justify-start">
             <div className="bg-background-light border border-primary/20 px-4 py-3 rounded-2xl">
@@ -1013,7 +1013,7 @@ const AITutorPanel = ({ isOpen, onClose }) => {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -1047,22 +1047,22 @@ const VehicleCard = ({ icon: Icon, title, description, gradient, onClick, delay 
       onClick={onClick}
       className="cursor-pointer group relative"
     >
-      <div className={`absolute inset-0 ${gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500` } />
-      
+      <div className={`absolute inset-0 ${gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`} />
+
       <div className="relative bg-background/80 backdrop-blur-xl border border-primary/20/50 rounded-2xl p-6 overflow-hidden">
-        <div className={`absolute inset-0 ${gradient} opacity-10 group-hover:opacity-20 transition-opacity` } />
-        
-        <div className={`relative z-10 w-16 h-16 ${gradient} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform` }>
+        <div className={`absolute inset-0 ${gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
+
+        <div className={`relative z-10 w-16 h-16 ${gradient} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
           <Icon className="w-8 h-8 text-white" />
         </div>
-        
+
         <h3 className="relative z-10 text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
         <p className="relative z-10 text-text-secondary mb-4">
           {description}
         </p>
-        
+
         <div className="relative z-10 flex items-center text-primary group-hover:text-cyan-300 transition-colors">
           <span className="text-sm font-semibold">Explore in 3D</span>
           <RotateCw className="w-4 h-4 ml-2 group-hover:rotate-180 transition-transform duration-500" />
@@ -1126,65 +1126,66 @@ export default function App() {
         <MobileBottomNav />
         <React.Suspense fallback={null}>
           <Routes>
-          <Route path="/" element={<HomeRouter />} />
-          <Route path="/home" element={<HomeRouter />} />
-          <Route path="/landing" element={<LandingPage />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
-          <Route path="/learn" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
-          <Route path="/learn/sections" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
-          <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
-          <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
-          <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
-          <Route path="/mechanics/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
-          <Route path="/mechanics/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
-          <Route path="/mechanics/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
+            <Route path="/" element={<HomeRouter />} />
+            <Route path="/home" element={<HomeRouter />} />
+            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/viewer" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+            <Route path="/learn" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
+            <Route path="/learn/sections" element={<ProtectedRoute><LearnSectionsPage /></ProtectedRoute>} />
+            <Route path="/learn/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
+            <Route path="/learn/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
+            <Route path="/learn/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
+            <Route path="/mechanics/rockets" element={<ProtectedRoute><RocketMechanicsPage /></ProtectedRoute>} />
+            <Route path="/mechanics/cars" element={<ProtectedRoute><CarMechanicsPage /></ProtectedRoute>} />
+            <Route path="/mechanics/planes" element={<ProtectedRoute><PlaneMechanicsPage /></ProtectedRoute>} />
 
-          <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
-          {/* Explode View Mode */}
-          <Route path="/explode-view" element={<ProtectedRoute><ExplodeViewPage /></ProtectedRoute>} />
-          <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
-          <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
-          <Route path="/career-projects" element={<ProtectedRoute><CareerProjectsPage /></ProtectedRoute>} />
-          <Route path="/internship" element={<ProtectedRoute><InternshipSimulatorPage /></ProtectedRoute>} />
-          <Route path="/projects/rocket-nozzle" element={<ProtectedRoute><RocketNozzleProject /></ProtectedRoute>} />
-          <Route path="/projects/solar-panel-system" element={<ProtectedRoute><SolarPanelProject /></ProtectedRoute>} />
-          <Route path="/projects/robotic-arm" element={<ProtectedRoute><RoboticArmProject /></ProtectedRoute>} />
-          <Route path="/projects/car-transmission" element={<ProtectedRoute><CarTransmissionProject /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
-          <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
-          <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
-          <Route path="/games/map/planes" element={<ProtectedRoute><GameMapPlanes /></ProtectedRoute>} />
-          <Route path="/games/map/electronics" element={<ProtectedRoute><GameMapElectronics /></ProtectedRoute>} />
-          <Route path="/games/map/civil" element={<ProtectedRoute><GameMapCivil /></ProtectedRoute>} />
-          <Route path="/lessons/rockets/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
-          <Route path="/games/play/planes/lesson/:lessonId" element={<ProtectedRoute><PlaneLessonPage /></ProtectedRoute>} />
-          <Route path="/games/play/planes/quiz/:lessonId" element={<ProtectedRoute><PlaneQuizPage /></ProtectedRoute>} />
-          <Route path="/games/play/cars/lesson/:lessonId" element={<ProtectedRoute><CarLessonPage /></ProtectedRoute>} />
-          <Route path="/games/play/electronics/lesson/:lessonId" element={<ProtectedRoute><ElectronicsLessonPage /></ProtectedRoute>} />
-          <Route path="/games/play/civil/lesson/:lessonId" element={<ProtectedRoute><CivilLessonPage /></ProtectedRoute>} />
-          <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
-          <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
-          <Route path="/learn/unit/:unitId" element={<ProtectedRoute><UnitOverviewPage /></ProtectedRoute>} />
-          <Route path="/learn/beginner/lesson/:lessonId" element={<ProtectedRoute><BeginnerLessonPage /></ProtectedRoute>} />
-          <Route path="/learn/beginner/quiz/:lessonId" element={<ProtectedRoute><BeginnerQuizPage /></ProtectedRoute>} />
-          <Route path="/games/play/:category/:level" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
-          <Route path="/games/journey" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
-          <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
-          <Route path="/games/simulation" element={<ProtectedRoute><SimulationGame /></ProtectedRoute>} />
-          <Route path="/games/matching" element={<ProtectedRoute><MatchingGame /></ProtectedRoute>} />
-          <Route path="/games/engine-builder" element={<ProtectedRoute><EngineBuilderGame /></ProtectedRoute>} />
-          <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
-          
-          <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/help" element={<HelpPage />} />
-          <Route path="/homework-solver" element={<ProtectedRoute><HomeworkSolverPage /></ProtectedRoute>} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/learn/electronics" element={<ProtectedRoute><ElectronicsPage /></ProtectedRoute>} />
+            {/* Explode View Mode */}
+            <Route path="/explode-view" element={<ProtectedRoute><ExplodeViewPage /></ProtectedRoute>} />
+            <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
+            <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+            <Route path="/career-projects" element={<ProtectedRoute><CareerProjectsPage /></ProtectedRoute>} />
+            <Route path="/internship" element={<ProtectedRoute><InternshipSimulatorPage /></ProtectedRoute>} />
+            <Route path="/projects/rocket-nozzle" element={<ProtectedRoute><RocketNozzleProject /></ProtectedRoute>} />
+            <Route path="/projects/solar-panel-system" element={<ProtectedRoute><SolarPanelProject /></ProtectedRoute>} />
+            <Route path="/projects/robotic-arm" element={<ProtectedRoute><RoboticArmProject /></ProtectedRoute>} />
+            <Route path="/projects/car-transmission" element={<ProtectedRoute><CarTransmissionProject /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/games" element={<ProtectedRoute><GameCategorySelect /></ProtectedRoute>} />
+            <Route path="/games/map/rockets" element={<ProtectedRoute><GameMapRockets /></ProtectedRoute>} />
+            <Route path="/games/map/cars" element={<ProtectedRoute><GameMapCars /></ProtectedRoute>} />
+            <Route path="/games/map/planes" element={<ProtectedRoute><GameMapPlanes /></ProtectedRoute>} />
+            <Route path="/games/map/electronics" element={<ProtectedRoute><GameMapElectronics /></ProtectedRoute>} />
+            <Route path="/games/map/civil" element={<ProtectedRoute><GameMapCivil /></ProtectedRoute>} />
+            <Route path="/lessons/rockets/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
+            <Route path="/games/play/planes/lesson/:lessonId" element={<ProtectedRoute><PlaneLessonPage /></ProtectedRoute>} />
+            <Route path="/games/play/planes/quiz/:lessonId" element={<ProtectedRoute><PlaneQuizPage /></ProtectedRoute>} />
+            <Route path="/games/play/cars/lesson/:lessonId" element={<ProtectedRoute><CarLessonPage /></ProtectedRoute>} />
+            <Route path="/games/play/electronics/lesson/:lessonId" element={<ProtectedRoute><ElectronicsLessonPage /></ProtectedRoute>} />
+            <Route path="/games/play/civil/lesson/:lessonId" element={<ProtectedRoute><CivilLessonPage /></ProtectedRoute>} />
+            <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
+            <Route path="/learn/unit/:unitId" element={<ProtectedRoute><UnitOverviewPage /></ProtectedRoute>} />
+            <Route path="/learn/beginner/lesson/:lessonId" element={<ProtectedRoute><BeginnerLessonPage /></ProtectedRoute>} />
+            <Route path="/learn/beginner/quiz/:lessonId" element={<ProtectedRoute><BeginnerQuizPage /></ProtectedRoute>} />
+            <Route path="/beginner-lessons" element={<ProtectedRoute><BeginnerLessonsPage /></ProtectedRoute>} />
+            <Route path="/games/play/:category/:level" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
+            <Route path="/games/journey" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
+            <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
+            <Route path="/games/simulation" element={<ProtectedRoute><SimulationGame /></ProtectedRoute>} />
+            <Route path="/games/matching" element={<ProtectedRoute><MatchingGame /></ProtectedRoute>} />
+            <Route path="/games/engine-builder" element={<ProtectedRoute><EngineBuilderGame /></ProtectedRoute>} />
+            <Route path="/models/:id?" element={<ProtectedRoute><AllInOnePage /></ProtectedRoute>} />
+
+            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/homework-solver" element={<ProtectedRoute><HomeworkSolverPage /></ProtectedRoute>} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
           </Routes>
         </React.Suspense>
       </Router>
