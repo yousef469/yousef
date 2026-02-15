@@ -12,6 +12,7 @@ import LessonNavigation from '../components/LessonNavigation';
 import LessonVoiceNarrator from '../components/LessonVoiceNarrator';
 import rocketsLessons from '../data/rocketsLessonsData.js';
 import { useProgress } from '../contexts/ProgressContext';
+import MicroLessonPlayer from '../components/MicroLessonPlayer';
 
 export default function RocketLessonPage() {
   const { lessonId } = useParams();
@@ -44,13 +45,13 @@ export default function RocketLessonPage() {
 
   // Get lesson data from curriculum using string lessonKey
   const lessonData = rocketsLessons[lessonKey];
-  
+
   // Save progress when quiz is completed
   useEffect(() => {
     if (quizCompleted && lessonData?.questions) {
       const totalQuestions = lessonData.questions.length;
       const percentage = (score / totalQuestions) * 100;
-      
+
       saveProgress('rockets', id, {
         score,
         total: totalQuestions,
@@ -65,12 +66,12 @@ export default function RocketLessonPage() {
 
     const question = questions[currentQuestion];
     const isLastQuestion = currentQuestion === questions.length - 1;
-    
+
     // Get question text (supports both formats)
     const questionText = question.question || question.q;
     // Get correct answer (supports both formats - new uses index, old uses text)
-    const correctAnswer = typeof question.correctAnswer === 'number' 
-      ? question.options[question.correctAnswer] 
+    const correctAnswer = typeof question.correctAnswer === 'number'
+      ? question.options[question.correctAnswer]
       : question.a;
 
     const handleAnswer = (answer) => {
@@ -115,15 +116,14 @@ export default function RocketLessonPage() {
                   key={idx}
                   onClick={() => !showResult && handleAnswer(option)}
                   disabled={showResult}
-                  className={`w-full p-3 sm:p-4 rounded-lg border-2 text-left transition-all text-sm sm:text-base ${
-                    showCorrect
-                      ? 'border-green-500 bg-green-500/20'
-                      : showWrong
+                  className={`w-full p-3 sm:p-4 rounded-lg border-2 text-left transition-all text-sm sm:text-base ${showCorrect
+                    ? 'border-green-500 bg-green-500/20'
+                    : showWrong
                       ? 'border-red-500 bg-red-500/20'
                       : isSelected
-                      ? 'border-purple-500 bg-purple-500/20'
-                      : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
-                  }`}
+                        ? 'border-purple-500 bg-purple-500/20'
+                        : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
+                    }`}
                 >
                   {option}
                 </button>
@@ -181,7 +181,7 @@ export default function RocketLessonPage() {
   // Render lesson sections content
   const LessonSections = ({ sections }) => {
     if (!sections || sections.length === 0) return null;
-    
+
     return (
       <div className="space-y-8">
         {sections.map((section, idx) => (
@@ -201,7 +201,7 @@ export default function RocketLessonPage() {
   // Key takeaways component
   const KeyTakeaways = ({ takeaways }) => {
     if (!takeaways || takeaways.length === 0) return null;
-    
+
     return (
       <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-6">
         <h3 className="text-xl font-bold text-green-400 mb-4">🎯 Key Takeaways</h3>
@@ -226,23 +226,23 @@ export default function RocketLessonPage() {
       <div className="space-y-8">
         {/* Interactive Demo */}
         {interactiveDemos[lessonKey]}
-        
+
         {/* Lesson Introduction */}
         {lessonData.introduction && (
           <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-6">
             <p className="text-lg text-gray-200">{lessonData.introduction}</p>
           </div>
         )}
-        
+
         {/* Main Lesson Content Sections */}
         <LessonSections sections={lessonData.sections || lessonData.content?.sections} />
-        
+
         {/* Key Takeaways */}
         <KeyTakeaways takeaways={lessonData.keyTakeaways || lessonData.content?.keyTakeaways} />
-        
+
         {/* Enhanced Content (calculators, diagrams) */}
         <EnhancedLessonContent lessonId={lessonKey} subject="rockets" />
-        
+
         {/* Quiz */}
         <QuizSection questions={lessonData.quiz?.questions || []} />
       </div>
@@ -312,24 +312,26 @@ export default function RocketLessonPage() {
 
       {/* Lesson Content */}
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <LessonBreadcrumb 
-          subject="rockets" 
-          lessonId={id} 
-          lessonTitle={lesson.title} 
+        <LessonBreadcrumb
+          subject="rockets"
+          lessonId={id}
+          lessonTitle={lesson.title}
         />
-        
-        <div className="mb-8">
-          <p className="text-lg text-gray-300">{lesson.description}</p>
-        </div>
 
-        {/* Voice Narrator */}
-        {lessonData && (
-          <div className="mb-6">
-            <LessonVoiceNarrator lessonData={lessonData} />
+        {/* Micro-Lesson Player */}
+        {lessonData ? (
+          <MicroLessonPlayer
+            subject="rockets"
+            lessonData={lessonData}
+            onComplete={completeLesson}
+          />
+        ) : (
+          <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-8 text-center">
+            <h3 className="text-2xl font-bold mb-4 italic">🚀 Preparing Launch...</h3>
+            <p className="text-gray-400">Loading your micro-lesson experience.</p>
           </div>
         )}
 
-        {lesson.content}
 
         {/* Community Q&A */}
         <div className="mt-12">
@@ -337,10 +339,10 @@ export default function RocketLessonPage() {
         </div>
 
         {/* Enhanced Navigation */}
-        <LessonNavigation 
-          subject="rockets" 
-          currentLessonId={id} 
-          allLessons={rocketsLessons} 
+        <LessonNavigation
+          subject="rockets"
+          currentLessonId={id}
+          allLessons={rocketsLessons}
         />
       </div>
     </div>

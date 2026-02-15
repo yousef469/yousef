@@ -7,6 +7,7 @@ import EnhancedLessonContent from '../components/EnhancedLessonContent';
 import LessonBreadcrumb from '../components/LessonBreadcrumb';
 import LessonNavigation from '../components/LessonNavigation';
 import LessonVoiceNarrator from '../components/LessonVoiceNarrator';
+import MicroLessonPlayer from '../components/MicroLessonPlayer';
 
 export default function PlaneLessonPage() {
   const { lessonId } = useParams();
@@ -15,7 +16,7 @@ export default function PlaneLessonPage() {
   const { completeLesson: saveProgress } = useProgress();
   const id = parseInt(lessonId);
   const lessonKey = searchParams.get('lesson') || lessonId;
-  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
@@ -47,8 +48,8 @@ export default function PlaneLessonPage() {
     const question = questions[currentQuestion];
     const isLastQuestion = currentQuestion === questions.length - 1;
     const questionText = question.question || question.q;
-    const correctAnswer = typeof question.correctAnswer === 'number' 
-      ? question.options[question.correctAnswer] 
+    const correctAnswer = typeof question.correctAnswer === 'number'
+      ? question.options[question.correctAnswer]
       : question.a;
 
     const handleAnswer = (answer) => {
@@ -89,12 +90,11 @@ export default function PlaneLessonPage() {
                   key={idx}
                   onClick={() => !showResult && handleAnswer(option)}
                   disabled={showResult}
-                  className={`w-full p-3 sm:p-4 rounded-lg border-2 text-left transition-all text-sm sm:text-base ${
-                    showCorrect ? 'border-green-500 bg-green-500/20'
+                  className={`w-full p-3 sm:p-4 rounded-lg border-2 text-left transition-all text-sm sm:text-base ${showCorrect ? 'border-green-500 bg-green-500/20'
                     : showWrong ? 'border-red-500 bg-red-500/20'
-                    : isSelected ? 'border-purple-500 bg-purple-500/20'
-                    : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
-                  }`}
+                      : isSelected ? 'border-purple-500 bg-purple-500/20'
+                        : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
+                    }`}
                 >
                   {option}
                 </button>
@@ -168,17 +168,11 @@ export default function PlaneLessonPage() {
     title: lessonData.title,
     description: lessonData.description || lessonData.introduction,
     content: (
-      <div className="space-y-8">
-        {lessonData.introduction && (
-          <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-6">
-            <p className="text-lg text-gray-200">{lessonData.introduction}</p>
-          </div>
-        )}
-        <LessonSections sections={lessonData.sections} />
-        <KeyTakeaways takeaways={lessonData.keyTakeaways} />
-        <EnhancedLessonContent lessonId={lessonKey} subject="planes" />
-        <QuizSection questions={lessonData.quiz?.questions || []} />
-      </div>
+      <MicroLessonPlayer
+        subject="planes"
+        lessonData={lessonData}
+        onComplete={completeLesson}
+      />
     )
   } : {
     unit: 'Introduction',

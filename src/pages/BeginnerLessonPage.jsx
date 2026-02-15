@@ -3,19 +3,19 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle, Clock } from 'lucide-react';
 import { useProgress } from '../contexts/ProgressContext';
 import beginnerLessons from '../data/beginnerLessonsData';
+import MicroLessonPlayer from '../components/MicroLessonPlayer';
 
 export default function BeginnerLessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
-  const [currentSection, setCurrentSection] = useState(0);
   const [lessonCompleted, setLessonCompleted] = useState(false);
-  
+
   const { completeLesson } = useProgress();
-  
+
   // Find lesson across all units
   let lesson = null;
   let unitKey = null;
-  
+
   for (const key in beginnerLessons) {
     const found = beginnerLessons[key].find(l => l.id === parseInt(lessonId));
     if (found) {
@@ -24,7 +24,7 @@ export default function BeginnerLessonPage() {
       break;
     }
   }
-  
+
   if (!lesson) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function BeginnerLessonPage() {
               <ArrowLeft className="w-5 h-5" />
               <span>Back to Unit</span>
             </button>
-            
+
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-cyan-300" />
               <span className="text-sm">{lesson.duration}</span>
@@ -102,7 +102,7 @@ export default function BeginnerLessonPage() {
               <div className="text-lg text-white/80 mt-2">{lesson.unit}</div>
             </div>
           </div>
-          
+
           {/* Progress Bar */}
           <div className="w-full bg-white/20 rounded-full h-2 mt-6">
             <div
@@ -115,30 +115,15 @@ export default function BeginnerLessonPage() {
           </div>
         </div>
 
-        {/* Introduction (only on first section) */}
-        {currentSection === 0 && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
-            <div className="flex items-start gap-3">
-              <BookOpen className="w-6 h-6 text-cyan-300 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-bold text-lg mb-2">Introduction</h3>
-                <p className="text-white/90 leading-relaxed">{lesson.content.introduction}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Current Section Content */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-white/20">
-          <h2 className="text-3xl font-bold mb-6">{currentContent.title}</h2>
-          <div className="prose prose-invert prose-lg max-w-none">
-            {currentContent.content.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="mb-4 text-white/90 leading-relaxed whitespace-pre-line">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
+        {/* Micro-Lesson Player */}
+        <MicroLessonPlayer
+          subject="beginner"
+          lessonData={lesson}
+          onComplete={() => {
+            completeLesson(parseInt(lessonId), 3, 0); // Correct call for beginner track
+            navigate(`/learn/unit/${lesson.unitNumber}`);
+          }}
+        />
 
         {/* Key Takeaways (only on last section) */}
         {isLastSection && (
@@ -175,25 +160,7 @@ export default function BeginnerLessonPage() {
           </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between gap-4">
-          <button
-            onClick={handlePrevious}
-            disabled={currentSection === 0}
-            className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Previous
-          </button>
-
-          <button
-            onClick={handleNext}
-            className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition-all shadow-lg"
-          >
-            {isLastSection ? 'Take Quiz' : 'Next'}
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
+        {/* Navigation is now handled by MicroLessonPlayer */}
       </div>
     </div>
   );

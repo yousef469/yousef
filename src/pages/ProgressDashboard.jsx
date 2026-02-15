@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Star, Flame, Award, Clock, Target, TrendingUp, Medal } from 'lucide-react';
+import StreakCounter from '../components/StreakCounter';
+import ProgressStats from '../components/ProgressStats';
 import { useProgress } from '../contexts/ProgressContext';
 
 export default function ProgressDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   const { progress, userProfile } = useProgress();
-  
+
   // Calculate stats from progress
   const totalXP = userProfile.total_xp || 0;
   const rankLevel = userProfile.level || 1;
@@ -16,7 +18,7 @@ export default function ProgressDashboard() {
   const quizzesCompleted = Object.keys(progress.quizScores).length;
   const perfectQuizzes = Object.values(progress.quizScores).filter(q => q.percentage === 100).length;
   const badges = progress.achievements?.length || 0;
-  
+
   const getRank = (level) => {
     if (level >= 20) return 'Diamond';
     if (level >= 15) return 'Platinum';
@@ -24,22 +26,22 @@ export default function ProgressDashboard() {
     if (level >= 5) return 'Silver';
     return 'Bronze';
   };
-  
+
   const currentRank = getRank(rankLevel);
   const getNextRankProgress = () => {
     const xpInLevel = totalXP % 1000;
     return { current: xpInLevel, required: 1000, percentage: (xpInLevel / 1000) * 100 };
   };
-  
+
   // Additional stats (TODO: implement tracking)
   const currentStreak = 0;
   const longestStreak = 0;
   const totalTimeSpent = 0;
   const totalStars = lessonsCompleted * 3; // Estimate 3 stars per lesson
-  const averageQuizScore = quizzesCompleted > 0 
-    ? Object.values(progress.quizScores).reduce((sum, q) => sum + (q.percentage || 0), 0) / quizzesCompleted 
+  const averageQuizScore = quizzesCompleted > 0
+    ? Object.values(progress.quizScores).reduce((sum, q) => sum + (q.percentage || 0), 0) / quizzesCompleted
     : 0;
-  
+
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -67,9 +69,9 @@ export default function ProgressDashboard() {
               <ArrowLeft className="w-5 h-5" />
               <span>Back to Home</span>
             </button>
-            
+
             <h1 className="text-2xl font-bold">Progress Dashboard</h1>
-            
+
             <div className="w-24" />
           </div>
         </div>
@@ -89,7 +91,7 @@ export default function ProgressDashboard() {
                 <div className="text-sm text-gray-400">{totalXP} Total XP</div>
               </div>
             </div>
-            
+
             <div className="text-right">
               <div className="text-2xl font-bold text-purple-400 mb-2">
                 {nextRankProgress.percentage.toFixed(0)}%
@@ -120,11 +122,10 @@ export default function ProgressDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-                  activeTab === tab.id
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === tab.id
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                }`}
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 {tab.name}
@@ -143,19 +144,19 @@ export default function ProgressDashboard() {
                 <div className="text-3xl font-bold text-white mb-1">{lessonsCompleted}</div>
                 <div className="text-sm text-gray-400">Lessons Completed</div>
               </div>
-              
+
               <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                 <Star className="w-8 h-8 text-yellow-400 mb-3" />
                 <div className="text-3xl font-bold text-white mb-1">{totalStars}</div>
                 <div className="text-sm text-gray-400">Stars Earned</div>
               </div>
-              
+
               <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                 <Flame className="w-8 h-8 text-orange-400 mb-3" />
                 <div className="text-3xl font-bold text-white mb-1">{currentStreak}</div>
                 <div className="text-sm text-gray-400">Day Streak</div>
               </div>
-              
+
               <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                 <Clock className="w-8 h-8 text-cyan-400 mb-3" />
                 <div className="text-3xl font-bold text-white mb-1">{formatTime(totalTimeSpent)}</div>
@@ -176,7 +177,7 @@ export default function ProgressDashboard() {
                     </div>
                   </div>
                 )}
-                
+
                 {totalXP > 0 && (
                   <div className="flex items-center gap-3 p-3 bg-purple-500/20 rounded-lg border border-purple-500/30">
                     <Trophy className="w-6 h-6 text-purple-400" />

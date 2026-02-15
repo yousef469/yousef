@@ -19,16 +19,20 @@ export function ProgressProvider({ children }) {
     quizScores: {},
     lastAccessed: {},
     totalTimeSpent: 0,
-    achievements: []
+    achievements: [],
+    completedMicroSteps: {}, // Added for step-level tracking
+    srsData: {} // Feature 3: Spaced Repetition System
   });
-  
+
   const [userProfile, setUserProfile] = useState({
     total_xp: 0,
     level: 1,
-    completed_lessons: []
+    completed_lessons: [],
+    completed_micro_steps: [] // Added for Supabase sync support
   });
-  
+
   const [newAchievement, setNewAchievement] = useState(null);
+  const [levelUpCelebration, setLevelUpCelebration] = useState(null);
 
   // Load progress from localStorage AND Supabase on mount
   useEffect(() => {
@@ -36,7 +40,11 @@ export function ProgressProvider({ children }) {
     const savedProgress = localStorage.getItem('engineerium_progress');
     if (savedProgress) {
       try {
-        setProgress(JSON.parse(savedProgress));
+        const parsed = JSON.parse(savedProgress);
+        // Ensure completedMicroSteps exists for legacy users
+        if (!parsed.completedMicroSteps) parsed.completedMicroSteps = {};
+        if (!parsed.srsData) parsed.srsData = {};
+        setProgress(parsed);
       } catch (error) {
         // Error loading progress
       }
@@ -51,7 +59,7 @@ export function ProgressProvider({ children }) {
   // Load user profile from Supabase
   const loadUserProfile = async () => {
     if (!user) return;
-    
+
     const { data, error } = await getUserProfile(user.id);
     if (data && !error) {
       setUserProfile(data);
@@ -63,10 +71,41 @@ export function ProgressProvider({ children }) {
     localStorage.setItem('engineerium_progress', JSON.stringify(progress));
   }, [progress]);
 
+  // Complete a micro-step within a lesson (Feature 1: Micro-Lesson System)
+  const completeMicroStep = async (subject, lessonId, stepIndex) => {
+    const key = `${subject}-${lessonId}-step-${stepIndex}`;
+
+    if (progress.completedMicroSteps[key]) return { xpEarned: 0 }; // Already completed
+
+    // Calculate base XP for completing a micro-step
+    let xpEarned = 20;
+
+    // Add variable reward logic (Feature 5)
+    const isLucky = Math.random() < 0.1; // 10% chance
+    if (isLucky) xpEarned *= 2;
+
+    // Update local state and award XP
+    await awardUserXP(xpEarned, 'micro_step', key);
+
+    setProgress(prev => ({
+      ...prev,
+      completedMicroSteps: {
+        ...prev.completedMicroSteps,
+        [key]: {
+          completedAt: new Date().toISOString(),
+          xpEarned,
+          isLucky
+        }
+      }
+    }));
+
+    return { xpEarned, isLucky };
+  };
+
   // Mark lesson as completed with XP reward
   const completeLesson = async (subject, lessonId, quizScore = null) => {
     const key = `${subject}-${lessonId}`;
-    
+
     // Calculate XP based on quiz score
     let xpEarned = 100; // Base XP for completing lesson
     if (quizScore !== null) {
@@ -75,21 +114,25 @@ export function ProgressProvider({ children }) {
       else if (percentage >= 80) xpEarned += 30; // Bonus for good score
       else if (percentage >= 60) xpEarned += 10; // Small bonus
     }
-    
+
+    // Add streak bonus (Feature 5) - Mock implementation for now
+    const streakBonus = 0; // TODO: Integrate with streak context
+    xpEarned += streakBonus;
+
     // Track if user leveled up and Supabase result
     let leveledUp = false;
     let supabaseResult = null;
-    
+
     // Update Supabase if user is logged in
     if (user) {
       supabaseResult = await addXP(user.id, xpEarned, lessonId, subject);
-      
+
       if (supabaseResult.data) {
         setUserProfile(supabaseResult.data);
         leveledUp = supabaseResult.leveledUp || false;
-        
-        // Show level up notification
+
         if (leveledUp) {
+          setLevelUpCelebration({ level: supabaseResult.data.level, xp: xpEarned });
           setNewAchievement({
             id: 'level_up',
             title: `Level ${supabaseResult.data.level} Reached!`,
@@ -99,12 +142,12 @@ export function ProgressProvider({ children }) {
         }
       }
     }
-    
+
     // Record learning activity for streak
     if (typeof window !== 'undefined' && window.recordLearningActivity) {
       window.recordLearningActivity();
     }
-    
+
     // ALWAYS update localStorage progress (this is the fallback)
     setProgress(prev => {
       const newProgress = {
@@ -124,6 +167,7 @@ export function ProgressProvider({ children }) {
         }
       };
 
+
       // Add quiz score if provided
       if (quizScore !== null) {
         newProgress.quizScores = {
@@ -135,7 +179,7 @@ export function ProgressProvider({ children }) {
       // Check for achievements
       const oldAchievements = prev.achievements || [];
       newProgress.achievements = checkAchievements(newProgress);
-      
+
       // Check if new achievement was unlocked
       const newAchievements = newProgress.achievements.filter(
         a => !oldAchievements.includes(a)
@@ -146,7 +190,7 @@ export function ProgressProvider({ children }) {
 
       return newProgress;
     });
-    
+
     // Force a re-render by updating userProfile with localStorage data if Supabase failed
     if (!user || !supabaseResult?.data) {
       setUserProfile(prev => ({
@@ -154,8 +198,72 @@ export function ProgressProvider({ children }) {
         completed_lessons: [...(prev.completed_lessons || []), key].filter((v, i, a) => a.indexOf(v) === i)
       }));
     }
-    
+
+    // Initialize or update SRS data for this lesson
+    updateSRS(subject, lessonId, quizScore ? (quizScore.score / quizScore.totalQuestions >= 0.8 ? 'perfect' : 'good') : 'good');
+
     return { xpEarned };
+  };
+
+  // Update SRS data for a lesson (Feature 3: Spaced Repetition System)
+  const updateSRS = (subject, lessonId, result = 'good') => {
+    const key = `${subject}-${lessonId}`;
+
+    setProgress(prev => {
+      const currentSRS = prev.srsData?.[key] || {
+        interval: 0,
+        factor: 2.5,
+        repetition: 0,
+        nextReview: new Date().toISOString()
+      };
+
+      let { interval, factor, repetition } = currentSRS;
+
+      if (result === 'perfect') {
+        if (repetition === 0) interval = 1;
+        else if (repetition === 1) interval = 3;
+        else interval = Math.round(interval * factor);
+        repetition += 1;
+      } else if (result === 'good') {
+        if (repetition === 0) interval = 1;
+        else interval = Math.round(interval * 1.5);
+        repetition += 1;
+      } else {
+        // 'poor' - reset interval
+        interval = 1;
+        repetition = 0;
+        factor = Math.max(1.3, factor - 0.2);
+      }
+
+      const nextReview = new Date();
+      nextReview.setDate(nextReview.getDate() + interval);
+
+      return {
+        ...prev,
+        srsData: {
+          ...prev.srsData,
+          [key]: {
+            interval,
+            factor,
+            repetition,
+            nextReview: nextReview.toISOString(),
+            lastReviewed: new Date().toISOString()
+          }
+        }
+      };
+    });
+  };
+
+  const getLessonsToReview = () => {
+    const now = new Date();
+    return Object.entries(progress.srsData || {})
+      .filter(([key, data]) => new Date(data.nextReview) <= now)
+      .map(([key, data]) => ({
+        key,
+        subject: data.subject || key.split('-')[0],
+        lessonId: key.split('-')[1],
+        ...data
+      }));
   };
 
   // Save quiz score
@@ -307,13 +415,13 @@ export function ProgressProvider({ children }) {
   const isLessonUnlocked = async (subject, lessonId) => {
     // Convert to number to ensure proper comparison
     const lessonNum = parseInt(lessonId);
-    
+
     // First lesson is ALWAYS unlocked, no matter what
     if (lessonNum === 1) return true;
-    
+
     try {
       const previousLessonKey = `${subject}-${lessonNum - 1}`;
-      
+
       // Check if user is logged in
       if (user) {
         const { unlocked } = await checkLessonUnlocked(user.id, subject, lessonNum);
@@ -321,7 +429,7 @@ export function ProgressProvider({ children }) {
         const unlockedInLocalStorage = !!progress.completedLessons[previousLessonKey];
         return unlocked || unlockedInLocalStorage;
       }
-      
+
       // Fallback to localStorage check
       return !!progress.completedLessons[previousLessonKey];
     } catch (error) {
@@ -331,13 +439,39 @@ export function ProgressProvider({ children }) {
     }
   };
 
+  // Calculate XP multiplier based on streak (Feature 5: Variable Reward Schedule)
+  const getStreakMultiplier = () => {
+    const saved = localStorage.getItem('learning_streak');
+    if (!saved) return 1.0;
+    try {
+      const data = JSON.parse(saved);
+      // 2% bonus per day of streak, capped at 100% (2x)
+      return Math.min(2.0, 1.0 + (data.currentStreak || 0) * 0.02);
+    } catch {
+      return 1.0;
+    }
+  };
+
   // Wrapper for awarding XP with profile update
   const awardUserXP = async (xpAmount, activityType, activityId) => {
-    if (!user) return;
-    const result = await awardXP(user.id, xpAmount, activityType, activityId);
+    const multiplier = getStreakMultiplier();
+    const finalXP = Math.round(xpAmount * multiplier);
+
+    if (!user) {
+      // Update local level if not logged in (basic logic)
+      setUserProfile(prev => ({
+        ...prev,
+        total_xp: prev.total_xp + finalXP,
+        level: Math.floor((prev.total_xp + finalXP) / 1000) + 1
+      }));
+      return { xpAwarded: finalXP };
+    }
+
+    const result = await awardXP(user.id, finalXP, activityType, activityId);
     if (result.data) {
       setUserProfile(result.data);
       if (result.leveledUp) {
+        setLevelUpCelebration({ level: result.newLevel, xp: result.xpAwarded });
         setNewAchievement({
           id: 'level_up',
           title: `Level ${result.newLevel} Reached!`,
@@ -353,6 +487,7 @@ export function ProgressProvider({ children }) {
     progress,
     userProfile,
     completeLesson,
+    completeMicroStep, // Added for micro-lesson system
     saveQuizScore,
     isLessonCompleted,
     isLessonUnlocked,
@@ -362,14 +497,21 @@ export function ProgressProvider({ children }) {
     resetProgress,
     getAchievementInfo,
     newAchievement,
+    levelUpCelebration,
+    clearLevelUpCelebration: () => setLevelUpCelebration(null),
     clearNewAchievement: () => setNewAchievement(null),
     // XP award functions
     awardXP: awardUserXP,
     awardProjectXP: (projectId) => awardProjectXP(user?.id, projectId),
     awardCommunityQuestionXP: (questionId) => awardCommunityQuestionXP(user?.id, questionId),
     awardCommunityAnswerXP: (answerId) => awardCommunityAnswerXP(user?.id, answerId),
-    awardDailyStreakXP: () => awardDailyStreakXP(user?.id)
+    awardDailyStreakXP: () => awardDailyStreakXP(user?.id),
+    // SRS Functions
+    updateSRS,
+    getLessonsToReview,
+    reviewCount: Object.values(progress.srsData || {}).filter(d => new Date(d.nextReview) <= new Date()).length
   };
+
 
   return (
     <ProgressContext.Provider value={value}>

@@ -9,27 +9,27 @@
   --color-primary: #00D9FF;
   --color-primary-light: #5FFFFF;
   --color-primary-dark: #00A8CC;
-  
+
   /* Secondary Colors - Neon Green */
   --color-secondary: #00FF88;
   --color-secondary-light: #66FFAA;
   --color-secondary-dark: #00CC6A;
-  
+
   /* Background Colors - Deep Space Blue */
   --color-background: #0A0E27;
   --color-background-light: #1A1F3A;
   --color-background-dark: #050711;
-  
+
   /* Accent Colors - Bold Orange */
   --color-accent: #FF6B35;
   --color-accent-light: #FF8C61;
   --color-accent-dark: #E5501A;
-  
+
   /* Text Colors */
   --color-text: #FFFFFF;
   --color-text-secondary: #B8E0FF;
   --color-text-muted: #94A3B8;
-  
+
   /* Status Colors */
   --color-success: #00FF88;
   --color-warning: #FFC107;
@@ -54,6 +54,7 @@
 
 /* Disable transitions for reduced motion */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -78,23 +79,22 @@ body {
 /* Glow effects - Use sparingly for 3D models and primary CTAs only */
 .glow-primary {
   box-shadow: 0 0 20px rgba(0, 217, 255, 0.4),
-              0 0 40px rgba(0, 217, 255, 0.2);
+    0 0 40px rgba(0, 217, 255, 0.2);
 }
 
 .glow-secondary {
   box-shadow: 0 0 20px rgba(0, 255, 136, 0.4),
-              0 0 40px rgba(0, 255, 136, 0.2);
+    0 0 40px rgba(0, 255, 136, 0.2);
 }
 
 .glow-accent {
   box-shadow: 0 0 20px rgba(255, 107, 53, 0.4),
-              0 0 40px rgba(255, 107, 53, 0.2);
+    0 0 40px rgba(255, 107, 53, 0.2);
 }
 
 /* Text glow for hero titles only */
 .hero-title-glow {
-  filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.6)) 
-          drop-shadow(0 0 60px rgba(0, 255, 136, 0.4));
+  filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.6)) drop-shadow(0 0 60px rgba(0, 255, 136, 0.4));
 }
 
 /* Glassmorphism for floating UI elements */
@@ -133,9 +133,12 @@ body {
 
 /* Floating animation for icons */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
+
   50% {
     transform: translateY(-20px) rotate(5deg);
   }
@@ -145,6 +148,7 @@ body {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -275,9 +279,12 @@ button:not(:disabled):active {
 
 /* 4. LOADING SKELETON - Pulse animation */
 @keyframes skeleton-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -285,12 +292,10 @@ button:not(:disabled):active {
 
 .skeleton {
   animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.05) 75%);
   background-size: 200% 100%;
 }
 
@@ -309,6 +314,7 @@ select:focus {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -321,9 +327,12 @@ select:focus {
 
 /* 7. RANK ANIMATION - Number change effect */
 @keyframes rank-change {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
     color: rgb(34, 211, 238);
@@ -340,6 +349,7 @@ select:focus {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -400,20 +410,31 @@ select:focus {
 }
 
 /* Consistent border radius system */
-.radius-sm { border-radius: 8px; }
-.radius-md { border-radius: 16px; }
-.radius-lg { border-radius: 24px; }
-.radius-xl { border-radius: 32px; }
+.radius-sm {
+  border-radius: 8px;
+}
+
+.radius-md {
+  border-radius: 16px;
+}
+
+.radius-lg {
+  border-radius: 24px;
+}
+
+.radius-xl {
+  border-radius: 32px;
+}
 
 /* Premium shadows */
 .shadow-premium {
-  box-shadow: 
+  box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.12),
     0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .shadow-premium-lg {
-  box-shadow: 
+  box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.3),
     0 1px 8px rgba(0, 0, 0, 0.2);
 }
@@ -423,9 +444,11 @@ select:focus {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -436,14 +459,90 @@ select:focus {
   animation: gradient-shift 3s ease infinite;
 }
 
+/* 9. SHINE ANIMATION - Moving light beam */
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+.animate-shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shine-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
+  animation: shine-sweep 3s infinite;
+}
+
+/* 10. TEXT GRADIENTS */
+.text-gradient-cyan {
+  background: linear-gradient(to right, #00D9FF, #00FF88);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(to right, #A855F7, #EC4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 11. BORDER GLOWS */
+@keyframes border-glow-pulse {
+
+  0%,
+  100% {
+    border-color: rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.2);
+  }
+
+  50% {
+    border-color: rgba(6, 182, 212, 0.8);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+  }
+}
+
+.border-glow-pulsing {
+  border-width: 1px;
+  animation: border-glow-pulse 2s infinite;
+}
+
+/* 12. 3D TILT EFFECT */
+.hover-tilt {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hover-tilt:hover {
+  transform: scale(1.05) perspective(1000px) rotateX(2deg) rotateY(2deg);
+}
+
 /* Success checkmark animation */
 @keyframes checkmark {
   0% {
     transform: scale(0) rotate(45deg);
   }
+
   50% {
     transform: scale(1.2) rotate(45deg);
   }
+
   100% {
     transform: scale(1) rotate(45deg);
   }
@@ -455,9 +554,12 @@ select:focus {
 
 /* Floating animation for badges */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -475,12 +577,10 @@ select:focus {
 }
 
 .shine {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
   background-size: 200% 100%;
   animation: shine 2s infinite;
 }
@@ -491,6 +591,7 @@ select:focus {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -501,6 +602,7 @@ select:focus {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -520,54 +622,59 @@ select:focus {
 
 /* Mobile-first touch targets - minimum 44px */
 @media (max-width: 768px) {
-  button, 
-  a, 
+
+  button,
+  a,
   [role="button"],
   input[type="checkbox"],
   input[type="radio"] {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Larger text on mobile for readability */
   body {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
   }
-  
+
   /* Better spacing on mobile */
-  .container, .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+  .container,
+  .max-w-7xl,
+  .max-w-6xl,
+  .max-w-5xl,
+  .max-w-4xl {
     padding-left: 16px;
     padding-right: 16px;
   }
-  
+
   /* Stack grids on mobile */
   .mobile-stack {
     display: flex;
     flex-direction: column;
   }
-  
+
   /* Full width buttons on mobile */
   .mobile-full-width {
     width: 100%;
   }
-  
+
   /* Hide on mobile */
   .hide-mobile {
     display: none !important;
   }
-  
+
   /* Smaller headings on mobile */
   h1 {
     font-size: 1.875rem !important;
     line-height: 2.25rem !important;
   }
-  
+
   h2 {
     font-size: 1.5rem !important;
     line-height: 2rem !important;
   }
-  
+
   h3 {
     font-size: 1.25rem !important;
     line-height: 1.75rem !important;
@@ -576,7 +683,10 @@ select:focus {
 
 /* Tablet adjustments */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .container, .max-w-7xl, .max-w-6xl {
+
+  .container,
+  .max-w-7xl,
+  .max-w-6xl {
     padding-left: 24px;
     padding-right: 24px;
   }
@@ -604,7 +714,8 @@ select:focus {
 }
 
 /* Prevent horizontal scroll on mobile */
-html, body {
+html,
+body {
   overflow-x: hidden;
   max-width: 100vw;
 }
@@ -620,13 +731,13 @@ html, body {
   .card-hover:hover {
     transform: none;
   }
-  
+
   /* Disable hover effects on touch devices */
   @media (hover: none) {
     button:hover {
       transform: none;
     }
-    
+
     .card-hover:hover {
       transform: none;
       box-shadow: none;
@@ -640,9 +751,17 @@ html, body {
 
 /* Tap feedback - scale down on press */
 @keyframes tap-feedback {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Button press animation for mobile */
@@ -666,11 +785,25 @@ button {
 
 /* Bounce effect on selection */
 @keyframes bounce-select {
-  0% { transform: scale(1); }
-  30% { transform: scale(0.92); }
-  50% { transform: scale(1.02); }
-  70% { transform: scale(0.98); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(0.92);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  70% {
+    transform: scale(0.98);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .bounce-on-tap:active {
@@ -679,9 +812,17 @@ button {
 
 /* Pulse effect for selected items */
 @keyframes pulse-select {
-  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.5); }
-  70% { box-shadow: 0 0 0 10px rgba(6, 182, 212, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(6, 182, 212, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+  }
 }
 
 .pulse-on-select {
@@ -690,10 +831,21 @@ button {
 
 /* Success feedback animation */
 @keyframes success-pop {
-  0% { transform: scale(1); }
-  25% { transform: scale(1.1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.1);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .success-feedback {
@@ -702,9 +854,26 @@ button {
 
 /* Shake animation for errors */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .shake-error {
@@ -719,8 +888,13 @@ button {
 
 /* Tab selection animation */
 @keyframes tab-select {
-  0% { transform: scaleX(0); }
-  100% { transform: scaleX(1); }
+  0% {
+    transform: scaleX(0);
+  }
+
+  100% {
+    transform: scaleX(1);
+  }
 }
 
 .tab-indicator {
@@ -730,15 +904,28 @@ button {
 
 /* Toggle switch animation */
 @keyframes toggle-on {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(110%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(110%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Checkbox tick animation */
 @keyframes tick-draw {
-  0% { stroke-dashoffset: 24; }
-  100% { stroke-dashoffset: 0; }
+  0% {
+    stroke-dashoffset: 24;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
 }
 
 .checkbox-tick {
@@ -748,11 +935,12 @@ button {
 
 /* Modal slide up animation for mobile */
 @keyframes slide-up {
-  0% { 
+  0% {
     transform: translateY(100%);
     opacity: 0;
   }
-  100% { 
+
+  100% {
     transform: translateY(0);
     opacity: 1;
   }
@@ -764,11 +952,12 @@ button {
 
 /* Fade scale for modals */
 @keyframes fade-scale {
-  0% { 
+  0% {
     transform: scale(0.95);
     opacity: 0;
   }
-  100% { 
+
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -780,11 +969,12 @@ button {
 
 /* List item stagger animation */
 @keyframes list-item-enter {
-  0% { 
+  0% {
     transform: translateX(-20px);
     opacity: 0;
   }
-  100% { 
+
+  100% {
     transform: translateX(0);
     opacity: 1;
   }
@@ -796,8 +986,15 @@ button {
 
 /* Number counter animation */
 @keyframes count-up {
-  0% { transform: translateY(100%); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .count-animate {
@@ -806,8 +1003,15 @@ button {
 
 /* Glow pulse for active states */
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+  }
 }
 
 .glow-pulse-active {
@@ -827,7 +1031,7 @@ button {
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
@@ -849,9 +1053,17 @@ button {
 
 /* Badge pop animation */
 @keyframes badge-pop {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .badge-animate {
@@ -860,7 +1072,9 @@ button {
 
 /* Progress fill animation */
 @keyframes progress-fill {
-  0% { width: 0%; }
+  0% {
+    width: 0%;
+  }
 }
 
 .progress-animate {
@@ -869,8 +1083,15 @@ button {
 
 /* Subtle breathing animation for loading states */
 @keyframes breathe {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .breathe {
@@ -879,8 +1100,12 @@ button {
 
 /* Mobile-friendly form inputs */
 @media (max-width: 768px) {
-  input, textarea, select {
-    font-size: 16px !important; /* Prevents iOS zoom on focus */
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* Prevents iOS zoom on focus */
   }
 }
 
@@ -898,7 +1123,7 @@ button {
   display: none;
 }
 
-.swipe-scroll > * {
+.swipe-scroll>* {
   scroll-snap-align: start;
   flex-shrink: 0;
 }

@@ -1,54 +1,66 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Flame, Star, BookOpen, Clock, ChevronRight } from 'lucide-react';
 import { useProgress } from '../contexts/ProgressContext';
+import Leaderboard from '../components/Leaderboard';
 
 export default function LearnSectionsPage() {
   const navigate = useNavigate();
   const { userProfile, getSubjectProgress } = useProgress();
+  const recommendation = localStorage.getItem('onboarding_recommendation');
 
   const subjects = [
-    { 
-      title: 'Rockets', 
-      icon: '🚀', 
+    {
+      title: 'Beginner',
+      icon: '🧠',
+      color: 'from-cyan-400 to-blue-500',
+      bgGlow: 'shadow-cyan-400/30',
+      path: '/beginner-lessons',
+      lessons: 36,
+      description: 'Foundations for everyone',
+      isNew: true
+    },
+    {
+      title: 'Rockets',
+      icon: '🚀',
       color: 'from-orange-500 to-red-600',
       bgGlow: 'shadow-orange-500/30',
-      path: '/games/map/rockets', 
+      path: '/games/map/rockets',
       lessons: 60,
       description: 'Rocket science & aerospace'
     },
-    { 
-      title: 'Planes', 
-      icon: '✈️', 
+    {
+      title: 'Planes',
+      icon: '✈️',
       color: 'from-blue-500 to-indigo-600',
       bgGlow: 'shadow-blue-500/30',
-      path: '/games/map/planes', 
+      path: '/games/map/planes',
       lessons: 31,
       description: 'Aircraft design & aviation'
     },
-    { 
-      title: 'Cars', 
-      icon: '🚗', 
+    {
+      title: 'Cars',
+      icon: '🚗',
       color: 'from-purple-500 to-pink-600',
       bgGlow: 'shadow-purple-500/30',
-      path: '/games/map/cars', 
+      path: '/games/map/cars',
       lessons: 27,
       description: 'Automotive engineering'
     },
-    { 
-      title: 'Electronics', 
-      icon: '⚡', 
+    {
+      title: 'Electronics',
+      icon: '⚡',
       color: 'from-teal-500 to-cyan-600',
       bgGlow: 'shadow-teal-500/30',
-      path: '/games/map/electronics', 
+      path: '/games/map/electronics',
       lessons: 28,
       description: 'Circuits & robotics'
     },
-    { 
-      title: 'Civil', 
-      icon: '🏗️', 
+    {
+      title: 'Civil',
+      icon: '🏗️',
       color: 'from-amber-500 to-orange-600',
       bgGlow: 'shadow-amber-500/30',
-      path: '/games/map/civil', 
+      path: '/games/map/civil',
       lessons: 27,
       description: 'Structures & infrastructure'
     }
@@ -79,7 +91,7 @@ export default function LearnSectionsPage() {
               <ArrowLeft className="w-5 h-5" />
               <span className="hidden sm:inline">Home</span>
             </button>
-            
+
             {/* User Stats */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
@@ -95,7 +107,7 @@ export default function LearnSectionsPage() {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-white via-cyan-200 to-white bg-clip-text text-transparent">
@@ -121,92 +133,124 @@ export default function LearnSectionsPage() {
             <div className="w-full sm:w-48">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
                 <span>Overall</span>
-                <span>{Math.round((totalCompleted / totalLessons) * 100)}%</span>
+                <span>{totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0}%</span>
               </div>
               <div className="h-2.5 bg-gray-700 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-500"
-                  style={{ width: `${(totalCompleted / totalLessons) * 100}%` }}
+                  style={{ width: `${totalLessons > 0 ? (totalCompleted / totalLessons) * 100 : 0}%` }}
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Subject Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {subjects.map((subject) => {
-            const progress = getSubjectProgress(subject.title.toLowerCase(), subject.lessons);
-            const progressPercent = Math.round(progress.percentage);
-            
-            return (
-              <button
-                key={subject.title}
-                onClick={() => navigate(subject.path)}
-                className={`group relative bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl ${subject.bgGlow} text-left overflow-hidden`}
-              >
-                {/* Gradient Overlay on Hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${subject.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`} />
-                
-                {/* Progress Ring Background */}
-                <div className="absolute -right-8 -top-8 w-32 h-32 opacity-10">
-                  <svg className="w-full h-full" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/20" />
-                    <circle 
-                      cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" 
-                      className={`text-white`}
-                      strokeDasharray={`${progressPercent * 2.83} 283`}
-                      strokeLinecap="round"
-                      transform="rotate(-90 50 50)"
-                    />
-                  </svg>
-                </div>
+        {/* Main Content Grid with Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Column: Subjects */}
+          <div className="lg:col-span-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {subjects.map((subject) => {
+                const progress = getSubjectProgress(subject.title.toLowerCase(), subject.lessons);
+                const progressPercent = Math.round(progress.percentage);
 
-                <div className="relative z-10">
-                  {/* Icon & Title */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${subject.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <span className="text-2xl">{subject.icon}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-gray-400">
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>{subject.lessons}</span>
-                    </div>
-                  </div>
+                return (
+                  <button
+                    key={subject.title}
+                    onClick={() => navigate(subject.path)}
+                    className={`group relative bg-gray-800/50 backdrop-blur-sm rounded-3xl p-5 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl ${subject.bgGlow} text-left overflow-hidden hover-tilt`}
+                  >
+                    {/* Gradient Overlay on Hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${subject.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`} />
 
-                  {/* Title & Description */}
-                  <h3 className="text-lg sm:text-xl font-bold mb-1 group-hover:text-white transition-colors">
-                    {subject.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-4">{subject.description}</p>
+                    {/* Recommendation Badge */}
+                    {recommendation === subject.title.toLowerCase() && (
+                      <div className="absolute top-4 left-4 z-20">
+                        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg animate-bounce">
+                          RECOMMENDED
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Progress Bar */}
-                  <div className="mb-3">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-500">{progress.completed} completed</span>
-                      <span className={`font-medium ${progressPercent > 0 ? 'text-cyan-400' : 'text-gray-500'}`}>
-                        {progressPercent}%
-                      </span>
+                    {/* Progress Ring Background */}
+                    <div className="absolute -right-8 -top-8 w-32 h-32 opacity-10">
+                      <svg className="w-full h-full" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/20" />
+                        <circle
+                          cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8"
+                          className={`text-white`}
+                          strokeDasharray={`${progressPercent * 2.83} 283`}
+                          strokeLinecap="round"
+                          transform="rotate(-90 50 50)"
+                        />
+                      </svg>
                     </div>
-                    <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full bg-gradient-to-r ${subject.color} rounded-full transition-all duration-500`}
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
 
-                  {/* CTA */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">
-                      {progress.completed === 0 ? 'Start Learning' : 'Continue'}
-                    </span>
-                    <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+                    <div className="relative z-10">
+                      {/* Icon & Title */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-14 h-14 bg-gradient-to-br ${subject.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                          <span className="text-2xl">{subject.icon}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-gray-400">
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>{subject.lessons}</span>
+                        </div>
+                      </div>
+
+                      {/* Title & Description */}
+                      <h3 className="text-lg sm:text-xl font-bold mb-1 group-hover:text-white transition-colors">
+                        {subject.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4">{subject.description}</p>
+
+                      {/* Progress Bar */}
+                      <div className="mb-3">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-gray-500">{progress.completed} completed</span>
+                          <span className={`font-medium ${progressPercent > 0 ? 'text-cyan-400' : 'text-gray-500'}`}>
+                            {progressPercent}%
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full bg-gradient-to-r ${subject.color} rounded-full transition-all duration-500`}
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* CTA */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">
+                          {progress.completed === 0 ? 'Start Learning' : 'Continue'}
+                        </span>
+                        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Column: Sidebar (Leaderboard) */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="sticky top-24">
+              <Leaderboard />
+
+              {/* Additional Sidebar Info */}
+              <div className="mt-6 bg-gray-800/30 rounded-2xl p-6 border border-white/5">
+                <h4 className="font-bold text-white mb-3 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  Weekly Tips
+                </h4>
+                <p className="text-sm text-gray-400 italic">
+                  "Spending 15 minutes a day is more effective than a 4-hour marathon. Keep your streak alive!"
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Quick Stats */}
@@ -216,7 +260,7 @@ export default function LearnSectionsPage() {
             <div className="text-xs text-gray-500">Total Lessons</div>
           </div>
           <div className="bg-gray-800/30 rounded-xl p-4 text-center border border-white/5">
-            <div className="text-2xl sm:text-3xl font-bold text-purple-400">5</div>
+            <div className="text-2xl sm:text-3xl font-bold text-purple-400">6</div>
             <div className="text-xs text-gray-500">Subjects</div>
           </div>
           <div className="bg-gray-800/30 rounded-xl p-4 text-center border border-white/5">
