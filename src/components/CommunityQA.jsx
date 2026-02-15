@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { askGemini } from '../services/gemini';
 import { supabase } from '../services/supabase';
+import { MessageCircle, Send, ThumbsUp, ThumbsDown, Clock, Sparkles } from 'lucide-react';
 
 export default function CommunityQA({ modelId, lessonId }) {
   const { user } = useAuth();
@@ -273,8 +275,8 @@ export default function CommunityQA({ modelId, lessonId }) {
                 onClick={() => handleVote(q.id, 'up')}
                 disabled={!user}
                 className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${q.hasUpvoted
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'hover:bg-gray-800 text-gray-400'
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'hover:bg-gray-800 text-gray-400'
                   } disabled:cursor-not-allowed`}
               >
                 <ThumbsUp className="w-4 h-4" />
@@ -286,8 +288,8 @@ export default function CommunityQA({ modelId, lessonId }) {
                 onClick={() => handleVote(q.id, 'down')}
                 disabled={!user}
                 className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${q.hasDownvoted
-                    ? 'bg-red-500/20 text-red-400'
-                    : 'hover:bg-gray-800 text-gray-400'
+                  ? 'bg-red-500/20 text-red-400'
+                  : 'hover:bg-gray-800 text-gray-400'
                   } disabled:cursor-not-allowed`}
               >
                 <ThumbsDown className="w-4 h-4" />
