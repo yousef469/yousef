@@ -1,5 +1,5 @@
 // Complete Aircraft Engineering Curriculum
-// MIT-Quality Content: 6 Sections, 31 Lessons
+// MIT-Quality Content: 10 Sections, 50 Lessons
 
 import { planesCurriculum, getAllLessons, getCurriculumStats } from './comprehensive-curriculum.js';
 
@@ -36,16 +36,20 @@ function getEmojiForSection(sectionId) {
     'foundations': '🎓',
     'structures': '🏗️',
     'propulsion': '🔥',
-    'controls': '🎛️',
-    'maintenance': '🔧',
-    'simulation': '🛫'
+    'systems': '⚙️',
+    'avionics': '🎛️',
+    'performance': '📊',
+    'advanced-aero': '🚀',
+    'future-tech': '🔋',
+    'space-basics': '🌌',
+    'history-regulations': '📜'
   };
   return emojis[sectionId] || '✈️';
 }
 
 function getLevelForSection(sectionIndex) {
-  if (sectionIndex <= 1) return 'Beginner';
-  if (sectionIndex <= 3) return 'Intermediate';
+  if (sectionIndex <= 2) return 'Beginner';
+  if (sectionIndex <= 6) return 'Intermediate';
   return 'Advanced';
 }
 

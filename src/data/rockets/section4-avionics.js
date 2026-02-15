@@ -1,1001 +1,177 @@
-// Section 4: Avionics & Control
-// 10 Lessons - Guidance, navigation, control, computers
-
+// Section 4: Avionics & GNC — 5 Deep Lessons
 export const section4Avionics = {
   id: 'avionics',
-  title: 'Unit 3: Avionics',
-  description: 'Guidance, navigation, and control systems',
+  title: 'Unit 4: Avionics & GNC',
+  description: 'Guidance, navigation, and control systems — the brains of the rocket',
   icon: '🧠',
-  color: 'from-cyan-500 to-blue-500',
-  units: [
-    {
-      id: 'gnc',
-      title: 'Guidance, Navigation & Control',
-      description: 'The brains of the rocket',
-      lessons: [
-        {
-          id: 'gnc-overview',
-          title: 'GNC System Overview',
-          duration: '30 min',
-          xp: 175,
-          description: 'How rockets know where they are and where to go',
-          aiTutor: true,
-          introduction: `GNC - Guidance, Navigation, and Control - is the brain of the rocket. It determines where the rocket is, where it needs to go, and how to get there. Without GNC, rockets would tumble out of control.`,
-          sections: [
-            {
-              title: 'The Three Functions',
-              content: `**Navigation: "Where am I?"**
-- Determines current position and velocity
-- Uses sensors (IMU, GPS, star trackers)
-- Integrates measurements over time
-
-**Guidance: "Where should I go?"**
-- Computes desired trajectory
-- Determines required attitude and thrust
-- Optimizes for fuel efficiency
-
-**Control: "How do I get there?"**
-- Commands actuators (engines, fins)
-- Maintains stability
-- Follows guidance commands
-
-**The Loop:**
-Navigation → Guidance → Control → Actuators → Vehicle Motion → Navigation...
-
-This loop runs 50-400 times per second!`
-            },
-            {
-              title: 'GNC Hardware',
-              content: `**Sensors:**
-- IMU (Inertial Measurement Unit)
-- GPS receivers
-- Star trackers
-- Radar altimeter
-- Air data sensors
-
-**Computers:**
-- Flight computers (redundant)
-- Real-time processing
-- Fault tolerance
-
-**Actuators:**
-- Engine gimbals
-- Grid fins
-- Cold gas thrusters
-- Reaction wheels
-
-**Falcon 9 GNC:**
-- Triple-redundant computers
-- Voting logic for fault tolerance
-- Custom Linux-based software
-- Updates possible between flights`
-            },
-            {
-              title: 'GNC Challenges',
-              content: `**Changing Dynamics:**
-- Mass decreases as fuel burns
-- Center of gravity shifts
-- Aerodynamics change with altitude
-
-**Sensor Errors:**
-- IMU drift over time
-- GPS dropouts
-- Noise in measurements
-
-**Actuator Limits:**
-- Gimbal range limited
-- Response time delays
-- Saturation possible
-
-**Fault Tolerance:**
-- Must handle sensor failures
-- Engine-out capability
-- Graceful degradation`
-            }
-          ],
-          keyTakeaways: [
-            'GNC = Navigation (where am I) + Guidance (where to go) + Control (how)',
-            'The GNC loop runs 50-400 times per second',
-            'Redundant computers and sensors ensure reliability',
-            'System must handle changing dynamics and failures'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Navigation answers:', options: ['Where should I go?', 'Where am I?', 'How do I get there?', 'When to launch?'], correctAnswer: 1, explanation: 'Navigation determines current position and velocity.' },
-              { id: 'q2', question: 'GNC loop runs how many times per second?', options: ['1-5', '10-20', '50-400', '1000+'], correctAnswer: 2, explanation: 'GNC loops typically run at 50-400 Hz.' },
-              { id: 'q3', question: 'Falcon 9 uses how many redundant computers?', options: ['1', '2', '3', '5'], correctAnswer: 2, explanation: 'Falcon 9 uses triple-redundant flight computers.' },
-              { id: 'q4', question: 'IMU measures:', options: ['Temperature', 'Acceleration and rotation', 'Pressure', 'Light'], correctAnswer: 1, explanation: 'IMU measures acceleration (3 axes) and angular rate (3 axes).' },
-              { id: 'q5', question: 'Control system commands:', options: ['Sensors', 'Actuators', 'Propellants', 'Payload'], correctAnswer: 1, explanation: 'Control commands actuators like engine gimbals and fins.' }
-            ]
-          }
-        },
-
-        {
-          id: 'imu-sensors',
-          title: 'Inertial Measurement Units',
-          duration: '30 min',
-          xp: 175,
-          description: 'Measuring acceleration and rotation',
-          aiTutor: true,
-          introduction: `The IMU is the most critical sensor on a rocket. It measures acceleration and rotation rate, allowing the navigation system to track position and attitude without any external references.`,
-          sections: [
-            {
-              title: 'IMU Components',
-              content: `**Accelerometers (3 axes):**
-- Measure linear acceleration
-- X, Y, Z directions
-- Range: ±20g to ±100g
-- Accuracy: 0.001g or better
-
-**Gyroscopes (3 axes):**
-- Measure angular velocity
-- Roll, pitch, yaw rates
-- Range: ±500°/s typical
-- Accuracy: 0.01°/s or better
-
-**6-DOF Sensing:**
-Together, accelerometers and gyros provide complete motion sensing - 6 degrees of freedom.
-
-**Important Note:**
-Accelerometers measure "specific force" - they can't distinguish between acceleration and gravity!
-In free fall (orbit), accelerometers read ZERO.`
-            },
-            {
-              title: 'IMU Technologies',
-              content: `**MEMS (Micro-Electro-Mechanical):**
-- Tiny silicon structures
-- Cheap, small, low power
-- Moderate accuracy
-- Used in consumer devices, some rockets
-
-**Ring Laser Gyro (RLG):**
-- Two laser beams in opposite directions
-- Rotation causes frequency shift
-- Very accurate, no moving parts
-- Used in aircraft, missiles
-
-**Fiber Optic Gyro (FOG):**
-- Light in coiled fiber
-- Sagnac effect measures rotation
-- High accuracy, reliable
-- Common in spacecraft
-
-**Hemispherical Resonator Gyro (HRG):**
-- Vibrating quartz hemisphere
-- Extremely accurate and reliable
-- Used in spacecraft, missiles`
-            },
-            {
-              title: 'IMU Errors and Calibration',
-              content: `**Error Sources:**
-- **Bias:** Constant offset (reads non-zero at rest)
-- **Scale factor:** Gain error
-- **Misalignment:** Axes not perfectly orthogonal
-- **Noise:** Random fluctuations
-- **Drift:** Errors accumulate over time
-
-**Calibration:**
-- Factory calibration
-- Pre-flight calibration
-- In-flight updates (GPS aiding)
-
-**Error Growth:**
-Position error grows as t² for accelerometer bias!
-1 mg bias → 18 km error after 1 hour
-
-**Mitigation:**
-- High-quality sensors
-- Sensor fusion (GPS + IMU)
-- Kalman filtering
-- Redundant IMUs`
-            }
-          ],
-          keyTakeaways: [
-            'IMU = 3 accelerometers + 3 gyroscopes (6-DOF)',
-            'Technologies: MEMS, ring laser, fiber optic, HRG',
-            'Errors accumulate over time - drift is the enemy',
-            'GPS aiding corrects IMU drift'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'IMU provides how many degrees of freedom?', options: ['3', '4', '6', '9'], correctAnswer: 2, explanation: '3 accelerometers + 3 gyros = 6 DOF sensing.' },
-              { id: 'q2', question: 'In orbit, accelerometers read:', options: ['1g', '0g', '9.8 m/s²', 'Varies'], correctAnswer: 1, explanation: 'In free fall (orbit), accelerometers read zero - cant sense gravity.' },
-              { id: 'q3', question: 'Ring laser gyros use:', options: ['Spinning mass', 'Two laser beams', 'Magnetic field', 'Vibrating crystal'], correctAnswer: 1, explanation: 'RLGs use counter-propagating laser beams - rotation shifts frequency.' },
-              { id: 'q4', question: 'IMU bias causes position error to grow as:', options: ['t', 't²', 't³', 'Constant'], correctAnswer: 1, explanation: 'Accelerometer bias integrates twice → position error ∝ t².' },
-              { id: 'q5', question: 'IMU drift is corrected using:', options: ['Better gyros only', 'GPS aiding', 'Faster sampling', 'Larger sensors'], correctAnswer: 1, explanation: 'GPS provides absolute position to correct accumulated IMU errors.' }
-            ]
-          }
-        },
-        {
-          id: 'gps-navigation',
-          title: 'GPS Navigation',
-          duration: '25 min',
-          xp: 150,
-          description: 'Satellite-based positioning for rockets',
-          aiTutor: true,
-          introduction: `GPS revolutionized rocket navigation. Instead of relying solely on IMUs that drift over time, rockets can now get precise position fixes from satellites. But using GPS on a rocket has unique challenges.`,
-          sections: [
-            {
-              title: 'How GPS Works',
-              content: `**The Concept:**
-- 24+ satellites in orbit
-- Each broadcasts time and position
-- Receiver measures signal travel time
-- Distance = speed of light × time
-
-**Trilateration:**
-- 3 satellites → position (with clock error)
-- 4 satellites → position + time
-- More satellites → better accuracy
-
-**GPS Accuracy:**
-- Standard: ~5 m horizontal
-- Differential GPS: ~1 m
-- RTK GPS: ~1 cm
-- Rockets typically use standard GPS`
-            },
-            {
-              title: 'GPS on Rockets',
-              content: `**Challenges:**
-- High velocity (up to 7+ km/s)
-- High altitude (above GPS constellation)
-- High acceleration (signal acquisition)
-- Ionospheric effects
-
-**COCOM Limits:**
-GPS receivers have built-in limits:
-- Velocity: <515 m/s (1,000 knots)
-- Altitude: <18 km (60,000 ft)
-- Must exceed BOTH to disable
-
-**Space-Rated GPS:**
-- Special receivers for rockets
-- Handle high dynamics
-- Work above constellation
-- Falcon 9 uses GPS throughout flight
-
-**GPS Dropouts:**
-- May lose lock during high-g maneuvers
-- IMU bridges the gap
-- Reacquire when dynamics settle`
-            },
-            {
-              title: 'Sensor Fusion',
-              content: `**Why Fuse GPS + IMU?**
-- GPS: Accurate but slow (1-10 Hz), can drop out
-- IMU: Fast (100+ Hz) but drifts
-- Together: Best of both worlds!
-
-**Kalman Filter:**
-- Optimal estimation algorithm
-- Combines measurements with dynamics model
-- Weights by uncertainty
-- Standard in aerospace
-
-**Result:**
-- Continuous navigation (IMU rate)
-- Bounded errors (GPS corrections)
-- Handles sensor failures
-- Smooth trajectory estimate`
-            }
-          ],
-          keyTakeaways: [
-            'GPS provides absolute position from satellite signals',
-            'COCOM limits restrict consumer GPS at high speed/altitude',
-            'Space-rated GPS works throughout rocket flight',
-            'Kalman filter fuses GPS + IMU for best navigation'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Minimum satellites needed for 3D position + time:', options: ['2', '3', '4', '6'], correctAnswer: 2, explanation: '4 satellites needed to solve for x, y, z, and clock error.' },
-              { id: 'q2', question: 'COCOM limits disable GPS above:', options: ['1 km/s AND 18 km', '515 m/s AND 18 km', '515 m/s OR 18 km', 'No limits exist'], correctAnswer: 1, explanation: 'Must exceed BOTH 515 m/s AND 18 km altitude to trigger limits.' },
-              { id: 'q3', question: 'GPS update rate is typically:', options: ['1000 Hz', '100 Hz', '1-10 Hz', '0.1 Hz'], correctAnswer: 2, explanation: 'GPS updates at 1-10 Hz - much slower than IMU.' },
-              { id: 'q4', question: 'Kalman filter is used to:', options: ['Amplify signals', 'Fuse sensor data optimally', 'Generate GPS signals', 'Control engines'], correctAnswer: 1, explanation: 'Kalman filter optimally combines GPS and IMU measurements.' },
-              { id: 'q5', question: 'Standard GPS accuracy is approximately:', options: ['1 cm', '1 m', '5 m', '100 m'], correctAnswer: 2, explanation: 'Standard GPS provides ~5m horizontal accuracy.' }
-            ]
-          }
-        },
-        
-{
-          id: 'guidance-algorithms',
-          title: 'Guidance Algorithms',
-          duration: '35 min',
-          xp: 200,
-          description: 'Computing the optimal path to orbit',
-          aiTutor: true,
-          introduction: `Guidance algorithms determine the optimal trajectory from launchpad to orbit. They must account for changing vehicle mass, atmospheric drag, and mission constraints while minimizing fuel consumption.`,
-          sections: [
-            {
-              title: 'Guidance Objectives',
-              content: `**Primary Goals:**
-- Reach target orbit (altitude, velocity, inclination)
-- Minimize propellant usage
-- Stay within structural limits
-- Avoid restricted zones
-
-**Constraints:**
-- Max acceleration (structural, human)
-- Max dynamic pressure (Max-Q)
-- Heating limits
-- Engine throttle range
-- Gimbal limits
-
-**Trade-offs:**
-- Steeper trajectory: Less gravity loss, more drag
-- Shallower trajectory: Less drag, more gravity loss
-- Optimal is somewhere in between`
-            },
-            {
-              title: 'Gravity Turn',
-              content: `**The Concept:**
-Instead of fighting gravity, use it!
-
-**Ideal Gravity Turn:**
-1. Launch vertically
-2. Pitch over slightly
-3. Let gravity naturally curve trajectory
-4. Thrust always along velocity vector
-
-**Benefits:**
-- Minimizes steering losses
-- Natural, stable trajectory
-- Reduces structural loads
-
-**Reality:**
-- Not perfectly optimal
-- Modified for constraints
-- Active guidance adjusts
-
-**Falcon 9 Profile:**
-- Vertical for ~10 seconds
-- Pitch program begins
-- Gravity turn through Max-Q
-- Active guidance to orbit`
-            },
-            {
-              title: 'Powered Explicit Guidance',
-              content: `**PEG (Powered Explicit Guidance):**
-Used by Space Shuttle, many modern rockets.
-
-**How It Works:**
-1. Predict where you'll be at burnout
-2. Compare to target orbit
-3. Calculate required thrust direction
-4. Update continuously
-
-**Advantages:**
-- Handles off-nominal conditions
-- Fuel-optimal
-- Adapts to engine performance
-
-**Terminal Guidance:**
-Final phase to hit exact orbit:
-- Very precise pointing
-- Small velocity corrections
-- Achieves <1 m/s accuracy
-
-**Iterative Guidance Mode (IGM):**
-Similar to PEG, used by Saturn V.
-Continuously recomputes optimal trajectory.`
-            }
-          ],
-          keyTakeaways: [
-            'Guidance computes optimal trajectory to target orbit',
-            'Gravity turn minimizes losses by following natural path',
-            'PEG adapts trajectory in real-time for fuel efficiency',
-            'Terminal guidance achieves precise orbit insertion'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Gravity turn thrust direction is:', options: ['Always vertical', 'Always horizontal', 'Along velocity vector', 'Toward target'], correctAnswer: 2, explanation: 'Gravity turn thrusts along velocity - lets gravity curve the path.' },
-              { id: 'q2', question: 'PEG stands for:', options: ['Powered Engine Guidance', 'Powered Explicit Guidance', 'Precision Entry Guidance', 'Programmed Earth Guidance'], correctAnswer: 1, explanation: 'Powered Explicit Guidance - used by Shuttle and modern rockets.' },
-              { id: 'q3', question: 'Steeper trajectory has:', options: ['More drag, less gravity loss', 'Less drag, more gravity loss', 'More of both', 'Less of both'], correctAnswer: 0, explanation: 'Steeper = more time in atmosphere (drag) but less time fighting gravity.' },
-              { id: 'q4', question: 'Terminal guidance achieves velocity accuracy of:', options: ['~100 m/s', '~10 m/s', '<1 m/s', '~1 km/s'], correctAnswer: 2, explanation: 'Terminal guidance achieves <1 m/s accuracy for precise orbit insertion.' },
-              { id: 'q5', question: 'Falcon 9 begins pitch program after:', options: ['Immediately', '~10 seconds', '~60 seconds', '~180 seconds'], correctAnswer: 1, explanation: 'Falcon 9 launches vertically for ~10s before beginning pitch maneuver.' }
-            ]
-          }
-        },
-        {
-          id: 'control-systems',
-          title: 'Control Systems',
-          duration: '30 min',
-          xp: 175,
-          description: 'Keeping rockets stable and on course',
-          aiTutor: true,
-          introduction: `Control systems are what keep a rocket from tumbling out of control. They take guidance commands and translate them into actuator movements that maintain stability and follow the desired trajectory.`,
-          sections: [
-            {
-              title: 'Control Basics',
-              content: `**Feedback Control:**
-1. Measure current state (attitude, rate)
-2. Compare to desired state
-3. Calculate error
-4. Command correction
-5. Repeat!
-
-**PID Controller:**
-Most common control algorithm.
-Output = Kp×error + Ki×∫error + Kd×(d/dt)error
-
-- **P (Proportional):** React to current error
-- **I (Integral):** Eliminate steady-state error
-- **D (Derivative):** Dampen oscillations
-
-**Tuning:**
-- Too much P: Oscillations
-- Too much I: Slow, overshoot
-- Too much D: Noise sensitivity
-- Just right: Fast, stable response`
-            },
-            {
-              title: 'Attitude Control',
-              content: `**Three Axes:**
-- **Roll:** Rotation around long axis
-- **Pitch:** Nose up/down
-- **Yaw:** Nose left/right
-
-**Actuators:**
-- Engine gimbal (pitch, yaw)
-- Differential throttle (roll with multiple engines)
-- Grid fins (atmospheric)
-- Cold gas thrusters (space)
-- Reaction wheels (spacecraft)
-
-**Control Modes:**
-- Rate control: Maintain desired rotation rate
-- Attitude hold: Maintain fixed orientation
-- Trajectory following: Track guidance commands
-
-**Bandwidth:**
-How fast the control system responds.
-- Structural modes: Must not excite!
-- Typically 1-10 Hz bandwidth`
-            },
-            {
-              title: 'Stability Challenges',
-              content: `**Changing Dynamics:**
-- Mass decreases (fuel burns)
-- CG moves (propellant slosh)
-- Aerodynamics change (altitude)
-
-**Propellant Slosh:**
-- Liquid moves in tanks
-- Can couple with control system
-- Baffles reduce slosh
-- Control system must handle it
-
-**Structural Flexibility:**
-- Rocket bends under load
-- Sensors see bending, not just rigid motion
-- Must filter out structural modes
-
-**Engine-Out:**
-- Asymmetric thrust
-- Control must compensate
-- Falcon 9 can lose engines and continue`
-            }
-          ],
-          keyTakeaways: [
-            'PID control is the workhorse algorithm',
-            'Attitude control manages roll, pitch, and yaw',
-            'Propellant slosh and flexibility are major challenges',
-            'Control system must adapt to changing dynamics'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'PID stands for:', options: ['Power Input Device', 'Proportional-Integral-Derivative', 'Precision Inertial Drive', 'Programmed Input Data'], correctAnswer: 1, explanation: 'PID = Proportional + Integral + Derivative control.' },
-              { id: 'q2', question: 'The D term in PID helps with:', options: ['Steady-state error', 'Damping oscillations', 'Increasing speed', 'Reducing noise'], correctAnswer: 1, explanation: 'Derivative term dampens oscillations by responding to rate of change.' },
-              { id: 'q3', question: 'Propellant slosh is controlled by:', options: ['Faster pumps', 'Baffles in tanks', 'Heating propellant', 'Pressurization'], correctAnswer: 1, explanation: 'Baffles reduce liquid movement that can destabilize the rocket.' },
-              { id: 'q4', question: 'Roll control on Falcon 9 uses:', options: ['Single engine gimbal', 'Differential throttle', 'Fins only', 'Reaction wheels'], correctAnswer: 1, explanation: 'With 9 engines, differential throttle provides roll control.' },
-              { id: 'q5', question: 'Control bandwidth is typically:', options: ['0.01 Hz', '1-10 Hz', '100 Hz', '1000 Hz'], correctAnswer: 1, explanation: 'Control bandwidth is 1-10 Hz - fast enough to control, slow enough to avoid exciting structure.' }
-            ]
-          }
-        },
-       
- {
-          id: 'flight-computers',
-          title: 'Flight Computers',
-          duration: '25 min',
-          xp: 150,
-          description: 'The hardware running rocket software',
-          aiTutor: true,
-          introduction: `Flight computers are the central nervous system of a rocket. They run the GNC algorithms, manage all systems, and make split-second decisions. Reliability is paramount - there's no rebooting in flight!`,
-          sections: [
-            {
-              title: 'Computer Architecture',
-              content: `**Requirements:**
-- Real-time performance
-- Radiation tolerance
-- Extreme reliability
-- Low power consumption
-
-**Redundancy:**
-- Triple Modular Redundancy (TMR)
-- Three computers vote on outputs
-- Majority wins
-- Single failure tolerated
-
-**Falcon 9 Computers:**
-- 3 flight computers
-- Linux-based OS
-- x86 processors
-- Commercial hardware (rad-tolerant)
-
-**Traditional Space:**
-- RAD750, RAD5500 processors
-- Radiation-hardened
-- Very expensive ($200k+ each)
-- Slower than your phone!`
-            },
-            {
-              title: 'Real-Time Systems',
-              content: `**Real-Time Requirements:**
-- Deterministic timing
-- Guaranteed response time
-- No missed deadlines!
-
-**Timing:**
-- GNC loop: 50-400 Hz
-- Sensor sampling: 100-1000 Hz
-- Actuator commands: 50-100 Hz
-
-**Operating Systems:**
-- VxWorks (traditional aerospace)
-- RTEMS (open source)
-- Linux with RT patches (SpaceX)
-
-**Watchdog Timer:**
-- Hardware timer
-- Software must "pet" it regularly
-- If missed, system resets
-- Catches software hangs`
-            },
-            {
-              title: 'Software Development',
-              content: `**Safety-Critical Software:**
-- DO-178C (aviation standard)
-- Extensive testing
-- Code review
-- Formal verification
-
-**SpaceX Approach:**
-- Agile development
-- Continuous integration
-- Extensive simulation
-- Test on real hardware
-
-**Software Updates:**
-- Can update between flights
-- Bug fixes and improvements
-- New features added
-- Falcon 9 software constantly evolving
-
-**Lines of Code:**
-- Falcon 9: Millions of lines
-- Extensive testing coverage
-- Automated test suites`
-            }
-          ],
-          keyTakeaways: [
-            'Triple redundancy with voting ensures reliability',
-            'Real-time systems guarantee timing deadlines',
-            'SpaceX uses Linux on commercial hardware',
-            'Software can be updated between flights'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Falcon 9 uses how many flight computers?', options: ['1', '2', '3', '5'], correctAnswer: 2, explanation: 'Falcon 9 uses 3 computers with voting for fault tolerance.' },
-              { id: 'q2', question: 'TMR stands for:', options: ['Total Mission Reliability', 'Triple Modular Redundancy', 'Thermal Management Relay', 'Telemetry Monitoring Receiver'], correctAnswer: 1, explanation: 'Triple Modular Redundancy - 3 computers vote on outputs.' },
-              { id: 'q3', question: 'Falcon 9 runs which operating system?', options: ['Windows', 'VxWorks', 'Linux', 'Custom OS'], correctAnswer: 2, explanation: 'SpaceX uses Linux with real-time patches.' },
-              { id: 'q4', question: 'Watchdog timer purpose is:', options: ['Keep time', 'Catch software hangs', 'Control temperature', 'Monitor fuel'], correctAnswer: 1, explanation: 'Watchdog resets system if software stops responding.' },
-              { id: 'q5', question: 'RAD750 processors cost approximately:', options: ['$100', '$1,000', '$200,000+', '$1 million'], correctAnswer: 2, explanation: 'Radiation-hardened processors cost $200k+ each.' }
-            ]
-          }
-        },
-        {
-          id: 'telemetry',
-          title: 'Telemetry & Communications',
-          duration: '25 min',
-          xp: 150,
-          description: 'Sending data from rocket to ground',
-          aiTutor: true,
-          introduction: `Telemetry is the lifeline between rocket and ground. It sends thousands of measurements per second, allowing engineers to monitor vehicle health and make decisions. Without telemetry, we'd be flying blind.`,
-          sections: [
-            {
-              title: 'Telemetry Basics',
-              content: `**What is Telemetry?**
-Remote measurement transmission.
-Rocket → Ground station
-
-**Data Types:**
-- Sensor readings (1000s of channels)
-- System status
-- GPS position
-- Video feeds
-- Event markers
-
-**Data Rates:**
-- Falcon 9: ~10 Mbps
-- Includes video streams
-- Compressed data
-
-**Frequency Bands:**
-- S-band: 2-4 GHz (common)
-- C-band: 4-8 GHz
-- Ku-band: 12-18 GHz (high data rate)
-- Ka-band: 26-40 GHz`
-            },
-            {
-              title: 'Communication Links',
-              content: `**Ground Stations:**
-- Track rocket with dish antennas
-- Multiple stations for coverage
-- Handoff as rocket moves
-
-**TDRS (NASA):**
-- Tracking and Data Relay Satellites
-- Provides coverage over oceans
-- Used by many missions
-
-**Starlink (SpaceX):**
-- Direct to satellite communication
-- Global coverage
-- Used for Starship telemetry
-
-**Link Budget:**
-- Transmit power
-- Antenna gain
-- Path loss
-- Receiver sensitivity
-- Must close the link!`
-            },
-            {
-              title: 'Flight Termination',
-              content: `**Range Safety:**
-- If rocket goes off course, must be destroyed
-- Protects people and property
-- Required by range
-
-**FTS (Flight Termination System):**
-- Independent system
-- Receives destruct command
-- Cuts propellant tanks
-- Terminates thrust
-
-**AFTS (Autonomous FTS):**
-- GPS-based
-- Onboard decision making
-- No ground command needed
-- Falcon 9 uses AFTS
-
-**Criteria:**
-- Leaves designated corridor
-- Exceeds velocity limits
-- Loss of control detected`
-            }
-          ],
-          keyTakeaways: [
-            'Telemetry sends thousands of measurements per second',
-            'Multiple ground stations provide continuous coverage',
-            'Flight termination system ensures range safety',
-            'AFTS makes autonomous destruct decisions'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Falcon 9 telemetry data rate is approximately:', options: ['1 kbps', '100 kbps', '10 Mbps', '1 Gbps'], correctAnswer: 2, explanation: 'Falcon 9 transmits ~10 Mbps including video.' },
-              { id: 'q2', question: 'S-band frequency range is:', options: ['100-500 MHz', '2-4 GHz', '10-20 GHz', '50-100 GHz'], correctAnswer: 1, explanation: 'S-band is 2-4 GHz - common for rocket telemetry.' },
-              { id: 'q3', question: 'AFTS stands for:', options: ['Automatic Flight Tracking System', 'Autonomous Flight Termination System', 'Advanced Fuel Transfer System', 'Attitude Flight Test System'], correctAnswer: 1, explanation: 'Autonomous Flight Termination System - makes destruct decisions onboard.' },
-              { id: 'q4', question: 'TDRS provides:', options: ['Propulsion', 'Communication relay', 'Navigation', 'Weather data'], correctAnswer: 1, explanation: 'TDRS satellites relay communications over areas without ground stations.' },
-              { id: 'q5', question: 'FTS is triggered when rocket:', options: ['Reaches orbit', 'Leaves designated corridor', 'Runs low on fuel', 'Completes mission'], correctAnswer: 1, explanation: 'FTS activates if rocket leaves safe flight corridor.' }
-            ]
-          }
-        },
-  
+  color: 'from-cyan-500 to-blue-600',
+  units: [{
+    id: 'gnc-systems',
+    title: 'Guidance, Navigation & Control',
+    description: 'Computers, sensors, and algorithms that guide the rocket',
+    lessons: [
       {
-          id: 'power-systems',
-          title: 'Electrical Power Systems',
-          duration: '25 min',
-          xp: 150,
-          description: 'Powering rocket avionics',
-          aiTutor: true,
-          introduction: `Every sensor, computer, and actuator needs electrical power. Rocket power systems must be lightweight, reliable, and provide clean power throughout the mission - from pre-launch through orbit insertion.`,
-          sections: [
-            {
-              title: 'Power Sources',
-              content: `**Batteries:**
-- Primary (non-rechargeable)
-- Lithium-ion most common
-- High energy density
-- Sized for mission duration
-
-**Falcon 9 Batteries:**
-- Lithium-ion packs
-- ~28V nominal
-- Sized for ~30 min mission
-- Separate packs for redundancy
-
-**Other Sources:**
-- Fuel cells (Shuttle)
-- Solar panels (spacecraft)
-- RTGs (deep space)
-- APUs (hydraulic power)
-
-**Power Budget:**
-- Avionics: 500-2000 W
-- Actuators: 1000-5000 W
-- Heaters: Variable
-- Total: Several kW`
-            },
-            {
-              title: 'Power Distribution',
-              content: `**Voltage Levels:**
-- 28V DC (aerospace standard)
-- 5V, 3.3V for electronics
-- 270V DC (some new systems)
-
-**Distribution:**
-- Main bus from batteries
-- DC-DC converters for different voltages
-- Fuses and circuit breakers
-- Redundant paths
-
-**Power Quality:**
-- Voltage regulation
-- Noise filtering
-- Transient protection
-- EMI shielding
-
-**Grounding:**
-- Single-point ground
-- Prevents ground loops
-- Critical for sensor accuracy`
-            },
-            {
-              title: 'Pyrotechnics',
-              content: `**Pyrotechnic Devices:**
-- Stage separation
-- Fairing jettison
-- Landing leg deployment
-- FTS charges
-
-**Firing Circuits:**
-- Redundant initiation
-- Safe/Arm devices
-- Capacitor discharge units
-- Precise timing
-
-**Safety:**
-- Multiple inhibits
-- Arm only when needed
-- Shielded wiring
-- ESD protection
-
-**Testing:**
-- Continuity checks
-- Resistance measurement
-- No-fire current verification`
-            }
-          ],
-          keyTakeaways: [
-            'Lithium-ion batteries power most rocket avionics',
-            '28V DC is the aerospace standard voltage',
-            'Redundant power paths ensure reliability',
-            'Pyrotechnic systems require multiple safety inhibits'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Standard aerospace voltage is:', options: ['5V', '12V', '28V', '120V'], correctAnswer: 2, explanation: '28V DC is the aerospace standard for power distribution.' },
-              { id: 'q2', question: 'Falcon 9 uses which battery type?', options: ['Lead-acid', 'NiCd', 'Lithium-ion', 'Fuel cells'], correctAnswer: 2, explanation: 'Lithium-ion batteries - high energy density, lightweight.' },
-              { id: 'q3', question: 'Typical avionics power consumption is:', options: ['10-50 W', '500-2000 W', '10-50 kW', '1 MW'], correctAnswer: 1, explanation: 'Avionics typically consume 500-2000 W.' },
-              { id: 'q4', question: 'Pyrotechnic safety uses:', options: ['Single inhibit', 'Multiple inhibits', 'No inhibits', 'Software only'], correctAnswer: 1, explanation: 'Multiple inhibits (safe/arm) prevent accidental firing.' },
-              { id: 'q5', question: 'Single-point grounding prevents:', options: ['Overheating', 'Ground loops', 'Short circuits', 'Battery drain'], correctAnswer: 1, explanation: 'Single-point ground prevents ground loops that cause noise.' }
-            ]
-          }
-        },
-        {
-          id: 'software-simulation',
-          title: 'Flight Software & Simulation',
-          duration: '30 min',
-          xp: 175,
-          description: 'Developing and testing rocket software',
-          aiTutor: true,
-          introduction: `Flight software is the most complex part of a modern rocket. Millions of lines of code control every aspect of flight. Extensive simulation ensures it works perfectly before the rocket ever leaves the pad.`,
-          sections: [
-            {
-              title: 'Software Architecture',
-              content: `**Layers:**
-- Hardware abstraction
-- Operating system
-- Middleware
-- Application software
-
-**Key Functions:**
-- GNC algorithms
-- Sequencing (event timing)
-- Health monitoring
-- Fault management
-- Telemetry formatting
-
-**Modularity:**
-- Separate modules for each function
-- Well-defined interfaces
-- Easier testing and updates
-
-**Real-Time Constraints:**
-- Hard deadlines
-- Deterministic execution
-- Priority-based scheduling`
-            },
-            {
-              title: 'Simulation Levels',
-              content: `**Software-in-the-Loop (SIL):**
-- Flight software on desktop
-- Simulated sensors/actuators
-- Fast execution
-- Early development
-
-**Processor-in-the-Loop (PIL):**
-- Flight software on flight processor
-- Simulated I/O
-- Tests real-time performance
-
-**Hardware-in-the-Loop (HIL):**
-- Real flight hardware
-- Simulated vehicle dynamics
-- Most realistic ground test
-- "Iron bird" test stands
-
-**Monte Carlo:**
-- Thousands of simulated flights
-- Random variations in parameters
-- Statistical success analysis
-- Finds edge cases`
-            },
-            {
-              title: 'Verification & Validation',
-              content: `**Verification:** Did we build it right?
-- Unit testing
-- Integration testing
-- Code review
-- Static analysis
-
-**Validation:** Did we build the right thing?
-- Requirements traceability
-- System testing
-- Flight testing
-
-**Test Coverage:**
-- Statement coverage
-- Branch coverage
-- MC/DC (Modified Condition/Decision)
-- 100% coverage goal
-
-**SpaceX Testing:**
-- Continuous integration
-- Automated test suites
-- Simulation before every flight
-- Learn from each mission`
-            }
-          ],
-          keyTakeaways: [
-            'Flight software has millions of lines of code',
-            'SIL → PIL → HIL progression increases fidelity',
-            'Monte Carlo finds edge cases through random simulation',
-            'Verification ensures correct implementation; validation ensures correct requirements'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'HIL stands for:', options: ['High Integration Level', 'Hardware-in-the-Loop', 'Hybrid Inertial Logic', 'Horizontal Integration Lab'], correctAnswer: 1, explanation: 'Hardware-in-the-Loop uses real hardware with simulated dynamics.' },
-              { id: 'q2', question: 'Monte Carlo simulation runs:', options: ['One perfect case', 'Thousands of random variations', 'Only failure cases', 'Real flights'], correctAnswer: 1, explanation: 'Monte Carlo runs thousands of cases with random parameter variations.' },
-              { id: 'q3', question: 'Verification asks:', options: ['Did we build the right thing?', 'Did we build it right?', 'Is it fast enough?', 'Is it cheap enough?'], correctAnswer: 1, explanation: 'Verification = built correctly; Validation = correct requirements.' },
-              { id: 'q4', question: 'MC/DC is a type of:', options: ['Processor', 'Test coverage metric', 'Communication protocol', 'Power system'], correctAnswer: 1, explanation: 'MC/DC (Modified Condition/Decision Coverage) is a rigorous test coverage metric.' },
-              { id: 'q5', question: 'SIL testing runs flight software on:', options: ['Flight hardware', 'Desktop computer', 'In flight', 'Ground station'], correctAnswer: 1, explanation: 'Software-in-the-Loop runs on desktop with simulated environment.' }
-            ]
-          }
-        },
-        {
-          id: 'autonomous-operations',
-          title: 'Autonomous Operations',
-          duration: '30 min',
-          xp: 175,
-          description: 'Rockets that think for themselves',
-          aiTutor: true,
-          introduction: `Modern rockets are increasingly autonomous. From automatic abort decisions to propulsive landing, rockets must make split-second decisions without human intervention. This autonomy enables capabilities that would be impossible with ground control.`,
-          sections: [
-            {
-              title: 'Why Autonomy?',
-              content: `**Speed:**
-- Light-speed delay to ground
-- Decisions needed in milliseconds
-- Human reaction too slow
-
-**Examples:**
-- Engine-out response: <100 ms
-- Abort decision: <1 second
-- Landing burn timing: Precise
-
-**Falcon 9 Autonomy:**
-- Automatic engine-out compensation
-- Autonomous flight termination
-- Propulsive landing (no human input)
-- Fairing recovery guidance
-
-**Crew Dragon:**
-- Automatic abort capability
-- Autonomous docking
-- Can complete mission without crew input`
-            },
-            {
-              title: 'Autonomous Landing',
-              content: `**The Challenge:**
-- Supersonic to zero in ~30 seconds
-- Fuel-optimal trajectory
-- Pinpoint accuracy (<1 m)
-- No second chances!
-
-**Guidance:**
-- Convex optimization
-- Real-time trajectory planning
-- Adapts to conditions
-
-**Sensors:**
-- GPS for position
-- Radar altimeter for height
-- IMU for attitude
-- Cameras (future)
-
-**Control:**
-- Engine gimbal for steering
-- Throttle for descent rate
-- Grid fins for aerodynamic control
-
-**Success Rate:**
-- Now >95% for Falcon 9
-- Continuous improvement`
-            },
-            {
-              title: 'Fault Management',
-              content: `**Automatic Responses:**
-- Sensor failure: Switch to backup
-- Engine anomaly: Shutdown or compensate
-- Off-nominal trajectory: Abort or adapt
-
-**Decision Trees:**
-- Pre-programmed responses
-- Based on extensive analysis
-- Tested in simulation
-
-**Machine Learning (Future):**
-- Pattern recognition
-- Anomaly detection
-- Adaptive control
-- SpaceX exploring for Starship
-
-**Human Oversight:**
-- Ground can command abort
-- But rocket can act faster
-- Autonomy as backup to human`
-            }
-          ],
-          keyTakeaways: [
-            'Autonomy enables millisecond decisions impossible for humans',
-            'Falcon 9 landing is fully autonomous - no human input',
-            'Fault management automatically handles failures',
-            'Machine learning may enhance future autonomy'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Engine-out response time is:', options: ['~10 seconds', '~1 second', '<100 ms', '~1 minute'], correctAnswer: 2, explanation: 'Engine-out compensation happens in <100 milliseconds.' },
-              { id: 'q2', question: 'Falcon 9 landing accuracy is:', options: ['~100 m', '~10 m', '<1 m', '~1 km'], correctAnswer: 2, explanation: 'Falcon 9 lands within 1 meter of target.' },
-              { id: 'q3', question: 'Crew Dragon can dock:', options: ['Only with crew control', 'Only with ground control', 'Autonomously', 'Cannot dock'], correctAnswer: 2, explanation: 'Crew Dragon can dock to ISS fully autonomously.' },
-              { id: 'q4', question: 'Landing guidance uses:', options: ['Simple ballistic trajectory', 'Convex optimization', 'Random search', 'Fixed program'], correctAnswer: 1, explanation: 'Convex optimization computes fuel-optimal landing trajectory in real-time.' },
-              { id: 'q5', question: 'Falcon 9 landing success rate is now:', options: ['~50%', '~75%', '>95%', '100%'], correctAnswer: 2, explanation: 'Falcon 9 achieves >95% landing success rate.' }
-            ]
-          }
+        id: 'flight-computers-software',
+        title: 'Flight Computers: Redundancy & Real-Time Software',
+        duration: '10 min', xp: 200,
+        description: 'The hardware and software that make split-second decisions at 28,000 km/h',
+        aiTutor: true,
+        introduction: `A rocket's flight computer is its central nervous system. It must process thousands of sensor readings, run complex guidance algorithms, and command every actuator — all in real-time, under extreme vibrations, and with zero tolerance for failure. In this lesson, we explore how engineers build computers that "never" fail.`,
+        sections: [
+          { title: '🎯 Real-Time Operating Systems (RTOS)', content: `**Why Your Laptop Can't Run a Rocket**\n\nIf your laptop freezes for a second while opening a file, it's annoying. If a flight computer freezes for a second, the rocket tumbles and explodes. Rocket software must be **deterministic**.\n\n**Deterministic Timing:**\nAn RTOS guarantees that a task will finish within a specific time (e.g., 5 milliseconds). It doesn't matter how busy the CPU is; the GNC loop MUST run 50 times per second exactly.\n\n**Key RTOS Features:**\n- **Preemptive Multitasking:** Higher priority tasks (like "don't crash") can immediately interrupt lower ones.\n- **Low Latency:** Minimum delay between a sensor event and the software response.\n- **Memory Protection:** One bug in a secondary system can't crash the core flight software.\n\n**Common Aerospace RTOS:**\n- **VxWorks:** Used by Mars Rovers and Boeing 787.\n- **RTEMS:** Open-source, used by many small satellites.\n- **SpaceX Linux:** SpaceX uses a modified Linux kernel with "Preempt-RT" patches, enabling them to use standard, high-performance processors instead of expensive rad-hard ones.` },
+          { title: '🔧 Triple Modular Redundancy (TMR)', content: `**Voting for Survival**\n\nHow do you handle a computer failure mid-flight? You use more computers.\n\n**The Voting Logic:**\n1. Use three identical computers (A, B, C).\n2. Each computer receives the SAME sensor data.\n3. Each computer runs the SAME flight software code.\n4. Before any command is sent to the engines, the three computers VOTE.\n5. If Computer A says "pitch up" and B/C say "pitch down," Computer A is overruled and ignored.\n\n**Falcon 9 Implementation:**\nSpaceX uses **Triple-Triple Redundancy**. There are three flight computer strings. Each string has three processors. They use a "dual-core lockstep" approach internally where two processors check each other, and then the three strings check each other. This is how they avoid using $200,000 radiation-hardened chips (like the RAD750) and instead use ~$100 commercial x86 processors.` },
+          { title: '📐 Radiation: The Invisible Enemy', content: `**Bit-Flips in Space**\n\nIn the upper atmosphere and orbit, high-energy particles (cosmic rays) can strike silicon chips. This causes **Single Event Upsets (SEUs)** — bits in memory or CPU registers flipping from 0 to 1 randomly.\n\n**Radiation Hardening Techniques:**\n- **Rad-Hard by Design:** Special transistor layouts that resist charge buildup. (Extremely slow and expensive).\n- **Rad-Hard by Process:** Building chips on insulating layers like Sapphire (SOS).\n- **Software-Based Protection:** Error-Correcting Code (ECC) memory that detects and fixes bit-flips automatically.\n\n**SpaceX\'s "Rad-Tolerant" Strategy:**\nInstead of making one chip invincible, make the SYSTEM resilient. If one cheap processor suffers an SEU and produces wrong data, the other two in the TMR voting block will overrule it. They then reboot the affected processor to clear the error. This "fail-operational" design is the secret to SpaceX's cost advantage.` },
+          { title: '🚀 The Flight Software Stack', content: `**Millions of Lines of C++**\n\nModern flight software is complex. The Falcon 9 stack is primarily C++ and C, running on Linux.\n\n**The Layers:**\n1. **Board Support Package (BSP):** Drivers that talk to hardware (IMUs, valves, radios).\n2. **Middleware:** Handles timing and communication between different computer strings.\n3. **Application Layer:** The "Brains" — Navigation (where am I?), Guidance (where to go?), and Control (how to move).\n4. **Failure Management:** Thousands of "what-if" scenarios programmed to handle engine-out, sensor loss, or communication dropouts.\n\n**Testing — The Most Important Part:**\n- **SITL (Software In The Loop):** Run the flight code on a regular PC against a physics simulator.\n- **HITL (Hardware In The Loop):** Run the flight code on the REAL flight computer connected to a simulator that tricks it into thinking it's flying. This catches timing issues that pure PC sims miss.` },
+          { title: '🧪 Flight Computer Practice', content: `**P1:** A GNC loop runs at 50 Hz. How many milliseconds does each cycle have?\n*Answer: 1000ms / 50 = 20ms per cycle. All calculations must finish in ~15ms to leave a buffer.*\n\n**P2:** If Computer A suffers a radiation hit and starts commanding "Gimbal 90 degrees," while B and C command "Gimbal 2 degrees," what happens in a TMR system?\n*Answer: The voter sees the 2-1 majority and sends the "2 degrees" command. Computer A is flagged as failed and its command is discarded. The rocket continues flying safely.*\n\n**P3:** Why use ECC memory in space?\n*Answer: ECC (Error Correcting Code) can detect and automatically fix single-bit flips caused by cosmic rays without needing a full system reboot, increasing system stability between voting cycles.*\n\n**P4:** What is the main difference between "Hardened" and "Tolerant" hardware?\n*Answer: Hardened hardware tries to prevent errors through physics/material choice. Tolerant hardware accepts that errors will happen but uses redundancy (like TMR) to ensure they don't cause a crash.*\n\n**P5:** You're building a cheap CubeSat. Do you use a $200k RAD750 or three $10 Arduinos in a voting block?\n*Answer: For Low Earth Orbit (LEO), the redundant Arduinos (or more likely ARM chips) are often sufficient and 20,000x cheaper, though the software complexity to manage the voting is higher.*` }
+        ],
+        keyTakeaways: ['Flight computers must be deterministic (RTOS)', 'Triple Modular Redundancy (TMR) uses voting to handle failures', 'Radiation causes bit-flips (SEUs) that redundancy can clear', 'HITL testing validates code on real hardware before flight', 'SpaceX uses commercial rad-tolerant chips to lower costs vs rad-hard'],
+        vocabulary: [
+          { term: 'RTOS', definition: 'Real-Time Operating System — guarantees task completion within a fixed deadline' },
+          { term: 'TMR', definition: 'Triple Modular Redundancy — three systems voting to eliminate errors' },
+          { term: 'SEU', definition: 'Single Event Upset — a bit-flip in silicon caused by cosmic radiation' },
+          { term: 'Deterministic', definition: 'A system whose behavior is predictable and repeatable in time' },
+          { term: 'HITL', definition: 'Hardware-In-The-Loop — testing real computers with simulated sensor data' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'An RTOS is required for flight because it is:', options: ['Faster than Windows', 'Deterministic', 'Cheaper', 'Easy to program'], correctAnswer: 1, explanation: 'Deterministic timing guarantees tasks finish on time, every time.' },
+            { id: 'q2', question: 'Triple Modular Redundancy (TMR) works by:', options: ['Faster CPUs', 'Voting logic', 'Thick lead shielding', 'Backup batteries'], correctAnswer: 1, explanation: 'Three computers vote; a majority (2 out of 3) must agree on the command.' },
+            { id: 'q3', question: 'SpaceX handles radiation bit-flips by:', options: ['Sapphire chips', 'Lead blocks', 'System-level redundancy', 'Not flying in high radiation'], correctAnswer: 2, explanation: 'Multiple cheap processors vote; if one flips, others overrule and reboot it.' },
+            { id: 'q4', question: 'Gimbal commands and GNC loops typically run at:', options: ['1 Hz', '10 Hz', '50-400 Hz', '10,000 Hz'], correctAnswer: 2, explanation: 'Fast loops are needed to maintain stability in a dynamic vehicle.' },
+            { id: 'q5', question: 'Testing flight code on a real computer is:', options: ['SITL', 'HITL', 'Beta test', 'Proof test'], correctAnswer: 1, explanation: 'Hardware-In-The-Loop (HITL) uses the actual flight hardware for testing.' }
+          ]
         }
-      ]
-    }
-  ]
+      },
+      {
+        id: 'sensors-navigation',
+        title: 'Sensors & Navigation: Knowing Where You Are',
+        duration: '10 min', xp: 200,
+        description: 'IMUs, GPS, Star Trackers, and the math that fuses them into a single truth',
+        aiTutor: true,
+        introduction: `In space, there are no landmarks. To survive, a rocket must "feel" its own motion using inertial sensors and confirm its position using satellites and stars. This is Navigation — the art of determining position and velocity in a void.`,
+        sections: [
+          { title: '🎯 Inertial Measurement Units (IMUs)', content: `**The "Balance" of the Rocket**\n\nAn IMU measures two things: linear acceleration and angular rotation rate. It usually contains:\n- **3 Accelerometers:** (X, Y, Z axes)\n- **3 Gyroscopes:** (Roll, Pitch, Yaw rates)\n\n**Dead Reckoning:**\nIf you know where you started and you measure EVERY acceleration and rotation, you can calculate your current position. This is called "dead reckoning."\n\n**The Problem: Drift**\nNo sensor is perfect. A tiny 0.001 degree error in a gyro accumulates over time. After 10 minutes, your computer might think you're 5 kilometers away from where you actually are. This is "Integration Drift."` },
+          { title: '🔧 GPS & Star Trackers', content: `**External References**\n\nTo fix IMU drift, the rocket needs "absolute" references.\n\n**GPS (Global Positioning System):**\n- Fast, accurate position (X, Y, Z) and velocity.\n- **Challenge:** Standard GPS stops working above 18km or 500m/s (COCOM limits) to prevent missile use. Rocket engineers use special "Space-Rated" GPS receivers that don't have these locks.\n\n**Star Trackers:**\n- High-resolution cameras that take photos of the sky.\n- Onboard computer compares photos to a stored star map.\n- Identifies patterns (like facial recognition) to determine EXACT attitude (pointing direction).\n- Accuracy: 0.001 degrees. This is how the Hubble telescope points so precisely at distant galaxies.` },
+          { title: '📐 Sensor Fusion: The Kalman Filter', content: `**The Math of "Truth"**\n\nThe IMU is fast (400 Hz) but drifts. GPS is slow (1 Hz) but has no drift. How do you combine them?\n\n**The Kalman Filter:**\nThis algorithm is the industry standard for navigation. It works in two steps:\n1. **Predict:** Use the IMU to guess the new position (Fast).\n2. **Update:** When a GPS signal arrives, check how far the guess was from the GPS truth. Adjust the estimate and learn how much the IMU is drifting.\n\nIt weights the data by "Trust" (Uncertainty). If the GPS signal is fuzzy, it trusts the IMU more. If the IMU is old, it trusts the new GPS more. It is the mathematical bridge between different sensors.` },
+          { title: '🚀 Orientation: Pitfall of Gimbals', content: `**Gimbal Lock and Quaternions**\n\nHow do you represent "Up" or "Left" in code? Most people think of Euler Angles (Pitch, Yaw, Roll). But there is a mathematical danger: **Gimbal Lock**.\n\n**Gimbal Lock:** If two axes of rotation align (e.g., you pitch 90 degrees up), you lose one degree of freedom. The math "breaks" and the computer can't tell which way is left or right. This famous problem nearly caused Apollo missions to lose control.\n\n**The Solution: Quaternions**\nModern rocket computers use Quaternions — a 4-dimensional mathematical system that represents rotation without ever suffering from gimbal lock. They are harder for humans to visualize but perfect for flight computers.` },
+          { title: '🧪 Navigation Practice', content: `**P1:** An accelerometer measures 9.81 m/s² while sitting on the launchpad. Why is it not ZERO?\n*Answer: It is measuring the "normal force" required to resist Earth's gravity. Nav computers "subtract" gravity from readings to find the REAL acceleration.*\n\n**P2:** A gyro drifts 0.1 deg/hour. How far off is the calculated angle after a 6-month trip to Mars without external fixes?\n*Answer: 0.1 × 24 × 180 = 432 degrees. You'd have spun around entirely and be pointing the wrong way! Real missions use Star Trackers every few hours to reset this drift.*\n\n**P3:** Why does a rocket need 3 gyros and 3 accelerometers?\n*Answer: To cover all 3 dimensions of space (X, Y, Z for linear motion; Roll, Pitch, Yaw for rotation).* \n\n**P4:** What is the primary advantage of a Kalman Filter?\n*Answer: It provides the "optimal" estimate of the vehicle's state by statistically combining noisy data from multiple sensors with a physics model.*\n\n**P5:** If your GPS gets jammed, can the rocket still fly?\n*Answer: Yes, using "Inertial Only" navigation. The IMU will continue tracking, but accuracy will slowly degrade. For a short ascent to orbit, the drift might be small enough for a successful mission.*` }
+        ],
+        keyTakeaways: ['IMUs use 3 accelerometers and 3 gyroscopes for 6-DOF tracking', 'Dead reckoning accumulates drift over time', 'GPS and Star Trackers provide absolute fixes to reset drift', 'The Kalman Filter fuses noisy sensors into a single "Truth"', 'Quaternions prevent "Gimbal Lock" in 3D rotation math'],
+        vocabulary: [
+          { term: 'IMU', definition: 'Inertial Measurement Unit — measures acceleration and rotation' },
+          { term: 'Drift', definition: 'Accumulated error in navigation due to sensor inaccuracies' },
+          { term: 'Kalman Filter', definition: 'Algorithm that optimally estimates state from uncertain measurements' },
+          { term: 'Gimbal Lock', definition: 'Loss of a degree of freedom when two axes align in 3D rotation' },
+          { term: 'Quaternion', definition: '4D complex numbers used for smooth, robust 3D rotations' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'An IMU typically contains how many basic sensors?', options: ['2', '4', '6', '12'], correctAnswer: 2, explanation: '3 accelerometers + 3 gyroscopes = 6 sensors total.' },
+            { id: 'q2', question: 'The main problem with Inertial Navigation is:', options: ['Too slow', 'Drift over time', 'Needs sunlight', 'Too heavy'], correctAnswer: 1, explanation: 'Small errors integrate over time to create large position errors.' },
+            { id: 'q3', question: 'Star Trackers are used to determine:', options: ['Altitude', 'Position', 'Precise Attitude', 'Fuel level'], correctAnswer: 2, explanation: 'They recognize star patterns to find the exact pointing direction.' },
+            { id: 'q4', question: 'The Kalman Filter is used for:', options: ['Cooling engines', 'Sensor Fusion', 'Orbit calculation', 'Ignition timing'], correctAnswer: 1, explanation: 'It fuses data from different sensors (like GPS and IMU) optimally.' },
+            { id: 'q5', question: 'Gimbal Lock is avoided today by using:', options: ['Euler Angles', 'Quaternions', 'More motors', 'Solar sails'], correctAnswer: 1, explanation: 'Quaternions allow any rotation without mathematical "locking" or breakdown.' }
+          ]
+        }
+      },
+      {
+        id: 'guidance-algorithms',
+        title: 'Guidance Laws: The Path to Orbit',
+        duration: '10 min', xp: 200,
+        description: 'From Gravity Turns to Powered Explicit Guidance — how a rocket steers itself to a target',
+        aiTutor: true,
+        introduction: `Guidance is the "Driver" of the rocket. It knows the goal (e.g., a specific orbit) and computes exactly which direction the rocket should point and when to burn the engines. It is an exercise in optimization: reaching the destination with the absolute minimum amount of fuel.`,
+        sections: [
+          { title: '🎯 Phase 1: The Pitch Program', content: `**Leaving the Pad**\n\nFor the first 10-15 seconds, a rocket flies perfectly vertical. This is to clear the launch tower and reach thinner air as quickly as possible. \n\nThen, the computer initiates the **Pitch Program**. It tilts the rocket slightly toward the ocean (or launch direction). This tiny tilt is the most important part of the flight — it sets the stage for everything that follows.` },
+          { title: '🔧 Phase 2: The Gravity Turn', content: `**Using Nature to Steer**\n\nA "Gravity Turn" is the most fuel-efficient way to reach orbit. After the initial pitch-over, the computer does... almost nothing. \n\nGravity pulls the "nose" of the rocket down as it flies faster and faster. Because the rocket is always pointing exactly where it's going (Zero Angle of Attack), it minimizes aerodynamic drag and stress. Gravity essentially steers the rocket for "free," turning its vertical climb into a horizontal orbit.` },
+          { title: '📐 Powered Explicit Guidance (PEG)', content: `**Targeting the Bullseye**\n\nOnce in the vacuum of space, "nature" isn't enough. The computer uses a complex algorithm called **PEG** (used by the Space Shuttle and Falcon 9).\n\n**How PEG Works:**\n1. It predicts where the rocket WILL be in 3 minutes based on current thrust.\n2. It compares that to the target orbit.\n3. It uses calculus to find the exact path that uses the LEAST fuel to close that gap.\n4. It updates this 50 times per second. If an engine is underperforming slightly, PEG detects it instantly and points the rocket a bit higher to compensate.` },
+          { title: '🚀 Terminal Guidance & Cutoff', content: `**Hitting 7,800 m/s Exactly**\n\nReaching orbit requires hitting a specific velocity with incredible precision. \n\n**SECO (Second Stage Engine Cut-Off):**\nAs the rocket nears its target speed (e.g., 7,500 m/s), PEG enters "Terminal Guidance." It fine-tunes the pointing to within 0.1 degrees. When the nav computer sees 7,800.0 m/s, it sends the "Engine Shutdown" command. In some missions, they shoot for a target 300km away and hit it within meters. \n\n**Delta-V Budget:**\nAny steering "jitter" wastes fuel. Good guidance minimizes "Steering Losses" — every second you spend pointing elsewhere is a second you are fighting the goal.` },
+          { title: '🧪 Guidance Practice', content: `**P1:** Why don't rockets fly straight up until they reach space, then turn 90 degrees?\n*Answer: This would be extremely inefficient. You'd spend massive fuel fighting gravity ("Gravity Losses"). A curved path turns vertical motion into horizontal speed gradually and naturally.*\n\n**P2:** What happens if you don't pitch over enough at the start?\n*Answer: You'll go too high too fast, but won't have the horizontal speed to STAY there. You'd fall back to Earth like a suborbital hop (New Shepard style).*\n\n**P3:** Why is the "Zero Angle of Attack" important in the atmosphere?\n*Answer: If a rocket tilts away from the wind direction, the air will push sideways on it, potentially snapping the vehicle in half like a dry stick. Pointing directly into the wind (relative) is much safer.*\n\n**P4:** If the engine is 5% weaker than expected, can the guidance system fix it?\n*Answer: Yes. Algorithms like PEG will recognize the lower acceleration and burn the engine for a few seconds longer, or tilt the rocket slightly steeper to gain more altitude. This is why liquid engines are safer than solid ones.*\n\n**P5:** What is SECO?\n*Answer: Second Stage Engine Cut-Off. The moment the guidance computer determines the target orbit has been reached and shuts down the engine.*` }
+        ],
+        keyTakeaways: ['Guidance optimizes path to minimize fuel (Delta-V) usage', 'The Gravity Turn uses Earth\'s gravity to naturally curve the trajectory', 'Rockets fly into the relative wind (Zero AoA) to minimize structural stress', 'PEG predicts and corrects the final path using calculus', 'SECO is the high-precision shut down at exactly the target velocity'],
+        vocabulary: [
+          { term: 'Delta-V', definition: 'Change in velocity — the "currency" of space flight' },
+          { term: 'Gravity Turn', definition: 'Trajectory following a natural arc to minimize steering losses' },
+          { term: 'Angle of Attack', definition: 'The angle between the rocket\'s nose and the oncoming wind' },
+          { term: 'SECO', definition: 'Second Stage Engine Cut-Off — the end of the powered flight phase' },
+          { term: 'Gravity Losses', definition: 'Fuel wasted fighting gravity rather than gaining speed' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'The most fuel-efficient trajectory to orbit is:', options: ['Straight up', '90-degree turn at 100km', 'A Gravity Turn', 'Spiral out'], correctAnswer: 2, explanation: 'Gravity turns use natural forces to curve the path, saving propellant.' },
+            { id: 'q2', question: 'Why fly vertical for the first 10 seconds?', options: ['To save fuel', 'To clear the tower and reach thin air', 'To cool the engine', 'To find GPS'], correctAnswer: 1, explanation: 'Clearing the ground and tower and quickly exiting the thickest air is priority.' },
+            { id: 'q3', question: 'What does PEG stand for?', options: ['Powered Engine Gear', 'Point Entry Guidance', 'Powered Explicit Guidance', 'Path Every Ground'], correctAnswer: 2, explanation: 'Powered Explicit Guidance — calculates the optimal path in real-time.' },
+            { id: 'q4', question: 'Angle of Attack should be near ZERO in the atmosphere to:', options: ['Go faster', 'Save propellant', 'Prevent structural failure', 'Talk to ground'], correctAnswer: 2, explanation: 'High side-loads from wind can snap the rocket if it points away from flight direction.' },
+            { id: 'q5', question: 'Target velocity for Low Earth Orbit is about:', options: ['1,000 m/s', '7,800 m/s', '11,200 m/s', '300,000 m/s'], correctAnswer: 1, explanation: 'Orbital velocity is roughly 7.8 km/s or 17,500 mph.' }
+          ]
+        }
+      },
+      {
+        id: 'control-systems',
+        title: 'Control: Taming the Fire',
+        duration: '10 min', xp: 200,
+        description: 'PIDs, TVC, and RCS — how we physically move a 500-ton vehicle with milliradian precision',
+        aiTutor: true,
+        introduction: `Navigation knows where you are. Guidance knows where you want to go. **Control** is the muscle that moves the rocket. It takes the "Go Left" command and determines exactly which pistons to push or which valves to open to steer the vehicle. It must act in milliseconds to prevent the rocket from becoming a firework.`,
+        sections: [
+          { title: '🎯 Thrust Vector Control (TVC)', content: `**The Primary Steering Hook**\n\nRockets steer by tilting their engine exhaust. This is called "Gimbaling." \n\n**How it works:**\n- Huge hydraulic or electric pistons (actuators) push and pull the entire engine assembly.\n- If the exhaust points 2 degrees left, the nose moves right. \n- **Challenge:** Those pistons must move a 1,000kg engine against 100 tons of thrust pressure. They are some of the most powerful mechanical parts on the rocket.` },
+          { title: '🔧 Reaction Control System (RCS)', content: `**Steering in a Vacuum**\n\nOnce in space, you don't have enough air for "fins" to work. And if your main engine is OFF, you can't gimbal it. \n\n**Cold Gas / Hypergolic Thrusters:**\nSmall thrusters around the nose and base of the rocket. They puff out gas (Nitrogen or Hypergolic propellants) to rotate the vehicle. These are used for:\n- Rotating the booster for reentry (boostback).\n- Pointing the nose precisely for docking with the ISS.\n- Maintaining attitude during long "coasts" between burns.` },
+          { title: '📐 The PID Controller', content: `**The Math of "Not Too Much"**\n\nIf the computer says "move 5 degrees left," and the engine moves 5 degrees left instantly, the rocket won't just stop at 5. It has momentum! It will swing to 6, then try to correct to 4, and start oscillating. \n\n**The PID loop fixes this:**\n- **Proportional (P):** The bigger the error, the more we steer.\n- **Integral (I):** If we've had a small error for a long time (like a crosswind), push harder.\n- **Derivative (D):** The "Brakes." If we are approaching the target quickly, SLOW DOWN the steering so we don't overshoot. \n\nEvery move a rocket makes — from landing on a ship to reaching orbit — is managed by hundreds of PID loops.` },
+          { title: '🚀 Stability: Center of Pressure', content: `**Why Arrows Don\'t Fly Backward**\n\nFor a stable rocket in the atmosphere, your **Center of Mass (CoM)** must be ABOVE your **Center of Pressure (CoP)**. \n\nThink of a dart: the heavy metal tip is at the front (CoM), and the light fins are at the back (CoP). If the fins were at the front, the dart would tumble. \n\n**Active vs. Passive Stability:**\n- **Fins** provide Passive Stability (nature does the work).\n- **TVC/Gimbaling** provides Active Stability (the computer fixes it). \nModern rockets (like Falcon 9) are actually "Unstable." If the computer turned off, they would flip over immediately. But by being unstable, they are more maneuverable and save the weight of massive fins.` },
+          { title: '🧪 Control Practice', content: `**P1:** Why does a falcon 9 have "Grid Fins"?\n*Answer: During reentry, the booster is falling "engines first" through the air. Grid fins at the TOP act like air-brakes and rudders to steer the booster precisely to the drone ship.*\n\n**P2:** What happens if your "D" (Derivative) gain in a PID is too low?\n*Answer: The system will overshoot its target and might enter a "limit cycle" where it swings back and forth forever. This can rattle the structure and waste fuel.*\n\n**P3:** Can you steer a rocket using only main engine throttling?\n*Answer: Only if you have multiple engines (like Saturn V or Falcon 9). By making the left engine push harder than the right, you can create a "Roll" or "Pitch" force. This is called "Differential Throttling."*\n\n**P4:** Where do Cold Gas Thrusters get their power?\n*Answer: Usually from tanks of high-pressure Nitrogen gas. They are simple "on-off" valves that release high-speed gas to push the rocket.*\n\n**P5:** If the Center of Mass (CoM) shifts below the Center of Pressure (CoP), what happens?\n*Answer: The vehicle becomes aerodynamically unstable and will try to fly backward (tumble). In a rocket, this usually results in "RUD" (Rapid Unscheduled Disassembly) due to structural stress.*` }
+        ],
+        keyTakeaways: ['TVC (Gimbaling) steers by tilting the engine exhaust', 'RCS thrusters provide control in space where fins don\'t work', 'PID algorithms prevent jerky steering and overshooting', 'Stable rockets have CoM above CoP (like a dart)', 'Modern rockets use active control to fly unstable, high-performance shapes'],
+        vocabulary: [
+          { term: 'TVC', definition: 'Thrust Vector Control — steering via engine gimbaling' },
+          { term: 'RCS', definition: 'Reaction Control System — small thrusters for attitude control' },
+          { term: 'PID', definition: 'Proportional-Integral-Derivative — the standard control loop algorithm' },
+          { term: 'Center of Pressure', definition: 'The point where all aerodynamic forces effectively act' },
+          { term: 'Gimbal', definition: 'The mechanical assembly that allows an engine to pivot' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'Engine "Gimbaling" refers to:', options: ['Thrusting harder', 'Tilting the engine to steer', 'Cooling the turbopump', 'Separating stages'], correctAnswer: 1, explanation: 'Gimbaling is the physical act of pivoting the engine to change thrust direction.' },
+            { id: 'q2', question: 'RCS thrusters are most important in:', options: ['High-speed atmosphere', 'The vacuum of space', 'During liftoff', 'Inside the ocean'], correctAnswer: 1, explanation: 'In vacuum, there is no air for fins or wings to push against.' },
+            { id: 'q3', question: 'The "Derivative" part of a PID loop acts like a:', options: ['Accelerator', 'Battery', 'Brake/Dampener', 'Fuel pump'], correctAnswer: 2, explanation: 'The Derivative term looks at the speed of change and slows the system down to prevent overshoot.' },
+            { id: 'q4', question: 'For a stable rocket, the Center of Pressure must be:', options: ['Above the Mass', 'Below the Mass', 'In the same spot', 'At the very tip'], correctAnswer: 1, explanation: 'CoP below CoM (fins at the back) keeps the nose pointing forward.' },
+            { id: 'q5', question: 'SpaceX Grid Fins are primarily used for:', options: ['Ascent', 'Reentry steering', 'Engine cooling', 'Satellite deployment'], correctAnswer: 1, explanation: 'Grid fins steer the booster as it falls back through the atmosphere toward the landing zone.' }
+          ]
+        }
+      },
+      {
+        id: 'telemetry-range-safety',
+        title: 'Telemetry & Range Safety: The Lifeline',
+        duration: '10 min', xp: 200,
+        description: 'How we track rockets and the "Dead Man Switch" that protects people on the ground',
+        aiTutor: true,
+        introduction: `A rocket flight doesn't just happen aboard the vehicle. It's an ongoing conversation with Earth. Thousands of sensors send a constant stream of data back home, and a high-stakes safety system stands ready to press the "Kill" button if things go wrong. This is the world of Telemetry and Range Safety.`,
+        sections: [
+          { title: '🎯 What is Telemetry?', content: `**The Data Stream**\n\nA modern rocket like Falcon 9 has over 3,000 sensors. They measure everything: fuel pressure, engine temp, vibration, voltage, and even the vibration of the cargo fairing. \n\n**The Stream:**\nAll this data is packed into digital packets and beamed down at ~10-20 Megabits per second. \n\n**S-Band and Starlink:**\nTraditionally, rockets used S-band radio to talk directly to ground stations. But if the rocket goes behind a mountain or over the horizon, you lose signal. SpaceX now uses its **Starlink** constellation to provide a continuous, high-speed link anywhere in the world — allowing for that iconic 4K video from space.` },
+          { title: '🔧 Ground Stations & TDRS', content: `**The Tracking Network**\n\nTo listen to a rocket, you need big dishes. \n- **Ground Stations:** Located along the coast (Cape Canaveral, Bermuda, Africa). As the rocket flies east, it is handed off from one station to the next.\n- **TDRS (Tracking and Data Relay Satellite):** NASA uses a fleet of satellites in very high orbit that look DOWN at the rocket and beam the signal back to Earth. This provides 100% coverage, even over the middle of the Pacific Ocean.` },
+          { title: '📐 Range Safety: The "Kill" Command', content: `**FTS (Flight Termination System)**\n\nIf a rocket loses control and points toward a city (like Miami or Houston), the Air Force or the onboard computer must destroy it immediately. \n\n**The Ordnance:**\nA strip of high-explosives (linear shaped charges) runs along the side of the propellant tanks. \n\n**AFTS (Autonomous Flight Termination System):**\nIn the old days, a human "Range Safety Officer" watched a radar screen and pushed a manual button. Today, Falcon 9 uses AFTS. The onboard computer constantly asks: "Am I in the safe corridor?" If it detects it has left the "Safety Box" and is a threat to people, it triggers the explosives automatically. No human in the loop means faster reaction times.` },
+          { title: '🚀 Link Budget & Blackout', content: `**The Physics of Talking**\n\n**The Link Budget:**\nEngineers must calculate if the signal is strong enough. You lose power based on distance squared ($1/d^2$). If you double the distance, the signal is 4x weaker. \n\n**Reentry Blackout:**\nDuring reentry, the air around the rocket becomes so hot it turns into **Plasma** (a soup of charged particles). Plasma blocks radio waves. For ~5 minutes, the ground hears nothing but silence. \n\n**The SpaceX "No Blackout" Trick:**\nBy using Starlink (pointing antennas UP away from the plasma shield), SpaceX has managed to maintain communication even during the hottest parts of reentry — something previously thought impossible.` },
+          { title: '🧪 Telemetry Practice', content: `**P1:** Why is 4K video from a rocket actually useful for engineers?\n*Answer: It's not just for YouTube. High-res video allows engineers to see tiny structural vibrations, ice buildup, or small leaks that sensors might miss. It is visual telemetry.*\n\n**P2:** What is a "shaped charge" in range safety?\n*Answer: It's an explosive designed to cut a precise line. On a rocket, it zips open the fuel tanks, causing the propellant to disperse and burn up harmlessly in the air before hitting the ground.*\n\n**P3:** Why is "Handoff" between ground stations critical?\n*Answer: Because the Earth is curved! A station in Florida can only see the rocket for about 8 minutes before it disappears behind the horizon. A station in the Bahamas must "catch" the signal next.*\n\n**P4:** If the AFTS computer fails, does the rocket explode?\n*Answer: No, the FTS is usually designed as "fail-safe" or has triple-redundancy. It only triggers if it is POSITIVE the rocket is off-course. If the FTS itself fails, range safety has backup systems (like the manual ground command).*\n\n**P5:** What does "closing the link" mean in radio engineering?\n*Answer: It means you have successfully proven that your transmitter power, antenna gain, and receiver sensitivity are enough to overcome the distance and noise of space. If you can't "close the link," you get no data.*` }
+        ],
+        keyTakeaways: ['Telemetry beams 3,000+ sensor readings back to Earth in real-time', 'Starlink provides high-speed global data links for Starship/Falcon 9', 'AFTS automatically destroys an off-course rocket to protect civilians', 'Reentry Blackout is caused by plasma blocking radio waves', 'Closing the link is the math of ensuring a signal can traverse the void'],
+        vocabulary: [
+          { term: 'Telemetry', definition: 'The wireless transmission of data from a remote vehicle' },
+          { term: 'FTS', definition: 'Flight Termination System — the explosives used to destroy an unsafe rocket' },
+          { term: 'Plasma Blackout', definition: 'Communication loss during reentry due to ionized gas' },
+          { term: 'AFTS', definition: 'Autonomous Flight Termination System — computer-controlled range safety' },
+          { term: 'Link Budget', definition: 'The calculation of all gains and losses in a communication system' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'Telemetry is primarily used for:', options: ['Fueling the rocket', 'Monitoring vehicle health', 'Propelling the craft', 'Igniting the engine'], correctAnswer: 1, explanation: 'It sends sensor data (temp, pressure, etc.) back to engineers.' },
+            { id: 'q2', question: 'The system that destroys a dangerous rocket is:', options: ['RCS', 'TVC', 'FTS', 'GNC'], correctAnswer: 2, explanation: 'FTS (Flight Termination System) is the safety "kill switch."' },
+            { id: 'q3', question: 'SpaceX uses Starlink for telemetry to provide:', options: ['Free internet', 'Cheaper radio', 'Continuous global coverage', 'Better GPS'], correctAnswer: 2, explanation: 'Starlink allows communication even in areas without ground stations.' },
+            { id: 'q4', question: 'What causes the "Reentry Blackout"?', options: ['Low battery', 'Cloud cover', 'Plasma formation', 'The vacuum'], correctAnswer: 2, explanation: 'Superheated air (plasma) blocks radio signals during high-speed reentry.' },
+            { id: 'q5', question: 'A shaped charge is used in range safety to:', options: ['Explode everything', 'Cut open propellant tanks', 'Add thrust', 'Eject the pilot'], correctAnswer: 1, explanation: 'It "zips" the tanks open so fuel burns in the air rather than exploding on the ground.' }
+          ]
+        }
+      }
+    ]
+  }]
 };
 
 export default section4Avionics;

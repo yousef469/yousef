@@ -32,10 +32,6 @@ const CivilLessonPage = lazy(() => import('./pages/CivilLessonPage'));
 
 const PlaneQuizPage = lazy(() => import('./pages/PlaneQuizPage'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
-const UnitOverviewPage = lazy(() => import('./pages/UnitOverviewPage'));
-const BeginnerLessonPage = lazy(() => import('./pages/BeginnerLessonPage'));
-const BeginnerQuizPage = lazy(() => import('./pages/BeginnerQuizPage'));
-const BeginnerLessonsPage = lazy(() => import('./pages/BeginnerLessonsPage'));
 const AuthCallback = lazy(() => import('./pages/auth/callback'));
 
 // ==================== 3D VIEWER COMPONENT ====================
@@ -990,8 +986,8 @@ const AITutorPanel = ({ isOpen, onClose }) => {
           >
             <div
               className={`max-w-[80%] p-3 rounded-2xl ${message.type === 'user'
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
-                  : 'bg-background-light text-text border border-primary/20'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
+                : 'bg-background-light text-text border border-primary/20'
                 }`}
             >
               {message.type === 'bot' && (
@@ -1167,10 +1163,6 @@ export default function App() {
             <Route path="/games/play/civil/lesson/:lessonId" element={<ProtectedRoute><CivilLessonPage /></ProtectedRoute>} />
             <Route path="/games/play/rockets/lesson/:lessonId" element={<ProtectedRoute><RocketLessonPage /></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
-            <Route path="/learn/unit/:unitId" element={<ProtectedRoute><UnitOverviewPage /></ProtectedRoute>} />
-            <Route path="/learn/beginner/lesson/:lessonId" element={<ProtectedRoute><BeginnerLessonPage /></ProtectedRoute>} />
-            <Route path="/learn/beginner/quiz/:lessonId" element={<ProtectedRoute><BeginnerQuizPage /></ProtectedRoute>} />
-            <Route path="/beginner-lessons" element={<ProtectedRoute><BeginnerLessonsPage /></ProtectedRoute>} />
             <Route path="/games/play/:category/:level" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
             <Route path="/games/journey" element={<ProtectedRoute><UnifiedGame /></ProtectedRoute>} />
             <Route path="/games/quiz" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />

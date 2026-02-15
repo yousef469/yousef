@@ -1,1023 +1,177 @@
-// Section 5: Rocket Design
-// 10 Lessons - Design process, optimization, mission planning
-
+// Section 5: Rocket Design & Analysis — 5 Lessons
 export const section5Design = {
   id: 'design',
-  title: 'Unit 4: Rocket Design',
-  description: 'Designing rockets from concept to flight',
+  title: 'Unit 5: Rocket Design & Analysis',
+  description: 'How engineers calculate, simulate, and design complex launch vehicles',
   icon: '📐',
-  color: 'from-green-500 to-teal-500',
-  units: [
-    {
-      id: 'design-process',
-      title: 'Design Process',
-      description: 'From requirements to flight-ready vehicle',
-      lessons: [
-        {
-          id: 'requirements',
-          title: 'Requirements & Mission Analysis',
-          duration: '30 min',
-          xp: 175,
-          description: 'Defining what your rocket must do',
-          aiTutor: true,
-          introduction: `Every rocket design starts with requirements. What payload? What orbit? How often? These questions drive every design decision. Get requirements wrong and you build the wrong rocket.`,
-          sections: [
-            {
-              title: 'Mission Requirements',
-              content: `**Key Questions:**
-- What payload mass?
-- What orbit (altitude, inclination)?
-- How many launches per year?
-- Reusable or expendable?
-- Crewed or cargo?
-
-**Example: Falcon 9 Requirements**
-- Payload: 22,800 kg to LEO
-- Orbit: Various (LEO, GTO, polar)
-- Rate: 50+ launches/year
-- Reusability: First stage, fairings
-- Crew: Dragon capable
-
-**Derived Requirements:**
-From mission requirements, derive:
-- Δv budget
-- Thrust requirements
-- Structural loads
-- Reliability targets`
-            },
-            {
-              title: 'Trade Studies',
-              content: `**What is a Trade Study?**
-Systematic comparison of design options.
-
-**Process:**
-1. Define options
-2. Establish criteria
-3. Weight criteria by importance
-4. Score each option
-5. Calculate weighted scores
-6. Select best option
-
-**Example: Propellant Selection**
-Criteria: Isp, density, cost, handling
-- LH2/LOX: High Isp, low density
-- RP-1/LOX: Medium Isp, high density
-- CH4/LOX: Good balance, ISRU potential
-
-**Decision Matrix:**
-Quantifies subjective decisions.
-Documents rationale for future reference.`
-            },
-            {
-              title: 'Design Phases',
-              content: `**Phase A: Concept**
-- Mission definition
-- Feasibility studies
-- Multiple concepts explored
-
-**Phase B: Preliminary Design**
-- Down-select to one concept
-- Major trade studies
-- Preliminary Design Review (PDR)
-
-**Phase C: Detailed Design**
-- Complete drawings
-- Analysis and simulation
-- Critical Design Review (CDR)
-
-**Phase D: Build & Test**
-- Manufacturing
-- Integration
-- Qualification testing
-
-**Phase E: Operations**
-- Launch campaigns
-- Continuous improvement`
-            }
-          ],
-          keyTakeaways: [
-            'Requirements drive all design decisions',
-            'Trade studies systematically compare options',
-            'Design progresses through defined phases',
-            'Reviews (PDR, CDR) gate progression'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Design starts with:', options: ['Drawing rockets', 'Requirements definition', 'Building prototypes', 'Selecting materials'], correctAnswer: 1, explanation: 'Requirements must be defined before design can begin.' },
-              { id: 'q2', question: 'PDR stands for:', options: ['Propulsion Design Review', 'Preliminary Design Review', 'Post-Design Review', 'Primary Development Review'], correctAnswer: 1, explanation: 'Preliminary Design Review gates entry to detailed design.' },
-              { id: 'q3', question: 'Trade studies help:', options: ['Build faster', 'Compare options systematically', 'Reduce cost only', 'Skip testing'], correctAnswer: 1, explanation: 'Trade studies systematically compare design options.' },
-              { id: 'q4', question: 'Falcon 9 payload to LEO is:', options: ['5,000 kg', '10,000 kg', '22,800 kg', '50,000 kg'], correctAnswer: 2, explanation: 'Falcon 9 delivers 22,800 kg to LEO.' },
-              { id: 'q5', question: 'CDR occurs in which phase?', options: ['Phase A', 'Phase B', 'Phase C', 'Phase E'], correctAnswer: 2, explanation: 'Critical Design Review concludes Phase C (Detailed Design).' }
-            ]
-          }
-        },
-   
-     {
-          id: 'vehicle-sizing',
-          title: 'Vehicle Sizing',
-          duration: '35 min',
-          xp: 200,
-          description: 'Determining rocket size from requirements',
-          aiTutor: true,
-          introduction: `How big should your rocket be? Vehicle sizing translates mission requirements into physical dimensions - tank sizes, engine thrust, structural mass. It's an iterative process that balances many constraints.`,
-          sections: [
-            {
-              title: 'Sizing Process',
-              content: `**Inputs:**
-- Payload mass
-- Target orbit (Δv)
-- Propellant choice (Isp)
-- Number of stages
-
-**The Iteration:**
-1. Guess initial mass
-2. Calculate propellant needed (rocket equation)
-3. Estimate structural mass
-4. Check if payload fits
-5. Adjust and repeat
-
-**Key Relationships:**
-- Δv = Isp × g₀ × ln(m₀/mf)
-- Propellant mass = m₀ - mf
-- Structure mass ≈ 5-10% of propellant
-- Payload = mf - structure - engines`
-            },
-            {
-              title: 'Stage Optimization',
-              content: `**Why Multiple Stages?**
-Single stage: Mass ratio ~25 needed for LEO
-Two stages: Each needs ratio ~5 (much easier!)
-
-**Optimal Staging:**
-For minimum total mass:
-- Equal Δv per stage (roughly)
-- Higher Isp upper stages
-- Higher thrust lower stages
-
-**Stage Mass Fractions:**
-- First stage: 3-5% structure
-- Upper stage: 5-10% structure
-- Upper stages less efficient (smaller scale)
-
-**Example: Falcon 9**
-- Stage 1: Δv ≈ 3,500 m/s
-- Stage 2: Δv ≈ 6,000 m/s
-- Total: ~9,500 m/s (LEO + losses)`
-            },
-            {
-              title: 'Sizing Example',
-              content: `**Design a rocket for 5,000 kg to LEO**
-
-**Given:**
-- Δv = 9,400 m/s
-- Two stages
-- RP-1/LOX (Isp = 300s SL, 340s vac)
-
-**Stage 2 (work backwards):**
-- Payload: 5,000 kg
-- Δv₂ = 5,500 m/s, Isp = 340s
-- Mass ratio = e^(5500/3334) = 5.2
-- If dry mass = 2,000 kg
-- m₀₂ = 5.2 × 7,000 = 36,400 kg
-- Propellant₂ = 29,400 kg
-
-**Stage 1:**
-- Payload = Stage 2 = 36,400 kg
-- Δv₁ = 3,900 m/s, Isp = 300s
-- Mass ratio = e^(3900/2943) = 3.8
-- Dry mass = 20,000 kg
-- m₀₁ = 3.8 × 56,400 = 214,000 kg
-
-**Total: ~214,000 kg for 5,000 kg payload (2.3%)**`
-            }
-          ],
-          keyTakeaways: [
-            'Sizing is iterative - guess, calculate, refine',
-            'Multiple stages dramatically improve payload fraction',
-            'Upper stages have higher Isp, lower stages higher thrust',
-            'Typical payload fraction is 2-4% of liftoff mass'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Vehicle sizing is:', options: ['One-time calculation', 'Iterative process', 'Done after building', 'Not needed'], correctAnswer: 1, explanation: 'Sizing requires iteration - mass affects mass!' },
-              { id: 'q2', question: 'Optimal staging typically has:', options: ['All Δv in first stage', 'Equal Δv per stage', 'All Δv in upper stage', 'Random distribution'], correctAnswer: 1, explanation: 'Roughly equal Δv per stage minimizes total mass.' },
-              { id: 'q3', question: 'Upper stages typically have:', options: ['Higher thrust', 'Higher Isp', 'More propellant', 'Heavier structure'], correctAnswer: 1, explanation: 'Upper stages optimize for Isp (vacuum operation).' },
-              { id: 'q4', question: 'First stage structure fraction is typically:', options: ['1%', '3-5%', '15-20%', '50%'], correctAnswer: 1, explanation: 'First stages achieve 3-5% structure fraction.' },
-              { id: 'q5', question: 'Typical payload fraction to LEO:', options: ['10-20%', '5-10%', '2-4%', '0.5%'], correctAnswer: 2, explanation: 'Payload is typically 2-4% of liftoff mass.' }
-            ]
-          }
-        },
-        {
-          id: 'trajectory-design',
-          title: 'Trajectory Design',
-          duration: '30 min',
-          xp: 175,
-          description: 'Planning the path from pad to orbit',
-          aiTutor: true,
-          introduction: `The trajectory is the path your rocket follows from launch to orbit. A well-designed trajectory minimizes fuel consumption while meeting all constraints. It's a complex optimization problem.`,
-          sections: [
-            {
-              title: 'Trajectory Phases',
-              content: `**Vertical Rise:**
-- First 10-20 seconds
-- Clear the tower
-- Build initial velocity
-
-**Pitch Program:**
-- Begin turning downrange
-- Follow gravity turn
-- Minimize steering losses
-
-**Max-Q:**
-- Maximum aerodynamic pressure
-- May throttle down
-- ~60-80 seconds
-
-**Stage Separation:**
-- First stage burnout
-- Coast phase (brief)
-- Second stage ignition
-
-**Orbit Insertion:**
-- Final burn to orbital velocity
-- Precise targeting
-- Payload deployment`
-            },
-            {
-              title: 'Launch Azimuth',
-              content: `**Azimuth = Launch direction**
-
-**Inclination Constraint:**
-Minimum inclination = Launch latitude
-- Cape Canaveral (28.5°N): i ≥ 28.5°
-- Vandenberg (34.7°N): i ≥ 34.7°
-- Baikonur (45.6°N): i ≥ 45.6°
-
-**Due East Launch:**
-- Maximum Earth rotation boost
-- ~400 m/s free at equator
-- ~350 m/s at Cape Canaveral
-
-**Polar Launch:**
-- 90° inclination
-- No rotation boost
-- Vandenberg preferred (ocean to south)
-
-**Retrograde:**
-- Inclination > 90°
-- Against Earth rotation
-- Requires more Δv`
-            },
-            {
-              title: 'Launch Windows',
-              content: `**What is a Launch Window?**
-Time period when launch is possible.
-
-**Factors:**
-- Target orbit plane
-- Lighting conditions
-- Range availability
-- Weather
-
-**ISS Rendezvous:**
-- Must launch into ISS orbital plane
-- Window: ~5 minutes
-- Instantaneous for direct insertion
-
-**GTO:**
-- Launch when target longitude overhead
-- Window: ~2 hours typically
-
-**Interplanetary:**
-- Planetary alignment
-- Mars: Every 26 months
-- Window: 2-4 weeks`
-            }
-          ],
-          keyTakeaways: [
-            'Trajectory has distinct phases: vertical rise, pitch, Max-Q, staging, insertion',
-            'Minimum inclination equals launch site latitude',
-            'Due east launch gets free velocity from Earth rotation',
-            'Launch windows depend on target orbit and constraints'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Max-Q occurs approximately:', options: ['At liftoff', '60-80 seconds', 'At staging', 'In orbit'], correctAnswer: 1, explanation: 'Max-Q happens when velocity × air density peaks, ~60-80s.' },
-              { id: 'q2', question: 'Minimum inclination from Cape Canaveral:', options: ['0°', '28.5°', '45°', '90°'], correctAnswer: 1, explanation: 'Minimum inclination equals latitude: 28.5° for Cape.' },
-              { id: 'q3', question: 'Due east launch provides:', options: ['Shortest path', 'Free velocity from Earth rotation', 'Lowest inclination', 'Best weather'], correctAnswer: 1, explanation: 'Earth rotation adds ~350-400 m/s for eastward launches.' },
-              { id: 'q4', question: 'ISS launch window is typically:', options: ['All day', '~5 minutes', '~2 hours', '~1 week'], correctAnswer: 1, explanation: 'ISS rendezvous requires precise plane matching - ~5 min window.' },
-              { id: 'q5', question: 'Mars launch windows occur:', options: ['Daily', 'Monthly', 'Every 26 months', 'Yearly'], correctAnswer: 2, explanation: 'Mars alignment for efficient transfer occurs every 26 months.' }
-            ]
-          }
-        },
-        {
-
-          id: 'payload-integration',
-          title: 'Payload Integration',
-          duration: '25 min',
-          xp: 150,
-          description: 'Connecting satellites to rockets',
-          aiTutor: true,
-          introduction: `The payload is the reason the rocket exists. Integrating payloads safely and correctly is critical - a $500M satellite depends on proper attachment, electrical connections, and environmental protection.`,
-          sections: [
-            {
-              title: 'Payload Interfaces',
-              content: `**Mechanical Interface:**
-- Payload adapter (connects to rocket)
-- Separation system
-- Standard bolt patterns
-- Clamp bands or Marman clamps
-
-**Electrical Interface:**
-- Power from rocket (optional)
-- Data/command lines
-- Separation signals
-- Umbilical connections
-
-**Environmental:**
-- Fairing protection
-- Thermal control
-- Contamination control
-- Acoustic protection
-
-**Standard Adapters:**
-- 937mm, 1194mm, 1666mm bolt circles
-- ESPA rings (multiple small sats)
-- Rideshare adapters`
-            },
-            {
-              title: 'Integration Process',
-              content: `**Timeline (typical):**
-- L-6 months: Interface agreement
-- L-3 months: Payload arrives at launch site
-- L-2 weeks: Payload processing
-- L-1 week: Encapsulation (fairing install)
-- L-3 days: Mate to rocket
-- L-1 day: Final checks
-
-**Cleanroom Operations:**
-- Class 100,000 or better
-- Contamination control
-- ESD protection
-- Careful handling
-
-**Testing:**
-- Fit checks
-- Electrical verification
-- Separation system tests
-- End-to-end communication`
-            },
-            {
-              title: 'Rideshare Missions',
-              content: `**What is Rideshare?**
-Multiple payloads share one launch.
-Dramatically reduces cost per kg.
-
-**SpaceX Transporter:**
-- Dedicated rideshare missions
-- 100+ satellites per launch
-- $1M for 200 kg
-- Regular schedule
-
-**Deployment Sequence:**
-- Primary payload first
-- Secondary payloads in sequence
-- Different orbits possible
-- Collision avoidance critical
-
-**Challenges:**
-- Schedule coordination
-- Interface standardization
-- Orbit compromises
-- Separation timing`
-            }
-          ],
-          keyTakeaways: [
-            'Payload interfaces: mechanical, electrical, environmental',
-            'Integration takes months of preparation',
-            'Cleanroom operations prevent contamination',
-            'Rideshare dramatically reduces launch cost'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Payload integration begins how long before launch?', options: ['1 week', '1 month', '6+ months', '1 day'], correctAnswer: 2, explanation: 'Interface agreements start 6+ months before launch.' },
-              { id: 'q2', question: 'ESPA rings are used for:', options: ['Engine mounting', 'Multiple small satellites', 'Fuel transfer', 'Landing legs'], correctAnswer: 1, explanation: 'ESPA rings allow multiple small satellites on one adapter.' },
-              { id: 'q3', question: 'Encapsulation means:', options: ['Fueling', 'Installing fairing', 'Launch', 'Separation'], correctAnswer: 1, explanation: 'Encapsulation is installing the payload fairing.' },
-              { id: 'q4', question: 'SpaceX Transporter rideshare cost for 200 kg:', options: ['$100,000', '$1 million', '$10 million', '$50 million'], correctAnswer: 1, explanation: 'SpaceX Transporter offers 200 kg slots for ~$1M.' },
-              { id: 'q5', question: 'Cleanroom class 100,000 means:', options: ['100,000 particles per cubic foot', 'Temperature 100,000°F', '100,000 sq ft area', '100,000 people allowed'], correctAnswer: 0, explanation: 'Class rating indicates max particles per cubic foot of air.' }
-            ]
-          }
-        },
-        {
-          id: 'reliability-engineering',
-          title: 'Reliability Engineering',
-          duration: '30 min',
-          xp: 175,
-          description: 'Designing rockets that dont fail',
-          aiTutor: true,
-          introduction: `Rocket launches are high-stakes events. A single failure can destroy a $500M satellite or, worse, cost lives. Reliability engineering ensures rockets work correctly, every time.`,
-          sections: [
-            {
-              title: 'Reliability Basics',
-              content: `**Reliability = Probability of Success**
-
-**Metrics:**
-- Mission success rate
-- Mean Time Between Failures (MTBF)
-- Failure rate (λ)
-
-**Rocket Reliability:**
-- Falcon 9: ~98% success rate
-- Atlas V: ~99% success rate
-- Soyuz: ~97% success rate
-
-**Reliability Allocation:**
-If system needs 99% reliability:
-- 100 components at 99.99% each
-- Or fewer, more reliable components
-- Redundancy helps!
-
-**Bathtub Curve:**
-- Early failures (infant mortality)
-- Random failures (useful life)
-- Wear-out failures (end of life)`
-            },
-            {
-              title: 'Failure Analysis',
-              content: `**FMEA (Failure Modes and Effects Analysis):**
-- List all possible failures
-- Assess severity and probability
-- Identify mitigations
-- Prioritize by risk
-
-**Fault Tree Analysis:**
-- Top-down approach
-- Start with undesired event
-- Trace causes backward
-- Identify critical paths
-
-**Criticality:**
-- Crit 1: Loss of mission/vehicle
-- Crit 2: Loss of mission
-- Crit 3: Degraded performance
-
-**Single Point Failures:**
-Components where one failure causes mission loss.
-Goal: Eliminate or mitigate all SPFs.`
-            },
-            {
-              title: 'Redundancy',
-              content: `**Types of Redundancy:**
-
-**Active (Hot):**
-- All units operating
-- Instant switchover
-- Example: Triple flight computers
-
-**Standby (Cold):**
-- Backup activates on failure
-- Switching time required
-- Example: Backup battery
-
-**Functional:**
-- Different method, same function
-- Example: GPS + star tracker
-
-**Falcon 9 Redundancy:**
-- 3 flight computers (voting)
-- Engine-out capability
-- Dual separation systems
-- Redundant sensors
-
-**Cost of Redundancy:**
-More mass, complexity, cost.
-Must balance against reliability gain.`
-            }
-          ],
-          keyTakeaways: [
-            'Reliability is probability of mission success',
-            'FMEA and fault trees identify failure modes',
-            'Single point failures must be eliminated or mitigated',
-            'Redundancy improves reliability but adds mass/cost'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Falcon 9 success rate is approximately:', options: ['90%', '95%', '98%', '100%'], correctAnswer: 2, explanation: 'Falcon 9 has achieved ~98% mission success rate.' },
-              { id: 'q2', question: 'FMEA stands for:', options: ['Failure Mode and Effects Analysis', 'Flight Management and Engineering Assessment', 'Fuel Mixture and Engine Analysis', 'Final Mission Evaluation Assessment'], correctAnswer: 0, explanation: 'FMEA systematically analyzes potential failure modes.' },
-              { id: 'q3', question: 'Single point failure is:', options: ['Minor issue', 'One failure causing mission loss', 'Redundant system', 'Test procedure'], correctAnswer: 1, explanation: 'SPF = one component failure causes mission failure.' },
-              { id: 'q4', question: 'Hot redundancy means:', options: ['High temperature operation', 'All units operating simultaneously', 'Backup is off until needed', 'No redundancy'], correctAnswer: 1, explanation: 'Hot (active) redundancy has all units running for instant switchover.' },
-              { id: 'q5', question: 'Falcon 9 has how many flight computers?', options: ['1', '2', '3', '5'], correctAnswer: 2, explanation: 'Falcon 9 uses triple-redundant flight computers with voting.' }
-            ]
-          }
-        },
-      
-  {
-          id: 'cost-engineering',
-          title: 'Cost Engineering',
-          duration: '25 min',
-          xp: 150,
-          description: 'Making rockets affordable',
-          aiTutor: true,
-          introduction: `Space was once only for governments with unlimited budgets. Today, companies compete on cost. Understanding cost drivers helps design affordable rockets that open space to everyone.`,
-          sections: [
-            {
-              title: 'Cost Breakdown',
-              content: `**Typical Expendable Rocket:**
-- Hardware: 60-70%
-- Operations: 15-20%
-- Range/insurance: 10-15%
-- Overhead: 5-10%
-
-**Hardware Costs:**
-- Engines: 30-40% of hardware
-- Structures: 20-30%
-- Avionics: 15-20%
-- Other: 15-25%
-
-**Historical Costs:**
-- Space Shuttle: ~$1.5B per launch
-- Delta IV Heavy: ~$350M
-- Atlas V: ~$150M
-- Falcon 9: ~$67M (expendable)
-- Falcon 9: ~$50M (reusable)`
-            },
-            {
-              title: 'Cost Reduction Strategies',
-              content: `**Reusability:**
-- Biggest cost driver
-- Falcon 9: 60% cost in first stage
-- Reuse 10x = 10x cost reduction potential
-
-**Vertical Integration:**
-- Make components in-house
-- SpaceX makes 80%+ internally
-- Reduces markup, improves control
-
-**Simplification:**
-- Fewer parts = lower cost
-- Merlin: 1 engine design, 9 per stage
-- Common components across vehicles
-
-**Production Rate:**
-- Higher volume = lower unit cost
-- Learning curve effects
-- SpaceX: 50+ rockets/year
-
-**Design for Manufacturing:**
-- Easy to build = cheaper
-- Automation where possible
-- Starship: Stainless steel (cheap, easy)`
-            },
-            {
-              title: 'The SpaceX Revolution',
-              content: `**Cost Comparison ($/kg to LEO):**
-| Vehicle | $/kg |
-|---------|------|
-| Shuttle | ~$54,000 |
-| Delta IV | ~$14,000 |
-| Falcon 9 (exp) | ~$2,700 |
-| Falcon 9 (reuse) | ~$1,500 |
-| Starship (goal) | ~$100 |
-
-**How SpaceX Did It:**
-- Reusability (first stage, fairings)
-- Vertical integration
-- Rapid iteration
-- High production rate
-- Simple, robust designs
-
-**Future:**
-Starship aims for <$10M per launch
-Could enable $100/kg to orbit!`
-            }
-          ],
-          keyTakeaways: [
-            'Engines are 30-40% of hardware cost',
-            'Reusability is the biggest cost reduction lever',
-            'Vertical integration reduces costs and improves control',
-            'SpaceX reduced costs from $54,000/kg to ~$1,500/kg'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Engines are what % of rocket hardware cost?', options: ['5-10%', '15-20%', '30-40%', '60-70%'], correctAnswer: 2, explanation: 'Engines typically represent 30-40% of hardware cost.' },
-              { id: 'q2', question: 'Falcon 9 reusable cost to LEO is approximately:', options: ['$50,000/kg', '$10,000/kg', '$1,500/kg', '$100/kg'], correctAnswer: 2, explanation: 'Falcon 9 reusable achieves ~$1,500/kg to LEO.' },
-              { id: 'q3', question: 'SpaceX manufactures what % of components in-house?', options: ['20%', '50%', '80%+', '100%'], correctAnswer: 2, explanation: 'SpaceX vertically integrates 80%+ of manufacturing.' },
-              { id: 'q4', question: 'Space Shuttle cost per launch was:', options: ['$50M', '$150M', '$500M', '~$1.5B'], correctAnswer: 3, explanation: 'Shuttle launches cost approximately $1.5 billion each.' },
-              { id: 'q5', question: 'Starship cost goal is:', options: ['$1,000/kg', '$500/kg', '~$100/kg', '$10/kg'], correctAnswer: 2, explanation: 'Starship aims for ~$100/kg to LEO - revolutionary if achieved.' }
-            ]
-          }
-        },
-        {
-          id: 'systems-engineering',
-          title: 'Systems Engineering',
-          duration: '30 min',
-          xp: 175,
-          description: 'Managing rocket complexity',
-          aiTutor: true,
-          introduction: `A rocket is a system of systems - propulsion, structures, avionics, and more, all working together. Systems engineering ensures all pieces fit together and the whole vehicle meets requirements.`,
-          sections: [
-            {
-              title: 'Systems Engineering Process',
-              content: `**The V-Model:**
-Left side (decomposition):
-- System requirements
-- Subsystem requirements
-- Component requirements
-- Detailed design
-
-Right side (integration):
-- Component testing
-- Subsystem testing
-- System testing
-- Mission operations
-
-**Key Activities:**
-- Requirements management
-- Interface control
-- Configuration management
-- Risk management
-- Technical reviews`
-            },
-            {
-              title: 'Interface Management',
-              content: `**Why Interfaces Matter:**
-Most problems occur at interfaces!
-- Mechanical fit
-- Electrical compatibility
-- Data formats
-- Thermal interactions
-
-**Interface Control Document (ICD):**
-- Defines all interfaces
-- Owned by systems engineering
-- Controlled changes only
-- Both sides must agree
-
-**Example Interfaces:**
-- Stage 1 ↔ Stage 2
-- Avionics ↔ Propulsion
-- Vehicle ↔ Ground systems
-- Payload ↔ Vehicle
-
-**N² Diagram:**
-Matrix showing all interfaces.
-Helps identify missing or conflicting interfaces.`
-            },
-            {
-              title: 'Risk Management',
-              content: `**Risk = Probability × Consequence**
-
-**Risk Categories:**
-- Technical (will it work?)
-- Schedule (will it be on time?)
-- Cost (will it be affordable?)
-- Safety (will anyone get hurt?)
-
-**Risk Process:**
-1. Identify risks
-2. Assess probability and impact
-3. Develop mitigations
-4. Track and update
-
-**Risk Matrix:**
-| | Low Impact | High Impact |
-|---|---|---|
-| High Prob | Medium | High |
-| Low Prob | Low | Medium |
-
-**Mitigation Strategies:**
-- Accept (low risks)
-- Mitigate (reduce probability/impact)
-- Transfer (insurance)
-- Avoid (change design)`
-            }
-          ],
-          keyTakeaways: [
-            'V-model guides decomposition and integration',
-            'Most problems occur at interfaces',
-            'ICDs define and control all interfaces',
-            'Risk management identifies and mitigates threats'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Most rocket problems occur at:', options: ['Engines', 'Interfaces', 'Structures', 'Software'], correctAnswer: 1, explanation: 'Interface issues are the most common source of problems.' },
-              { id: 'q2', question: 'ICD stands for:', options: ['Internal Component Design', 'Interface Control Document', 'Integrated Circuit Device', 'Initial Concept Definition'], correctAnswer: 1, explanation: 'Interface Control Document defines all interfaces.' },
-              { id: 'q3', question: 'Risk equals:', options: ['Probability only', 'Consequence only', 'Probability × Consequence', 'Cost'], correctAnswer: 2, explanation: 'Risk = Probability × Consequence (likelihood × impact).' },
-              { id: 'q4', question: 'The V-model left side is:', options: ['Integration', 'Decomposition', 'Testing', 'Operations'], correctAnswer: 1, explanation: 'Left side decomposes requirements; right side integrates and tests.' },
-              { id: 'q5', question: 'N² diagram shows:', options: ['Cost breakdown', 'All interfaces', 'Schedule', 'Risk matrix'], correctAnswer: 1, explanation: 'N² (N-squared) diagram maps all system interfaces.' }
-            ]
-          }
-        },
-        {
-
-          id: 'reusability-design',
-          title: 'Design for Reusability',
-          duration: '30 min',
-          xp: 175,
-          description: 'Making rockets fly again',
-          aiTutor: true,
-          introduction: `Reusability is revolutionizing spaceflight economics. But designing a rocket to fly multiple times requires different thinking than expendable vehicles. Every system must survive, be inspectable, and be refurbishable.`,
-          sections: [
-            {
-              title: 'Reusability Requirements',
-              content: `**Design Life:**
-- Expendable: 1 flight (~10 minutes)
-- Reusable: 10-100+ flights
-- Must survive repeated stress cycles
-
-**Key Challenges:**
-- Thermal cycling (ambient → 3,400K → ambient)
-- Mechanical fatigue
-- Corrosion and contamination
-- Wear items
-
-**Design Margins:**
-- Higher safety factors
-- Operate below maximum capability
-- Reserve for degradation
-
-**Falcon 9 Targets:**
-- First stage: 10+ flights (achieved 20+)
-- Engines: 10+ firings
-- Fairings: 2+ flights`
-            },
-            {
-              title: 'Inspection & Refurbishment',
-              content: `**Between-Flight Inspection:**
-- Visual inspection
-- Borescope (internal)
-- Non-destructive testing
-- Data analysis from flight
-
-**Refurbishment:**
-- Replace wear items
-- Clean and inspect
-- Functional testing
-- Typically 2-4 weeks turnaround
-
-**What Gets Replaced:**
-- Seals and gaskets
-- Pyrotechnics
-- Consumables
-- Damaged components
-
-**What Gets Reused:**
-- Engines (with inspection)
-- Tanks
-- Structures
-- Avionics (mostly)`
-            },
-            {
-              title: 'Recovery Systems',
-              content: `**Propulsive Landing (Falcon 9):**
-- Boostback burn
-- Entry burn
-- Landing burn
-- Grid fins for steering
-- Landing legs
-
-**Parachute Recovery:**
-- Fairings use parachutes
-- Simpler but less precise
-- Water landing possible
-
-**Catch Systems (Starship):**
-- Tower catches booster
-- No landing legs needed
-- Saves mass
-- Requires precision
-
-**Trade-offs:**
-- Propulsive: Precise but uses fuel
-- Parachute: Simple but imprecise
-- Catch: Mass-efficient but complex`
-            }
-          ],
-          keyTakeaways: [
-            'Reusable rockets need 10-100x design life of expendable',
-            'Inspection and refurbishment between flights is critical',
-            'Propulsive landing enables precise, rapid reuse',
-            'Catch systems save mass but require extreme precision'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Falcon 9 first stage has achieved:', options: ['5 flights', '10 flights', '20+ flights', '100 flights'], correctAnswer: 2, explanation: 'Falcon 9 boosters have flown 20+ times.' },
-              { id: 'q2', question: 'Typical refurbishment time is:', options: ['1 day', '2-4 weeks', '6 months', '1 year'], correctAnswer: 1, explanation: 'Falcon 9 turnaround is typically 2-4 weeks.' },
-              { id: 'q3', question: 'Starship booster recovery uses:', options: ['Parachutes', 'Propulsive landing with legs', 'Tower catch', 'Water landing'], correctAnswer: 2, explanation: 'Mechazilla tower catches Super Heavy booster.' },
-              { id: 'q4', question: 'Reusable design requires:', options: ['Lower safety factors', 'Higher safety factors', 'Same as expendable', 'No safety factors'], correctAnswer: 1, explanation: 'Reusable vehicles need higher margins for repeated use.' },
-              { id: 'q5', question: 'Fairings are recovered using:', options: ['Propulsive landing', 'Parachutes', 'Helicopter catch', 'Not recovered'], correctAnswer: 1, explanation: 'Falcon 9 fairings use parachutes and are caught or water-landed.' }
-            ]
-          }
-        },
-        {
-          id: 'future-propulsion',
-          title: 'Future Propulsion Technologies',
-          duration: '30 min',
-          xp: 175,
-          description: 'Beyond chemical rockets',
-          aiTutor: true,
-          introduction: `Chemical rockets have taken us to the Moon and Mars, but they have fundamental limits. Future propulsion technologies could enable faster travel, larger payloads, and missions to the outer solar system.`,
-          sections: [
-            {
-              title: 'Electric Propulsion',
-              content: `**Ion Engines:**
-- Accelerate ions with electric field
-- Isp: 1,500-10,000 seconds!
-- Thrust: Very low (mN to N)
-- Used: Deep space missions
-
-**Hall Thrusters:**
-- Similar to ion, different geometry
-- Isp: 1,500-3,000 s
-- Higher thrust than ion
-- Used: Starlink satellites
-
-**Limitations:**
-- Low thrust (can't launch from Earth)
-- Need large solar arrays or nuclear power
-- Long trip times
-
-**Applications:**
-- Station keeping
-- Orbit raising
-- Interplanetary missions
-- Starlink uses Hall thrusters`
-            },
-            {
-              title: 'Nuclear Propulsion',
-              content: `**Nuclear Thermal (NTR):**
-- Nuclear reactor heats propellant
-- Isp: 800-1000 seconds
-- Thrust: High (like chemical)
-- Could halve Mars trip time!
-
-**Nuclear Electric (NEP):**
-- Reactor generates electricity
-- Powers ion/Hall thrusters
-- Very high Isp, low thrust
-- Good for outer planets
-
-**Challenges:**
-- Safety concerns
-- Political issues
-- Testing difficulties
-- Public perception
-
-**DRACO Program:**
-- NASA/DARPA nuclear thermal demo
-- Planned for 2027
-- Could enable fast Mars transit`
-            },
-            {
-              title: 'Advanced Concepts',
-              content: `**Solar Sails:**
-- Pushed by sunlight pressure
-- No propellant needed!
-- Very low acceleration
-- Good for small probes
-
-**Laser Propulsion:**
-- Ground laser pushes spacecraft
-- Could achieve very high speeds
-- Breakthrough Starshot concept
-- 20% light speed to Alpha Centauri?
-
-**Fusion Propulsion:**
-- If we can make fusion work...
-- Isp: 10,000-1,000,000 seconds
-- Could enable interstellar travel
-- Still decades away
-
-**Space Elevators:**
-- Cable from Earth to orbit
-- Climb up instead of rocket
-- Requires materials we don't have yet
-- Carbon nanotubes promising`
-            }
-          ],
-          keyTakeaways: [
-            'Electric propulsion: High Isp but low thrust',
-            'Nuclear thermal could halve Mars trip time',
-            'Solar sails need no propellant',
-            'Fusion and space elevators are far-future technologies'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Ion engine Isp is:', options: ['300 s', '1,000 s', '1,500-10,000 s', '100,000 s'], correctAnswer: 2, explanation: 'Ion engines achieve 1,500-10,000 s Isp - far higher than chemical.' },
-              { id: 'q2', question: 'Starlink satellites use:', options: ['Chemical rockets', 'Hall thrusters', 'Nuclear', 'Solar sails'], correctAnswer: 1, explanation: 'Starlink uses krypton Hall thrusters for orbit maintenance.' },
-              { id: 'q3', question: 'Nuclear thermal Isp is approximately:', options: ['300 s', '500 s', '800-1000 s', '10,000 s'], correctAnswer: 2, explanation: 'NTR achieves 800-1000 s - about 2x chemical rockets.' },
-              { id: 'q4', question: 'Solar sails are pushed by:', options: ['Solar wind', 'Sunlight pressure', 'Magnetic fields', 'Gravity'], correctAnswer: 1, explanation: 'Photon pressure from sunlight pushes solar sails.' },
-              { id: 'q5', question: 'DRACO nuclear demo is planned for:', options: ['2024', '2027', '2035', '2050'], correctAnswer: 1, explanation: 'NASA/DARPA DRACO nuclear thermal demo targeted for 2027.' }
-            ]
-          }
-        },
-        {
-          id: 'career-paths',
-          title: 'Aerospace Career Paths',
-          duration: '25 min',
-          xp: 150,
-          description: 'Your future in rocket engineering',
-          aiTutor: true,
-          introduction: `The space industry is booming with opportunities. From SpaceX to NASA to startups, there's never been a better time to pursue a career in aerospace. Let's explore the paths available to you.`,
-          sections: [
-            {
-              title: 'Engineering Disciplines',
-              content: `**Propulsion Engineer:**
-- Design engines and propellant systems
-- Combustion, turbomachinery, nozzles
-- Degrees: Aerospace, Mechanical
-
-**Structures Engineer:**
-- Design tanks, airframes, mechanisms
-- Stress analysis, materials
-- Degrees: Aerospace, Mechanical, Civil
-
-**GNC Engineer:**
-- Guidance, navigation, control
-- Algorithms, simulation
-- Degrees: Aerospace, EE, CS
-
-**Avionics Engineer:**
-- Flight computers, sensors, software
-- Embedded systems
-- Degrees: EE, CS, Aerospace
-
-**Systems Engineer:**
-- Integration, requirements, interfaces
-- Big picture thinking
-- Degrees: Any engineering + experience`
-            },
-            {
-              title: 'Companies & Organizations',
-              content: `**Commercial:**
-- SpaceX (Hawthorne, TX, FL)
-- Blue Origin (Kent, WA; TX)
-- Rocket Lab (Long Beach, NZ)
-- Relativity Space (Long Beach)
-- Many startups!
-
-**Government:**
-- NASA (multiple centers)
-- Space Force
-- National labs
-
-**Traditional Aerospace:**
-- Boeing
-- Lockheed Martin
-- Northrop Grumman
-- ULA
-
-**International:**
-- ESA, JAXA, ISRO
-- Arianespace, ROSCOSMOS
-- Many national programs`
-            },
-            {
-              title: 'Getting Started',
-              content: `**Education:**
-- Bachelor's in engineering (minimum)
-- Master's helpful but not required
-- PhD for research positions
-
-**Skills to Develop:**
-- Programming (Python, C/C++)
-- CAD (SolidWorks, CATIA)
-- Analysis tools (MATLAB, FEA)
-- Hands-on building
-
-**Experience:**
-- Internships (apply early!)
-- Student rocket teams
-- Personal projects
-- Research opportunities
-
-**Tips:**
-- Network at conferences
-- Follow industry news
-- Build things!
-- Apply widely
-- Persistence pays off`
-            }
-          ],
-          keyTakeaways: [
-            'Multiple engineering disciplines contribute to rockets',
-            'Commercial space is growing rapidly with many opportunities',
-            'Bachelors degree is minimum; hands-on experience valuable',
-            'Student teams and internships are great entry points'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'GNC stands for:', options: ['General Navigation Computer', 'Guidance Navigation Control', 'Ground Network Center', 'Global Navigation Constellation'], correctAnswer: 1, explanation: 'GNC = Guidance, Navigation, and Control engineering.' },
-              { id: 'q2', question: 'SpaceX headquarters is in:', options: ['Houston', 'Hawthorne, CA', 'Seattle', 'Washington DC'], correctAnswer: 1, explanation: 'SpaceX HQ is in Hawthorne, California.' },
-              { id: 'q3', question: 'Minimum education for aerospace engineer:', options: ['High school', 'Associates', 'Bachelors', 'Masters'], correctAnswer: 2, explanation: 'Bachelors degree in engineering is the minimum requirement.' },
-              { id: 'q4', question: 'Best way to gain experience as a student:', options: ['Just study', 'Internships and rocket teams', 'Wait until graduation', 'Online courses only'], correctAnswer: 1, explanation: 'Internships and student rocket teams provide invaluable experience.' },
-              { id: 'q5', question: 'Which is NOT a commercial space company?', options: ['SpaceX', 'Blue Origin', 'NASA', 'Rocket Lab'], correctAnswer: 2, explanation: 'NASA is a government agency, not a commercial company.' }
-            ]
-          }
+  color: 'from-blue-600 to-indigo-700',
+  units: [{
+    id: 'design-engineering',
+    title: 'Systems Engineering & Design',
+    description: 'The process of designing a rocket from a blank sheet of paper',
+    lessons: [
+      {
+        id: 'systems-engineering',
+        title: 'Systems Engineering: The V-Model',
+        duration: '10 min', xp: 200,
+        description: 'Managing complexity in a machine with millions of parts',
+        aiTutor: true,
+        introduction: "A rocket isn't just an engine with a tank attached. It's a complex system of systems. Systems Engineering is the discipline that ensures when the engine vibrates, it doesn't shake the delicate satellite or snap the avionics wires. It is the glue that holds a multi-billion dollar project together.",
+        sections: [
+          { title: '🎯 Requirements: The "Shall" Statements', content: "**Starting with the End in Mind**\n\nEvery rocket starts with a set of **Requirements**. In engineering, these are written as 'The vehicle SHALL...' statements.\n\n**Example Requirements:**\n- The vehicle SHALL lift 20,000 kg to Low Earth Orbit.\n- The vehicle SHALL withstand 4G of longitudinal acceleration.\n- The avionics SHALL operate in temperatures from -40°C to +85°C.\n\n**Derived Requirements:**\nIf the whole rocket must lift 20 tons, the Systems Engineer 'derives' requirements for the parts: 'The engine SHALL produce 800 kN of thrust.' This creates a hierarchy where every bolt's existence is justified by a requirement." },
+          { title: '🔧 The V-Model: Design to Verification', content: "**The Lifecycle of a Rocket**\n\nSystems engineering follows the 'V-Model':\n\n**The Left Side (Decomposition):**\n1. Concept of Operations (What's the mission?)\n2. High-Level Requirements (The whole rocket)\n3. Detailed Design (The individual parts)\n\n**The Bottom (Implementation):**\nBuild the parts.\n\n**The Right Side (Integration & Verification):**\n1. Component Test (Does the valve open?)\n2. Sub-system Test (Does the engine fire?)\n3. System Verification (Does the rocket work as a whole?)\n\n**Verification vs. Validation:**\n- **Verification:** Did we build the system RIGHT? (Does it meet the 800kN requirement?)\n- **Validation:** Did we build the RIGHT system? (Does it actually get the satellite to orbit?)" },
+          { title: '📐 Trade Studies: Choosing the Best Path', content: "**Engineering is the Art of Compromise**\n\nA 'Trade Study' is a formal process for making decisions. \n\n**Example: Choosing a Propellant**\n- **Option A (Kerosene):** Cheap, dense, easy to handle. Lower performance.\n- **Option B (Hydrogen):** High performance, but requires massive tanks and extreme cooling.\n\nEngineers score these options based on **Weightings**: (Cost: 40%, Mass: 30%, Risk: 20%, Schedule: 10%). The result tells them which path is scientifically 'best' for that specific mission. There is no 'best' rocket, only the best rocket for a specific job." },
+          { title: '🚀 Interfaces: Where Systems Meet', content: "**The Danger Zone**\n\nMost failures happen at **Interfaces** — the point where two different teams' work meets. \n\n**Interface Control Documents (ICD):**\nThis is a legal-style contract between sub-systems. \n- **Mechanical ICD:** Exactly where the bolt holes are and what size bolts to use.\n- **Electrical ICD:** How many volts are on Pin 1 of this connector?\n- **Software ICD:** What format is the data packet (JSON? Binary?) and how often is it sent?\n\nIf the Engine team changes a bolt hole by 1mm and doesn't update the ICD, the Tank team won't know, and the rocket can't be assembled. Systems Engineering manages these 'Handshakes'." },
+          { title: '🧪 Systems Engineering Practice', content: "**P1:** Why are 'Shall' statements preferred over 'Must' or 'Will'?\n*Answer: 'Shall' is the legal standard in engineering contracts. It implies a mandatory, testable requirement. 'Will' often implies a statement of fact or future intent, which is harder to hold a contractor to.*\n\n**P2:** If a component fails Verification, what part of the V-Model do you go back to?\n*Answer: You go back across the 'V' to the corresponding Design or Requirement stage on the left side to see if the design was wrong or the requirement was unrealistic.*\n\n**P3:** What is the 'Concept of Operations' (ConOps)?\n*Answer: A high-level description of how the system will be used from start to finish (Launch → Ascent → Deployment → Disposal). It helps everyone understand the big picture before they get lost in the math.*\n\n**P4:** Why do engineers perform 'Mass Margin' analysis?\n*Answer: Because during design, everything gets heavier. Systems engineers track a 'Weight Budget' and keep a ~15% reserve (margin). If the rocket starts getting too heavy, they must 'trade' features or find ways to cut weight elsewhere.*\n\n**P5:** What is an ICD?\n*Answer: Interface Control Document. It defines the electrical, mechanical, and data boundaries between two system components to ensure they fit and work together.*" }
+        ],
+        keyTakeaways: ['Systems Engineering manages the "glue" between complex sub-systems', 'The V-Model traces requirements from concept to final testing', 'Verification checks if specs are met; Validation checks if the goal is achieved', 'Interface Control Documents (ICDs) prevent assembly and communication failures', 'Engineering is about making data-driven compromises (Trade Studies)'],
+        vocabulary: [
+          { term: 'Requirement', definition: 'A mandatory condition or capability that a system must conform to' },
+          { term: 'V-Model', definition: 'System development lifecycle model tracing design to testing' },
+          { term: 'Verification', definition: 'The process of confirming a system meets its specified requirements' },
+          { term: 'ICD', definition: 'Interface Control Document — defines the boundaries between systems' },
+          { term: 'Trade Study', definition: 'Objective evaluation of multiple technical solutions to find the best compromise' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'The primary language of engineering requirements is:', options: ['May', 'Could', 'Shall', 'Should'], correctAnswer: 2, explanation: "'Shall' denotes a mandatory, testable requirement." },
+            { id: 'q2', question: 'Validation answers which question?', options: ['Did we build the system right?', 'Did we build the right system?', 'Is it cheap?', 'Does it look good?'], correctAnswer: 1, explanation: "Validation ensures the final product actually solves the user's problem." },
+            { id: 'q3', question: 'An ICD (Interface Control Document) is used to:', options: ['Design engines', 'Define how components fit together', 'Calculate orbits', 'Buy materials'], correctAnswer: 1, explanation: 'It manages the boundaries and connections between different parts of the system.' },
+            { id: 'q4', question: 'Mass Margin is used because:', options: ['Rockets are too light', 'Components tend to get heavier during design', 'To waste fuel', 'For better stability'], correctAnswer: 1, explanation: 'A mass buffer is necessary to account for the fact that designs get heavier as they become more detailed.' },
+            { id: 'q5', question: 'In the V-Model, the right side represents:', options: ['Design', 'Concept', 'Integration and Testing', 'Manufacturing'], correctAnswer: 2, explanation: 'The left side is design/decomposition; the right side is assembly and verification.' }
+          ]
         }
-      ]
-    }
-  ]
+      },
+      {
+        id: 'mass-budget-balancing',
+        title: 'Mass Budgets & The Tyranny of the KG',
+        duration: '10 min', xp: 200,
+        description: 'Every gram counts: Managing mass properties for stability and performance',
+        aiTutor: true,
+        introduction: "In rocketry, mass is life. Every kilogram added to the structure is a kilogram subtracted from the satellite or the crew's food. This lesson is about the Mass Budget — the most stressful spreadsheet in aerospace engineering.",
+        sections: [
+          { title: '🎯 Dry Mass vs. Wet Mass', content: "**The Weight of Fuel**\n\nA typical rocket (like Falcon 9) is ~90-95% fuel by weight. \n\n- **Dry Mass:** The weight of the empty rocket (metal, engines, computers).\n- **Wet Mass:** Dry mass plus all propellants (Fuel + Oxidizer).\n\n**The Ratio:**\nTo reach orbit, a single-stage rocket generally needs a 'Mass Fraction' of about 0.90 (90% fuel). If the structure is too heavy (Dry Mass is too high), the rocket will run out of fuel before it reaches orbital speed. This is why we use stages — we 'drop' the empty mass as soon as it's useless." },
+          { title: '🔧 Center of Mass (CoM) vs. Center of Pressure (CoP)', content: "**The Stability Balance**\n\nMass isn't just about weight; it's about **Distribution**.\n\n- **Center of Mass (CoM):** The average position of all mass in the rocket. If you balanced the rocket on a finger, this is the point where it wouldn't tip.\n- **Center of Pressure (CoP):** The point where all aerodynamic (wind) forces act. Think of it as the 'Center of the Wind.'\n\n**The Rule of Stability:**\nThe CoM MUST be **higher** (closer to the nose) than the CoP. If the weight is at the back and the 'wind catcher' (fins) is at the front, the rocket will flip immediately. As fuel burns, the CoM moves. Engineers must ensure the rocket stays stable throughout the entire burn." },
+          { title: '📐 Moment of Inertia: Resistance to Spinning', content: "**Why Long Rockets Turn Slower**\n\nMoment of Inertia (I) is the measure of how hard it is to rotate something. \n\n- A short, fat rocket rotates easily (Low I).\n- A long, skinny rocket is harder to start spinning, but harder to STOP once it starts (High I).\n\n**The Slosh Problem:**\nAs a rocket maneuvers, 400 tons of liquid oxygen can 'slosh' inside the tanks. This moves the CoM and changes the Moment of Inertia dynamically. High-speed computers must calculate these changes in real-time to adjust the engine steering (gimbals) accordingly." },
+          { title: '🚀 Mass Margin: The Buffer', content: "**Accounting for Error**\n\nAt the start of a project, engineers use 'Estimated Mass.' As they actually build the part, it becomes 'Measured Mass.' \n\nA Systems Engineer manages the **Mass Margin**: \n- Concept phase: 20-30% margin.\n- Design phase: 10-15% margin.\n- Launch phase: 1-2% margin.\n\nIf the landing legs come in 500kg heavier than the budget, the engineer must find 500kg to cut from the tanks or the avionics. This is a constant game of 'weight loss' optimization." },
+          { title: '🧪 Mass Analysis Practice', content: "**P1:** A rocket has a 500,000 kg wet mass and a 50,000 kg dry mass. What is the Propellant Mass Fraction?\n*Answer: (Wet - Dry) / Wet = 450,000 / 500,000 = 0.90 (or 90%).*\n\n**P2:** If you add heavy fins to the bottom of a rocket, does it become MORE or LESS stable?\n*Answer: MORE stable. Fins at the bottom pull the Center of Pressure (CoP) backward, increasing the distance between CoM and CoP (the 'static margin').*\n\n**P3:** Why does the Center of Mass move during flight?\n*Answer: Because fuel (which is 90% of the mass) is being consumed at the bottom of the tanks and ejected out the engine nozzle. The balance point of the vehicle shifts upward or downward depending on tank design.*\n\n**P4:** What is the 'Ballast' in a rocket?\n*Answer: Ballast is dead weight (like steel plates) added intentionally to adjust the Center of Mass or to simulate a payload when the real one isn't ready. Adding ballast is a 'last resort' because it wastes performance.*\n\n**P5:** If a rocket is 70 meters tall, is it harder to 'pitch' than a 10-meter rocket?\n*Answer: Yes. The Moment of Inertia increases with the square of the distance (I = m * r^2). Long rockets require much more gimbal force to rotate.*" }
+        ],
+        keyTakeaways: ['The Propellant Mass Fraction (90%+) is critical for reaching orbit', 'Stability requires Center of Mass (CoM) to be above Center of Pressure (CoP)', 'Moment of Inertia determines how much force is needed to steer the rocket', 'Propellant slosh dynamically changes the vehicle\'s center of gravity', 'Mass Margin accounts for the inevitable "weight gain" during engineering design'],
+        vocabulary: [
+          { term: 'Dry Mass', definition: 'The mass of a rocket without any propellant' },
+          { term: 'Mass Fraction', definition: 'The ratio of propellant mass to total mission mass' },
+          { term: 'Moment of Inertia', definition: 'A property which describes how much resistance an object has to rotational change' },
+          { term: 'Static Margin', definition: 'The distance between the Center of Mass and Center of Pressure' },
+          { term: 'Slosh', definition: 'Movement of liquid propellant inside tanks, which affects stability' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'For a stable flight, the Center of Pressure (CoP) must be:', options: ['Above the CoM', 'Below the CoM', 'At the very tip', 'Exactly aligned with CoM'], correctAnswer: 1, explanation: 'CoP below CoM (like a dart) provides aerodynamic stability.' },
+            { id: 'q2', question: 'About what percentage of a rocket is fuel?', options: ['10%', '50%', '90%', '99%'], correctAnswer: 2, explanation: 'Most orbital rockets are 90-95% propellant.' },
+            { id: 'q3', question: 'Moment of Inertia resists which motion?', options: ['Forward speed', 'Falling', 'Rotation', 'Vibration'], correctAnswer: 2, explanation: 'Inertia resists changes in rotation (Roll, Pitch, Yaw).' },
+            { id: 'q4', question: 'Adding fins to the tail of a rocket:', options: ['Increases CoM', 'Lowers CoP', 'Increases CoP', 'Makes it lighter'], correctAnswer: 1, explanation: 'Fins move the Center of Pressure toward the rear of the vehicle.' },
+            { id: 'q5', question: 'Propellant slosh is dangerous because it:', options: ['Cools the fuel', 'Moves the Center of Mass unexpectedly', 'Increases thrust', 'Makes the rocket heavier'], correctAnswer: 1, explanation: 'Moving liquid can destabilize a rocket by shifting the balance point.' }
+          ]
+        }
+      },
+      {
+        id: 'aerodynamic-analysis',
+        title: 'Aerodynamics: Flying Through the Soup',
+        duration: '10 min', xp: 200,
+        description: 'From Mach 1 to Max-Q: The invisible forces that can crush a rocket',
+        aiTutor: true,
+        introduction: "Rockets don't fly in a vacuum until they leave the earth. For the first two minutes, they are fighting an ocean of air. At high speeds, air becomes as hard as concrete. This lesson is about how we design rockets to survive the Aero phase of flight.",
+        sections: [
+          { title: '🎯 Mach Numbers and Shockwaves', content: "**Breaking the Sound Barrier**\n\nAs a rocket accelerates, it quickly approaches the speed of sound (**Mach 1** ~343 m/s). \n\n**Transonic Region (Mach 0.8 - 1.2):**\nThis is the most dangerous aerodynamic phase. Air moves around the rocket's nose at supersonic speeds while it's still subsonic, creating random, moving shockwaves. This can cause 'buffeting' — intense vibration that can literally shake a rocket apart. \n\n**Supersonic (Mach 1.2+):**\nOnce fully supersonic, a 'Bow Shock' forms at the tip. The air can't move out of the way fast enough, so it compresses into a thin, hot wave. Everything behind this wave must be designed to withstand that pressure." },
+          { title: '🔧 Max-Q: The Breaking Point', content: "**Maximum Dynamic Pressure**\n\n**q = 0.5 * rho * v^2**\n\n- rho: Air Density (gets thinner as you go up)\n- v: Velocity (gets faster as you burn)\n\n**Max-Q** is the moment when these two balance out at their highest point. The air is pushing as hard as it possibly can against the rocket. \n\n**The SpaceX Trick:**\nDuring Max-Q (around 1 minute into flight), SpaceX actually **throttles down** the Merlin engines to reduce acceleration. Once they pass the thickest air and dynamic pressure drops, they throttle back up to 100%. This saves the rocket from having to be built extra heavy just to survive 30 seconds of thin-air wind." },
+          { title: '📐 Drag Coefficients (Cd)', content: "**Slippery Shapes**\n\nA rocket's shape is optimized for minimum drag. \n- **The Nose Cone:** The 'Ogive' shape (a curved cone) is the most efficient for supersonic speeds. \n- **Interstage:** The gap between the first and second stage must be smooth. \n- **Skin Friction:** At high speeds, even the roughness of the paint causes drag and heat.\n\n**Total Drag:**\nDrag subtracts from your thrust. An 'un-aerodynamic' rocket requires more fuel to do the same job. But the trade-off is often complexity: the more complex the shape, the harder it is to build." },
+          { title: '🚀 Atmospheric Heating: The Fire of Ascent', content: "**Air as a Blowtorch**\n\nAs you fly at Mach 5 through the atmosphere, air molecules don't have time to move. They collide with the rocket skin, generating immense heat through **Compression**. \n\nThe rocket's 'Nose Fairing' must be able to withstand ~600°C without melting or burning the satellite inside. Most fairings are made of aluminum honeycomb or carbon fiber with specialized thermal white paint to reflect heat and withstand the friction of launch." },
+          { title: '🧪 Aerodynamics Practice', content: "**P1:** Why are rocket fins usually very thin and sharp compared to airplane wings?\n*Answer: Airplane wings are designed for subsonic lift (thick for air flow). Rocket fins are designed for supersonic stability (thin to minimize drag and shockwave resistance).*\n\n**P2:** If you double your speed, how much does the dynamic pressure (q) increase?\n*Answer: Speed is squared (v^2), so doubling speed increases pressure by 4 TIMES. This is why Max-Q comes so quickly as the rocket speeds up.*\n\n**P3:** At the top of the atmosphere, density is near zero. What is the dynamic pressure even if you are going Mach 20?\n*Answer: Near zero. If there are no air molecules (rho), there is no pressure (q). This is why ICBMs and rockets can fly thousands of km/h in space without heating up.*\n\n**P4:** What is 'Buffeting'?\n*Answer: Strong, turbulent vibrations caused by moving shockwaves during the transonic phase (near Mach 1). It's like driving a car over a very bumpy road at high speed.*\n\n**P5:** Why does the fairing separate as soon as the rocket leaves the atmosphere?\n*Answer: To save weight. The fairing (which can weigh 1,000kg+) is only needed to protect the payload from air pressure and heat. Once in space, it is 'dead weight' that reduces mission performance.*" }
+        ],
+        keyTakeaways: ['Transonic buffeting occurs near Mach 1 and causes intense vibration', 'Max-Q is the moment of maximum physical stress on the rocket structure', 'Rockets throttle down during Max-Q to reduce the "q" load', 'Shockwaves at supersonic speeds compress and heat the air', 'Fairings are jettisoned in space to increase fuel efficiency (payload capacity)'],
+        vocabulary: [
+          { term: 'Max-Q', definition: 'Maximum Dynamic Pressure — the peak aerodynamic load on the vehicle' },
+          { term: 'Mach Number', definition: 'The ratio of an object\'s speed to the local speed of sound' },
+          { term: 'Ogive', definition: 'A rounded, pointed geometric shape used for rocket nose cones' },
+          { term: 'Transonic', definition: 'The speed range (Mach 0.8-1.2) where airflow is both sub- and supersonic' },
+          { term: 'Dynamic Pressure', definition: 'The kinetic energy of the air per unit volume (1/2 rho v^2)' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'Max-Q occurs when which two values reach their combined peak?', options: ['Thrust and Mass', 'Altitude and Speed', 'Air Density and Velocity', 'Heat and Pressure'], correctAnswer: 2, explanation: 'Dynamic pressure is a function of both density (rho) and velocity (v).' },
+            { id: 'q2', question: 'To survive Max-Q, many rockets do what?', options: ['Throttle down', 'Release fuel', 'Turn off computers', 'Expand the fairing'], correctAnswer: 0, explanation: 'Throttling down reduces the stress on the structure until they reach thinner air.' },
+            { id: 'q3', question: 'Mach 1 represents:', options: ['The speed of light', 'The speed of sound', 'Orbital velocity', 'Escape velocity'], correctAnswer: 1, explanation: 'Mach 1 is the speed of sound (~343 m/s in air).' },
+            { id: 'q4', question: 'Why is the "Transonic" region dangerous?', options: ['No air to breathe', 'Engines stop working', 'Moving shockwaves cause intense buffeting', 'Gravity is stronger'], correctAnswer: 2, explanation: 'The mixture of subsonic and supersonic flow creates turbulent shockwaves.' },
+            { id: 'q5', question: 'Fairings are jettisoned (dropped) when:', options: ['On the launchpad', 'During Max-Q', 'When in the vacuum of space', 'Never'], correctAnswer: 2, explanation: 'Once air pressure is gone, the heavy fairing is no longer needed to protect the satellite.' }
+          ]
+        }
+      },
+      {
+        id: 'safety-factors-margins',
+        title: 'Safety Factors & Reliability',
+        duration: '10 min', xp: 200,
+        description: 'How strong is "strong enough"? Designing for failure without the weight',
+        aiTutor: true,
+        introduction: "In bridge building, you might make it 5 times stronger than needed. In rocketry, if you make it 5 times stronger, it will never leave the ground. Engineers must balance Safety with Mass. This is the study of Safety Factors and the statistics of reliability.",
+        sections: [
+          { title: '🎯 Factor of Safety (FoS)', content: "**The Definition of Confidence**\n\n**FoS = Failure Load / Expected Load**\n\n- **Aviation Standard:** 1.5 (Things fail at 150% of the maximum expected load).\n- **Rocket Standard:** 1.1 to 1.25. (Extremely tight! High precision required).\n- **Human-Rated Standard:** 1.4 (Increased safety for capsules carrying astronauts).\n\nIf a tank is expected to hold 100 PSI, and the FoS is 1.25, it must be designed to burst at 125 PSI. Any stronger is 'wasted weight.'" },
+          { title: '🔧 Margin of Safety (MoS)', content: "**The Engineer's Scorecard**\n\nMargin of Safety tells you how much 'extra' strength you have left after accounting for your Safety Factor.\n\n**MoS = Actual Strength / (Safety Factor * Max Load) - 1**\n\n- **Positive Margin (>0):** The part is safe.\n- **Zero Margin (0):** The part is exactly as strong as the requirement (Perfect Engineering).\n- **Negative Margin (<0):** The part will fail. Must redesign.\n\nAerospace engineers aim for very small positive margins (e.g., +0.02). Large positive margins (+5.0) indicate a part that is 'overbuilt' and too heavy." },
+          { title: '📐 Redundancy: 1+1 = Survival', content: "**Dealing with Statistics**\n\nEverything has a 'Reliability' (e.g., 99%). If a rocket has 100 parts with 99% reliability, the chance of the WHOLE rocket working is 0.99^100 = 36.6%. Too low!\n\n**Types of Redundancy:**\n- **Active Redundancy:** Both systems run at once (Triple Flight Computers).\n- **Standby Redundancy:** Backup system turns on only if Primary fails (Auxiliary batteries).\n- **Dissimilar Redundancy:** Two different ways to do the same thing (Parachutes + Thrusters) to prevent a 'common cause' failure." },
+          { title: '🚀 FMEA: Thinking Like a Pessimist', content: "**Failure Mode and Effects Analysis**\n\nEngineers perform an FMEA for every single part. They ask three questions:\n1. **How can it fail?** (e.g., 'The seal leaks').\n2. **What is the effect?** (e.g., 'Fire in the engine bay').\n3. **How likely is it?** (1 to 10 scale).\n\nThey then calculate a **Risk Priority Number (RPN)**. Any part with a high RPN (High risk + Bad effect) MUST be redesigned with more redundancy or a higher Safety Factor." },
+          { title: '🧪 Safety Practice', content: "**P1:** A beam handles 1,000kg. To have a Factor of Safety of 1.4, what load must it fail at during testing?\n*Answer: 1,000 * 1.4 = 1,400 kg.*\n\n**P2:** If an engineer calculates a Margin of Safety of -0.1, what does that mean?\n*Answer: The part is roughly 10% too weak. It will likely fail during service and needs to be thickened or made of stronger material.*\n\n**P3:** Why can't we just use a Safety Factor of 10 to be 'Super Safe'?\n*Answer: Mass. A Safety Factor of 10 would make the rocket tanks 10x thicker and heavier. Such a rocket would be too heavy to even lift itself off the pad, let alone reach orbit.*\n\n**P4:** What is 'Human-Rating'?\n*Answer: A certification given to rockets (like Falcon 9 + Crew Dragon) that meet higher safety standards, have more redundancy, and undergo much more intense testing than 'cargo-only' rockets.*\n\n**P5:** If you have two independent batteries, each with a 10% failure rate, what is the chance of TOTAL power failure?\n*Answer: 0.1 * 0.1 = 0.01 (1%). This shows how redundancy dramatically improves reliability even with imperfect parts.*" }
+        ],
+        keyTakeaways: ['Rockets use tight Safety Factors (1.25) to minimize weight', 'Margin of Safety measures "extra" strength relative to requirements', 'Redundancy protects against individual component failures', 'FMEA identifies and prioritizes the most dangerous risks', 'Human-rated vehicles require higher safety margins (1.4 FoS)'],
+        vocabulary: [
+          { term: 'Factor of Safety', definition: 'The ratio of a material\'s strength to the maximum expected stress' },
+          { term: 'Margin of Safety', definition: 'The amount of safety factor remaining beyond requirements' },
+          { term: 'FMEA', definition: 'Failure Mode and Effects Analysis — a systematic risk-assessment method' },
+          { term: 'Human-Rated', definition: 'Certified as safe enough for human transportation' },
+          { term: 'Common Cause Failure', definition: 'One event that causes multiple redundant systems to fail at once' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'A typical aerospace Factor of Safety is:', options: ['1.25', '2.0', '5.0', '10.0'], correctAnswer: 0, explanation: 'Tight margins (1.25 to 1.5) are necessary to keep the vehicle light enough to fly.' },
+            { id: 'q2', question: 'A Margin of Safety of ZERO means:', options: ['The part will break', 'The part is perfectly engineered to requirements', 'The part is too heavy', 'The part has no mass'], correctAnswer: 1, explanation: 'Zero margin means it meets the safety factor exactly with no extra wasted weight.' },
+            { id: 'q3', question: 'FMEA is used to:', options: ['Design engines', 'Identify and mitigate potential failures', 'Calculate orbits', 'Hire astronauts'], correctAnswer: 1, explanation: 'Failure Mode and Effects Analysis is the standard method for finding risks.' },
+            { id: 'q4', question: 'Two redundant sensors with 90% reliability have a combined reliability of:', options: ['90%', '99%', '81%', '50%'], correctAnswer: 1, explanation: 'Failure chance is 10% * 10% = 1%. Success chance = 100 - 1 = 99%.' },
+            { id: 'q5', question: 'Redundancy that uses two different technologies is called:', options: ['Dissimilar Redundancy', 'Active Redundancy', 'Slow Redundancy', 'Weak Redundancy'], correctAnswer: 0, explanation: 'Dissimilar redundancy prevents one bug or physics error from killing both systems.' }
+          ]
+        }
+      },
+      {
+        id: 'simulation-software-tools',
+        title: 'Simulation: Flying Before You Build',
+        duration: '10 min', xp: 200,
+        description: 'CFD, FEA, and GMAT — the software that replaces expensive failed launches',
+        aiTutor: true,
+        introduction: "In the 1960s, if you wanted to know if a rocket would explode, you built it and watched. Today, we fly a rocket 10,000 times on a computer before the first piece of metal is cut. This is the world of engineering simulation.",
+        sections: [
+          { title: '🎯 FEA: Structural Simulation', content: "**Finite Element Analysis**\n\nHow do you know if a tank will burst under 100 tons of weight? You divide the 3D model of the tank into millions of tiny triangles (elements). \n\n**The Computer Calculates:**\n- Stress at every single corner (node) of those triangles.\n- Heat flow from the engine into the metal.\n- Vibrations (resonance) that might shake things loose.\n\n**Result:** Engineers see a 'Heat Map' of stress. If one spot turns red, they know they need a thicker weld there. If it stays blue, they can cut some metal away to save weight." },
+          { title: '🔧 CFD: Aerodynamic Simulation', content: "**Computational Fluid Dynamics**\n\nCFD simulates how air (or liquid fuel) flows. It is a Virtual Wind Tunnel.\n\n**Applications:**\n- **External Aero:** Calculating Max-Q and aerodynamic drag.\n- **Internal Flow:** Simulating how fuel enters the combustion chamber through the injector. \n- **Thermal:** Mapping the 3,000°C exhaust gas to see if it will melt the nozzle.\n\nCFD requires supercomputers. A single 10-second simulation of an engine fire can take weeks for a computer to calculate." },
+          { title: '📐 GMAT & Mission Design', content: "**Calculating the Path**\n\n**Software (GMAT, STK, Kerbal!):**\nThese tools calculate the physics of orbital mechanics. They account for the gravity of the Earth, Moon, and Sun, and even the 'pressure' of light from the Sun hitting the rocket. \n\nEngineers use these to plan the 'Transfer Maneuvers.' They determine exactly which day and which second the rocket must launch to reach Mars with the least amount of fuel. This 'Mission Analysis' determines the fuel requirements for the entire vehicle design." },
+          { title: '🚀 MBSE: The Modern Project Map', content: "**Model-Based Systems Engineering**\n\nOlder rockets were designed with thousands of paper blueprints. Modern rockets (like Starship) use **MBSE**. \n\nThe 'Digital Twin' is a central model that connects everything. If the Engine team increases the engine mass in the 3D model, the Mission team's simulation AUTOMATICALLY updates the available payload capacity on their screen. MBSE ensures the System of Systems stays in sync without thousands of meetings." },
+          { title: '🧪 Simulation Practice', content: "**P1:** Why is FEA (Finite Element Analysis) better than hand calculations?\n*Answer: Hand calculations work for simple shapes like a tube. FEA works for complex, real-world shapes like a engine mount with holes, welds, and changing thicknesses that are impossible to solve on paper.*\n\n**P2:** What is a 'Digital Twin'?\n*Answer: A highly accurate virtual model of the rocket. As the real rocket flies, sensors feed data back to the digital twin, allowing engineers to see if the real vehicle is behaving exactly as predicted.*\n\n**P3:** Why is CFD (Fluid Dynamics) so computationally expensive?\n*Answer: Fluids are chaotic (turbulence). To be accurate, the computer must solve the Navier-Stokes equations for millions of small volumes of air, tracking pressure and temperature trillions of times over.*\n\n**P4:** If a simulation says the rocket will fail, but the math on paper says it's safe, which do you trust?\n*Answer: Usually neither! You investigate the discrepancy. Simulations are only as good as their models (Garbage In, Garbage Out). You use a 'Validation Test' to see which one matches reality.*\n\n**P5:** What is 'Monte Carlo' simulation in rocketry?\n*Answer: Running the same launch 1,000 times with random variations (e.g., wind at 5mph, 10mph, 15mph). If the rocket reaches orbit 995 times out of 1,000, you have a 99.5% confidence in the launch window.*" }
+        ],
+        keyTakeaways: ['FEA (Finite Element Analysis) predicts structural failure and stress', 'CFD (Fluid Dynamics) simulates air and fuel flow without a wind tunnel', 'Mission Design software (like GMAT) calculates interplanetary trajectories', 'MBSE creates a "Digital Twin" where changes sync automatically', 'Simulations allow for "testing" failure scenarios that are too dangerous in real life'],
+        vocabulary: [
+          { term: 'FEA', definition: 'Finite Element Analysis — structural simulation via mesh decomposition' },
+          { term: 'CFD', definition: 'Computational Fluid Dynamics — numerical simulation of gas and liquid flow' },
+          { term: 'GMAT', definition: 'General Mission Analysis Tool — open source orbital mechanics software' },
+          { term: 'Monte Carlo', definition: 'Statistical technique using repeated random sampling to find probability' },
+          { term: 'Digital Twin', definition: 'A virtual representation that serves as the real-time digital counterpart of a physical object' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'FEA is used primarily to simulate:', options: ['Air flow', 'Structures and stresses', 'Orbits', 'Marketing'], correctAnswer: 1, explanation: 'Finite Element Analysis checks if parts will bend or break under load.' },
+            { id: 'q2', question: 'CFD stands for:', options: ['Continuous Fuel Delivery', 'Computational Fluid Dynamics', 'Computer Flight Design', 'Calculated Flow Data'], correctAnswer: 1, explanation: 'CFD is the study of how gases and liquids move.' },
+            { id: 'q3', question: 'A "Digital Twin" is:', options: ['A second rocket', 'A virtual model of the real rocket', 'An identical twin astronaut', 'A backup hard drive'], correctAnswer: 1, explanation: 'It is a high-fidelity virtual model that mirrors the behavior of the real hardware.' },
+            { id: 'q4', question: 'Monte Carlo simulation is used to find:', options: ['The cheapest fuel', 'The probability of success', 'The heaviest part', 'The tallest rocket'], correctAnswer: 1, explanation: 'By running thousands of random-variation sims, you find the statistical success rate.' },
+            { id: 'q5', question: 'Why separate the payload fairing based on simulation?', options: ['To save power', 'To reduce weight as soon as drag is low', 'For better radio', 'To cool the satellite'], correctAnswer: 1, explanation: 'Sims show exactly where drag becomes low enough to drop the heavy fairing safely.' }
+          ]
+        }
+      }
+    ]
+  }]
 };
 
 export default section5Design;

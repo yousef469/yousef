@@ -10,22 +10,12 @@ export default function LearnSectionsPage() {
 
   const subjects = [
     {
-      title: 'Beginner',
-      icon: '🧠',
-      color: 'from-cyan-400 to-blue-500',
-      bgGlow: 'shadow-cyan-400/30',
-      path: '/beginner-lessons',
-      lessons: 36,
-      description: 'Foundations for everyone',
-      isNew: true
-    },
-    {
       title: 'Rockets',
       icon: '🚀',
       color: 'from-orange-500 to-red-600',
       bgGlow: 'shadow-orange-500/30',
       path: '/games/map/rockets',
-      lessons: 60,
+      lessons: 50,
       description: 'Rocket science & aerospace'
     },
     {
@@ -34,7 +24,7 @@ export default function LearnSectionsPage() {
       color: 'from-blue-500 to-indigo-600',
       bgGlow: 'shadow-blue-500/30',
       path: '/games/map/planes',
-      lessons: 31,
+      lessons: 50,
       description: 'Aircraft design & aviation'
     },
     {
@@ -43,7 +33,7 @@ export default function LearnSectionsPage() {
       color: 'from-purple-500 to-pink-600',
       bgGlow: 'shadow-purple-500/30',
       path: '/games/map/cars',
-      lessons: 27,
+      lessons: 50,
       description: 'Automotive engineering'
     },
     {
@@ -52,7 +42,7 @@ export default function LearnSectionsPage() {
       color: 'from-teal-500 to-cyan-600',
       bgGlow: 'shadow-teal-500/30',
       path: '/games/map/electronics',
-      lessons: 28,
+      lessons: 50,
       description: 'Circuits & robotics'
     },
     {
@@ -61,7 +51,7 @@ export default function LearnSectionsPage() {
       color: 'from-amber-500 to-orange-600',
       bgGlow: 'shadow-amber-500/30',
       path: '/games/map/civil',
-      lessons: 27,
+      lessons: 50,
       description: 'Structures & infrastructure'
     }
   ];

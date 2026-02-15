@@ -146,6 +146,34 @@ export const askGemini = async (userMessage, conversationHistory = []) => {
   }
 };
 
+// Contextual lesson AI tutor - knows which lesson the student is in
+export const askAboutLesson = async (lessonTitle, lessonSummary, userQuestion, conversationHistory = []) => {
+  try {
+    const lessonContext = `You are tutoring a student who is currently studying the lesson: "${lessonTitle}".
+Lesson summary: ${lessonSummary}
+
+You MUST answer as if you are the instructor FOR THIS SPECIFIC LESSON. 
+Do NOT say "refer to the lesson" — you ARE the lesson. Explain concepts directly.
+Use examples relevant to this lesson topic. Be encouraging and thorough.`;
+
+    const context = conversationHistory
+      .map(msg => `${msg.role === 'user' ? 'Student' : 'Tutor'}: ${msg.content}`)
+      .join('\n\n');
+
+    const fullPrompt = `${SYSTEM_PROMPT}\n\n${lessonContext}\n\n${context ? context + '\n\n' : ''}Student: ${userQuestion}\n\nTutor:`;
+
+    const text = await callGeminiAPI(fullPrompt);
+
+    return { success: true, response: text };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      response: "I'm having trouble connecting right now. Please try again in a moment."
+    };
+  }
+};
+
 export const askAboutModel = async (modelName, modelType, question) => {
   try {
     const prompt = `As an engineering tutor, answer this question about the ${modelName} (a ${modelType}):

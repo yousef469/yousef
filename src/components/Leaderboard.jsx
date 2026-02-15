@@ -24,7 +24,17 @@ export default function Leaderboard() {
     try {
       let query = supabase
         .from('user_profiles')
-        .select('user_id, total_xp, level, completed_lessons, streak, updated_at')
+        .select(`
+          user_id, 
+          total_xp, 
+          level, 
+          streak, 
+          updated_at,
+          profiles:user_id (
+            full_name,
+            avatar_url
+          )
+        `)
         .order('total_xp', { ascending: false })
         .limit(30);
 
@@ -32,12 +42,11 @@ export default function Leaderboard() {
       if (error) throw error;
 
       const transformedData = data.map((profile, index) => {
-        const username = `User_${profile.user_id.substring(0, 5)}`;
         return {
           rank: index + 1,
           user: {
-            name: username,
-            avatar: getRandomAvatar(profile.user_id),
+            name: profile.profiles?.full_name || `User_${profile.user_id.substring(0, 5)}`,
+            avatar: profile.profiles?.avatar_url || getRandomAvatar(profile.user_id),
             id: profile.user_id,
           },
           xp: profile.total_xp || 0,
@@ -138,8 +147,8 @@ export default function Leaderboard() {
 
                 <div
                   className={`relative group flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${isMe
-                      ? 'bg-cyan-500/10 border border-cyan-500/50 shadow-lg shadow-cyan-500/10 z-10'
-                      : 'hover:bg-white/5 border border-transparent'
+                    ? 'bg-cyan-500/10 border border-cyan-500/50 shadow-lg shadow-cyan-500/10 z-10'
+                    : 'hover:bg-white/5 border border-transparent'
                     }`}
                 >
                   {/* Rank */}

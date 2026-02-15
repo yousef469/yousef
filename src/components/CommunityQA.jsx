@@ -21,8 +21,8 @@ export default function CommunityQA({ modelId, lessonId }) {
           .select(`
             *,
             user:user_id (
-              email,
-              user_metadata
+              full_name,
+              avatar_url
             )
           `);
 
@@ -45,8 +45,8 @@ export default function CommunityQA({ modelId, lessonId }) {
         const transformed = data.map(q => ({
           id: q.id,
           user: {
-            name: q.user?.user_metadata?.full_name || q.user?.email?.split('@')[0] || 'Anonymous',
-            avatar: q.user?.user_metadata?.avatar_url || '👤'
+            name: q.user?.full_name || 'Anonymous',
+            avatar: q.user?.avatar_url || '👤'
           },
           question: q.title + (q.content ? ': ' + q.content : ''),
           answer: q.is_solved ? 'Answered' : null, // Simplification
@@ -163,7 +163,24 @@ export default function CommunityQA({ modelId, lessonId }) {
       return q;
     }));
 
-    // TODO: Save vote to Supabase
+    // Save vote to Supabase
+    const syncVote = async () => {
+      try {
+        const { error } = await supabase
+          .from('community_votes')
+          .upsert({
+            post_id: questionId,
+            user_id: user.id,
+            vote_type: voteType
+          }, { onConflict: 'post_id,user_id' });
+
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving vote:', err);
+      }
+    };
+
+    syncVote();
   };
 
   const handleReply = (questionId) => {

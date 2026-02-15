@@ -6,19 +6,29 @@ import { section1Powertrain } from './section1-powertrain.js';
 import { section2Dynamics } from './section2-dynamics.js';
 import { section3Electronics } from './section3-electronics.js';
 import { section4Safety } from './section4-safety.js';
+import { section5EV } from './section5-ev.js';
+import { section6Autonomous } from './section6-autonomous.js';
+import { section7Manufacturing } from './section7-manufacturing.js';
+import { section8Maintenance } from './section8-maintenance.js';
+import { section9Future } from './section9-future.js';
 
 export const automotiveCurriculum = {
   title: 'Automotive Engineering',
   subtitle: 'Complete Vehicle Engineering Education',
   description: 'Master vehicle systems from engines to safety',
-  totalLessons: 27,
-  totalHours: 12,
+  totalLessons: 50,
+  totalHours: 13,
   sections: [
     section0Foundations,
     section1Powertrain,
     section2Dynamics,
     section3Electronics,
-    section4Safety
+    section4Safety,
+    section5EV,
+    section6Autonomous,
+    section7Manufacturing,
+    section8Maintenance,
+    section9Future
   ]
 };
 
@@ -27,14 +37,19 @@ export {
   section1Powertrain,
   section2Dynamics,
   section3Electronics,
-  section4Safety
+  section4Safety,
+  section5EV,
+  section6Autonomous,
+  section7Manufacturing,
+  section8Maintenance,
+  section9Future
 };
 
 // Helper function to get all lessons as flat array
 export const getAllLessons = () => {
   const lessons = [];
   let lessonIndex = 0;
-  
+
   automotiveCurriculum.sections.forEach((section, sectionIndex) => {
     section.units.forEach((unit, unitIndex) => {
       unit.lessons.forEach((lesson) => {
@@ -52,7 +67,7 @@ export const getAllLessons = () => {
       });
     });
   });
-  
+
   return lessons;
 };
 
@@ -71,7 +86,7 @@ export const getCurriculumStats = () => {
     const mins = parseInt(l.duration) || 25;
     return sum + mins;
   }, 0);
-  
+
   return {
     totalSections: automotiveCurriculum.sections.length,
     totalUnits: automotiveCurriculum.sections.reduce((sum, s) => sum + s.units.length, 0),

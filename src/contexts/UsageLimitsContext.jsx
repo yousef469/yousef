@@ -17,7 +17,7 @@ export const TIER_LIMITS = {
     modelComparisonPerWeek: BETA_MODE ? -1 : 1,
     explodeModePerWeek: BETA_MODE ? -1 : 3,
     calculatorPercent: BETA_MODE ? 100 : 25,
-    lessonsAccess: BETA_MODE ? 'all' : 'beginner',
+    lessonsAccess: 'all',
     careerProjects: BETA_MODE ? true : false,
     certificates: BETA_MODE ? true : false,
     vrSupport: BETA_MODE ? true : false,

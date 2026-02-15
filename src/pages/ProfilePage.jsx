@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
 import { supabase } from '../services/supabase';
-import { 
+import {
   ArrowLeft, Edit2, Save, X, Trophy, Flame, BookMarked, Award, TrendingUp,
   Zap, Crown, Share2, Gift, Globe, LogOut
 } from 'lucide-react';
@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const { progress, userProfile } = useProgress();
   const { t } = useTranslation();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('👤');
@@ -34,7 +34,7 @@ export default function ProfilePage() {
   // Load user profile data
   useEffect(() => {
     if (!user) return;
-    
+
     try {
       // Load from localStorage
       const saved = localStorage.getItem(`profile_${user.id}`);
@@ -77,7 +77,7 @@ export default function ProfilePage() {
         });
     }
   }, [completedLessons, totalXP, user]);
-  
+
   const getRank = (lvl) => {
     if (lvl >= 20) return 'Diamond';
     if (lvl >= 15) return 'Platinum';
@@ -112,7 +112,7 @@ export default function ProfilePage() {
     { id: 'plane_master', name: 'Aviation Master', desc: 'Complete all plane lessons', icon: '✈️' },
     { id: 'electronics_master', name: 'Electronics Master', desc: 'Complete all electronics lessons', icon: '⚡' }
   ];
-  
+
   const achievements = allAchievements.map(ach => ({
     ...ach,
     unlocked: progress.achievements?.includes(ach.id) || completedLessons >= (ach.id === 'first_lesson' ? 1 : ach.id === 'ten_lessons' ? 10 : ach.id === 'quarter_century' ? 25 : ach.id === 'half_century' ? 50 : 999)
@@ -142,12 +142,12 @@ export default function ProfilePage() {
       const data = JSON.parse(saved);
       const today = new Date().toDateString();
       const lastDate = data.lastActivityDate;
-      
+
       if (lastDate) {
         const lastActivity = new Date(lastDate);
         const todayDate = new Date(today);
         const diffDays = Math.floor((todayDate - lastActivity) / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays > 1) {
           data.currentStreak = 0;
         }
@@ -159,19 +159,32 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!user) return;
-    
+
     setSaving(true);
     try {
-      // Save to localStorage for now (Supabase table may not have username/avatar columns)
+      // 1. Save to Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          full_name: username,
+          avatar_url: selectedAvatar,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      // 2. Fallback to localStorage for instant UI updates/offline support
       localStorage.setItem(`profile_${user.id}`, JSON.stringify({
         username,
         avatar: selectedAvatar
       }));
-      
+
       setIsEditing(false);
       alert('✅ Profile updated successfully!');
     } catch (error) {
-      alert('❌ Error saving profile. Please try again.');
+      console.error('Error saving profile:', error);
+      alert('❌ Error saving profile to database. Changes might not be public.');
     } finally {
       setSaving(false);
     }
@@ -180,13 +193,13 @@ export default function ProfilePage() {
   const shareProgress = () => {
     const shareText = `🚀 I'm Level ${level} on Engineerium! ${completedLessons}/${totalLessons} lessons completed with ${totalXP} XP earned! Join me in learning engineering! 🎓`;
     const shareUrl = window.location.origin;
-    
+
     if (navigator.share) {
       navigator.share({
         title: 'My Engineerium Progress',
         text: shareText,
         url: shareUrl
-      }).catch(() => {});
+      }).catch(() => { });
     } else {
       navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
       alert('Progress copied to clipboard!');
@@ -229,7 +242,7 @@ export default function ProfilePage() {
                   <h1 className="text-2xl font-bold mb-1">{username}</h1>
                 )}
                 <p className="text-gray-400 text-sm mb-2">{user?.email}</p>
-                
+
                 {/* Followers & Following */}
                 <div className="flex items-center gap-4 mb-3">
                   <div className="text-center">
@@ -245,7 +258,7 @@ export default function ProfilePage() {
                     <div className="text-xs text-gray-500">Day Streak</div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Crown className="w-5 h-5 text-yellow-400" />
@@ -313,7 +326,7 @@ export default function ProfilePage() {
               <span>1000 XP</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-3">
-              <div 
+              <div
                 className="bg-gradient-to-r from-purple-500 to-pink-600 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${xpPercentage}%` }}
               />
@@ -330,11 +343,10 @@ export default function ProfilePage() {
                   <button
                     key={avatar}
                     onClick={() => setSelectedAvatar(avatar)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all ${
-                      selectedAvatar === avatar
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all ${selectedAvatar === avatar
                         ? 'bg-blue-600 scale-110'
                         : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
+                      }`}
                   >
                     {avatar}
                   </button>
@@ -385,11 +397,10 @@ export default function ProfilePage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap ${
-                activeTab === tab
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap ${activeTab === tab
                   ? 'bg-cyan-600 text-white'
                   : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
+                }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -405,14 +416,14 @@ export default function ProfilePage() {
                 <TrendingUp className="w-5 h-5 text-cyan-400" />
                 Learning Progress
               </h3>
-              
+
               <div className="mb-6">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Overall Completion</span>
                   <span className="text-cyan-400 font-bold">{Math.round(lessonPercentage)}%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-4">
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-cyan-500 to-blue-600 h-4 rounded-full transition-all duration-500"
                     style={{ width: `${lessonPercentage}%` }}
                   />
@@ -428,11 +439,11 @@ export default function ProfilePage() {
                   {['rockets', 'planes', 'cars', 'physics', 'mathematics', 'electronics'].map(subject => {
                     const subjectCompleted = Object.keys(progress.completedLessons).filter(k => k.startsWith(`${subject}-`)).length;
                     if (subjectCompleted === 0) return null;
-                    
+
                     const subjectTotal = subject === 'physics' ? 33 : subject === 'mathematics' ? 37 : 18;
                     const subjectPercent = Math.round((subjectCompleted / subjectTotal) * 100);
                     const icons = { rockets: '🚀', planes: '✈️', cars: '🚗', physics: '⚛️', mathematics: '🔢', electronics: '⚡' };
-                    
+
                     return (
                       <div key={subject} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
                         <div className="flex items-center gap-3">
@@ -460,7 +471,7 @@ export default function ProfilePage() {
               <Zap className="w-5 h-5 text-yellow-400" />
               Recent Activity
             </h3>
-            
+
             {recentActivity.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
                 <p>No activity yet. Start learning to see your progress here!</p>
@@ -492,16 +503,15 @@ export default function ProfilePage() {
               <Award className="w-5 h-5 text-purple-400" />
               Achievements
             </h3>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {achievements.map((achievement) => (
-                <div 
+                <div
                   key={achievement.id}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    achievement.unlocked 
-                      ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' 
+                  className={`p-4 rounded-lg border-2 transition-all ${achievement.unlocked
+                      ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50'
                       : 'bg-gray-700/30 border-gray-600 opacity-50'
-                  }`}
+                    }`}
                 >
                   <div className="text-4xl mb-2">{achievement.icon}</div>
                   <p className="font-semibold mb-1">{achievement.name}</p>
@@ -531,7 +541,7 @@ export default function ProfilePage() {
             </div>
             <span className="text-gray-400">→</span>
           </button>
-          
+
           <button
             onClick={async () => {
               await signOut();
@@ -550,10 +560,10 @@ export default function ProfilePage() {
 
       {/* Referral System Modal */}
       <ReferralSystem isOpen={showReferral} onClose={() => setShowReferral(false)} />
-      
+
       {/* Share Progress Modal */}
       <ShareProgress isOpen={showShare} onClose={() => setShowShare(false)} />
-      
+
       {/* Language Selector Modal */}
       <LanguageSelector isOpen={showLangModal} onClose={() => setShowLangModal(false)} />
     </div>

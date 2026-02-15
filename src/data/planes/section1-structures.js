@@ -1,137 +1,190 @@
-// Section 1: Aircraft Structures - 6 Lessons (2 units × 3 lessons)
-
 export const section1Structures = {
   id: 'structures',
   title: 'Section 1: Aircraft Structures',
-  description: 'Wing design, fuselage construction, and materials',
+  description: 'Wing design, fuselage, landing gear, and materials',
   icon: '🏗️',
   color: 'from-purple-500 to-pink-500',
   units: [
     {
-      id: 'wing-design',
-      title: 'Wing Design & Construction',
-      description: 'How wings are built to handle flight loads',
+      id: 'aircraft-structures',
+      title: 'Structural Engineering',
+      description: 'How aircraft are built to withstand flight loads',
       lessons: [
         {
-          id: 'wing-anatomy',
-          title: 'Wing Anatomy & Components',
-          duration: '25 min',
-          xp: 150,
-          description: 'Spars, ribs, skin, and structural elements',
-          introduction: 'Aircraft wings must be strong enough to handle enormous loads while remaining as light as possible.',
-          sections: [
-            { title: 'Wing Structure Overview', content: '**Main Structural Elements:**\n\n- Spars: Main load-bearing beams running spanwise\n- Ribs: Maintain airfoil shape, transfer loads\n- Skin: Aerodynamic surface, carries shear loads\n- Stringers: Longitudinal stiffeners\n\n**Load Paths:**\nLift → Skin → Ribs → Spars → Fuselage' },
-            { title: 'Spar Design', content: '**Types of Spars:**\n\n1. I-beam: Most common, efficient\n2. Box spar: Torsionally stiff\n3. Multi-spar: Distributes loads\n\n**Spar Caps:** Handle bending (tension/compression)\n**Spar Web:** Handles shear loads' },
-            { title: 'Wing Configurations', content: '**Planform Shapes:**\n- Rectangular: Simple, good stall characteristics\n- Tapered: Efficient, lighter\n- Swept: High-speed performance\n- Delta: Supersonic aircraft\n\n**Aspect Ratio = Span²/Area**\nHigh AR = Efficient (gliders)\nLow AR = Maneuverable (fighters)' }
-          ],
-          keyTakeaways: ['Spars carry primary bending loads', 'Ribs maintain airfoil shape', 'Wing planform affects performance', 'Aspect ratio trades efficiency vs maneuverability'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Main spanwise load-bearing element:', options: ['Rib', 'Spar', 'Skin', 'Stringer'], correctAnswer: 1, explanation: 'Spars are the main beams running along the wing span.' },
-            { id: 'q2', question: 'Ribs primarily:', options: ['Carry bending loads', 'Maintain airfoil shape', 'Generate lift', 'Reduce drag'], correctAnswer: 1, explanation: 'Ribs maintain the airfoil shape and transfer loads to spars.' },
-            { id: 'q3', question: 'High aspect ratio wings are:', options: ['More maneuverable', 'More efficient', 'Stronger', 'Heavier'], correctAnswer: 1, explanation: 'High AR reduces induced drag, improving efficiency.' }
-          ]}
-        },
-        {
-          id: 'wing-loads',
-          title: 'Wing Loading & Stress Analysis',
+          id: 'wing-design',
+          title: 'Wing Design & Construction',
           duration: '30 min',
           xp: 175,
-          description: 'Understanding forces and stresses in wings',
-          introduction: 'Wings experience complex loads during flight. Engineers must ensure structures can handle all expected conditions.',
+          description: 'Spars, ribs, skin, and structural elements',
+          introduction: 'Aircraft wings must be strong enough to handle enormous loads while remaining as light as possible. Their internal structure is a marvel of engineering.',
           sections: [
-            { title: 'Types of Loads', content: '**Flight Loads:**\n- Lift distribution (elliptical ideal)\n- Maneuver loads (g-forces)\n- Gust loads (turbulence)\n\n**Ground Loads:**\n- Landing impact\n- Taxi bumps\n- Towing forces\n\n**Load Factor (n):** n = L/W\n- Normal flight: n = 1\n- 60° bank turn: n = 2\n- Limit load: Max expected (2.5g transport)' },
-            { title: 'Stress Analysis', content: '**Bending Stress:**\nσ = My/I\n- M = bending moment\n- y = distance from neutral axis\n- I = moment of inertia\n\n**Shear Stress:**\nτ = VQ/It\n\n**Safety Factor:**\nUltimate load = 1.5 × Limit load\nStructure must not fail at ultimate load' },
-            { title: 'V-n Diagram', content: '**Flight Envelope:**\nThe V-n diagram shows allowable combinations of speed and load factor.\n\n**Key Points:**\n- Vs: Stall speed\n- Va: Maneuvering speed\n- Vne: Never exceed speed\n- Positive/negative g limits\n\n**Design Considerations:**\n- Must handle all points in envelope\n- Plus safety factor' }
+            {
+              title: 'Wing Structure Overview',
+              content: `**Main Structural Elements:**\n\n- **Spars:** Main load-bearing beams running spanwise. They carry bending loads.\n- **Ribs:** Maintain airfoil shape and distribute loads from skin to spars.\n- **Skin:** Aerodynamic surface that carries shear loads (and torsion).\n- **Stringers:** Longitudinal stiffeners that prevent skin buckling.\n\n**Load Paths:**\nLift → Skin → Ribs → Spars → Fuselage`
+            },
+            {
+              title: 'Spar Concepts',
+              content: `**The Backbone of the Wing**\n\n**Types of Spars:**\n1. **I-beam:** Efficient for bending, common in many aircraft.\n2. **Box spar:** Two vertical webs, very stiff in torsion (twisting).\n3. **Multi-spar:** Failsafe design (if one breaks, others hold).\n\n**Components:**\n- **Spar Caps:** Top/bottom flanges. Handle tension/compression (bending).\n- **Spar Web:** Vertical part. Handles shear forces.`
+            },
+            {
+              title: 'Wing Configurations',
+              content: `**Planform Shapes:**\n- **Rectangular:** Simple to build, stall starts at root (safe).\n- **Tapered:** More efficient distribution of lift, lighter.\n- **Swept:** Delays shockwaves for high-speed flight, but can suffer tip stall.\n- **Delta:** Optimal for supersonic (Concorde, fighters).\n\n**Aspect Ratio (AR):**\n- AR = Span² / Area\n- High AR (Gliders): Efficient, low drag.\n- Low AR (Fighters): Maneuverable, strong.`
+            }
           ],
-          keyTakeaways: ['Load factor measures g-forces', 'Safety factor of 1.5 for ultimate loads', 'V-n diagram defines flight envelope', 'Bending stress is critical in spars'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Load factor in a 60° bank turn:', options: ['1g', '1.5g', '2g', '3g'], correctAnswer: 2, explanation: 'n = 1/cos(60°) = 2g in a 60° bank.' },
-            { id: 'q2', question: 'Ultimate load safety factor:', options: ['1.0', '1.25', '1.5', '2.0'], correctAnswer: 2, explanation: 'Ultimate load = 1.5 × limit load for transport aircraft.' },
-            { id: 'q3', question: 'Va is:', options: ['Stall speed', 'Maneuvering speed', 'Never exceed', 'Cruise speed'], correctAnswer: 1, explanation: 'Va is maneuvering speed - max speed for full control deflection.' }
-          ]}
+          keyTakeaways: [
+            'Spars are the primary load-bearing beams',
+            'Ribs maintain the airfoil shape',
+            'Box spars provide great torsional stiffness',
+            'Aspect ratio dictates part of the efficiency vs. maneuverability trade-off'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'Which component carries primary bending loads?', options: ['Rib', 'Spar', 'Skin', 'Stringer'], correctAnswer: 1, explanation: 'Spars act as the main beams to resist bending forces.' },
+              { id: 'q2', question: 'Ribs primarily:', options: ['Carry bending loads', 'Maintain airfoil shape', 'Generate lift', 'Reduce drag'], correctAnswer: 1, explanation: 'Ribs maintain the airfoil shape and transfer air loads to the spars.' },
+              { id: 'q3', question: 'High aspect ratio wings are best for:', options: ['Maneuverability', 'Efficiency/Gliding', 'Supersonic speed', 'Storage'], correctAnswer: 1, explanation: 'High aspect ratio reduces induced drag, making wings very efficient (like on gliders).' }
+            ]
+          }
         },
         {
-          id: 'control-surfaces',
-          title: 'Control Surfaces & Mechanisms',
-          duration: '25 min',
-          xp: 150,
-          description: 'Ailerons, flaps, and high-lift devices',
-          introduction: 'Control surfaces allow pilots to maneuver the aircraft. High-lift devices enable slower takeoff and landing speeds.',
-          sections: [
-            { title: 'Primary Control Surfaces', content: '**Ailerons:** Roll control\n- Located on outer wing trailing edge\n- Move differentially (one up, one down)\n- Adverse yaw requires rudder coordination\n\n**Elevator:** Pitch control\n- On horizontal stabilizer\n- Moves up/down together\n\n**Rudder:** Yaw control\n- On vertical stabilizer\n- Coordinates turns, crosswind landings' },
-            { title: 'High-Lift Devices', content: '**Trailing Edge Flaps:**\n- Plain flap: Simple hinge\n- Split flap: Lower surface only\n- Slotted flap: Gap for airflow\n- Fowler flap: Extends and deflects\n\n**Leading Edge Devices:**\n- Slats: Create slot for high α\n- Krueger flaps: Fold out from leading edge\n\n**Effect:** Increase C_Lmax by 50-100%' },
-            { title: 'Actuation Systems', content: '**Manual Systems:**\n- Cables and pulleys\n- Push-pull rods\n- Light aircraft\n\n**Powered Systems:**\n- Hydraulic actuators\n- Electric actuators\n- Fly-by-wire (electronic)\n\n**Redundancy:**\nMultiple systems for safety\n- Dual hydraulic systems\n- Manual backup' }
-          ],
-          keyTakeaways: ['Ailerons control roll, elevator pitch, rudder yaw', 'Flaps increase lift coefficient', 'Slats delay stall to higher angles', 'Redundant systems ensure safety'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Ailerons control:', options: ['Pitch', 'Roll', 'Yaw', 'Speed'], correctAnswer: 1, explanation: 'Ailerons control roll about the longitudinal axis.' },
-            { id: 'q2', question: 'Fowler flaps:', options: ['Only deflect', 'Extend and deflect', 'Only extend', 'Retract'], correctAnswer: 1, explanation: 'Fowler flaps extend rearward and deflect, increasing both area and camber.' },
-            { id: 'q3', question: 'Slats help by:', options: ['Reducing drag', 'Delaying stall', 'Increasing speed', 'Reducing weight'], correctAnswer: 1, explanation: 'Slats energize boundary layer, delaying stall to higher angles of attack.' }
-          ]}
-        }
-      ]
-    },
-    {
-      id: 'fuselage-materials',
-      title: 'Fuselage & Materials',
-      description: 'Body construction and aerospace materials',
-      lessons: [
-        {
           id: 'fuselage-design',
-          title: 'Fuselage Design & Construction',
-          duration: '25 min',
-          xp: 150,
-          description: 'Semi-monocoque structures and pressurization',
-          introduction: 'The fuselage carries passengers, cargo, and connects all aircraft components. It must handle pressurization, bending, and torsion loads.',
+          title: 'Fuselage & Pressurization',
+          duration: '30 min',
+          xp: 175,
+          description: 'Semi-monocoque structures and cabin pressure',
+          introduction: 'The fuselage carries payload and connects the aircraft parts. For high-altitude flight, it must also serve as a pressure vessel.',
           sections: [
-            { title: 'Fuselage Structure Types', content: '**Truss Structure:**\n- Steel tube framework\n- Fabric or metal covering\n- Light aircraft, older designs\n\n**Monocoque:**\n- Skin carries all loads\n- No internal framework\n- Efficient but damage-sensitive\n\n**Semi-Monocoque:**\n- Skin + frames + stringers\n- Most common today\n- Damage tolerant' },
-            { title: 'Structural Elements', content: '**Frames:** Circular rings maintaining shape\n**Stringers:** Longitudinal stiffeners\n**Skin:** Carries shear and pressurization\n**Longerons:** Heavy longitudinal members\n**Bulkheads:** Solid frames at major load points\n\n**Load Paths:**\nPressure → Skin → Frames\nBending → Stringers → Frames' },
-            { title: 'Pressurization', content: '**Why Pressurize?**\nAt 35,000 ft, air pressure is only 25% of sea level.\nHumans need equivalent of 8,000 ft or lower.\n\n**Pressure Differential:**\nΔP = 8-9 psi typical\n\n**Hoop Stress:**\nσ = PR/t\n- P = pressure differential\n- R = fuselage radius\n- t = skin thickness\n\n**Fatigue Concern:**\nEach pressurization cycle stresses the structure.' }
+            {
+              title: 'Structural Concepts',
+              content: `**Truss (Old):**\n- Frame of tubes (wood/steel) covered in fabric. Strong but draggy.\n\n**Monocoque (Eggshell):**\n- Skin carries ALL loads. Efficient but denting destroys strength.\n\n**Semi-Monocoque (Modern):**\n- **Skin:** Carries pressure & shear.\n- **Frames:** Maintain shape (like ribs).\n- **Stringers:** Carry bending/axial loads.\n- Result: Damage tolerant and light.`
+            },
+            {
+              title: 'Pressurization Physics',
+              content: `**Why Pressurize?**\nAt 35,000 ft, air pressure is ~25% of sea level. Humans need ~8,000 ft equivalent or lower.\n\n**The Pressure Vessel:**\n The fuselage acts like a balloon.\n- **Differential Pressure (ΔP):** Difference between inside and outside air (typ. 8-9 psi).\n- **Hoop Stress:** Tension around the circumference (σ = PR/t).\n- **Fatigue:** Each flight pumps up and deflates the fuselage (cycle).`
+            },
+            {
+              title: 'Structural Failure Modes',
+              content: `**Things to Avoid:**\n\n1. **Fatigue Cracking:** Caused by cycles (Aloha Airlines 243).\n2. **Decompression:**\n   - **Slow:** Seal leak.\n   - **Rapid:** Lung damage risk, fog formation.\n   - **Explosive:** Structural failure.\n\n**Design Solutions:**\n- Rip-stop doublers (grids that stop cracks).\n- Window rounded corners (reduce stress risers).`
+            }
           ],
-          keyTakeaways: ['Semi-monocoque is most common structure', 'Pressurization creates hoop stress in skin', 'Frames and stringers stiffen the structure', 'Fatigue from pressure cycles is critical'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Most common fuselage structure:', options: ['Truss', 'Monocoque', 'Semi-monocoque', 'Geodetic'], correctAnswer: 2, explanation: 'Semi-monocoque combines skin, frames, and stringers for efficiency and damage tolerance.' },
-            { id: 'q2', question: 'Cabin altitude is typically maintained at:', options: ['Sea level', '8,000 ft', '20,000 ft', '35,000 ft'], correctAnswer: 1, explanation: 'Cabin altitude is kept at 8,000 ft or below for passenger comfort.' },
-            { id: 'q3', question: 'Hoop stress formula:', options: ['σ = F/A', 'σ = PR/t', 'σ = My/I', 'σ = E×ε'], correctAnswer: 1, explanation: 'Hoop stress σ = PR/t for pressurized cylinders.' }
-          ]}
+          keyTakeaways: [
+            'Semi-monocoque is the standard for modern aircraft',
+            'Fuselage acts as a pressure vessel at altitude',
+            'Hoop stress is the primary load from pressurization',
+            'Square windows cause stress concentrations (Comet disasters)'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'Most common modern fuselage structure:', options: ['Truss', 'Monocoque', 'Semi-monocoque', 'Solid beam'], correctAnswer: 2, explanation: 'Semi-monocoque combines skin, frames, and stringers for an optimal weight/strength ratio.' },
+              { id: 'q2', question: 'Square windows were found to cause:', options: ['Better views', 'Stress risers & fatigue', 'Less drag', 'More weight'], correctAnswer: 1, explanation: 'The de Havilland Comet crashes proved square windows concentrate stress, leading to fatigue cracks.' },
+              { id: 'q3', question: 'Hoop stress acts:', options: ['Lengthwise', 'Circumferentially', 'Vertically', 'Diagonally'], correctAnswer: 1, explanation: 'Hoop stress tries to pull the cylinder apart around its circumference.' }
+            ]
+          }
+        },
+        {
+          id: 'landing-gear',
+          title: 'Landing Gear Systems',
+          duration: '35 min',
+          xp: 200,
+          description: 'Shock absorption, brakes, and retraction',
+          aiTutor: true,
+          introduction: 'Landing gear must withstand the brutal impact of landing, support the aircraft on ground, and disappear during flight to reduce drag.',
+          sections: [
+            {
+              title: 'Gear Configurations',
+              content: `**Types of Arrangements:**\n\n1. **Tricycle (Standard):**\n- Nose gear + 2 Main gear.\n- Stable on ground, easy to steer.\n- Allows braking in turns.\n\n2. **Taildragger (Conventional):**\n- 2 Main gear + Tail wheel.\n- Lighter, less drag.\n- Unstable on ground (prone to "ground loop").\n\n3. **Bicycle:**\n- Main gear in line (U-2 spy plane, B-52).\n- Requires outriggers.`
+            },
+            {
+              title: 'Shock Absorption',
+              content: `**Oleo-Pneumatic Strut:**\nThe standard for almost all aircraft.\n\n**How it works:**\n- **Gas (Nitrogen):** Acts as a spring (supports weight).\n- **Oil (Hydraulic Fluid):** Acts as a damper (absorbs impact energy).\n- When landing, oil is forced through small orifices, converting kinetic energy to heat.\n\n**Other Types:**\n- Rigid (Helicopter skids).\n- Spring Steel (Cessna 172).`
+            },
+            {
+              title: 'Brakes & Retraction',
+              content: `**Braking Systems:**\n- **Multi-disc stacks:** Stators (fixed) & Rotors (spinning).\n- **Carbon Brakes:** Lighter, handle higher heat than steel.\n- **Anti-Skid:** Like ABS on cars, prevents tire lockup (essential for jets).\n\n**Retraction:**\n- Uses hydraulic rams (or electric motors).\n- **Uplocks:** Hold gear up mechanically (so hydraulics can turn off).\n- **Emergency Extension:** Gravity drop or manual pump if systems fail.`
+            }
+          ],
+          keyTakeaways: [
+            'Tricycle gear is the most stable configuration',
+            'Oleo struts use gas for spring and oil for damping',
+            'Carbon brakes offer superior performance and weight savings',
+            'Anti-skid systems prevent tires from blowing out'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'The gas in an Oleo strut serves as:', options: ['The damper', 'The spring', 'The lubricant', 'The coolant'], correctAnswer: 1, explanation: 'Compressed nitrogen acts as the spring to support the aircraft weight.' },
+              { id: 'q2', question: 'Tricycle gear is preferred because:', options: ['It is lighter', 'It is ground stable', 'It has less drag', 'It is cheaper'], correctAnswer: 1, explanation: 'Detailed analysis shows tricycle gear prevents ground loops, making it stable.' },
+              { id: 'q3', question: 'Carbon brakes are better than steel because:', options: ['They are cheaper', 'They handle high heat & are lighter', 'They never wear out', 'They are quieter'], correctAnswer: 1, explanation: 'Carbon brakes maintain friction at high temps and save significant weight.' }
+            ]
+          }
         },
         {
           id: 'aerospace-materials',
           title: 'Aerospace Materials',
           duration: '30 min',
           xp: 175,
-          description: 'Aluminum, composites, and advanced materials',
-          introduction: 'Material selection is crucial in aerospace. The right material balances strength, weight, cost, and manufacturability.',
+          description: 'Aluminum, composites, and future alloys',
+          introduction: 'Material selection is a trade-off between strength, weight, cost, and temperature resistance. Modern aircraft are transitioning from metal to plastic (composites).',
           sections: [
-            { title: 'Aluminum Alloys', content: '**Most Common Aerospace Material**\n\n**2024-T3:** High strength, fatigue resistant\n- Fuselage skins, wing skins\n- Yield: 345 MPa\n\n**7075-T6:** Highest strength aluminum\n- Wing spars, fittings\n- Yield: 503 MPa\n\n**Advantages:**\n- Good strength-to-weight\n- Easy to manufacture\n- Well understood\n\n**Disadvantages:**\n- Corrosion susceptible\n- Fatigue cracks' },
-            { title: 'Composite Materials', content: '**Carbon Fiber Reinforced Polymer (CFRP)**\n\n**Advantages:**\n- 20-30% lighter than aluminum\n- No corrosion\n- Fatigue resistant\n- Can be tailored for loads\n\n**Disadvantages:**\n- Expensive\n- Difficult to inspect\n- Impact damage sensitivity\n\n**Usage:**\n- Boeing 787: 50% composites\n- Airbus A350: 53% composites\n- Wings, fuselage, empennage' },
-            { title: 'Other Materials', content: '**Titanium:**\n- High strength, heat resistant\n- Engine pylons, landing gear\n- Expensive, hard to machine\n\n**Steel:**\n- Landing gear, fasteners\n- High strength but heavy\n\n**Honeycomb Core:**\n- Sandwich panels\n- Excellent stiffness-to-weight\n- Floor panels, control surfaces\n\n**Future Materials:**\n- Ceramic matrix composites\n- Metal matrix composites\n- Graphene-enhanced materials' }
+            {
+              title: 'Metals',
+              content: `**Aluminum Alloys:**\n- **2024:** Tension (Lower Wing skins). Fatigue resistant.\n- **7075:** Compression (Upper Wing skins). Stronger but brittle.\n\n**Titanium:**\n- High strength-to-weight.\n- Heat resistant (used in engines/firewalls).\n- Compatible with carbon fiber (doesn't corrode).\n\n**Steel:**\n- Heavy but cheap and hard.\n- Used in landing gear and fasteners.`
+            },
+            {
+              title: 'Composites',
+              content: `**Carbon Fiber Reinforced Polymer (CFRP):**\n- **Pros:** 20% lighter than Al, infinite fatigue life, no corrosion, can be molded into complex shapes.\n- **Cons:** Expensive, hides damage (barely visible impact damage), hard to repair.\n\n**Honeycomb Cores:**\n- Sandwich structure (Face sheets + Core).\n- Incredible stiffness for low weight.\n- Used in floor panels and control surfaces.`
+            },
+            {
+              title: 'Galvanic Corrosion',
+              content: `**The Hidden Killer**\n\nWhen dissimilar metals touch in the presence of an electrolyte (water):\n- Setting up a battery.\n- Aluminum corrodes rapidly if touching Carbon or Steel.\n- Solution: Sealants, paint, or using Titanium fasteners.`
+            }
           ],
-          keyTakeaways: ['Aluminum alloys still dominate aircraft structures', 'Composites offer 20-30% weight savings', 'Material selection depends on application', 'Modern aircraft use 50%+ composites'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Boeing 787 composite content:', options: ['20%', '35%', '50%', '80%'], correctAnswer: 2, explanation: 'The 787 Dreamliner is approximately 50% composite by weight.' },
-            { id: 'q2', question: 'Highest strength aluminum alloy:', options: ['2024', '6061', '7075', '5052'], correctAnswer: 2, explanation: '7075-T6 has the highest strength of common aerospace aluminum alloys.' },
-            { id: 'q3', question: 'Main advantage of composites:', options: ['Lower cost', 'Lighter weight', 'Easier inspection', 'Better conductivity'], correctAnswer: 1, explanation: 'Composites offer 20-30% weight savings compared to aluminum.' }
-          ]}
+          keyTakeaways: [
+            'Aluminum 2024 and 7075 are the workhorses of metal aircraft',
+            'Composites offer weight savings and fatigue resistance',
+            'Titanium is used in high-heat areas and with composites',
+            'Galvanic corrosion must be prevented by insulation'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'Boeing 787 is primarily made of:', options: ['Aluminum', 'Steel', 'Titanium', 'Carbon Fiber Composite'], correctAnswer: 3, explanation: 'The 787 is ~50% composite by weight.' },
+              { id: 'q2', question: 'Which metal is best for high heat (engines)?', options: ['Aluminum', 'Magnesium', 'Titanium', 'Zinc'], correctAnswer: 2, explanation: 'Titanium retains strength at high temperatures where aluminum would melt or weaken.' },
+              { id: 'q3', question: 'Aluminum touching Carbon Fiber causes:', options: ['Stronger bond', 'Galvanic corrosion', 'Fire', 'Magnetic interference'], correctAnswer: 1, explanation: 'Carbon is cathodic to Aluminum, causing the aluminum to corrode rapidly.' }
+            ]
+          }
         },
         {
-          id: 'fatigue-damage',
-          title: 'Fatigue & Damage Tolerance',
-          duration: '25 min',
-          xp: 150,
-          description: 'How structures age and inspection requirements',
-          introduction: 'Aircraft structures experience millions of load cycles. Understanding fatigue and damage tolerance is essential for safety.',
+          id: 'structural-loads',
+          title: 'Structural Loads & Fatigue',
+          duration: '30 min',
+          xp: 175,
+          description: 'V-n diagrams, limit loads, and damage tolerance',
+          introduction: 'How do engineers calculate if a wing will snap? It comes down to understanding the Flight Envelope and how materials eventually get tired.',
           sections: [
-            { title: 'Metal Fatigue', content: '**What is Fatigue?**\nMaterial failure under repeated loading below ultimate strength.\n\n**S-N Curve:**\nStress vs. Number of cycles to failure\n- Higher stress = fewer cycles\n- Endurance limit (steel) or no limit (aluminum)\n\n**Fatigue Life:**\nAluminum has NO endurance limit\n- Will eventually fail at any stress level\n- Must design for finite life or damage tolerance' },
-            { title: 'Damage Tolerance', content: '**Philosophy:**\nAssume cracks exist and will grow.\nDesign so cracks are found before failure.\n\n**Key Concepts:**\n- Crack growth rate: da/dN\n- Stress intensity factor: K\n- Critical crack length\n\n**Inspection Intervals:**\nBased on crack growth analysis\n- Find cracks before critical size\n- Multiple load paths for redundancy' },
-            { title: 'Inspection Methods', content: '**Non-Destructive Testing (NDT):**\n\n**Visual:** Most common, surface defects\n**Dye Penetrant:** Surface cracks\n**Magnetic Particle:** Ferrous metals\n**Eddy Current:** Subsurface cracks\n**Ultrasonic:** Internal defects\n**X-Ray:** Internal structure\n\n**Scheduled Inspections:**\n- A Check: ~500 flight hours\n- C Check: ~2 years\n- D Check: ~6 years (heavy maintenance)' }
+            {
+              title: 'The V-n Diagram',
+              content: `**Flight Envelope Map**\n- Plots Velocity (V) vs. Load Factor (n).\n- **Corner Velocity (Va):** Speed where you stall before you break the plane. (Maneuvering Speed).\n- **Vne:** Never Exceed speed (flutter risk).\n- **Limit Load:** Max expected load (2.5g for airliners).\n- **Ultimate Load:** Limit x 1.5 (Wing must hold for 3 seconds).`
+            },
+            {
+              title: 'Fatigue & Damage Tolerance',
+              content: `**Metal Fatigue:**\n- Repeated loading causes cracks to grow even below yield stress. (Like bending a paperclip).\n- **S-N Curve:** Stress vs Number of cycles.\n\n**Damage Tolerance Philosophy:**\n"We know cracks exist. We manage them."\n- Design structure so cracks grow slowly.\n- Inspect frequently enough to catch them before catastrophic failure.\n- Redundancy: Multiple load paths.`
+            },
+            {
+              title: 'Stress Analysis Basics',
+              content: `**Types of Stress:**\n1. **Tension:** Pulling apart.\n2. **Compression:** Crushing (Buckling risk).\n3. **Shear:** Sliding layers (Rivets).\n4. **Torsion:** Twisting.\n\n**Margin of Safety (MS):**\nMS = (Allowable Load / Applied Load) - 1\n- Must be positive (>0).`
+            }
           ],
-          keyTakeaways: ['Aluminum has no fatigue endurance limit', 'Damage tolerance assumes cracks exist', 'Regular inspections catch cracks early', 'Multiple load paths provide redundancy'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Aluminum fatigue endurance limit:', options: ['50% of ultimate', '30% of ultimate', 'Does not exist', '10% of ultimate'], correctAnswer: 2, explanation: 'Unlike steel, aluminum has no endurance limit and will eventually fail at any stress.' },
-            { id: 'q2', question: 'Damage tolerance assumes:', options: ['No cracks exist', 'Cracks exist and grow', 'Material is perfect', 'Infinite life'], correctAnswer: 1, explanation: 'Damage tolerance design assumes cracks exist and manages their growth.' },
-            { id: 'q3', question: 'D Check interval:', options: ['500 hours', '1 year', '6 years', '20 years'], correctAnswer: 2, explanation: 'D Check (heavy maintenance) occurs approximately every 6 years.' }
-          ]}
+          keyTakeaways: [
+            'Ultimate Load is 1.5x Limit Load',
+            'Va (Maneuvering Speed) protects the structure from overstress',
+            'Fatigue is the progressive growth of cracks under cyclic loads',
+            'Damage tolerance relies on inspection and redundancy'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'The Safety Factor for aircraft structures is typically:', options: ['1.1', '1.5', '2.0', '10.0'], correctAnswer: 1, explanation: 'Aviation standard is 1.5 (Ultimate Load = 1.5 x Limit Load).' },
+              { id: 'q2', question: 'Maneuvering Speed (Va) allows:', options: ['Full control deflection without structural failure', 'Flying at Mach 1', 'Landing on short runways', 'Zero G flight'], correctAnswer: 0, explanation: 'Below Va, the wing will stall before generating enough force to bend the spar.' },
+              { id: 'q3', question: 'Damage Tolerance assumes:', options: ['Materials are perfect', 'Cracks exist and must be managed', 'Planes never break', 'Only aluminum cracks'], correctAnswer: 1, explanation: 'It assumes flaws/cracks are present and ensures safety via inspection/redundancy.' }
+            ]
+          }
         }
       ]
     }

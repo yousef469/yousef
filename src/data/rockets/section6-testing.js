@@ -1,1176 +1,177 @@
-// Section 6: Testing & Operations
-// 10 Lessons - Testing, launch operations, mission control
-
+// Section 6: Rocket Testing & Safety — 5 Lessons
 export const section6Testing = {
-  id: 'testing-ops',
-  title: 'Unit 5: Testing & Operations',
-  description: 'Testing rockets and conducting launches',
-  icon: '🔬',
-  color: 'from-red-500 to-orange-500',
-  units: [
-    {
-      id: 'testing-operations',
-      title: 'Testing & Launch Operations',
-      description: 'From test stand to orbit',
-      lessons: [
-        {
-          id: 'test-philosophy',
-          title: 'Test Philosophy',
-          duration: '25 min',
-          xp: 150,
-          description: 'Why and how we test rockets',
-          aiTutor: true,
-          introduction: `Testing is how we turn designs into reliable rockets. Every component, subsystem, and complete vehicle must prove it works before flight. The philosophy of testing determines success or failure.`,
-          sections: [
-            {
-              title: 'Test Philosophies',
-              content: `**Traditional (NASA/Old Space):**
-- Extensive analysis before testing
-- Few, expensive tests
-- High confidence before each test
-- Long development cycles
-
-**Iterative (SpaceX):**
-- Test early, test often
-- Learn from failures
-- Rapid iteration
-- "Hardware-rich" approach
-
-**Test Like You Fly:**
-- Test conditions match flight
-- Same hardware, same environment
-- Realistic scenarios
-- No surprises in flight
-
-**Fly Like You Test:**
-- Don't exceed tested conditions
-- Stay within proven envelope
-- Gradual expansion of capability`
-            },
-            {
-              title: 'Test Pyramid',
-              content: `**Component Level (Base):**
-- Individual parts
-- Thousands of tests
-- Cheap, fast
-- Valves, sensors, actuators
-
-**Subsystem Level:**
-- Integrated components
-- Hundreds of tests
-- Engine assemblies, avionics boxes
-
-**System Level:**
-- Complete stages
-- Tens of tests
-- Full-duration firings
-
-**Vehicle Level (Top):**
-- Complete rocket
-- Few tests
-- Most expensive
-- Flight tests
-
-**More tests at bottom, fewer at top.
-Find problems early when cheap to fix!`
-            },
-            {
-              title: 'Test Documentation',
-              content: `**Test Plan:**
-- What to test
-- Success criteria
-- Resources needed
-- Schedule
-
-**Test Procedure:**
-- Step-by-step instructions
-- Safety precautions
-- Data to collect
-- Contingencies
-
-**Test Report:**
-- Results vs predictions
-- Anomalies observed
-- Lessons learned
-- Recommendations
-
-**Test Readiness Review:**
-- Is hardware ready?
-- Is facility ready?
-- Are procedures approved?
-- Go/no-go decision`
-            }
-          ],
-          keyTakeaways: [
-            'Test early and often - find problems when cheap to fix',
-            'Test like you fly - realistic conditions essential',
-            'Test pyramid: many component tests, few vehicle tests',
-            'Documentation ensures repeatability and learning'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'SpaceX test philosophy emphasizes:', options: ['Extensive analysis first', 'Test early and often', 'Minimal testing', 'Only flight testing'], correctAnswer: 1, explanation: 'SpaceX tests early, learns from failures, iterates rapidly.' },
-              { id: 'q2', question: 'Test pyramid has most tests at:', options: ['Vehicle level', 'System level', 'Component level', 'All equal'], correctAnswer: 2, explanation: 'Component tests are cheapest - do many to find problems early.' },
-              { id: 'q3', question: 'Test like you fly means:', options: ['Test in flight', 'Match flight conditions', 'Skip ground testing', 'Test faster'], correctAnswer: 1, explanation: 'Test conditions should match actual flight environment.' },
-              { id: 'q4', question: 'Test Readiness Review determines:', options: ['Test results', 'Go/no-go for test', 'Budget', 'Schedule only'], correctAnswer: 1, explanation: 'TRR confirms readiness and authorizes test to proceed.' },
-              { id: 'q5', question: 'Finding problems early is important because:', options: ['Its more exciting', 'Fixes are cheaper', 'Tests are easier', 'Documentation is simpler'], correctAnswer: 1, explanation: 'Early problems are much cheaper to fix than late ones.' }
-            ]
-          }
-        },
-  
+  id: 'testing-safety',
+  title: 'Unit 6: Testing & Safety',
+  description: 'How engineers prove a rocket is safe before it leaves the pad',
+  icon: '🛡️',
+  color: 'from-green-600 to-teal-700',
+  units: [{
+    id: 'validation-methods',
+    title: 'Verification & Validation',
+    description: 'The rigorous testing required for spaceflight certification',
+    lessons: [
       {
-          id: 'ground-testing',
-          title: 'Ground Testing',
-          duration: '30 min',
-          xp: 175,
-          description: 'Testing rockets without leaving Earth',
-          aiTutor: true,
-          introduction: `Before a rocket flies, it undergoes extensive ground testing. From engine test stands to thermal vacuum chambers, ground tests prove the vehicle is ready for the harsh environment of launch and space.`,
-          sections: [
-            {
-              title: 'Engine Testing',
-              content: `**Test Stand Components:**
-- Thrust measurement (load cells)
-- Propellant feed systems
-- Data acquisition (1000s of sensors)
-- High-speed cameras
-- Sound suppression (water deluge)
-
-**Test Types:**
-- Hot fire: Full combustion test
-- Cold flow: Propellant flow without ignition
-- Acceptance: Each flight engine
-- Development: New designs
-
-**Measurements:**
-- Thrust (±0.1% accuracy)
-- Chamber pressure
-- Temperatures (100s of points)
-- Flow rates
-- Vibration
-
-**SpaceX McGregor:**
-- Tests all Merlin and Raptor engines
-- Multiple test stands
-- 1000s of tests per year`
-            },
-            {
-              title: 'Environmental Testing',
-              content: `**Vibration Testing:**
-- Shake tables simulate launch
-- Random vibration spectrum
-- Sine sweep finds resonances
-- Proves structure survives
-
-**Acoustic Testing:**
-- 140+ dB sound levels
-- Simulates launch acoustics
-- Large reverberant chambers
-- Critical for payloads
-
-**Thermal Vacuum:**
-- Space environment simulation
-- Vacuum + temperature cycling
-- -150°C to +150°C
-- Proves thermal design
-
-**EMI/EMC Testing:**
-- Electromagnetic compatibility
-- No interference between systems
-- Shielded chambers
-- Required for all avionics`
-            },
-            {
-              title: 'Static Fire',
-              content: `**What is Static Fire?**
-Full vehicle on pad, engines fire briefly.
-Vehicle doesn't move (held down).
-
-**Purpose:**
-- Verify all systems work together
-- Check propellant loading
-- Confirm engine performance
-- Final check before flight
-
-**Falcon 9 Static Fire:**
-- ~3 seconds duration
-- All 9 engines fire
-- Typically 1-2 days before launch
-- Data reviewed before flight
-
-**Starship Static Fire:**
-- Tests Raptor engines
-- Multiple static fires during development
-- Validates vehicle integration`
-            }
-          ],
-          keyTakeaways: [
-            'Engine tests measure thrust, pressure, temperature, flow',
-            'Environmental tests simulate launch and space conditions',
-            'Static fire is final integrated test before flight',
-            'Thousands of sensors capture data for analysis'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Static fire duration for Falcon 9 is:', options: ['30 seconds', '3 seconds', '3 minutes', '30 minutes'], correctAnswer: 1, explanation: 'Falcon 9 static fires last ~3 seconds.' },
-              { id: 'q2', question: 'Thermal vacuum testing simulates:', options: ['Launch acoustics', 'Space environment', 'Vibration', 'Rain'], correctAnswer: 1, explanation: 'TVAC simulates vacuum and temperature extremes of space.' },
-              { id: 'q3', question: 'Acoustic testing levels exceed:', options: ['100 dB', '120 dB', '140 dB', '180 dB'], correctAnswer: 2, explanation: 'Launch acoustics exceed 140 dB - extremely loud!' },
-              { id: 'q4', question: 'SpaceX engine testing is done at:', options: ['Cape Canaveral', 'McGregor, TX', 'Hawthorne', 'Vandenberg'], correctAnswer: 1, explanation: 'McGregor, Texas is SpaceX primary engine test facility.' },
-              { id: 'q5', question: 'Static fire occurs how long before launch?', options: ['1 hour', '1-2 days', '1 week', '1 month'], correctAnswer: 1, explanation: 'Static fire typically occurs 1-2 days before launch.' }
-            ]
-          }
-        },
-        {
-          id: 'launch-site',
-          title: 'Launch Site Operations',
-          duration: '30 min',
-          xp: 175,
-          description: 'Preparing rockets for launch',
-          aiTutor: true,
-          introduction: `Launch sites are where rockets meet their destiny. From vehicle integration to propellant loading, launch site operations are a carefully choreographed sequence leading to liftoff.`,
-          sections: [
-            {
-              title: 'Launch Site Facilities',
-              content: `**Vehicle Assembly:**
-- Integration buildings
-- Cleanrooms for payloads
-- Horizontal or vertical integration
-
-**Launch Pad:**
-- Flame trench
-- Sound suppression
-- Propellant storage
-- Lightning protection
-- Launch mount
-
-**Support Facilities:**
-- Mission control
-- Tracking stations
-- Weather monitoring
-- Emergency response
-
-**Major US Sites:**
-- Cape Canaveral (FL): East coast
-- Vandenberg (CA): Polar orbits
-- Wallops (VA): Small rockets
-- Boca Chica (TX): SpaceX Starship`
-            },
-            {
-              title: 'Launch Campaign',
-              content: `**Typical Timeline:**
-- L-30 days: Vehicle arrives
-- L-14 days: Payload integration
-- L-7 days: Payload encapsulation
-- L-3 days: Vehicle rollout
-- L-2 days: Static fire
-- L-1 day: Final preps
-- L-0: Launch!
-
-**Falcon 9 Efficiency:**
-- Horizontal integration
-- Transport to pad on transporter
-- Raise to vertical
-- Same-day propellant load
-- Rapid turnaround possible
-
-**Starship Operations:**
-- Vertical stacking on pad
-- Mechazilla tower
-- Rapid reuse goal`
-            },
-            {
-              title: 'Propellant Loading',
-              content: `**Cryogenic Loading:**
-- LOX: -183°C
-- LH2: -253°C
-- CH4: -161°C
-- Must load close to launch (boil-off)
-
-**Falcon 9 Loading:**
-- T-35 min: RP-1 loading
-- T-35 min: LOX loading begins
-- T-7 min: Full load
-- T-1 min: Final top-off
-
-**Densification:**
-- SpaceX supercools propellants
-- LOX at -207°C (vs -183°C)
-- 8% more propellant capacity
-- Must launch quickly after load
-
-**Safety:**
-- Exclusion zones
-- Remote operations
-- Automated sequences
-- Abort capability`
-            }
-          ],
-          keyTakeaways: [
-            'Launch sites have assembly, pad, and support facilities',
-            'Launch campaigns take weeks of preparation',
-            'Cryogenic propellants loaded close to launch',
-            'SpaceX densification increases propellant capacity 8%'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Falcon 9 uses which integration method?', options: ['Vertical only', 'Horizontal', 'In-flight', 'Underground'], correctAnswer: 1, explanation: 'Falcon 9 integrates horizontally, then raises to vertical on pad.' },
-              { id: 'q2', question: 'LOX boiling point is:', options: ['-253°C', '-183°C', '-161°C', '0°C'], correctAnswer: 1, explanation: 'Liquid oxygen boils at -183°C.' },
-              { id: 'q3', question: 'Vandenberg is used for:', options: ['Only east launches', 'Polar orbits', 'Only crewed', 'Testing only'], correctAnswer: 1, explanation: 'Vandenberg launches south over ocean for polar orbits.' },
-              { id: 'q4', question: 'Propellant densification increases capacity by:', options: ['1%', '8%', '20%', '50%'], correctAnswer: 1, explanation: 'Supercooling propellants increases density by ~8%.' },
-              { id: 'q5', question: 'Payload encapsulation occurs:', options: ['At factory', 'L-7 days', 'L-1 hour', 'After launch'], correctAnswer: 1, explanation: 'Fairing installation typically happens about a week before launch.' }
-            ]
-          }
-        },
-    
-    {
-          id: 'countdown',
-          title: 'Launch Countdown',
-          duration: '25 min',
-          xp: 150,
-          description: 'The final hours before liftoff',
-          aiTutor: true,
-          introduction: `The countdown is the final sequence leading to launch. Every system is checked, propellants loaded, and the vehicle prepared for its journey. It's a carefully orchestrated process with no room for error.`,
-          sections: [
-            {
-              title: 'Countdown Sequence',
-              content: `**T-4 hours:**
-- Final vehicle checks
-- Weather assessment
-- Range clearance
-
-**T-1 hour:**
-- Propellant loading begins
-- Crew ingress (if crewed)
-- Final software loads
-
-**T-10 minutes:**
-- Terminal count begins
-- Automated sequence starts
-- Final polls
-
-**T-1 minute:**
-- Propellant top-off complete
-- Vehicle in flight configuration
-- Final hold point
-
-**T-10 seconds:**
-- Ignition sequence start
-- Engine start commands
-- Sound suppression water
-
-**T-0:**
-- Liftoff!`
-            },
-            {
-              title: 'Go/No-Go Polls',
-              content: `**What is a Poll?**
-Each console position reports status.
-"Go" = ready, "No-go" = problem.
-
-**Key Positions:**
-- Flight Director: Overall authority
-- Propulsion: Engine systems
-- GNC: Guidance and control
-- Range Safety: Public safety
-- Weather: Conditions acceptable
-- Payload: Customer ready
-
-**Criteria:**
-- All systems nominal
-- Weather within limits
-- Range clear
-- Tracking ready
-
-**Hold vs Scrub:**
-- Hold: Pause countdown, may resume
-- Scrub: Cancel for the day
-- Recycle: Reset to earlier time`
-            },
-            {
-              title: 'Abort Modes',
-              content: `**Pre-Ignition Abort:**
-- Problem detected before engine start
-- Safest - just don't launch
-- Can recycle and try again
-
-**Pad Abort:**
-- Engines started but problem detected
-- Shutdown before liftoff
-- Falcon 9 has done this
-
-**In-Flight Abort:**
-- Problem after liftoff
-- Crew escape (if crewed)
-- Vehicle may be lost
-
-**Abort Triggers:**
-- Engine anomaly
-- Guidance failure
-- Structural issue
-- Range safety violation
-
-**Falcon 9 Pad Abort (2016):**
-- Anomaly detected at T-0
-- Engines shut down
-- Vehicle safe
-- Launched successfully later`
-            }
-          ],
-          keyTakeaways: [
-            'Countdown is carefully sequenced over hours',
-            'Go/No-Go polls confirm all systems ready',
-            'Multiple abort modes protect vehicle and crew',
-            'Holds allow issues to be resolved without scrubbing'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Terminal count begins at approximately:', options: ['T-4 hours', 'T-1 hour', 'T-10 minutes', 'T-10 seconds'], correctAnswer: 2, explanation: 'Terminal count (automated sequence) starts around T-10 minutes.' },
-              { id: 'q2', question: 'A scrub means:', options: ['Clean the rocket', 'Cancel for the day', 'Pause briefly', 'Launch immediately'], correctAnswer: 1, explanation: 'Scrub = cancel launch attempt for the day.' },
-              { id: 'q3', question: 'Flight Director has:', options: ['No authority', 'Overall authority', 'Weather authority only', 'Propulsion authority only'], correctAnswer: 1, explanation: 'Flight Director has overall authority for launch decision.' },
-              { id: 'q4', question: 'Pad abort occurs:', options: ['Before ignition', 'After ignition, before liftoff', 'After liftoff', 'In orbit'], correctAnswer: 1, explanation: 'Pad abort: engines started but shutdown before liftoff.' },
-              { id: 'q5', question: 'Propellant loading typically starts at:', options: ['T-4 hours', 'T-1 hour', 'T-10 minutes', 'T-1 minute'], correctAnswer: 1, explanation: 'Cryogenic propellant loading begins about 1 hour before launch.' }
-            ]
-          }
-        },
-        {
-          id: 'mission-control',
-          title: 'Mission Control',
-          duration: '30 min',
-          xp: 175,
-          description: 'Commanding rockets from the ground',
-          aiTutor: true,
-          introduction: `Mission Control is the nerve center of every launch. Teams of engineers monitor every system, ready to respond to any situation. From Houston to Hawthorne, mission control makes spaceflight possible.`,
-          sections: [
-            {
-              title: 'Control Room Layout',
-              content: `**Front Room:**
-- Flight Director (center)
-- Key system consoles
-- Large displays
-- Real-time decisions
-
-**Back Room:**
-- Detailed system experts
-- Support front room
-- Deep analysis capability
-
-**Console Positions:**
-- FLIGHT: Flight Director
-- PROP: Propulsion
-- GNC: Guidance/Navigation/Control
-- EECOM: Electrical/Environmental
-- CAPCOM: Crew communication
-- FIDO: Flight Dynamics
-
-**Displays:**
-- Telemetry data
-- Trajectory plots
-- Video feeds
-- Timeline`
-            },
-            {
-              title: 'Flight Director Role',
-              content: `**Responsibilities:**
-- Overall mission authority
-- Go/No-Go decisions
-- Anomaly response
-- Team coordination
-
-**Famous Flight Directors:**
-- Chris Kraft (invented the role)
-- Gene Kranz (Apollo 13)
-- Milt Heflin (Shuttle era)
-
-**Decision Making:**
-- Gather information quickly
-- Assess options
-- Make decisive calls
-- Accept responsibility
-
-**Gene Kranz Quote:**
-"Failure is not an option."
-(Actually said by a screenwriter, but captures the spirit!)`
-            },
-            {
-              title: 'Anomaly Response',
-              content: `**When Things Go Wrong:**
-1. Recognize the problem
-2. Gather data
-3. Assess severity
-4. Determine options
-5. Execute response
-
-**Communication:**
-- Clear, concise calls
-- Standard phraseology
-- Confirm understanding
-- Document everything
-
-**Apollo 13 Example:**
-- Oxygen tank explosion
-- Mission control worked problem
-- Improvised solutions
-- Brought crew home safely
-
-**Modern Automation:**
-- Many responses automated
-- Faster than human reaction
-- Mission control monitors
-- Intervenes when needed`
-            }
-          ],
-          keyTakeaways: [
-            'Mission control monitors all systems in real-time',
-            'Flight Director has overall mission authority',
-            'Clear communication protocols prevent confusion',
-            'Modern systems automate many responses'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Flight Director position is called:', options: ['CAPCOM', 'FLIGHT', 'GNC', 'PROP'], correctAnswer: 1, explanation: 'FLIGHT is the call sign for Flight Director.' },
-              { id: 'q2', question: 'CAPCOM communicates with:', options: ['Propulsion', 'The crew', 'Range safety', 'Weather'], correctAnswer: 1, explanation: 'CAPCOM (Capsule Communicator) talks to the crew.' },
-              { id: 'q3', question: 'Back room provides:', options: ['Snacks', 'Detailed expert support', 'Public relations', 'Security'], correctAnswer: 1, explanation: 'Back room has deep experts supporting front room consoles.' },
-              { id: 'q4', question: 'Who invented the Flight Director role?', options: ['Gene Kranz', 'Chris Kraft', 'Wernher von Braun', 'Elon Musk'], correctAnswer: 1, explanation: 'Chris Kraft created the Flight Director role for Mercury program.' },
-              { id: 'q5', question: 'Modern anomaly response is often:', options: ['Ignored', 'Automated', 'Delayed', 'Manual only'], correctAnswer: 1, explanation: 'Many responses are automated for speed; humans monitor and intervene.' }
-            ]
-          }
-        },
-        
-{
-          id: 'range-safety',
-          title: 'Range Safety',
-          duration: '25 min',
-          xp: 150,
-          description: 'Protecting people during launches',
-          aiTutor: true,
-          introduction: `Range safety ensures that rocket launches don't endanger the public. From exclusion zones to flight termination systems, multiple layers of protection keep people safe even if something goes wrong.`,
-          sections: [
-            {
-              title: 'Range Safety Principles',
-              content: `**Primary Goal:**
-Protect public safety above all else.
-
-**Risk Criteria:**
-- Expected Casualty (Ec) < 30 per million
-- Individual risk limits
-- Collective risk limits
-
-**Protection Methods:**
-- Exclusion zones (keep people away)
-- Flight corridors (planned trajectory)
-- Flight termination (destroy if off-course)
-- Tracking (know where rocket is)
-
-**Range Organizations:**
-- Eastern Range (Cape Canaveral)
-- Western Range (Vandenberg)
-- Wallops Flight Facility
-- Commercial ranges`
-            },
-            {
-              title: 'Flight Termination System',
-              content: `**Purpose:**
-Destroy rocket if it threatens populated areas.
-
-**Traditional FTS:**
-- Ground command
-- Range safety officer watches
-- Sends destruct command if needed
-- Explosive charges cut tanks
-
-**Autonomous FTS (AFTS):**
-- GPS-based
-- Onboard decision making
-- Faster response
-- No ground command needed
-- Falcon 9 uses AFTS
-
-**Termination Criteria:**
-- Leaves flight corridor
-- Exceeds velocity limits
-- Loss of tracking
-- Loss of control
-
-**AFTS Advantages:**
-- Faster response
-- Works over ocean (no ground stations)
-- Reduces range infrastructure`
-            },
-            {
-              title: 'Debris Analysis',
-              content: `**What Happens After Termination?**
-Debris falls - must predict where.
-
-**Debris Footprint:**
-- Area where debris may land
-- Depends on altitude, velocity, breakup
-- Must be over unpopulated area
-
-**Casualty Analysis:**
-- Population density
-- Debris characteristics
-- Probability of impact
-- Probability of casualty
-
-**Exclusion Zones:**
-- Ocean areas cleared of ships
-- Airspace restricted
-- Ground areas evacuated if needed
-
-**Notices:**
-- NOTAM (Notice to Airmen)
-- NOTMAR (Notice to Mariners)
-- Public notifications`
-            }
-          ],
-          keyTakeaways: [
-            'Range safety protects public from rocket accidents',
-            'FTS destroys rocket if it threatens populated areas',
-            'AFTS makes autonomous termination decisions',
-            'Debris analysis ensures safe impact zones'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Primary range safety goal is:', options: ['Protect rocket', 'Protect payload', 'Protect public', 'Protect schedule'], correctAnswer: 2, explanation: 'Public safety is the primary concern of range safety.' },
-              { id: 'q2', question: 'AFTS stands for:', options: ['Automatic Flight Tracking System', 'Autonomous Flight Termination System', 'Advanced Fuel Transfer System', 'Attitude Flight Test System'], correctAnswer: 1, explanation: 'Autonomous Flight Termination System makes onboard destruct decisions.' },
-              { id: 'q3', question: 'FTS is triggered when rocket:', options: ['Reaches orbit', 'Leaves flight corridor', 'Runs low on fuel', 'Completes mission'], correctAnswer: 1, explanation: 'FTS activates if rocket leaves designated safe corridor.' },
-              { id: 'q4', question: 'NOTAM stands for:', options: ['Notice to All Mariners', 'Notice to Airmen', 'National Orbital Tracking And Monitoring', 'Navigation Of Trajectory And Mission'], correctAnswer: 1, explanation: 'NOTAM = Notice to Airmen, warns of restricted airspace.' },
-              { id: 'q5', question: 'Falcon 9 uses which FTS type?', options: ['Ground command only', 'AFTS', 'No FTS', 'Manual'], correctAnswer: 1, explanation: 'Falcon 9 uses Autonomous FTS for faster, more flexible operations.' }
-            ]
-          }
-        },
-        {
-          id: 'weather',
-          title: 'Launch Weather',
-          duration: '25 min',
-          xp: 150,
-          description: 'When weather says no',
-          aiTutor: true,
-          introduction: `Weather is one of the biggest factors in launch decisions. Lightning, wind, rain, and clouds can all prevent a launch. Understanding weather constraints helps explain why launches sometimes scrub.`,
-          sections: [
-            {
-              title: 'Weather Constraints',
-              content: `**Lightning:**
-- Most common constraint
-- Can't launch through anvil clouds
-- Must wait for storms to clear
-- Triggered lightning is a risk
-
-**Wind:**
-- Upper level winds affect trajectory
-- Surface winds affect pad operations
-- Wind shear can stress vehicle
-- Limits: ~30-40 mph surface
-
-**Precipitation:**
-- Rain can damage vehicle
-- Ice formation on cryogenic tanks
-- Visibility for tracking
-
-**Clouds:**
-- Cumulus can indicate convection
-- Must see rocket for tracking
-- Some cloud types prohibited
-
-**Temperature:**
-- Affects propellant density
-- O-ring concerns (Challenger)
-- Equipment operating limits`
-            },
-            {
-              title: 'Weather Monitoring',
-              content: `**45th Weather Squadron:**
-- Dedicated to Cape Canaveral
-- 24/7 monitoring
-- Launch forecasts
-- Go/No-Go recommendations
-
-**Tools:**
-- Weather balloons
-- Radar
-- Satellites
-- Field mills (lightning)
-- Wind profilers
-
-**Forecast Products:**
-- L-3 day outlook
-- L-24 hour forecast
-- L-4 hour update
-- Real-time monitoring
-
-**Probability of Violation (POV):**
-- Chance weather will violate criteria
-- <20% POV typically needed
-- Updated throughout countdown`
-            },
-            {
-              title: 'Weather Decisions',
-              content: `**Who Decides?**
-- Weather officer provides data
-- Launch director makes call
-- Conservative approach
-
-**Scrub vs Wait:**
-- Brief weather: May hold
-- Extended weather: Scrub
-- Window duration matters
-
-**Florida Challenges:**
-- Afternoon thunderstorms common
-- Sea breeze convergence
-- Morning launches preferred
-
-**California Advantages:**
-- More stable weather
-- Marine layer main issue
-- Fewer lightning concerns
-
-**Statistics:**
-- ~30-40% of scrubs are weather
-- Florida worse than California
-- Summer worse than winter`
-            }
-          ],
-          keyTakeaways: [
-            'Lightning is the most common weather constraint',
-            'Wind, rain, and clouds also affect launch decisions',
-            '45th Weather Squadron provides dedicated forecasts',
-            '30-40% of launch scrubs are weather-related'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Most common weather constraint is:', options: ['Wind', 'Rain', 'Lightning', 'Temperature'], correctAnswer: 2, explanation: 'Lightning is the most frequent cause of weather delays.' },
-              { id: 'q2', question: 'Surface wind limit is approximately:', options: ['10 mph', '30-40 mph', '100 mph', 'No limit'], correctAnswer: 1, explanation: 'Surface winds above 30-40 mph typically prevent launch.' },
-              { id: 'q3', question: 'What % of scrubs are weather-related?', options: ['5-10%', '15-20%', '30-40%', '60-70%'], correctAnswer: 2, explanation: 'Weather causes 30-40% of launch scrubs.' },
-              { id: 'q4', question: 'Florida weather challenge is:', options: ['Too cold', 'Afternoon thunderstorms', 'Too dry', 'No wind'], correctAnswer: 1, explanation: 'Florida has frequent afternoon thunderstorms, especially in summer.' },
-              { id: 'q5', question: 'POV stands for:', options: ['Point of View', 'Probability of Violation', 'Percent of Visibility', 'Power of Vehicle'], correctAnswer: 1, explanation: 'Probability of Violation = chance weather will violate launch criteria.' }
-            ]
-          }
-        },
-  
-      {
-          id: 'post-flight',
-          title: 'Post-Flight Analysis',
-          duration: '25 min',
-          xp: 150,
-          description: 'Learning from every flight',
-          aiTutor: true,
-          introduction: `Every flight generates gigabytes of data. Post-flight analysis extracts lessons learned, identifies anomalies, and improves future flights. It's how rockets get better over time.`,
-          sections: [
-            {
-              title: 'Data Collection',
-              content: `**Telemetry Data:**
-- Thousands of parameters
-- Recorded throughout flight
-- Transmitted to ground
-- Stored for analysis
-
-**Video:**
-- Onboard cameras
-- Ground tracking cameras
-- Drone ship cameras
-- Public broadcast
-
-**Recovered Hardware:**
-- First stage (if reusable)
-- Fairings
-- Physical inspection
-- Forensic analysis
-
-**Data Volume:**
-- Falcon 9: ~10 GB per flight
-- Thousands of channels
-- Millisecond resolution`
-            },
-            {
-              title: 'Analysis Process',
-              content: `**Quick Look:**
-- Immediate post-flight
-- Key parameters check
-- Obvious anomalies
-- Initial success assessment
-
-**Detailed Analysis:**
-- Days to weeks
-- Every parameter reviewed
-- Compare to predictions
-- Identify trends
-
-**Anomaly Investigation:**
-- Root cause analysis
-- Fault tree
-- Corrective actions
-- Prevent recurrence
-
-**Flight Readiness:**
-- Analysis must complete
-- Anomalies resolved
-- Before next flight approved`
-            },
-            {
-              title: 'Continuous Improvement',
-              content: `**Lessons Learned:**
-- Document findings
-- Share across teams
-- Update procedures
-- Improve designs
-
-**Fleet Leader:**
-- Track usage of each vehicle
-- Identify wear patterns
-- Predict maintenance needs
-- Extend service life
-
-**Performance Trends:**
-- Engine performance over flights
-- Structural health
-- Avionics reliability
-- Identify degradation
-
-**SpaceX Approach:**
-- Rapid analysis
-- Quick turnaround
-- Continuous updates
-- Data-driven decisions`
-            }
-          ],
-          keyTakeaways: [
-            'Every flight generates gigabytes of telemetry data',
-            'Quick look analysis happens immediately after flight',
-            'Anomaly investigation finds root causes',
-            'Lessons learned improve future flights'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'Falcon 9 generates approximately how much data per flight?', options: ['1 MB', '100 MB', '~10 GB', '1 TB'], correctAnswer: 2, explanation: 'Falcon 9 generates ~10 GB of telemetry per flight.' },
-              { id: 'q2', question: 'Quick look analysis happens:', options: ['Before flight', 'Immediately after flight', 'Weeks later', 'Never'], correctAnswer: 1, explanation: 'Quick look is immediate post-flight assessment of key parameters.' },
-              { id: 'q3', question: 'Anomaly investigation uses:', options: ['Guessing', 'Root cause analysis', 'Ignoring problems', 'Random fixes'], correctAnswer: 1, explanation: 'Root cause analysis systematically identifies why anomalies occurred.' },
-              { id: 'q4', question: 'Fleet leader tracking helps:', options: ['Marketing', 'Predict maintenance needs', 'Reduce data', 'Speed up launches'], correctAnswer: 1, explanation: 'Fleet leader data predicts when maintenance or replacement is needed.' },
-              { id: 'q5', question: 'Before next flight, anomalies must be:', options: ['Ignored', 'Documented only', 'Resolved', 'Hidden'], correctAnswer: 2, explanation: 'All anomalies must be resolved before approving next flight.' }
-            ]
-          }
-        },
-        {
-          id: 'failure-investigation',
-          title: 'Failure Investigation',
-          duration: '30 min',
-          xp: 175,
-          description: 'When things go wrong',
-          aiTutor: true,
-          introduction: `Rocket failures are rare but devastating. When they happen, thorough investigation is essential to understand what went wrong and prevent it from happening again. Every failure makes rockets safer.`,
-          sections: [
-            {
-              title: 'Investigation Process',
-              content: `**Immediate Response:**
-- Secure the scene
-- Preserve evidence
-- Impound data
-- Notify authorities
-
-**Investigation Team:**
-- Independent investigators
-- Subject matter experts
-- Quality assurance
-- Sometimes NASA/FAA oversight
-
-**Evidence Collection:**
-- Telemetry analysis
-- Debris recovery
-- Witness interviews
-- Manufacturing records
-
-**Timeline:**
-- Weeks to months
-- Thorough, not rushed
-- Must find root cause
-- Return to flight depends on it`
-            },
-            {
-              title: 'Root Cause Analysis',
-              content: `**Fault Tree:**
-- Start with failure event
-- Work backward to causes
-- Identify all contributors
-- Find root cause(s)
-
-**5 Whys:**
-- Ask "why" repeatedly
-- Dig deeper each time
-- Find underlying cause
-- Not just symptoms
-
-**Fishbone Diagram:**
-- Categories of causes
-- People, process, equipment
-- Environment, materials
-- Systematic approach
-
-**Common Causes:**
-- Design errors
-- Manufacturing defects
-- Procedural mistakes
-- Environmental factors
-- Software bugs`
-            },
-            {
-              title: 'Return to Flight',
-              content: `**Corrective Actions:**
-- Fix the root cause
-- Verify effectiveness
-- Update procedures
-- Retrain if needed
-
-**Independent Review:**
-- External experts
-- Challenge assumptions
-- Verify completeness
-- Approve return to flight
-
-**Communication:**
-- Transparent reporting
-- Customer notification
-- Public statement
-- Regulatory compliance
-
-**Famous Investigations:**
-- Challenger (1986): O-ring failure
-- Columbia (2003): Foam strike
-- Falcon 9 (2015): Strut failure
-- Falcon 9 (2016): COPV failure
-
-Each led to significant improvements.`
-            }
-          ],
-          keyTakeaways: [
-            'Failure investigation is thorough and systematic',
-            'Root cause analysis finds underlying causes, not symptoms',
-            'Corrective actions must be verified before return to flight',
-            'Every failure leads to improvements'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'First step after failure is:', options: ['Launch again', 'Secure scene and preserve evidence', 'Blame someone', 'Ignore it'], correctAnswer: 1, explanation: 'Preserving evidence is critical for investigation.' },
-              { id: 'q2', question: '5 Whys technique:', options: ['Asks why 5 times to find root cause', 'Takes 5 days', 'Needs 5 people', 'Costs $5 million'], correctAnswer: 0, explanation: '5 Whys repeatedly asks "why" to dig to root cause.' },
-              { id: 'q3', question: 'Challenger failure was caused by:', options: ['Engine failure', 'O-ring failure', 'Software bug', 'Pilot error'], correctAnswer: 1, explanation: 'Cold temperature caused O-ring failure in solid rocket booster.' },
-              { id: 'q4', question: 'Return to flight requires:', options: ['Just fixing the problem', 'Independent review approval', 'Waiting 1 year', 'New rocket design'], correctAnswer: 1, explanation: 'Independent review must verify corrective actions before return to flight.' },
-              { id: 'q5', question: 'Investigation timeline is typically:', options: ['Hours', 'Days', 'Weeks to months', 'Years'], correctAnswer: 2, explanation: 'Thorough investigations take weeks to months.' }
-            ]
-          }
-        },
-       
- {
-          id: 'orbital-operations',
-          title: 'Orbital Operations',
-          duration: '30 min',
-          xp: 175,
-          description: 'What happens after reaching orbit',
-          aiTutor: true,
-          introduction: `Reaching orbit is just the beginning. Satellites must be deployed, orbits adjusted, and missions executed. Understanding orbital operations completes your knowledge of the full mission lifecycle.`,
-          sections: [
-            {
-              title: 'Payload Deployment',
-              content: `**Deployment Sequence:**
-1. Reach target orbit
-2. Attitude stabilization
-3. Separation command
-4. Springs/pushers deploy payload
-5. Confirm separation
-6. Payload activates
-
-**Deployment Methods:**
-- Spring pushers (simple)
-- Spin deployment (stability)
-- Robotic arm (ISS)
-- Dispenser (multiple sats)
-
-**Rideshare Deployment:**
-- Multiple payloads
-- Sequenced deployment
-- Different orbits possible
-- Collision avoidance critical
-
-**Confirmation:**
-- Telemetry from payload
-- Ground tracking
-- Visual (cameras)`
-            },
-            {
-              title: 'Orbit Adjustment',
-              content: `**Why Adjust?**
-- Insertion errors
-- Different target orbit
-- Collision avoidance
-- Station keeping
-
-**Maneuver Types:**
-- Hohmann transfer (efficient)
-- Bi-elliptic (very high orbits)
-- Plane change (expensive!)
-- Phasing (rendezvous)
-
-**Propulsion Options:**
-- Chemical (fast, high thrust)
-- Electric (slow, efficient)
-- Combination
-
-**GTO to GEO:**
-- Launch to transfer orbit
-- Coast to apogee
-- Circularization burn
-- Takes hours to days`
-            },
-            {
-              title: 'End of Mission',
-              content: `**Deorbit (LEO):**
-- Retrograde burn
-- Reenter atmosphere
-- Burn up or controlled impact
-- Required within 25 years
-
-**Graveyard Orbit (GEO):**
-- Boost above GEO
-- ~300 km higher
-- Doesn't interfere with active sats
-- Remains indefinitely
-
-**Passivation:**
-- Deplete propellants
-- Discharge batteries
-- Prevent explosions
-- Reduce debris risk
-
-**Space Debris:**
-- Growing problem
-- Collision risk
-- Active debris removal (future)
-- Design for demise`
-            }
-          ],
-          keyTakeaways: [
-            'Payload deployment is carefully sequenced',
-            'Orbit adjustments use chemical or electric propulsion',
-            'LEO satellites must deorbit within 25 years',
-            'GEO satellites go to graveyard orbit'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'LEO satellites must deorbit within:', options: ['1 year', '5 years', '25 years', 'Never'], correctAnswer: 2, explanation: 'International guidelines require LEO deorbit within 25 years.' },
-              { id: 'q2', question: 'Graveyard orbit is:', options: ['Below LEO', 'At GEO', 'Above GEO', 'At L2'], correctAnswer: 2, explanation: 'Graveyard orbit is ~300 km above GEO.' },
-              { id: 'q3', question: 'Passivation involves:', options: ['Painting satellite', 'Depleting propellants and batteries', 'Activating payload', 'Boosting orbit'], correctAnswer: 1, explanation: 'Passivation removes stored energy to prevent explosions.' },
-              { id: 'q4', question: 'Hohmann transfer is:', options: ['Fastest', 'Most fuel efficient', 'Most expensive', 'Impossible'], correctAnswer: 1, explanation: 'Hohmann transfer is the most fuel-efficient orbit change.' },
-              { id: 'q5', question: 'Rideshare deployment requires:', options: ['Single payload', 'Collision avoidance', 'No sequencing', 'Same orbit for all'], correctAnswer: 1, explanation: 'Multiple payloads require careful sequencing to avoid collisions.' }
-            ]
-          }
-        },
-        {
-          id: 'future-operations',
-          title: 'Future of Launch Operations',
-          duration: '25 min',
-          xp: 150,
-          description: 'Where launch operations are heading',
-          aiTutor: true,
-          introduction: `Launch operations are evolving rapidly. From daily flights to autonomous operations, the future promises more accessible, affordable, and frequent access to space. Let's explore what's coming.`,
-          sections: [
-            {
-              title: 'Increased Cadence',
-              content: `**Current State:**
-- SpaceX: ~90 launches/year
-- Industry total: ~200/year
-- Growing rapidly
-
-**Near Future:**
-- SpaceX goal: 150+/year
-- Starship: Daily flights?
-- Multiple providers scaling
-
-**Enabling Factors:**
-- Reusability
-- Streamlined operations
-- Autonomous systems
-- Dedicated facilities
-
-**Challenges:**
-- Range capacity
-- Workforce
-- Supply chain
-- Regulatory`
-            },
-            {
-              title: 'Autonomous Operations',
-              content: `**Current Automation:**
-- Countdown sequences
-- Flight termination
-- Landing
-- Some inspections
-
-**Future Automation:**
-- Autonomous vehicle processing
-- AI-based anomaly detection
-- Robotic refurbishment
-- Minimal human intervention
-
-**Benefits:**
-- Faster turnaround
-- Lower cost
-- Fewer errors
-- 24/7 operations
-
-**Starship Vision:**
-- Aircraft-like operations
-- Hours between flights
-- Minimal ground crew
-- Fully autonomous landing/stacking`
-            },
-            {
-              title: 'New Capabilities',
-              content: `**Point-to-Point:**
-- Earth-to-Earth transport
-- 30 minutes anywhere
-- Starship capability
-- Military and commercial
-
-**Space Tourism:**
-- Suborbital (Blue Origin, Virgin)
-- Orbital (SpaceX, Axiom)
-- Lunar tourism (dearMoon)
-- Growing market
-
-**In-Space Manufacturing:**
-- Microgravity production
-- Pharmaceuticals, materials
-- Requires frequent launch
-
-**Lunar/Mars Operations:**
-- Artemis program
-- SpaceX Mars plans
-- Sustained presence
-- New operational paradigms
-
-**The Future:**
-Space access becomes routine.
-Launch operations become like airline operations.
-You might fly to space in your lifetime!`
-            }
-          ],
-          keyTakeaways: [
-            'Launch cadence is increasing dramatically',
-            'Automation will enable faster, cheaper operations',
-            'Point-to-point and tourism are emerging markets',
-            'Space access is becoming routine'
-          ],
-          quiz: {
-            questions: [
-              { id: 'q1', question: 'SpaceX current launch rate is approximately:', options: ['10/year', '50/year', '90/year', '200/year'], correctAnswer: 2, explanation: 'SpaceX launches ~90 times per year as of 2024.' },
-              { id: 'q2', question: 'Starship turnaround goal is:', options: ['Months', 'Weeks', 'Days', 'Hours'], correctAnswer: 3, explanation: 'Starship aims for hours between flights - aircraft-like operations.' },
-              { id: 'q3', question: 'Point-to-point transport could reach anywhere in:', options: ['30 minutes', '2 hours', '8 hours', '24 hours'], correctAnswer: 0, explanation: 'Suborbital point-to-point could reach anywhere on Earth in ~30 minutes.' },
-              { id: 'q4', question: 'Space tourism is offered by:', options: ['Only NASA', 'Blue Origin and SpaceX', 'No one yet', 'Only Russia'], correctAnswer: 1, explanation: 'Blue Origin, Virgin Galactic, and SpaceX offer space tourism.' },
-              { id: 'q5', question: 'Future launch operations will be more like:', options: ['Current operations', 'Airline operations', 'Ship operations', 'Train operations'], correctAnswer: 1, explanation: 'Goal is aircraft-like routine operations with rapid turnaround.' }
-            ]
-          }
+        id: 'structural-testing',
+        title: 'Structural Testing: Shakers and Loads',
+        duration: '10 min', xp: 200,
+        description: 'Simulating the violent forces of launch on a stationary rocket',
+        aiTutor: true,
+        introduction: "You can't test a rocket's strength while it's in space. You have to prove it on the ground. Structural testing involve subjecting the rocket to loads and vibrations that are 25-50% HIGHER than the worst-case flight scenario to ensure it doesn't snap under pressure.",
+        sections: [
+          { title: '🎯 Static Load Testing', content: "**The Big Squeeze**\n\nEngineers build massive steel frames (test rigs) around the rocket tanks. They then use hydraulic pistons to pull, push, and twist the rocket to simulate the 'G-loads' of launch.\n\n**Limit Load vs. Ultimate Load:**\n- **Limit Load:** The maximum force we EVER expect the rocket to see in flight.\n- **Ultimate Load:** Typically 1.25x or 1.5x the Limit Load.\n\n**Test to Failure:**\nSometimes, engineers take a 'sacrificial' tank and keep increasing the pressure until it literally explodes. This confirms the mathematical models and proves exactly where the weakest weld is. If it explodes at 124 PSI when the requirement was 125 PSI, the whole design must be changed." },
+          { title: '🔧 Vibration & Acoustic Testing', content: "**The Shaker Table**\n\nA rocket launch is the loudest thing on Earth. High-decibel sound waves are strong enough to shake bolts loose and shatter glass. \n\n**The Sine-Shake:**\nEntire satellites or avionics boxes are bolted to a 'Shaker Table' — a giant magnetic piston that vibrates at 2,000 Hz. If a wire snaps or a solder joint cracks during this 'simulated launch,' the part fails qualification.\n\n**Acoustic Chambers:**\nSome parts are placed in 'The Big Horn' — a room with massive speakers that simulate the 160+ decibel roar of the engines. This ensures the carbon-fiber fairings don't delaminate under the sound pressure." },
+          { title: '📐 Modal Analysis: Finding the Ring', content: "**Avoid the Resonance**\n\nEvery object has a 'Natural Frequency' — the speed at which it wants to vibrate. (Think of a wine glass ringing).\n\n**The Pogo Effect:**\nIf the engine's vibration matches the natural' vibration of the fuel in the pipes, they enter a 'feedback loop' called Pogo. The rocket will bounce up and down with increasing violence until it breaks in half. \n\n**Modal Testing:**\nEngineers tap the rocket with 'instrumented hammers' to find these dangerous frequencies. They then add 'Dampeners' (like shock absorbers) or change the stiffness of the metal to ensure the natural frequencies are far away from the engine's 50 Hz signature." },
+          { title: '🚀 Qualification vs. Acceptance', content: "**Prove it Once, Check it Every Time**\n\n**Qualification Testing:**\nDone on the FIRST prototype. It is destructive and brutal. It proves the DESIGN is good. You test 'Limit + 25%' to ensure there is a safety margin.\n\n**Acceptance Testing (AT):**\nDone on EVERY rocket that actually flies. It is gentle. You test it to 'Limit' loads but not higher. This is to catch manufacturing defects (a bad weld, a loose bolt) without damaging the vehicle. Every SpaceX Merlin engine and every Falcon 9 booster undergoes Acceptance Testing before it ever reaches the launchpad." },
+          { title: '🧪 Structural Testing Practice', content: "**P1:** Why do we test a rocket to 1.25x the expected load?\n*Answer: This accounts for 'Factor of Safety.' We know our math might be off by 5%, or the metal might have a 2% defect. The 25% 'extra' ensures that even with those errors, the rocket stays in one piece.*\n\n**P2:** What happens if a part 'Resonates' during the shaker test?\n*Answer: The vibrations amplify itself. A 1mm shake becomes a 10mm shake, which can quickly exceed the strength of the metal and cause a 'Fatigue Failure' (snapping).*\n\n**P3:** Can you use the same rocket for Qualification and then for a real mission?\n*Answer: Generally no. Qualification testing is so stressful (Testing to Failure) that it weakens the metal and uses up its 'Fatigue Life.' The Qual unit becomes a museum piece or scrap metal.*\n\n**P4:** What is 'Burn-in' testing for avionics?\n*Answer: Running the electronics for 48-100 hours continuously at high temperatures. Most electronic failures happen in the first few hours of life ('Infant Mortality'). If it survives the burn-in, it's much more likely to work during the 10-minute launch.*\n\n**P5:** Why is acoustic testing done for satellites inside the fairing?\n*Answer: Because sound waves reflect off the inside of the nose cone, creating a 'cavity' of intense energy. Even if the satellite is safe from the wind, the noise itself can destroy delicate solar panels or sensors.*" }
+        ],
+        keyTakeaways: ['Qualification proves the DESIGN; Acceptance proves the BUILD', 'Testing to Ultimate Load (1.25x - 1.5x) validates the Safety Factor', 'Shaker tables simulate the extreme vibration environment of launch', 'Resonance (Pogo) is a destructive feedback loop that must be tuned out', 'Acoustic testing ensures sound pressure doesnt shatter components'],
+        vocabulary: [
+          { term: 'Ultimate Load', definition: 'The maximum load a structure can withstand without failing' },
+          { term: 'Acceptance Test', definition: 'A non-destructive test performed on flight hardware to find defects' },
+          { term: 'Pogo', definition: 'Longitudinal vibration caused by coupling between structures and propellant' },
+          { term: 'Resonance', definition: 'When a system is driven to oscillate with greater amplitude at specific frequencies' },
+          { term: 'Fatigue Life', definition: 'The number of stress cycles a part can survive before cracking' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'Structural "Acceptance Testing" is performed on:', options: ['The first prototype only', 'Every rocket before flight', 'Only failed parts', 'The blueprint'], correctAnswer: 1, explanation: 'Every engine and stage is checked for manufacturing defects before use.' },
+            { id: 'q2', question: 'Ultimate Load is typically what factor of the expected load?', options: ['0.5x', '1.0x', '1.25x to 1.5x', '10x'], correctAnswer: 2, explanation: '1.25x or 1.5x is common in aerospace to balance safety and mass.' },
+            { id: 'q3', question: 'The "Pogo" effect is dangerous because it is:', options: ['Too slow', 'A feedback loop of vibration', 'A fuel leak', 'A computer bug'], correctAnswer: 1, explanation: 'It is a destructive vibration that can break the rocket apart.' },
+            { id: 'q4', question: 'Vibration testing uses a:', options: ['Wind Tunnel', 'Shaker Table', 'Vacuum Chamber', 'Oven'], correctAnswer: 1, explanation: 'Shaker tables simulate the violent mechanical vibration of the engines.' },
+            { id: 'q5', question: 'Why is acoustic testing performed in a specialized chamber?', options: ['To save power', 'To simulate the loud engine roar', 'To test the radio', 'To find the weight'], correctAnswer: 1, explanation: 'Sound pressure at 160dB is strong enough to damage structural parts.' }
+          ]
         }
-      ]
-    }
-  ]
+      },
+      {
+        id: 'wind-tunnel-testing',
+        title: 'Wind Tunnels: Taming the Airflow',
+        duration: '10 min', xp: 200,
+        description: 'Testing scale models from sub-sonic to Mach 10',
+        aiTutor: true,
+        introduction: "Even with the world's best supercomputers, air is unpredictable. Scaling a rocket down to 1/10th its size and putting it in a high-speed Wind Tunnel is still a mandatory step for every new launch vehicle. We need to see if the fins actually steer or if the nose cone causes turbulent shockwaves that flip the mission.",
+        sections: [
+          { title: '🎯 Scale Models & Similarity', content: "**The Art of Scaling**\n\nYou can't just build a 70-meter rocket and hope for the best. You build a 1-meter model. \n\n**Reynolds Number:**\nFor the air to behave the same way on a small model as it does on a big rocket, you must match the 'Reynolds Number.' This often means using high-pressure air or different gases to simulate the 'thickness' of the atmosphere relative to the smaller size. \n\n**Force Measurement:**\nThe model is mounted on a 'Sting' — a sensitive sensor that measures Drag (pulling back), Lift (pulling up), and Moment (trying to spin it). If the model starts spinning uncontrollably in the tunnel, the real rocket will too." },
+          { title: '🔧 Supersonic and Hypersonic Tunnels', content: "**Faster than a Bullet**\n\n- **Subsonic Tunnels:** Test landing and low-altitude flight.\n- **Transonic Tunnels:** Test the dangerous Mach 0.8 to 1.2 region where shockwaves form.\n- **Hypersonic Tunnels (Mach 5+):** Use high-pressure tanks to fire a 'slug' of air at incredible speeds for just a few seconds. This tests the extreme heat and pressure of reentry.\n\n**Schlieren Photography:**\nEngineers use a special lighting technique called 'Schlieren' to actually SEE the air. It makes invisible shockwaves visible as dark lines in the photo, allowing designers to see if a bolt or a camera on the side of the rocket is causing 'dirty' air that could overheat the skin." },
+          { title: '📐 CFD vs. Wind Tunnel', content: "**Virtual vs. Reality**\n\n**CFD (Computational Fluid Dynamics):**\n- Pros: Cheap per run, can test 1,000 shapes in a weekend.\n- Cons: Math models for turbulence aren't perfect.\n\n**Wind Tunnel:**\n- Pros: Real physics. No 'guessing' about turbulence.\n- Cons: Very expensive (up to $5,000 per HOUR), hard to build perfect models.\n\n**The Modern Workflow:**\n1. Use CFD to narrow down 100 designs to the 'Best 3.'\n2. Build a high-quality model of the winners.\n3. Put them in the Wind Tunnel to VERIFY that the CFD math was right." },
+          { title: '🚀 Base Heating & Plume Interaction', content: "**The Fire Underneath**\n\nOne of the hardest things to simulate is what happens at the bottom of the rocket when 9 engines fire. \n\n**The Recirculation:**\nAt high altitudes, the engine plumes expand until they touch each other. This creates a vacuum that pulls super-hot exhaust GAS back UP toward the fragile engine wiring. Wind tunnels help engineers design 'Heat Shields' and 'Base Covers' to prevent the rocket from burning its own bottom off during ascent." },
+          { title: '🧪 Wind Tunnel Practice', content: "**P1:** Why use 'Schlieren Photography' in a wind tunnel?\n*Answer: It allows engineers to see density changes in the air, making shockwaves visible. This helps them identify 'Interference Drag' or areas where the air is becoming dangerously turbulent.*\n\n**P2:** If a model is 1/10th scale, do you need the wind to go 10x faster?\n*Answer: Not necessarily. You must maintain the 'Reynolds Number,' which is a ratio of inertial forces to viscous forces. Often engineers increase the air PRESSURE while keeping velocity the same to achieve 'Similarity.'*\n\n**P3:** What is a 'Blowdown' tunnel?\n*Answer: A tunnel that works by releasing a high-pressure tank of air all at once. They can reach Mach 10 but only run for 30-60 seconds before the tank is empty. It is a high-speed 'burst' test.*\n\n**P4:** Why are some models tested upside down or sideways?\n*Answer: Gravity. By rotating the model, engineers can measure if the 'Weight' of the model is confusing the sensitive 'Lift' and 'Drag' sensors. It's a way to cancel out errors.*\n\n**P5:** Can you test the effect of an engine firing in a wind tunnel?\n*Answer: Yes, but it's hard. Some tunnels use 'Cold Gas' or even small real engines to see how the hot exhaust plume disrupts the air around the fins. This is the ultimate test of aerodynamic stability.*" }
+        ],
+        keyTakeaways: ['Wind tunnels provide real-world validation for computer (CFD) models', 'Reynolds Number matching ensures a small model behaves like a big rocket', 'Schlieren photography makes invisible shockwaves visible for analysis', 'Plume interaction testing prevents the rocket from burning its own base', 'Hypersonic blowdown tunnels test the extreme speeds of reentry'],
+        vocabulary: [
+          { term: 'Reynolds Number', definition: 'A dimensionless quantity used to help predict flow patterns in different fluid scenarios' },
+          { term: 'Schlieren', definition: 'An optical process used to photograph the flow of fluids of varying density' },
+          { term: 'Hypersonic', definition: 'Speeds exceeding Mach 5 (five times the speed of sound)' },
+          { term: 'Sting', definition: 'The support structure that holds a model inside a wind tunnel and measures forces' },
+          { term: 'Blowdown Tunnel', definition: 'A high-speed wind tunnel powered by a single release of pressurized gas' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'To ensure a small model behaves like a large rocket, we match the:', options: ['Color', 'Reynolds Number', 'Price', 'Length only'], correctAnswer: 1, explanation: 'The Reynolds Number ensures "Similarity" in how air flows over different sizes.' },
+            { id: 'q2', question: 'Which speed region is most dangerous for shockwave vibration?', options: ['Subsonic', 'Transonic (Mach 1)', 'Hypersonic', 'Static'], correctAnswer: 1, explanation: 'The transition to Mach 1 creates unstable shockwave buffeting.' },
+            { id: 'q3', question: 'Schlieren photography is used to see:', options: ['The interior of the engine', 'Invisible shockwaves', 'The colors of the paint', 'Fuel leaks'], correctAnswer: 1, explanation: 'It visualizes density changes in air, making wave patterns visible.' },
+            { id: 'q4', question: 'Hypersonic speed is defined as:', options: ['Mach 1+', 'Mach 5+', 'Mach 10+', 'Mach 25+'], correctAnswer: 1, explanation: 'Anything above Mach 5 is generally considered Hypersonic.' },
+            { id: 'q5', question: 'CFD and Wind Tunnels are used together because:', options: ['CFD is more accurate', 'The Wind Tunnel verifies the CFD results', 'CFD is only for colors', 'They are not used together'], correctAnswer: 1, explanation: 'Wind tunnels serve as the "ground truth" to verify that computer simulations are correct.' }
+          ]
+        }
+      },
+      {
+        id: 'integrated-systems-testing',
+        title: 'Integrated Testing: WDR and Static Fire',
+        duration: '10 min', xp: 200,
+        description: 'Practicing a launch without actually letting go of the Earth',
+        aiTutor: true,
+        introduction: "You've tested the individual parts. You've tested the design. Now, you have the REAL rocket sitting on the pad. But you aren't going to launch yet. First, you must prove the 'Integrated System' is ready. This is the world of Wet Dress Rehearsals and Static Fires — the final exams before space.",
+        sections: [
+          { title: '🎯 WDR: The Practice Countdown', content: "**Wet Dress Rehearsal (WDR)**\n\n'Wet' means with fuel. A WDR is a full countdown that goes exactly like a real launch, until T-minus 1 second.\n\n**Process:**\n1. Roll the rocket to the pad.\n2. Fuel it with hundreds of tons of liquid oxygen and kerosene.\n3. Turn on the computers, radars, and ground support equipment.\n4. Run the countdown clock to the final second.\n5. **Abort!** \n\n**Why do it?** WDR tests 'Ground-to-Vehicle' communication. It ensures the pipes don't leak when they turn cold (-180°C) and the computers don't freeze under the data load. After the test, the fuel is pumped back out (this is the most dangerous part of the test)." },
+          { title: '🔧 Static Fire: Taming the Beast', content: "**Igniting the Pad**\n\nA Static Fire is a WDR plus one big addition: The engines actually light.\n\n**The Hold-Down:**\nMassive steel clamps hold the rocket to the pad with thousands of tons of force. The engines ignite for 3 to 7 seconds. \n\n**The Data:**\nEngineers look for 'Start-up Trends.' Are all 9 engines reaching full power at the same time? Is there a weird vibration in Engine #4? If even one sensor looks 'off,' the launch is delayed. A Static Fire proves that the rocket is healthy and ready to fly." },
+          { title: '📐 Hardware-In-The-Loop (HITL)', content: "**The Final Sim**\n\nBefore ever fueling the rocket, engineers run a 'HITL' test. They take the REAL flight computers and connect them to a simulator that tricks them into thinking they are flying.\n\n**The 'What-Ifs':**\nWhile the computer thinks it's at Mach 2, the engineers 'break' a sensor in the sim. 'What happens if Engine 3 explodes right now?' The HITL test proves the computer's logic will survive the disaster and pivot to a safe 'Engine-Out' mode. It is the only way to test software against high-speed physics without crashing a real rocket." },
+          { title: '🚀 Launch Abort Systems (LAS)', content: "**The Ejection Seat for Capsules**\n\nIf a rocket explodes on the pad during integrated testing (or launch), the astronauts need an out. \n\n**The Abort Motor:**\nA small, powerful solid rocket on TOP of the crew capsule. In 0.1 seconds, it can pull the capsule away from the exploding rocket with 10G of force. \n\n**Integrated Abort Tests:**\nSpaceX and Boeing perform 'Pad Abort' and 'In-Flight Abort' tests using real capsules to prove that even if the primary rocket fails, the crew survives. This is the ultimate 'Integrated' safety test." },
+          { title: '🧪 Integrated Testing Practice', content: "**P1:** Why is pumping fuel OUT of a rocket (Defueling) more dangerous than fueling it?\n*Answer: Because the tanks are now full of explosive vapors and are structurally 'stretching' back to their warm size. Any spark or valve failure is catastrophic in this high-energy state.*\n\n**P2:** What is a 'Hold-Down' clamp?\n*Answer: Massive structural bolts or clamps that literally pin the rocket to the ground. During a Static Fire, they must resist 800+ tons of thrust so the rocket doesn't accidentally take off.*\n\n**P3:** Why only fire the engines for 5 seconds during a static fire?\n*Answer: Because 5 seconds is enough to reach 'Steady State' (everything is hot and working). Any longer wastes fuel and starts to burn the launchpad equipment and flame trench.*\n\n**P4:** What is the difference between a WDR and a 'Dry' Dress Rehearsal?\n*Answer: A 'Dry' dress rehearsal is just people and computers practicing. A 'Wet' rehearsal involves the real liquid propellants, which adds the danger of cryogenics and pressure.*\n\n**P5:** If a sensor fails during a WDR, do you launch anyway?\n*Answer: Absolutely not. A WDR failure is an automatic 'L-minus 2 day' reset. You find the cause, fix it, and often re-run the test. Trust is the most important currency in launch.*" }
+        ],
+        keyTakeaways: ['WDR (Wet Dress Rehearsal) tests fueling and countdown electronics', 'Static Fire tests engine performance while the rocket is clamped down', 'HITL testing proves flight software works on the actual flight hardware', 'Integrated tests catch "system-level" bugs that individual part tests miss', 'Launch Abort Systems (LAS) focus on crew survival during a rocket failure'],
+        vocabulary: [
+          { term: 'WDR', definition: 'Wet Dress Rehearsal — a full countdown with propellants but no ignition' },
+          { term: 'Static Fire', definition: 'Engine ignition test while the vehicle is mechanically restrained' },
+          { term: 'HITL', definition: 'Hardware-In-The-Loop — using real hardware to run a simulated mission' },
+          { term: 'Steady State', definition: 'When an engine has reached constant temperature and pressure after ignition' },
+          { term: 'Abort', definition: 'The intentional termination of a launch sequence or mission for safety' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'A "Wet" Dress Rehearsal (WDR) involves:', options: ['Rain testing', 'Launch into the ocean', 'Loading real liquid propellants', 'Testing the parachutes'], correctAnswer: 2, explanation: '"Wet" signifies that the rocket is fueled with liquid oxidizer and fuel.' },
+            { id: 'q2', question: 'During a Static Fire, the rocket is:', options: ['Falling', 'In orbit', 'Clamped to the pad', 'Exploding'], correctAnswer: 2, explanation: 'Hold-down clamps keep the rocket stationary while engines fire.' },
+            { id: 'q3', question: 'What is the purpose of HITL testing?', options: ['To save weight', 'To test real computers against simulated physics', 'To paint the rocket', 'To launch a satellite'], correctAnswer: 1, explanation: 'It ensures the actual flight software and hardware can handle mission maneuvers.' },
+            { id: 'q4', question: 'Launch Abort Systems (LAS) are primarily for:', options: ['Satellite safety', 'Crew safety', 'Engine efficiency', 'Saving fuel'], correctAnswer: 1, explanation: 'They pull the human-carrying capsule away from a failing rocket.' },
+            { id: 'q5', question: 'Why is a Static Fire only a few seconds long?', options: ['Engines are too small', 'Fuel is too expensive', 'To gather startup data without damaging the pad', 'Because the rocket moves too fast'], correctAnswer: 2, explanation: 'Engineers only need few seconds to verify the engine health and startup transients.' }
+          ]
+        }
+      },
+      {
+        id: 'safety-systems-range',
+        title: 'Range Safety & Flight Termination',
+        duration: '10 min', xp: 200,
+        description: 'The "Dead Man Switch": How we kill a rocket to save a city',
+        aiTutor: true,
+        introduction: "A rocket is essentially a flying bomb. If it goes off course, it becomes a threat to thousands of people on the ground. This is the most intense part of aerospace engineering: the system designed specifically to blow up the rocket you spent years building.",
+        sections: [
+          { title: '🎯 Range Safety Corridors', content: "**The Hallway in the Sky**\n\nEvery launch has a 'Safety Corridor' (or Flight Box). This is a 3D path through the air. As long as the rocket stays inside the box, it's safe. If it touches the 'walls' of the box, it is no longer safe.\n\n**The Threat:** If a rocket loses a fin and starts turning toward a populated coast, it could impact land. Range Safety ensures it only impacts the ocean." },
+          { title: '🔧 The Flight Termination System (FTS)', content: "**The Self-Destruct Mechanism**\n\nThe FTS is a completely independent system from the flight computer. It has its own batteries, its own radio, and its own sensors. \n\n**The Charges:** \nLinear Shaped Charges (explosives) are mounted along the side of the propellant tanks. When triggered, they 'zip' the tanks open like a zipper. This releases the fuel and oxidizer, which burn up in the air. This is NOT a giant explosion (usually); it's a way to stop the engines and ensure the pieces are small and fall in a predictable area." },
+          { title: '📐 AFTS: The AI Safety Officer', content: "**Autonomous Range Safety**\n\nIn the old days, a human Range Safety Officer (RSO) watched a radar screen. If the rocket went off course, the human pushed a physical red button. \n\n**The Problem:** GPS is faster than humans. \n\n**AFTS (Autonomous FTS):** Used by all modern SpaceX launches. The rocket has an onboard computer that constantly asks: 'Am I where I belong?' If it detects it's 100 meters outside the safety corridor, it triggers the self-destruct in milliseconds. This allows for 'tighter' safety corridors and more flexible launch paths." },
+          { title: '🚀 Pre-Launch Safety: Inhibits', content: "**Why doesn't it explode accidentally?**\n\nYou don't want the FTS to trigger while the rocket is being fueled or while people are standing near it. \n\n**The Inhibits:** \nFTS use 'Triple Inhibits.' This means THREE separate physical conditions must be met for the explosives to fire: \n1. A physical 'Arm' pin must be pulled.\n2. A software command must be sent.\n3. The power must be switched to 'Internal.' \n\nThis 'Safety Architecture' ensures that one mistake or one short-circuit cannot destroy the rocket." },
+          { title: '🧪 Range Safety Practice', content: "**P1:** Does 'Self-Destruct' mean the whole rocket turns to dust?\n*Answer: No. It usually means the structural integrity of the tanks is breached. The rocket breaks into several large pieces and the thrust stops. The goal is to make sure it falls into the designated 'Splash Zone.'*\n\n**P2:** If the main flight computer fails, how does the FTS know where the rocket is?\n*Answer: The FTS is 'Dissimilar.' It has its own GPS and its own IMU sensors. It doesn't trust the main computer at all. If the main computer says 'I'm fine' but the FTS sensors say 'We're in Miami,' the FTS wins and kills the rocket.*\n\n**P3:** Why do we launch over the ocean (East Coast)?\n*Answer: Because the Earth rotates East (adding ~400 m/s for free), and any debris from a failed launch falls safely into the Atlantic Ocean rather than on land.*\n\n**P4:** What is 'Linear Shaped Charge'?\n*Answer: A type of explosive that focuses its energy in a thin line (like a blade) rather than an orb. It is used to cut through the 5mm thick aluminum walls of the rocket tanks precisely.*\n\n**P5:** Can the AFTS be 'hacked' from the ground?\n*Answer: No. AFTS is blocked from outside commands once the 'internal' timer starts. It makes its own decisions based on its own sensors, making it immune to external electronic interference during flight.*" }
+        ],
+        keyTakeaways: ['Range Safety ensures debris only falls in designated ocean corridors', 'FTS (Flight Termination System) is an independent self-destruct system', 'AFTS allows the rocket to autonomously self-destruct if it violates safety limits', 'Triple inhibits prevent accidental detonation on the ground', 'Linear shaped charges "zip" open tanks to terminate thrust immediately'],
+        vocabulary: [
+          { term: 'FTS', definition: 'Flight Termination System — independent explosives for safety' },
+          { term: 'RSO', definition: 'Range Safety Officer — human responsible for flight safety (older systems)' },
+          { term: 'Safety Corridor', definition: 'The designated 3D path within which a rocket is allowed to fly' },
+          { term: 'Inhibit', definition: 'A hardware or software block that prevents a critical action (like firing explosives)' },
+          { term: 'Shaped Charge', definition: 'An explosive charge shaped to focus the effect of the explosive\'s energy' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'The FTS is used to:', options: ['Launch the rocket', 'Destroy the rocket if it becomes unsafe', 'Cool the engine', 'Calculate the orbit'], correctAnswer: 1, explanation: 'Flight Termination System is the "self-destruct" safety mechanism.' },
+            { id: 'q2', question: 'Modern SpaceX rockets use which type of safety?', options: ['Human Officer only', 'Autonomous (AFTS)', 'No safety needed', 'Radio commands only'], correctAnswer: 1, explanation: 'AFTS uses onboard computers for faster, more accurate safety decisions.' },
+            { id: 'q3', question: 'Safety corridors are used to:', options: ['Find satellites', 'Ensure debris falls in the ocean', 'Group rockets', 'Save fuel'], correctAnswer: 1, explanation: 'Corridors keep the flight path away from populated land.' },
+            { id: 'q4', question: 'An "Inhibit" is designed to:', options: ['Speed up launch', 'Prevent accidental FTS fire on the ground', 'Increase thrust', 'Talk to ground'], correctAnswer: 1, explanation: 'Multiple inhibits ensure safety explosives only fire when intended.' },
+            { id: 'q5', question: 'FTS explosives are typically:', options: ['Nuclear', 'Linear Shaped Charges', 'Gunpowder', 'Dynamite'], correctAnswer: 1, explanation: 'Shaped charges cut the tanks open precisely like a zipper.' }
+          ]
+        }
+      },
+      {
+        id: 'failure-analysis-amos6',
+        title: 'Failure Analysis: Learning from Disaster',
+        duration: '10 min', xp: 200,
+        description: 'Case Study: The AMOS-6 explosion and the mystery of liquid oxygen',
+        aiTutor: true,
+        introduction: "In engineering, your biggest mistakes are your biggest teachers. In 2016, a SpaceX Falcon 9 exploded unexpectedly ON THE PAD during a routine test. No engines were running. No fuel was being burned. It was a mystery. This lesson is about how engineers solve 'unsolvable' problems through Root Cause Analysis.",
+        sections: [
+          { title: '🎯 Root Cause Analysis (RCA)', content: "**The 5 Whys**\n\nWhen a rocket fails, engineers don't just fix the broken part. They find the 'Root Cause.' \n\n**Example:**\n1. Why did the rocket explode? (Tank popped).\n2. Why did it pop? (Strut failed).\n3. Why did the strut fail? (Sub-standard material).\n4. Why was it sub-standard? (Supplier changed process).\n5. **Root Cause:** Quality control failed to verify the supplier change.\n\nFixing the material is a band-aid. Fixing the Quality Control process is the Root Cause fix." },
+          { title: '🔧 The AMOS-6 Case Study', content: "**The Impossible Explosion**\n\nSpaceX's AMOS-6 rocket exploded during fueling. The 'Failure Analysis' took months.\n\n**The Discovery:** \nThey found that **Liquid Oxygen (LOX)** had gotten trapped between a carbon-fiber tank wrap and the aluminum tank inside. Because SpaceX uses 'Super-Chilled' LOX (extra cold), the oxygen actually turned into a **SOLID**. \n\n**The Spark:** When the tank pressurized, the carbon fibers shifted, 'cracked' the solid oxygen, and the friction caused a spark. In a pure oxygen environment, that tiny spark was enough to vaporize the entire rocket in seconds." },
+          { title: '📐 Redesign and Return to Flight', content: "**Fixing the Physics**\n\nOnce the Root Cause was found, the fix wasn't an 'extra bolt.' It was a change in procedures.\n- Changed the fueling temperature.\n- Redesigned the COPVs (Composite Overwrapped Pressure Vessels) so oxygen couldn't get trapped.\n- Improved sensor resolution to 'see' those pressure spikes in the future.\n\n**Reliability Growth:** Every time a rocket fails and is fixed at the root cause level, it becomes exponentially more reliable. This is why 'Old' rocket designs (like Atlas V) rarely fail — they've already made all their mistakes.`" },
+          { title: '🚀 The "Go/No-Go" Culture', content: "**Engineering Ethics**\n\nThe most important safety system is the Human. \n- **The Challenger Disaster:** Managers ignored engineers' warnings about cold weather. \n- **The Solution:** A culture where ANY engineer can call a 'Hold' or 'Abort' without being fired. \n\nAt SpaceX and NASA, if a junior tech sees a hair-line crack, they have the authority to stop a $500M launch. This 'Culture of Safety' is just as important as the 'Factor of Safety' math." },
+          { title: '🧪 Failure Analysis Practice', content: "**P1:** Why do we collect 'Telemetry' data before an explosion happens?\n*Answer: Because after the explosion, there is no physical evidence left (everything is vaporized). Telemetry is the 'Black Box' that tells engineers exactly what the pressures and temperatures were in the milliseconds before the failure.*\n\n**P2:** What is 'Solid Oxygen'?\n*Answer: Oxygen normally turns liquid at -183°C. If you cool it further to -218°C, it becomes a solid. In the AMOS-6 failure, the super-cold helium pipes accidentally turned the nearby oxygen into solid 'ice' pods.*\n\n**P3:** What is a 'COPV'?\n*Answer: Composite Overwrapped Pressure Vessel. A tank made of aluminum wrapped in thousands of miles of carbon fiber. It's incredibly strong but complex.* \n\n**P4:** If a rocket explodes and we can't find the cause, can we launch again?\n*Answer: No. In aerospace, this is called a 'Unexplained Anomaly.' You are grounded until you can prove you understand the physics of what happened and have fixed it. This is why investigations take so long.*\n\n**P5:** What is the 'Swiss Cheese Model' of failure?\n*Answer: The idea that for a catastrophe to happen, the 'holes' (failures) in multiple layers of safety (Human, Hardware, Software) must all line up perfectly. We have multiple layers so one hole doesn't kill the mission.*" }
+        ],
+        keyTakeaways: ['Root Cause Analysis (RCA) fixes the process, not just the part', 'Unexpected failures (like AMOS-6) reveal new physics and improve future designs', 'COPVs (tanks) are high-performance but carry unique friction/spark risks', 'A "Culture of Safety" empowers any employee to stop a dangerous launch', 'Telemetry is the primary tool for reconstructing failures after an explosion'],
+        vocabulary: [
+          { term: 'Root Cause', definition: 'The fundamental reason for the occurrence of a problem' },
+          { term: 'RCA', definition: 'Root Cause Analysis — a method of problem solving used for identifying the root causes' },
+          { term: 'AMOS-6', definition: 'The Falcon 9 mission that exploded on the pad in 2016' },
+          { term: 'COPV', definition: 'Composite Overwrapped Pressure Vessel — high-pressure storage tank' },
+          { term: 'Animate', definition: 'In failure analysis, to reconstruct the events using digital models and telemetry' }
+        ],
+        quiz: {
+          questions: [
+            { id: 'q1', question: 'Root Cause Analysis (RCA) goals are to fix:', options: ['The broken bolt', 'The underlying process or physics', 'The budget', 'The weather'], correctAnswer: 1, explanation: 'RCA ensures the mistake never happens again by fixing the core reason.' },
+            { id: 'q2', question: 'The AMOS-6 explosion was caused by what unexpected state?', options: ['Liquid Fuel', 'Solid Oxygen', 'Excess Heat', 'Solar flares'], correctAnswer: 1, explanation: 'Solid oxygen trapped in COPV fibers caused friction and ignition.' },
+            { id: 'q3', question: 'A COPV tank is made of:', options: ['Solid Gold', 'Aluminum wrapped in Carbon Fiber', 'Plastic', 'Lead'], correctAnswer: 1, explanation: 'Composite Overwrapped Pressure Vessels combine metal and carbon fiber for strength.' },
+            { id: 'q4', question: 'The "5 Whys" is a technique for:', options: ['Asking for money', 'Finding the root cause of a failure', 'Math homework', 'Orbit design'], correctAnswer: 1, explanation: 'Repeatedly asking "Why" digs below the symptoms to the core problem.' },
+            { id: 'q5', question: 'Who can "Abort" a launch for safety?', options: ['Only the CEO', 'Only the Government', 'Any mission-critical engineer or technician', 'Nobody'], correctAnswer: 2, explanation: 'A healthy safety culture empowers anyone to stop a dangerous operation.' }
+          ]
+        }
+      }
+    ]
+  }]
 };
 
 export default section6Testing;

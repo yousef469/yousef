@@ -1,131 +1,189 @@
-// Section 2: Propulsion Systems - 6 Lessons (2 units × 3 lessons)
-
 export const section2Propulsion = {
   id: 'propulsion',
   title: 'Section 2: Propulsion Systems',
-  description: 'Piston engines, turboprops, and jet engines',
+  description: 'Piston engines, jets, and propellers',
   icon: '🔥',
   color: 'from-orange-500 to-red-500',
   units: [
     {
-      id: 'piston-turboprop',
-      title: 'Piston & Turboprop Engines',
-      description: 'Propeller-driven aircraft powerplants',
+      id: 'propulsion-systems',
+      title: 'Aircraft Powerplants',
+      description: 'From pistons to jets',
       lessons: [
         {
           id: 'piston-engines',
-          title: 'Piston Engine Fundamentals',
-          duration: '25 min', xp: 150,
-          description: 'How reciprocating engines power aircraft',
-          introduction: 'Piston engines powered the first century of aviation and still dominate general aviation today.',
+          title: 'Reciprocating Engines',
+          duration: '30 min',
+          xp: 175,
+          description: 'The four-stroke cycle and engine operation',
+          introduction: 'Piston engines powered the first century of aviation and still dominate general aviation today. They are masterpieces of mechanical timing.',
           sections: [
-            { title: 'Four-Stroke Cycle', content: '**Intake-Compression-Power-Exhaust**\n\n1. **Intake:** Piston down, fuel-air mixture enters\n2. **Compression:** Piston up, mixture compressed\n3. **Power:** Spark ignites, expansion pushes piston\n4. **Exhaust:** Piston up, gases expelled\n\n**Compression Ratio:** 7:1 to 10:1 typical\n**Firing Order:** Ensures smooth operation' },
-            { title: 'Aircraft Engine Features', content: '**Horizontally Opposed:**\n- Flat configuration\n- Low vibration\n- Good cooling\n\n**Air Cooling:**\n- Fins on cylinders\n- Cowl flaps control airflow\n\n**Dual Ignition:**\n- Two spark plugs per cylinder\n- Two magnetos\n- Redundancy for safety' },
-            { title: 'Performance & Limitations', content: '**Power Output:**\n- Measured in horsepower (HP)\n- Typical: 100-400 HP\n- Decreases with altitude (less air)\n\n**Turbocharging:**\n- Compresses intake air\n- Maintains power at altitude\n\n**Limitations:**\n- Detonation (knock)\n- Overheating\n- Fuel quality requirements' }
+            {
+              title: 'The Otto Cycle',
+              content: `**Four Strokes of Power:**\n\n1. **Intake:** Piston moves down, sucking in fuel/air mixture.\n2. **Compression:** Piston moves up, squeezing the mixture (Ratio 7:1 to 10:1).\n3. **Power:** Spark plug fires, explosion pushes piston down (The only working stroke).\n4. **Exhaust:** Piston moves up, pushing out burnt gases.\n\n**Key Concepts:**\n- **Ignition:** Dual magnetos (self-powered) fire two spark plugs per cylinder for redundancy and better burn.\n- **Cooling:** Air-cooled (fins) vs Liquid-cooled.`
+            },
+            {
+              title: 'Performance & Systems',
+              content: `**Engine Controls:**\n- **Throttle:** Controls Manifold Pressure (Air/Fuel amount) -> Power.\n- **Mixture:** Controls Fuel/Air ratio. (Lean it as you climb because air gets thinner!).\n- **Propeller:** Controls RPM.\n\n**Turbocharging vs Supercharging:**\nBoth force more air into the engine to maintain sea-level power at altitude.\n- **Turbo:** Driven by exhaust gas (free energy, but hot).\n- **Supercharger:** Driven by the engine crankshaft (instant response, but steals HP).`
+            },
+            {
+              title: 'Operational Realities',
+              content: `**Detonation:**\nExplosive uneven burning of fuel (Knocking). Can destroy an engine in seconds.\n- Cause: Low grade fuel, high heat, too lean.\n\n**Shock Cooling:**\nDescending too fast with low power cools the engine rapidly, causing cylinder heads to crack.`
+            }
           ],
-          keyTakeaways: ['Four-stroke cycle: intake, compression, power, exhaust', 'Aircraft engines use dual ignition for safety', 'Power decreases with altitude without turbocharging'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Aircraft piston engines typically use:', options: ['Water cooling', 'Air cooling', 'Oil cooling', 'No cooling'], correctAnswer: 1, explanation: 'Most aircraft piston engines are air-cooled with cylinder fins.' },
-            { id: 'q2', question: 'Dual ignition provides:', options: ['More power', 'Redundancy', 'Less fuel use', 'Quieter operation'], correctAnswer: 1, explanation: 'Two independent ignition systems provide redundancy for safety.' },
-            { id: 'q3', question: 'Turbocharging helps maintain:', options: ['Fuel efficiency', 'Power at altitude', 'Engine cooling', 'Oil pressure'], correctAnswer: 1, explanation: 'Turbochargers compress air to maintain power as altitude increases.' }
-          ]}
+          keyTakeaways: [
+            'Aircraft engines use the 4-stroke Otto cycle',
+            'Dual ignition provides safety and efficiency',
+            'Mixture must be leaned at altitude to maintain correct ratio',
+            'Turbocharging restores power lost at high altitudes'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'Which stroke actually produces power?', options: ['Intake', 'Compression', 'Power', 'Exhaust'], correctAnswer: 2, explanation: 'Only the Power stroke turns the crankshaft; the others consume energy.' },
+              { id: 'q2', question: 'Why do aircraft engines have two spark plugs per cylinder?', options: ['More power', 'Safety/Redundancy', 'Cheaper', 'Less weight'], correctAnswer: 1, explanation: 'If one fails, the other keeps the engine running. It also burns fuel more evenly.' },
+              { id: 'q3', question: 'What drives a Turbocharger?', options: ['Crankshaft', 'Exhaust gas', 'Electric motor', 'Wind'], correctAnswer: 1, explanation: 'Turbos use the waste energy of the high-velocity exhaust gases.' }
+            ]
+          }
         },
         {
           id: 'propellers',
-          title: 'Propeller Theory & Design',
-          duration: '25 min', xp: 150,
-          description: 'How propellers convert power to thrust',
-          introduction: 'Propellers are rotating airfoils that convert engine power into thrust. Understanding propeller theory is essential for efficient flight.',
+          title: 'Propeller Aerodynamics',
+          duration: '25 min',
+          xp: 150,
+          description: 'Converting torque into thrust',
+          introduction: 'A propeller is just a rotating wing. Understanding its twist and pitch is crucial for efficiency.',
           sections: [
-            { title: 'Propeller Aerodynamics', content: '**Rotating Airfoil:**\nEach blade section is an airfoil\n- Angle of attack varies along blade\n- Twist compensates for speed variation\n\n**Blade Angle:**\n- Angle between chord and plane of rotation\n- Higher near hub, lower at tip\n\n**Advance Ratio:** J = V/(nD)\n- V = airspeed\n- n = RPM\n- D = diameter' },
-            { title: 'Propeller Types', content: '**Fixed Pitch:**\n- Simple, no moving parts\n- Optimized for one condition\n- Training aircraft\n\n**Constant Speed:**\n- Governor adjusts pitch\n- Optimal efficiency across speeds\n- Most GA and all turboprops\n\n**Feathering:**\n- Blades turn edge-on to wind\n- Minimizes drag if engine fails\n- Multi-engine aircraft' },
-            { title: 'Efficiency & Performance', content: '**Propeller Efficiency:**\nη = Thrust Power / Shaft Power\nη = TV / P\n\n**Typical Values:**\n- Fixed pitch: 70-80%\n- Constant speed: 80-90%\n\n**Factors Affecting Efficiency:**\n- Blade design\n- Operating RPM\n- Airspeed\n- Number of blades' }
+            {
+              title: 'Blade Element Theory',
+              content: `**A Twisted Wing**\n\n- The tip moves near speed of sound (Mach 0.9).\n- The root (near hub) moves slowly.\n- **Twist:** The blade angle is high at the root and low at the tip to keep the Angle of Attack (AoA) constant along the blade.\n\n**Forces:**\n- **Thrust:** The "Lift" pointing forward.\n- **Torque:** The "Drag" resisting rotation (Engine must overcome this).`
+            },
+            {
+              title: 'Propeller Types',
+              content: `**Fixed Pitch:**\n- Simple, one piece.\n- Compromise: "Climb Prop" (low pitch) vs "Cruise Prop" (high pitch).\n\n**Constant Speed (Variable Pitch):**\n- Pilot sets RPM.\n- **Governor** uses oil pressure to twist blades automatically.\n- Like an automatic transmission for a car.\n\n**Feathering:**\n- Turning blades edge-on to the wind.\n- Critical for multi-engine failure to reduce drag.`
+            },
+            {
+              title: 'P-Factor & Torque Effects',
+              content: `**Why planes turn left:**\n\n1. **Torque:** Newton's 3rd law. Prop turns right, plane rolls left.\n2. **P-Factor:** At high AoA (climb), descending blade takes a bigger "bite" of air than ascending blade. Yaw to the left.\n3. **Spiraling Slipstream:** Prop wash hits the left side of the vertical stabilizer.`
+            }
           ],
-          keyTakeaways: ['Propeller blades are twisted airfoils', 'Constant speed props maintain optimal efficiency', 'Feathering reduces drag after engine failure'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Propeller blade twist compensates for:', options: ['Weight', 'Speed variation along blade', 'Temperature', 'Vibration'], correctAnswer: 1, explanation: 'Blade tips move faster than roots, requiring twist to maintain optimal angle of attack.' },
-            { id: 'q2', question: 'Constant speed propeller efficiency:', options: ['50-60%', '60-70%', '80-90%', '95-100%'], correctAnswer: 2, explanation: 'Constant speed propellers achieve 80-90% efficiency.' },
-            { id: 'q3', question: 'Feathering is used when:', options: ['Climbing', 'Cruising', 'Engine fails', 'Landing'], correctAnswer: 2, explanation: 'Feathering minimizes drag from a windmilling propeller after engine failure.' }
-          ]}
+          keyTakeaways: [
+            'Propellers are twisted to maintain constant AoA along the blade',
+            'Constant speed props optimize efficiency for both climb and cruise',
+            'Feathering a prop reduces drag significantly after engine failure',
+            'P-Factor causes a left-turning tendency during high-power climbs'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'Why are propeller blades twisted?', options: ['For style', 'To reduce noise', 'To maintain constant AoA', 'To increase strength'], correctAnswer: 2, explanation: 'The twist compensates for the different speeds of the blade sections (tip vs root).' },
+              { id: 'q2', question: 'In a Constant Speed prop, what changes the blade angle?', options: ['Electric motor', 'Oil pressure via Governor', 'Wind force', 'Human strength'], correctAnswer: 1, explanation: 'A governor regulates oil pressure to the hub to change pitch and maintain RPM.' },
+              { id: 'q3', question: 'P-Factor is most noticeable during:', options: ['Cruise', 'Descent', 'High angles of attack (Climb)', 'Taxiing'], correctAnswer: 2, explanation: 'P-Factor is caused by asymmetric thrust loading on the blades at high angles of attack.' }
+            ]
+          }
+        },
+        {
+          id: 'gas-turbines',
+          title: 'Gas Turbine Fundamentals',
+          duration: '35 min',
+          xp: 200,
+          description: 'The Brayton cycle, Turbojets, and Turbofans',
+          introduction: 'Gas turbines are the muscle of modern aviation. They compress air, burn it, and use the expansion to create massive thrust.',
+          sections: [
+            {
+              title: 'The Brayton Cycle',
+              content: `**Suck, Squeeze, Bang, Blow**\n\nSuccessful continuous combustion:\n1. **Inlet:** Slows air down, increases pressure.\n2. **Compressor:** Squeezes air (Pressure Ratio 30:1+).\n3. **Combustor:** Fuel added, continuous burn (const pressure).\n4. **Turbine:** Exhaust spins turbine (which drives compressor).\n5. **Nozzle:** Accelerates gas to create Jet Thrust.`
+            },
+            {
+              title: 'Engine Types',
+              content: `**Turbojet:**\n- All air goes through the core.\n- Loud, inefficient at low speed. Fast exhaust.\n- Used in older fighters/Concorde.\n\n**Turbofan:**\n- **Core** generates power to spin a huge **Fan**.\n- **Bypass Ratio:** Most air goes *around* the core (80-90%).\n- Quiet, efficient, massive thrust at takeoff.\n- The "Fan" is basically a ducted propeller.\n\n**Components:**\n- **N1:** Low pressure spool (Fan).\n- **N2:** High pressure spool (Core).`
+            },
+            {
+              title: 'Performance Metrics',
+              content: `**Thrust vs. Speed:**\n- Jets produce *more* power as they go faster (Ram effect).\n\n**Specific Fuel Consumption (SFC):**\n- Fuel used per pound of thrust.\n- High Bypass Turbofans have the lowest (best) SFC.\n- Altitude: Jets are efficient at high altitude (cold air = efficient thermodynamic cycle).`
+            }
+          ],
+          keyTakeaways: [
+            'Gas turbines operate on the continuous Brayton cycle',
+            'Turbofans are more efficient because they accelerate a large mass of air slowly',
+            'The Turbine extracts energy to drive the Compressor',
+            'High Bypass engines power almost all modern airliners'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'In a Turbofan, most thrust comes from:', options: ['The Core', 'The Fan (Bypass air)', 'The Afterburner', 'The Nozzle'], correctAnswer: 1, explanation: 'In high-bypass engines, up to 90% of thrust is generated by the large front fan.' },
+              { id: 'q2', question: 'What does the Turbine do?', options: ['Compresses air', 'Adds fuel', 'Extracts energy to drive the compressor', 'Cooling'], correctAnswer: 2, explanation: 'The turbine absorbs energy from the hot exhaust to keep the compressor spinning.' },
+              { id: 'q3', question: 'The Brayton Cycle consists of:', options: ['Compression, Combustion, Expansion', 'Intake, Compression, Power, Exhaust', 'Lift, Weight, Thrust', 'None'], correctAnswer: 0, explanation: 'Continuous Compression, Constant Pressure Combustion, and Expansion.' }
+            ]
+          }
         },
         {
           id: 'turboprops',
-          title: 'Turboprop Engines',
-          duration: '30 min', xp: 175,
-          description: 'Gas turbines driving propellers',
-          introduction: 'Turboprops combine jet engine efficiency with propeller thrust, ideal for regional aircraft and military transports.',
+          title: 'Turboprop & Turboshaft',
+          duration: '30 min',
+          xp: 175,
+          description: 'Harnessing jet power for shafts and rotors',
+          introduction: 'Sometimes you don not want jet thrust; you want raw torque. Turboprops and turboshafts use a gas turbine to drive a gearbox, not a nozzle.',
           sections: [
-            { title: 'Turboprop Basics', content: '**How It Works:**\n1. Compressor draws in air\n2. Combustion adds energy\n3. Turbine extracts power\n4. Power drives propeller via gearbox\n\n**Power Split:**\n- ~90% thrust from propeller\n- ~10% from jet exhaust\n\n**Advantages:**\n- Fuel efficient at medium speeds\n- Good short-field performance\n- Reliable' },
-            { title: 'Components', content: '**Gas Generator:**\n- Compressor (axial or centrifugal)\n- Combustion chamber\n- Gas generator turbine\n\n**Power Section:**\n- Free power turbine\n- Reduction gearbox\n- Propeller\n\n**Reduction Gearbox:**\n- Turbine: 20,000-40,000 RPM\n- Propeller: 1,500-2,000 RPM\n- Gear ratio: ~15:1' },
-            { title: 'Performance', content: '**Equivalent Shaft Horsepower (ESHP):**\nESHP = SHP + (Thrust × V)/550\n\n**Typical Power:**\n- Regional: 1,000-5,000 SHP\n- Military: Up to 11,000 SHP (C-130)\n\n**Altitude Performance:**\n- Better than piston at altitude\n- Flat-rated to certain altitude\n\n**Speed Range:**\n- Optimal: 250-400 knots\n- Above 400 kts, jets more efficient' }
+            {
+              title: 'How They Work',
+              content: `**Extracting the Power**\n\nInstead of letting the exhaust gas shoot out the back (Thrust):\n1. Use extra **Turbine Stages** to absorb almost ALL the energy.\n2. Send this rotational energy to a shaft.\n3. **Reduction Gearbox:** Slows the 30,000 RPM turbine down to 2,000 RPM for the prop/rotor.\n\n**Free Turbine:**\nThe power turbine is not mechanically connected to the engine core (Gas Generator). The air coupling acts like a fluid clutch.`
+            },
+            {
+              title: 'Turboprops',
+              content: `**The Efficient Middle Ground**\n- **Best for:** 250-400 knots, short runways.\n- **Why:** Propellers move a lot of air (efficient at low speed).\n- **Example:** C-130 Hercules, Q400, PC-12.\n- **Reverse Thrust:** Easy to implement by changing propeller pitch.`
+            },
+            {
+              title: 'Turboshafts',
+              content: `**Helicopter Power**\n- Identical to turboprops but lighter gearbox logic.\n- **Governance:** Engine must maintain constant RPM (e.g., 100%) regardless of how much pitch (load) the pilot pulls.\n- **APU:** The Auxiliary Power Unit in jets is a small turboshaft driving a generator/compressor.`
+            }
           ],
-          keyTakeaways: ['Turboprops are gas turbines driving propellers', '90% of thrust comes from the propeller', 'Reduction gearbox matches turbine to propeller speed', 'Most efficient at 250-400 knots'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Turboprop thrust from propeller:', options: ['50%', '70%', '90%', '100%'], correctAnswer: 2, explanation: 'About 90% of turboprop thrust comes from the propeller, 10% from exhaust.' },
-            { id: 'q2', question: 'Reduction gearbox ratio typically:', options: ['2:1', '5:1', '15:1', '50:1'], correctAnswer: 2, explanation: 'Gearbox reduces ~30,000 RPM turbine to ~2,000 RPM propeller (15:1).' },
-            { id: 'q3', question: 'Turboprops most efficient at:', options: ['100-200 kts', '250-400 kts', '500-600 kts', 'Mach 0.85'], correctAnswer: 1, explanation: 'Turboprops are most efficient in the 250-400 knot range.' }
-          ]}
-        }
-      ]
-    },
-    {
-      id: 'jet-engines',
-      title: 'Jet Engines',
-      description: 'Turbofan and turbojet propulsion',
-      lessons: [
-        {
-          id: 'jet-fundamentals',
-          title: 'Jet Engine Fundamentals',
-          duration: '30 min', xp: 175,
-          description: 'How gas turbines produce thrust',
-          introduction: 'Jet engines revolutionized aviation, enabling high-speed, high-altitude flight. Understanding their operation is essential for modern aviation.',
-          sections: [
-            { title: 'Brayton Cycle', content: '**The Jet Engine Thermodynamic Cycle:**\n\n1. **Compression:** Air compressed (pressure rises)\n2. **Combustion:** Fuel added, constant pressure burn\n3. **Expansion:** Hot gas expands through turbine\n4. **Exhaust:** High-velocity jet produces thrust\n\n**Thrust Equation:**\nF = ṁ(Ve - V0) + (Pe - P0)Ae\n\nSimplified: F = ṁ × ΔV' },
-            { title: 'Engine Components', content: '**Inlet:** Slows air, increases pressure\n**Compressor:** Raises pressure 20-40:1\n**Combustor:** Burns fuel at ~2000°C\n**Turbine:** Extracts power for compressor\n**Nozzle:** Accelerates exhaust\n\n**Spool Configuration:**\n- Single spool: Simple\n- Dual spool: N1 (fan), N2 (core)\n- Triple spool: Some Rolls-Royce' },
-            { title: 'Turbojet vs Turbofan', content: '**Turbojet:**\n- All air through core\n- High exhaust velocity\n- Efficient at high Mach\n- Loud, fuel hungry at low speed\n\n**Turbofan:**\n- Bypass air around core\n- Lower exhaust velocity\n- More efficient subsonic\n- Quieter\n\n**Bypass Ratio:**\nBPR = Bypass air / Core air\n- Low BPR (1-2): Military\n- High BPR (8-12): Airliners' }
+          keyTakeaways: [
+            'Turboprops extract exhaust energy to drive a propeller',
+            'Reduction gearboxes are critical to convert high RPM to usable torque',
+            'Free turbines allow the prop to stop while the engine runs (Hotel Mode)',
+            'Turboprops fill the gap between piston efficiency and jet speed'
           ],
-          keyTakeaways: ['Jet engines follow the Brayton cycle', 'Thrust = mass flow × velocity change', 'High bypass turbofans are most efficient for airliners', 'Bypass ratio affects efficiency and noise'],
-          quiz: { questions: [
-            { id: 'q1', question: 'Modern airliner bypass ratio:', options: ['0.5:1', '2:1', '8-12:1', '20:1'], correctAnswer: 2, explanation: 'Modern high-bypass turbofans have BPR of 8-12:1.' },
-            { id: 'q2', question: 'Compressor pressure ratio:', options: ['2:1', '10:1', '20-40:1', '100:1'], correctAnswer: 2, explanation: 'Modern jet engines compress air 20-40 times.' },
-            { id: 'q3', question: 'Turbofans are quieter because:', options: ['Smaller engines', 'Lower exhaust velocity', 'No combustion', 'Electric motors'], correctAnswer: 1, explanation: 'Bypass air has lower velocity, reducing noise.' }
-          ]}
-        },
-        {
-          id: 'jet-performance',
-          title: 'Jet Engine Performance',
-          duration: '25 min', xp: 150,
-          description: 'Thrust, efficiency, and operating parameters',
-          introduction: 'Understanding jet engine performance helps pilots and engineers optimize aircraft operations.',
-          sections: [
-            { title: 'Thrust Characteristics', content: '**Thrust vs Speed:**\n- Turbojet: Thrust fairly constant\n- Turbofan: Thrust decreases with speed\n\n**Thrust vs Altitude:**\n- Decreases with air density\n- ~50% at 35,000 ft\n\n**Thrust Settings:**\n- Takeoff: Maximum (time limited)\n- Max Continuous: Unlimited use\n- Climb: Reduced for engine life\n- Cruise: Optimized for efficiency' },
-            { title: 'Efficiency Metrics', content: '**Specific Fuel Consumption (SFC):**\nSFC = Fuel flow / Thrust\nUnits: lb/hr/lb or kg/hr/N\n\n**Typical Values:**\n- Turbojet: 0.8-1.0\n- Low BPR turbofan: 0.5-0.7\n- High BPR turbofan: 0.3-0.4\n\n**Thermal Efficiency:**\nη_th = Work out / Heat in\n~40-50% for modern engines\n\n**Propulsive Efficiency:**\nη_p = Thrust power / Jet power' },
-            { title: 'Engine Ratings', content: '**Takeoff Thrust:**\n- Maximum rated thrust\n- Time limited (5 minutes)\n- Example: CFM56: 27,000 lbf\n\n**Flat Rating:**\n- Full thrust up to certain temp\n- Above that, thrust decreases\n\n**Derate:**\n- Reduced thrust for engine life\n- Assumed takeoff thrust\n- Saves maintenance costs' }
-          ],
-          keyTakeaways: ['Thrust decreases with altitude and speed', 'High BPR engines have best SFC', 'Takeoff thrust is time-limited', 'Derate extends engine life'],
-          quiz: { questions: [
-            { id: 'q1', question: 'High BPR turbofan SFC:', options: ['0.8-1.0', '0.5-0.7', '0.3-0.4', '0.1-0.2'], correctAnswer: 2, explanation: 'High bypass turbofans achieve SFC of 0.3-0.4 lb/hr/lb.' },
-            { id: 'q2', question: 'Takeoff thrust time limit:', options: ['1 minute', '5 minutes', '30 minutes', 'Unlimited'], correctAnswer: 1, explanation: 'Takeoff thrust is typically limited to 5 minutes.' },
-            { id: 'q3', question: 'At 35,000 ft, thrust is approximately:', options: ['100%', '75%', '50%', '25%'], correctAnswer: 2, explanation: 'Thrust is roughly 50% of sea level value at 35,000 ft.' }
-          ]}
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'How is a Turboprop different from a Turbojet?', options: ['It uses diesel', 'It extracts energy to drive a shaft', 'It has no compressor', 'It is quieter'], correctAnswer: 1, explanation: 'A turboprop uses turbines to extract energy for a shaft/propeller rather than jet thrust.' },
+              { id: 'q2', question: 'What does the Reduction Gearbox do?', options: ['Increases RPM', 'Reduces RPM and increases Torque', 'Cools the engine', 'Mixes fuel'], correctAnswer: 1, explanation: 'It steps down the high turbine speed to a speed the propeller can handle.' },
+              { id: 'q3', question: 'Turboshafts are primarily used in:', options: ['Fighters', 'Gliders', 'Helicopters', 'Submarines'], correctAnswer: 2, explanation: 'Helicopters use turboshafts to drive the main rotor transmission.' }
+            ]
+          }
         },
         {
           id: 'engine-systems',
-          title: 'Engine Systems & Operation',
-          duration: '25 min', xp: 150,
-          description: 'Fuel, oil, starting, and control systems',
-          introduction: 'Jet engines require sophisticated support systems for reliable operation. Understanding these systems is crucial for safe flight.',
+          title: 'Engine Systems',
+          duration: '30 min',
+          xp: 150,
+          description: 'Fuel, oil, and FADEC control systems',
+          introduction: 'An engine is useless without fuel to burn, oil to lubricate, and a computer to tell it what to do.',
           sections: [
-            { title: 'Fuel System', content: '**Jet Fuel Types:**\n- Jet A: Commercial (freeze -40°C)\n- Jet A-1: International (-47°C)\n- JP-8: Military\n\n**Fuel System Components:**\n- Tanks (wing, center)\n- Boost pumps\n- Fuel heaters\n- Fuel control unit (FCU)\n\n**Fuel Flow:**\n- Cruise: 2,000-3,000 lb/hr per engine\n- Takeoff: 5,000-8,000 lb/hr' },
-            { title: 'Oil System', content: '**Functions:**\n- Lubrication\n- Cooling\n- Cleaning\n\n**Dry Sump System:**\n- Oil stored in tank\n- Pumped to bearings\n- Scavenged back to tank\n\n**Oil Consumption:**\n- Normal: 0.1-0.5 qt/hr\n- Monitored for trends\n\n**Temperature Limits:**\n- Max: ~150°C\n- Indicates bearing health' },
-            { title: 'Starting & Control', content: '**Starting Sequence:**\n1. Starter motor spins engine\n2. Ignition activated\n3. Fuel introduced\n4. Light-off occurs\n5. Engine accelerates to idle\n\n**FADEC:**\nFull Authority Digital Engine Control\n- Computer controls all parameters\n- Optimizes performance\n- Protects engine limits\n- Redundant channels' }
+            {
+              title: 'Fuel Systems',
+              content: `**Liquid Energy**\n- **Jet A/A-1:** Kerosene based. Higher flash point than gas (safer).\n- **Heaters:** Fuel is used to cool engine oil (Heat Exchanger). Warms fuel to prevent icing.\n- **Pumps:**\n  - **Boost Pumps:** In tanks (prevent cavitation/vapor lock).\n  - **Engine Driven Pump:** High pressure for injection.`
+            },
+            {
+              title: 'Oil Systems',
+              content: `**Lifeblood of the Engine**\n- **Functions:** Lubricate, Cool, Clean, Seal, Actuate (Prop governors).\n- **Dry Sump:** Oil is stored in a separate tank, not the oil pan. Allows inverted flight and better cooling.\n- **Chip Detectors:** Magnetic plugs that catch metal flakes (early warning of failure).`
+            },
+            {
+              title: 'FADEC',
+              content: `**Full Authority Digital Engine Control**\nThe computer is the boss.\n- **No Mechanical Link:** Throttle lever is just a sensor.\n- **Protection:** Prevents hot starts, over-speed, and compressor stalls.\n- **Efficiency:** Adjusts fuel flow 100s of times a second for optimal burn.\n- **Redundancy:** Dual channels (A and B). If both fail, the engine quits.`
+            }
           ],
-          keyTakeaways: ['Jet A is standard commercial fuel', 'Dry sump oil system with external tank', 'FADEC provides automatic engine control', 'Oil consumption trends indicate engine health'],
-          quiz: { questions: [
-            { id: 'q1', question: 'FADEC stands for:', options: ['Fast Acting Digital Engine Control', 'Full Authority Digital Engine Control', 'Fuel And Digital Engine Computer', 'Flight Automated Digital Engine Control'], correctAnswer: 1, explanation: 'FADEC = Full Authority Digital Engine Control.' },
-            { id: 'q2', question: 'Jet A freeze point:', options: ['-20°C', '-40°C', '-60°C', '-80°C'], correctAnswer: 1, explanation: 'Jet A freezes at -40°C (-40°F).' },
-            { id: 'q3', question: 'Normal oil consumption:', options: ['0 qt/hr', '0.1-0.5 qt/hr', '2-3 qt/hr', '5+ qt/hr'], correctAnswer: 1, explanation: 'Normal jet engine oil consumption is 0.1-0.5 quarts per hour.' }
-          ]}
+          keyTakeaways: [
+            'Jet A is kerosene-based and used for cooling oil',
+            'Dry sump oil systems allow for complex maneuvers',
+            'FADEC protects the engine and optimizes efficiency',
+            'Magnetic chip detectors warn of internal engine wear'
+          ],
+          quiz: {
+            questions: [
+              { id: 'q1', question: 'FADEC stands for:', options: ['Fast Acting Digital Engine Control', 'Full Authority Digital Engine Control', 'Fuel And Digital Engine Computer', 'Flight Automated Digital Engine Control'], correctAnswer: 1, explanation: 'Full Authority Digital Engine Control.' },
+              { id: 'q2', question: 'Why is a dry sump system used?', options: ['It uses no oil', 'To store oil separately for better cooling/inverted flight', 'It is cheaper', 'It weighs less'], correctAnswer: 1, explanation: 'Dry sumps ensure oil supply during maneuvers where gravity might starve a wet sump.' },
+              { id: 'q3', question: 'What is the purpose of a Fuel-Oil Heat Exchanger?', options: ['Cool fuel, heat oil', 'Heat fuel, cool oil', 'Mix them together', 'Filter the fuel'], correctAnswer: 1, explanation: 'It cools the hot engine oil while heating the cold fuel (preventing ice).' }
+            ]
+          }
         }
       ]
     }

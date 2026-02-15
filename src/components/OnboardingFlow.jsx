@@ -76,8 +76,8 @@ export default function OnboardingFlow({ onComplete }) {
     const score = calculateScore();
     if (score <= 1) return {
       title: 'Foundation Builder',
-      desc: 'We recommend starting with our "Beginner Tech" track to master the core principles.',
-      path: '/learn/beginner'
+      desc: 'We recommend starting with our "Rocket Engineering" track to master the core principles.',
+      path: '/learn/rockets'
     };
     if (score <= 3) return {
       title: 'Engineering Explorer',
