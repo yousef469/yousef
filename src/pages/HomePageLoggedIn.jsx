@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, Globe, Briefcase, Maximize2, Crown } from 'lucide-react';
+import { Rocket, Plane, Car, Sparkles, ArrowLeftRight, Users as UsersIcon, Lock, Globe, Briefcase, Maximize2, Crown, MessageSquare, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
@@ -15,6 +15,9 @@ import StreakCounter from '../components/StreakCounter';
 import CelebrationOverlay from '../components/CelebrationOverlay';
 import StoryPlayer from '../components/StoryPlayer';
 import stories from '../data/storiesData';
+import DailyChallenge from '../components/DailyChallenge';
+import WeeklyChallenge from '../components/WeeklyChallenge';
+import SRSReviewCard from '../components/SRSReviewCard';
 
 const HomePageLoggedIn = () => {
   const navigate = useNavigate();
