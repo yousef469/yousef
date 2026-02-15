@@ -2,8 +2,7 @@
 
 > Master engineering through interactive 3D models, AI-powered tutoring, gamified learning, and real-world projects
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://engineerium.vercel.app)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://engineeruim-p8ti.vercel.app/)
 [![React](https://img.shields.io/badge/React-18.x-61DAFB)](https://reactjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E)](https://supabase.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini-AI%20Powered-4285F4)](https://ai.google.dev/)
@@ -13,6 +12,7 @@
 ## 📚 Table of Contents
 
 - [Platform Overview](#-platform-overview)
+- [Project Vision & Impact](#-project-vision--impact)
 - [Complete Feature List](#-complete-feature-list)
 - [Learning Tracks](#-learning-tracks-5-disciplines)
 - [Authentication & Security](#-authentication--security)
@@ -43,6 +43,25 @@ Engineerium is a comprehensive STEM education platform that combines:
 - **Community Features** for collaborative learning
 - **Career Projects** for portfolio building
 - **25+ Engineering Calculators** and 200+ formulas
+
+---
+
+## 🎯 Project Vision & Impact
+
+### The "Why": The Reason for Creation
+Engineerium was created to bridge the massive gap between **dense theoretical math/physics** and **real-world engineering**. Traditional textbooks are static; Engineerium was built to make engineering "alive," allowing students to interact with the same formulas (like the Tsiolkovsky Rocket Equation) used at NASA and SpaceX in a visual, low-risk environment.
+
+### 📈 Evolution and Improvements
+The project has evolved from a simple model viewer into a **comprehensive career-ready curriculum**:
+- **Foundation Depth**: Curriculum sections like `Unit 0: Foundations` include **MIT-quality content** covering Vectors, Newton’s Laws, and Thermodynamics.
+- **Technical Fidelity**: 3D models moved from simple shapes to **high-fidelity components** (like the Falcon 9 Octaweb and Merlin Engines) with dedicated "JARVIS" modes that analyze parts in real-time.
+- **AI Integration**: The tutoring system moved from simple chat to **EnGo Tutor**, which is context-aware—meaning it knows exactly which lesson you are on and can explain complex derivations step-by-step.
+
+### 🎓 How It Transforms Student Learning
+1.  **Visual Intuition**: Instead of just reading "Thrust = Force," students see the vectors acting on a 3D car or rocket. The **Explode View** lets them see the "guts" of an engine, building spatial awareness.
+2.  **Instant Feedback**: Every lesson contains a **5-question quiz** with immediate explanations. This "micro-learning" prevents knowledge gaps from forming.
+3.  **Variable Complexity**: It starts with "Beginner Units" (Foundations) and scales all the way to **Capstone Projects**, allowing a student to grow from a hobbyist to a career-ready engineer.
+4.  **The EnGo Safety Net**: If a student is stuck on a formula like `F_net = √(F_net,x² + F_net,y²)`, they can ask the AI tutor to "Explain this like I'm 10" or "Show me the advanced derivation."
 
 ---
 
@@ -845,15 +864,9 @@ Run SQL scripts from `SETUP_DATABASE.md` in Supabase.
 
 ---
 
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file.
-
----
-
 ## 🔗 Links
 
-- **Live Demo**: [engineerium.vercel.app](https://engineerium.vercel.app)
+- **Live Demo**: [engineeruim-p8ti.vercel.app](https://engineeruim-p8ti.vercel.app/)
 - **GitHub**: [github.com/yousef469/Engineeruim](https://github.com/yousef469/Engineeruim)
 - **Contact**: youseflovemessi@gmail.com
 

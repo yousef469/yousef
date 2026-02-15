@@ -14,8 +14,8 @@ const userInfo = new Map(); // socketId -> {userId, userName}
 
 // Health check endpoints for deployment platforms
 app.get('/', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     service: 'Engineerium WebRTC Signaling Server',
     timestamp: new Date().toISOString(),
     activeSessions: sessions.size
@@ -68,20 +68,76 @@ app.post('/api/gemini/text', async (req, res) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ Gemini API Error:', response.status, errorText);
-      return res.status(response.status).json({ 
+      return res.status(response.status).json({
         error: `Gemini API Failed: ${response.status}`,
-        details: errorText 
+        details: errorText
       });
     }
 
     const data = await response.json();
-    
+
     // Return the full response structure that frontend expects
     console.log('✅ Engo Bot response sent');
     return res.json(data);
 
   } catch (error) {
     console.error('❌ Text API Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Gemini Vision API (for 3D analysis / screenshots)
+app.post('/api/gemini/vision', async (req, res) => {
+  try {
+    const { prompt, images, maxTokens = 1024 } = req.body;
+
+    if (!prompt || !images || !images.length) {
+      return res.status(400).json({ error: 'Missing prompt or images' });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'API key not configured on server' });
+    }
+
+    console.log(`👁️ Gemini Vision request: ${images.length} images`);
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [
+              { text: prompt },
+              ...images.map(img => ({
+                inlineData: {
+                  mimeType: img.mime_type,
+                  data: img.data
+                }
+              }))
+            ]
+          }],
+          generationConfig: {
+            maxOutputTokens: maxTokens,
+            temperature: 0.4
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ error: errorText });
+    }
+
+    const data = await response.json();
+    return res.json(data);
+
+  } catch (error) {
+    console.error('❌ Vision API Error:', error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -119,7 +175,7 @@ app.post('/api/tts', async (req, res) => {
     }
 
     const data = await response.json();
-    
+
     if (!data.data) {
       throw new Error('No audio data');
     }
@@ -148,7 +204,7 @@ const io = new Server(server, {
     origin: [
       'https://engineeruim.vercel.app',
       'https://engineeruim-eight.vercel.app',
-      'https://www.engineeruim.com', 
+      'https://www.engineeruim.com',
       'https://engineerium.vercel.app',
       'http://localhost:3000',
       /\.vercel\.app$/ // Allow all Vercel preview deployments
@@ -164,10 +220,10 @@ io.on('connection', (socket) => {
   // Join a session
   socket.on('join-session', ({ sessionId, userId, userName }) => {
     socket.join(sessionId);
-    
+
     // Store user info
     userInfo.set(socket.id, { userId, userName });
-    
+
     if (!sessions.has(sessionId)) {
       sessions.set(sessionId, new Set());
     }
@@ -210,16 +266,16 @@ io.on('connection', (socket) => {
   // Disconnect
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    
+
     // Remove user info
     userInfo.delete(socket.id);
-    
+
     // Remove from all sessions
     sessions.forEach((users, sessionId) => {
       if (users.has(socket.id)) {
         users.delete(socket.id);
         socket.to(sessionId).emit('user-left', socket.id);
-        
+
         // Clean up empty sessions
         if (users.size === 0) {
           sessions.delete(sessionId);

@@ -33,7 +33,7 @@ export const initErrorTracking = () => {
 export const logError = (errorData) => {
   try {
     const errors = JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]');
-    
+
     const errorEntry = {
       ...errorData,
       timestamp: new Date().toISOString(),
@@ -43,14 +43,14 @@ export const logError = (errorData) => {
     };
 
     errors.unshift(errorEntry);
-    
+
     // Keep only last MAX_ERRORS
     if (errors.length > MAX_ERRORS) {
       errors.length = MAX_ERRORS;
     }
 
     localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(errors));
-    
+
     // Send to backend if available
     sendErrorToBackend(errorEntry);
   } catch (e) {
@@ -68,7 +68,7 @@ const sendErrorToBackend = async (errorEntry) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(errorEntry),
-    }).catch(() => {}); // Silently fail
+    }).catch(() => { }); // Silently fail
   } catch (e) {
     // Silently fail - don't want error tracking to cause errors
   }
@@ -107,7 +107,7 @@ export const trackComponentError = (componentName, error) => {
   });
 };
 
-export const trackUserAction = (action, details = {}) => {
+export const trackUserAction = () => {
   // Track user actions silently
 };
 

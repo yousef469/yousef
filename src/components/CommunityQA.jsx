@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { MessageCircle, ThumbsUp, ThumbsDown, Send, User, Clock, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { askGemini } from '../services/gemini';
+import { supabase } from '../services/supabase';
 
 export default function CommunityQA({ modelId, lessonId }) {
   const { user } = useAuth();
@@ -11,58 +10,59 @@ export default function CommunityQA({ modelId, lessonId }) {
   const [replyText, setReplyText] = useState('');
   const [sortBy, setSortBy] = useState('popular'); // popular, recent
 
-  // Mock data - replace with Supabase queries
+  // Fetch questions from Supabase
   useEffect(() => {
-    // TODO: Fetch from Supabase
-    const mockQuestions = [
-      {
-        id: 1,
-        user: { name: 'Alex Chen', avatar: '👨‍🚀' },
-        question: 'Why does the rocket need multiple stages?',
-        answer: 'Multiple stages allow the rocket to drop empty fuel tanks, reducing mass and increasing efficiency. This is based on the Tsiolkovsky rocket equation!',
-        upvotes: 24,
-        downvotes: 2,
-        replies: 3,
-        timestamp: '2 hours ago',
-        hasUpvoted: false,
-        hasDownvoted: false
-      },
-      {
-        id: 2,
-        user: { name: 'Sarah Johnson', avatar: '👩‍🔬' },
-        question: 'How does thrust vectoring work exactly?',
-        answer: 'Thrust vectoring uses gimbals to tilt the engine nozzle, changing the direction of thrust. This creates a moment that rotates the rocket.',
-        upvotes: 18,
-        downvotes: 1,
-        replies: 5,
-        timestamp: '5 hours ago',
-        hasUpvoted: false,
-        hasDownvoted: false
-      },
-      {
-        id: 3,
-        user: { name: 'Mike Rodriguez', avatar: '🧑‍💻' },
-        question: 'What fuel does the Falcon 9 use?',
-        answer: 'Falcon 9 uses RP-1 (refined kerosene) and liquid oxygen (LOX). This combination provides good performance and is relatively easy to handle.',
-        upvotes: 31,
-        downvotes: 0,
-        replies: 2,
-        timestamp: '1 day ago',
-        hasUpvoted: true,
-        hasDownvoted: false
-      }
-    ];
+    const fetchQuestions = async () => {
+      try {
+        let query = supabase
+          .from('community_posts')
+          .select(`
+            *,
+            user:user_id (
+              email,
+              user_metadata
+            )
+          `);
 
-    // Sort questions
-    const sorted = [...mockQuestions].sort((a, b) => {
-      if (sortBy === 'popular') {
-        return (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes);
-      } else {
-        return b.id - a.id; // Newer first
-      }
-    });
+        // Filter based on modelId or lessonId context if possible
+        // For now, we filter by category/subject if applicable
+        if (modelId || lessonId) {
+          // You might want to add specific columns for these
+        }
 
-    setQuestions(sorted);
+        if (sortBy === 'popular') {
+          query = query.order('upvotes', { ascending: false });
+        } else {
+          query = query.order('created_at', { ascending: false });
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Transform data to match component expectations
+        const transformed = data.map(q => ({
+          id: q.id,
+          user: {
+            name: q.user?.user_metadata?.full_name || q.user?.email?.split('@')[0] || 'Anonymous',
+            avatar: q.user?.user_metadata?.avatar_url || '👤'
+          },
+          question: q.title + (q.content ? ': ' + q.content : ''),
+          answer: q.is_solved ? 'Answered' : null, // Simplification
+          upvotes: q.upvotes || 0,
+          downvotes: q.downvotes || 0,
+          replies: 0, // Would need another Join/Query
+          timestamp: new Date(q.created_at).toLocaleDateString(),
+          hasUpvoted: false,
+          hasDownvoted: false
+        }));
+
+        setQuestions(transformed);
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+      }
+    };
+
+    fetchQuestions();
   }, [sortBy, modelId, lessonId]);
 
   const handleAskQuestion = async () => {
@@ -88,33 +88,39 @@ export default function CommunityQA({ modelId, lessonId }) {
 
     setQuestions([question, ...questions]);
 
-    // Get AI response automatically
+    // Save to Supabase
     try {
-      const result = await askGemini(questionText, []);
-      
-      // Update question with AI answer
-      setQuestions(prev => prev.map(q => 
-        q.id === question.id 
-          ? { 
-              ...q, 
-              aiAnswer: { loading: false, content: result.response },
-              answer: result.response // Set as the answer
-            }
-          : q
-      ));
-    } catch (error) {
-      console.error('AI response error:', error);
-      setQuestions(prev => prev.map(q => 
-        q.id === question.id 
-          ? { 
-              ...q, 
-              aiAnswer: { loading: false, content: null }
-            }
-          : q
-      ));
-    }
+      const { data, error } = await supabase
+        .from('community_posts')
+        .insert([{
+          user_id: user.id,
+          title: questionText,
+          content: '',
+          category: 'question',
+          subject: modelId || 'general'
+        }])
+        .select()
+        .single();
 
-    // TODO: Save to Supabase
+      if (error) throw error;
+
+      // Get AI response automatically
+      const result = await askGemini(questionText, []);
+
+      // Update local state and (optionally) Supabase with AI answer
+      setQuestions(prev => prev.map(q =>
+        q.id === question.id
+          ? {
+            ...q,
+            id: data.id, // Update with real ID
+            aiAnswer: { loading: false, content: result.response },
+            answer: result.response
+          }
+          : q
+      ));
+    } catch (err) {
+      console.error('Error saving question:', err);
+    }
   };
 
   const handleVote = (questionId, voteType) => {
@@ -123,7 +129,7 @@ export default function CommunityQA({ modelId, lessonId }) {
     setQuestions(questions.map(q => {
       if (q.id === questionId) {
         const newQ = { ...q };
-        
+
         if (voteType === 'up') {
           if (q.hasUpvoted) {
             newQ.upvotes--;
@@ -149,7 +155,7 @@ export default function CommunityQA({ modelId, lessonId }) {
             }
           }
         }
-        
+
         return newQ;
       }
       return q;
@@ -266,11 +272,10 @@ export default function CommunityQA({ modelId, lessonId }) {
               <button
                 onClick={() => handleVote(q.id, 'up')}
                 disabled={!user}
-                className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
-                  q.hasUpvoted
+                className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${q.hasUpvoted
                     ? 'bg-green-500/20 text-green-400'
                     : 'hover:bg-gray-800 text-gray-400'
-                } disabled:cursor-not-allowed`}
+                  } disabled:cursor-not-allowed`}
               >
                 <ThumbsUp className="w-4 h-4" />
                 <span className="text-sm font-semibold">{q.upvotes}</span>
@@ -280,11 +285,10 @@ export default function CommunityQA({ modelId, lessonId }) {
               <button
                 onClick={() => handleVote(q.id, 'down')}
                 disabled={!user}
-                className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
-                  q.hasDownvoted
+                className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${q.hasDownvoted
                     ? 'bg-red-500/20 text-red-400'
                     : 'hover:bg-gray-800 text-gray-400'
-                } disabled:cursor-not-allowed`}
+                  } disabled:cursor-not-allowed`}
               >
                 <ThumbsDown className="w-4 h-4" />
                 <span className="text-sm font-semibold">{q.downvotes}</span>

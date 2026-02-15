@@ -1,9 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ptwjvfuwwjpfcivlqjxo.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0d2p2ZnV3d2pwZmNpdmxxanhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNjg5OTUsImV4cCI6MjA3NjY0NDk5NX0.XZMuH_2Vb7bqlpTT7AF0gi3aaf2Whs0On-QDaV8vBL0';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables. Please check your .env file.');
+}
+
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -57,7 +61,7 @@ export const onAuthStateChange = (callback) => {
 export const signInWithGoogle = async () => {
   // Redirect to auth callback page to handle the token
   const redirectUrl = `${window.location.origin}/auth/callback`;
-  
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -167,7 +171,7 @@ export const getUserProfile = async (userId) => {
     .select('*')
     .eq('user_id', userId)
     .single();
-  
+
   // If profile doesn't exist, create it
   if (error && error.code === 'PGRST116') {
     const { data: newProfile, error: createError } = await supabase
@@ -182,77 +186,77 @@ export const getUserProfile = async (userId) => {
       .single();
     return { data: newProfile, error: createError };
   }
-  
+
   return { data, error };
 };
 
 export const addXP = async (userId, xpAmount, lessonId, subject) => {
   // Get current profile
   const { data: profile, error: profileError } = await getUserProfile(userId);
-  
+
   if (profileError) {
     return { error: profileError };
   }
-  
+
   if (!profile) {
     return { error: 'Profile not found' };
   }
-  
+
   const newXP = (profile.total_xp || 0) + xpAmount;
   const newLevel = Math.floor(newXP / 1000) + 1; // Level up every 1000 XP
-  
+
   // Add lesson to completed list if not already there
   const completedLessons = profile.completed_lessons || [];
   const lessonKey = `${subject}-${lessonId}`;
   if (!completedLessons.includes(lessonKey)) {
     completedLessons.push(lessonKey);
   }
-  
+
   const updateData = {
     total_xp: newXP,
     level: newLevel,
     completed_lessons: completedLessons,
     updated_at: new Date().toISOString()
   };
-  
+
   const { data, error } = await supabase
     .from('user_profiles')
     .update(updateData)
     .eq('user_id', userId)
     .select()
     .single();
-  
+
   return { data, error, leveledUp: newLevel > profile.level };
 };
 
 // Award XP for various activities
-export const awardXP = async (userId, xpAmount, activityType = 'general', activityId = null) => {
+export const awardXP = async (userId, xpAmount) => {
   const { data: profile, error: profileError } = await getUserProfile(userId);
-  
+
   if (profileError || !profile) {
     return { error: profileError || 'Profile not found' };
   }
-  
+
   const newXP = (profile.total_xp || 0) + xpAmount;
   const oldLevel = profile.level || 1;
   const newLevel = Math.floor(newXP / 1000) + 1; // 1000 XP per level
-  
+
   const updateData = {
     total_xp: newXP,
     level: newLevel,
     updated_at: new Date().toISOString()
   };
-  
+
   const { data, error } = await supabase
     .from('user_profiles')
     .update(updateData)
     .eq('user_id', userId)
     .select()
     .single();
-  
-  return { 
-    data, 
-    error, 
+
+  return {
+    data,
+    error,
     leveledUp: newLevel > oldLevel,
     xpAwarded: xpAmount,
     newXP,
@@ -269,14 +273,14 @@ export const awardDailyStreakXP = (userId) => awardXP(userId, 25, 'daily_streak'
 export const getCompletedLessons = async (userId, subject) => {
   try {
     const { data: profile } = await getUserProfile(userId);
-    
+
     if (!profile) return { data: [], error: null };
-    
+
     const completedLessons = profile.completed_lessons || [];
     const subjectLessons = completedLessons
       .filter(lesson => lesson.startsWith(`${subject}-`))
       .map(lesson => parseInt(lesson.split('-')[1]));
-    
+
     return { data: subjectLessons, error: null };
   } catch (error) {
     return { data: [], error };
@@ -286,16 +290,16 @@ export const getCompletedLessons = async (userId, subject) => {
 export const isLessonUnlocked = async (userId, subject, lessonId) => {
   // Convert to number to ensure proper comparison
   const lessonNum = parseInt(lessonId);
-  
+
   // First lesson is ALWAYS unlocked, no matter what
   if (lessonNum === 1) return { unlocked: true };
-  
+
   try {
     const { data: completedLessons } = await getCompletedLessons(userId, subject);
-    
+
     // Check if previous lesson is completed
     const previousLessonCompleted = completedLessons && completedLessons.includes(lessonNum - 1);
-    
+
     return { unlocked: previousLessonCompleted };
   } catch (error) {
     // On error, only unlock lesson 1
@@ -381,7 +385,7 @@ export const getBookUrl = (filename) => {
   const { data } = supabase.storage
     .from('books')
     .getPublicUrl(filename);
-  
+
   return data.publicUrl;
 };
 
@@ -389,6 +393,6 @@ export const listBooks = async () => {
   const { data, error } = await supabase.storage
     .from('books')
     .list();
-  
+
   return { data, error };
 };

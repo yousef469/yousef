@@ -4,35 +4,57 @@ const API_BASE = BACKEND_URL ? `${BACKEND_URL}/api/gemini` : '/api/gemini';
 
 // Backend API call
 const callGeminiAPI = async (prompt, retries = 4) => {
-  
-  try {
-    const response = await fetch(`${API_BASE}/text`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        maxTokens: 512,
-        retries
-      })
-    });
+  const response = await fetch(`${API_BASE}/text`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prompt,
+      maxTokens: 512,
+      retries
+    })
+  });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || `Backend error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) {
-      throw new Error('No text in response');
-    }
-
-    return text;
-
-  } catch (error) {
-    throw error;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || `Backend error: ${response.status}`);
   }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return text;
+};
+
+// Vision API call
+const callGeminiVision = async (prompt, images, retries = 4) => {
+  const response = await fetch(`${API_BASE}/vision`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prompt,
+      images,
+      maxTokens: 1024,
+      retries
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || `Backend error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return text;
 };
 
 export const generateResponse = async (prompt, options = {}) => {
@@ -45,17 +67,17 @@ export const generateResponse = async (prompt, options = {}) => {
         data: options.inline_data.data
       }]);
     }
-    
+
     // Text-only request
     const context = typeof options === 'string' ? options : '';
-    const fullPrompt = context 
+    const fullPrompt = context
       ? `Context: ${context}\n\nQuestion: ${prompt}\n\nProvide a detailed, practical engineering explanation with examples.`
       : `${prompt}\n\nProvide a detailed, practical engineering explanation with examples.`;
 
     const response = await callGeminiAPI(fullPrompt);
     return response;
   } catch (error) {
-    
+
     if (error.message?.includes('404')) {
       return `**API Configuration Issue**
 
@@ -68,7 +90,7 @@ Your API key doesn't have access to the Gemini models. Please:
 
 Current error: ${error.message}`;
     }
-    
+
     if (error.message?.includes('429') || error.message?.includes('quota')) {
       return `**Rate Limit Exceeded**
 
@@ -83,7 +105,7 @@ The AI service has reached its usage limit. This happens when:
 
 The free tier allows 15 requests per minute. Please try again shortly.`;
     }
-    
+
     return `**Temporary Error**
 
 ${error.message}
@@ -176,7 +198,7 @@ export const generateLesson = async (topic, difficulty = 'beginner') => {
 6. **Try This** - 2-3 practice problems
 
 Make it engaging with specific examples and numbers.`;
-  
+
   return await generateResponse(prompt);
 };
 
@@ -201,7 +223,7 @@ Cover:
 - Real-world impact
 
 Use specific examples and data.`;
-  
+
   return await generateResponse(prompt);
 };
 
