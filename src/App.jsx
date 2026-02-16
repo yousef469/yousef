@@ -32,6 +32,7 @@ const CivilLessonPage = lazy(() => import('./pages/CivilLessonPage'));
 
 const PlaneQuizPage = lazy(() => import('./pages/PlaneQuizPage'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
+const SimLabPage = lazy(() => import('./pages/SimLabPage'));
 const AuthCallback = lazy(() => import('./pages/auth/callback'));
 
 // ==================== 3D VIEWER COMPONENT ====================
@@ -1084,7 +1085,6 @@ const ExplodeViewPage = lazy(() => import('./pages/ExplodeViewPage'));
 const EngineeringToolboxPage = lazy(() => import('./pages/EngineeringToolboxPage'));
 const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const CareerProjectsPage = lazy(() => import('./pages/CareerProjectsPage'));
-const InternshipSimulatorPage = lazy(() => import('./pages/InternshipSimulatorPage'));
 const RocketNozzleProject = lazy(() => import('./pages/projects/RocketNozzleProject'));
 const SolarPanelProject = lazy(() => import('./pages/projects/SolarPanelProject'));
 const RoboticArmProject = lazy(() => import('./pages/projects/RoboticArmProject'));
@@ -1143,7 +1143,7 @@ export default function App() {
             <Route path="/toolbox" element={<ProtectedRoute><EngineeringToolboxPage /></ProtectedRoute>} />
             <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
             <Route path="/career-projects" element={<ProtectedRoute><CareerProjectsPage /></ProtectedRoute>} />
-            <Route path="/internship" element={<ProtectedRoute><InternshipSimulatorPage /></ProtectedRoute>} />
+            <Route path="/sim-lab" element={<ProtectedRoute><SimLabPage /></ProtectedRoute>} />
             <Route path="/projects/rocket-nozzle" element={<ProtectedRoute><RocketNozzleProject /></ProtectedRoute>} />
             <Route path="/projects/solar-panel-system" element={<ProtectedRoute><SolarPanelProject /></ProtectedRoute>} />
             <Route path="/projects/robotic-arm" element={<ProtectedRoute><RoboticArmProject /></ProtectedRoute>} />

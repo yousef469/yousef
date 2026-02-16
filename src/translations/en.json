@@ -189,10 +189,10 @@
         "desc": "Build portfolio-worthy engineering projects",
         "button": "Start Building"
       },
-      "internship": {
-        "title": "Internship Simulator",
-        "desc": "Real engineering tasks from SpaceX, Tesla & more",
-        "button": "Start Internship"
+      "physicsLab": {
+        "title": "3D SimLab & CAD",
+        "desc": "Build, customize, and simulate your own 3D engineering models",
+        "button": "Enter SimLab"
       },
       "homework": {
         "title": "AI Homework Solver",
